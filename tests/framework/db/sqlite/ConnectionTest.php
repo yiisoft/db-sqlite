@@ -1,9 +1,9 @@
 <?php
+
 namespace yiiunit\framework\db\sqlite;
 
 use yii\db\Connection;
 use yii\db\Transaction;
-use yiiunit\framework\db\ConnectionTest;
 use yiiunit\data\ar\ActiveRecord;
 use yiiunit\data\ar\Customer;
 
@@ -11,7 +11,7 @@ use yiiunit\data\ar\Customer;
  * @group db
  * @group sqlite
  */
-class SqliteConnectionTest extends ConnectionTest
+class ConnectionTest extends \yiiunit\framework\db\ConnectionTest
 {
     protected $driverName = 'sqlite';
 

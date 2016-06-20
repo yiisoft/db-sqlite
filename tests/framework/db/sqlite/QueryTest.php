@@ -2,13 +2,12 @@
 namespace yiiunit\framework\db\sqlite;
 
 use yii\db\Query;
-use yiiunit\framework\db\QueryTest;
 
 /**
  * @group db
  * @group sqlite
  */
-class SqliteQueryTest extends QueryTest
+class QueryTest extends \yiiunit\framework\db\QueryTest
 {
     protected $driverName = 'sqlite';
 

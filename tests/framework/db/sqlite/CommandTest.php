@@ -1,13 +1,12 @@
 <?php
-namespace yiiunit\framework\db\sqlite;
 
-use yiiunit\framework\db\CommandTest;
+namespace yiiunit\framework\db\sqlite;
 
 /**
  * @group db
  * @group sqlite
  */
-class SqliteCommandTest extends CommandTest
+class CommandTest extends \yiiunit\framework\db\CommandTest
 {
     protected $driverName = 'sqlite';
 
