@@ -7,7 +7,7 @@
 
 namespace yii\db\sqlite;
 
-use yii\base\NotSupportedException;
+use yii\exceptions\NotSupportedException;
 use yii\db\CheckConstraint;
 use yii\db\ColumnSchema;
 use yii\db\Constraint;

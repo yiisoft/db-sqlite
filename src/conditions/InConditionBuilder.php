@@ -7,7 +7,7 @@
 
 namespace yii\db\sqlite\conditions;
 
-use yii\base\NotSupportedException;
+use yii\exceptions\NotSupportedException;
 
 /**
  * {@inheritdoc}

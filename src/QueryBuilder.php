@@ -7,8 +7,8 @@
 
 namespace yii\db\sqlite;
 
-use yii\base\InvalidArgumentException;
-use yii\base\NotSupportedException;
+use yii\exceptions\InvalidArgumentException;
+use yii\exceptions\NotSupportedException;
 use yii\db\Connection;
 use yii\db\Constraint;
 use yii\db\Expression;
