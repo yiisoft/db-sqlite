@@ -5,18 +5,18 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\db\sqlite;
+namespace yii\db\sqlite\tests\unit;
 
 use yii\db\Connection;
 use yii\db\Transaction;
-use yiiunit\data\ar\ActiveRecord;
-use yiiunit\data\ar\Customer;
+use yii\tests\data\ar\ActiveRecord;
+use yii\tests\data\ar\Customer;
 
 /**
  * @group db
  * @group sqlite
  */
-class ConnectionTest extends \yiiunit\framework\db\ConnectionTest
+class ConnectionTest extends \yii\db\tests\unit\ConnectionTest
 {
     protected $driverName = 'sqlite';
 
@@ -176,7 +176,7 @@ class ConnectionTest extends \yiiunit\framework\db\ConnectionTest
     {
         $databases = self::getParam('databases');
         $fixture = $databases[$this->driverName]['fixture'];
-        $basePath = \Yii::getAlias('@yiiunit/runtime');
+        $basePath = \Yii::getAlias('@yii/tests/runtime');
 
         $config = [
             '__class' => \yii\db\Connection::class,
@@ -204,7 +204,7 @@ class ConnectionTest extends \yiiunit\framework\db\ConnectionTest
     public function testAliasDbPath()
     {
         $config = [
-            'dsn' => 'sqlite:@yiiunit/runtime/yii2aliastest.sq3',
+            'dsn' => 'sqlite:@yii/tests/runtime/yii2aliastest.sq3',
         ];
         $connection = new Connection($config);
         $connection->open();

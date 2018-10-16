@@ -5,17 +5,17 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\db\sqlite;
+namespace yii\db\sqlite\tests\unit;
 
 use yii\db\Query;
 use yii\db\Schema;
-use yiiunit\data\base\TraversableObject;
+use yii\tests\data\base\TraversableObject;
 
 /**
  * @group db
  * @group sqlite
  */
-class QueryBuilderTest extends \yiiunit\framework\db\QueryBuilderTest
+class QueryBuilderTest extends \yii\db\tests\unit\QueryBuilderTest
 {
     protected $driverName = 'sqlite';
 

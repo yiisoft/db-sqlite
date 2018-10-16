@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\db\sqlite;
+namespace yii\db\sqlite\tests\unit;
 
 use yii\db\Schema;
 use yii\db\sqlite\ColumnSchemaBuilder;
@@ -15,7 +15,7 @@ use yii\db\sqlite\ColumnSchemaBuilder;
  * @group db
  * @group sqlite
  */
-class ColumnSchemaBuilderTest extends \yiiunit\framework\db\ColumnSchemaBuilderTest
+class ColumnSchemaBuilderTest extends \yii\db\tests\unit\ColumnSchemaBuilderTest
 {
     public $driverName = 'sqlite';
 

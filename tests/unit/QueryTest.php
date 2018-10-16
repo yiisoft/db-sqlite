@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\db\sqlite;
+namespace yii\db\sqlite\tests\unit;
 
 use yii\db\Query;
 
@@ -13,7 +13,7 @@ use yii\db\Query;
  * @group db
  * @group sqlite
  */
-class QueryTest extends \yiiunit\framework\db\QueryTest
+class QueryTest extends \yii\db\tests\unit\QueryTest
 {
     protected $driverName = 'sqlite';
 

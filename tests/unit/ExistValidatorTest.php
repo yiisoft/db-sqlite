@@ -5,14 +5,14 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\db\sqlite;
+namespace yii\db\sqlite\tests\unit;
 
 /**
  * @group db
  * @group sqlite
  * @group validators
  */
-class ExistValidatorTest extends \yiiunit\framework\validators\ExistValidatorTest
+class ExistValidatorTest extends \yii\db\tests\unit\validators\ExistValidatorTest
 {
     public $driverName = 'sqlite';
 }

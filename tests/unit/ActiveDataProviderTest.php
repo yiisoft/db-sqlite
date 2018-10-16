@@ -5,14 +5,14 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\db\sqlite;
+namespace yii\db\sqlite\tests\unit;
 
 /**
  * @group db
  * @group sqlite
  * @group data
  */
-class ActiveDataProviderTest extends \yiiunit\framework\data\ActiveDataProviderTest
+class ActiveDataProviderTest extends \yii\activerecord\tests\unit\ActiveDataProviderTest
 {
     public $driverName = 'sqlite';
 }

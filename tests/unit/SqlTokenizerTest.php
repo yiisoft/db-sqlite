@@ -5,11 +5,11 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\db\sqlite;
+namespace yii\db\sqlite\tests\unit;
 
 use yii\db\sqlite\SqlTokenizer;
 use yii\db\SqlToken;
-use yiiunit\TestCase;
+use yii\tests\TestCase;
 
 /**
  * @group db

@@ -5,13 +5,13 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\db\sqlite;
+namespace yii\db\sqlite\tests\unit;
 
 /**
  * @group db
  * @group sqlite
  */
-class BatchQueryResultTest extends \yiiunit\framework\db\BatchQueryResultTest
+class BatchQueryResultTest extends \yii\db\tests\unit\BatchQueryResultTest
 {
     public $driverName = 'sqlite';
 }
