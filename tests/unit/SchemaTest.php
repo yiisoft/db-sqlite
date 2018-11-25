@@ -73,6 +73,12 @@ class SchemaTest extends \yii\db\tests\unit\SchemaTest
 
         $result['4: primary key'][2]->name = null;
         $result['4: unique'][2][0]->name = AnyValue::getInstance();
+        
+        $result['5: primary key'] = ['T_upsert', 'primaryKey', new Constraint([
+            'name' => AnyValue::getInstance(),
+            'columnNames' => ['id'],
+        ])];
+        
         return $result;
     }
 }
