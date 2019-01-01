@@ -11,6 +11,7 @@ use yii\db\Connection;
 use yii\db\Transaction;
 use yii\tests\data\ar\ActiveRecord;
 use yii\tests\data\ar\Customer;
+use yii\helpers\Yii;
 
 /**
  * @group db
@@ -176,7 +177,7 @@ class ConnectionTest extends \yii\db\tests\unit\ConnectionTest
     {
         $databases = self::getParam('databases');
         $fixture = $databases[$this->driverName]['fixture'];
-        $basePath = \Yii::getAlias('@yii/tests/runtime');
+        $basePath = Yii::getAlias('@yii/tests/runtime');
 
         $config = [
             '__class' => \yii\db\Connection::class,
@@ -198,7 +199,7 @@ class ConnectionTest extends \yii\db\tests\unit\ConnectionTest
             $config['slaves'][] = $slave;
         }
 
-        return \Yii::createObject($config);
+        return Yii::createObject($config);
     }
 
     public function testAliasDbPath()
