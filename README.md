@@ -18,4 +18,4 @@ It is used in [Yii Framework] but is supposed to be usable separately.
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/db-sqlite/v/stable.png)](https://packagist.org/packages/yiisoft/db-sqlite)
 [![Total Downloads](https://poser.pugx.org/yiisoft/db-sqlite/downloads.png)](https://packagist.org/packages/yiisoft/db-sqlite)
-[![Build Status](https://travis-ci.org/yiisoft/db-sqlite.svg?branch=master)](https://travis-ci.org/yiisoft/db-sqlite)
+[![Build Status](https://travis-ci.com/yiisoft/db-sqlite.svg?branch=master)](https://travis-ci.com/yiisoft/db-sqlite)
