@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -39,6 +40,7 @@ class SchemaTest extends \yii\db\tests\unit\SchemaTest
         $columns['bool_col2']['type'] = 'boolean';
         $columns['bool_col2']['phpType'] = 'boolean';
         $columns['bool_col2']['defaultValue'] = true;
+
         return $columns;
     }
 
@@ -73,12 +75,12 @@ class SchemaTest extends \yii\db\tests\unit\SchemaTest
 
         $result['4: primary key'][2]->name = null;
         $result['4: unique'][2][0]->name = AnyValue::getInstance();
-        
+
         $result['5: primary key'] = ['T_upsert', 'primaryKey', new Constraint([
-            'name' => AnyValue::getInstance(),
+            'name'        => AnyValue::getInstance(),
             'columnNames' => ['id'],
         ])];
-        
+
         return $result;
     }
 }

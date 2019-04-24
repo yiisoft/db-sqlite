@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -16,6 +17,7 @@ use Yiisoft\Strings\StringHelper;
  * {@inheritdoc}
  *
  * @author Sergey Makinen <sergey@makinen.ru>
+ *
  * @since 2.0.14
  */
 class Command extends \yii\db\Command
@@ -39,6 +41,7 @@ class Command extends \yii\db\Command
             $result = parent::execute();
         }
         $this->setSql($sql)->bindValues($params);
+
         return $result;
     }
 
@@ -63,14 +66,17 @@ class Command extends \yii\db\Command
         $this->setSql($lastStatementSql)->bindValues($lastStatementParams);
         $result = parent::queryInternal($method, $fetchMode);
         $this->setSql($sql)->bindValues($params);
+
         return $result;
     }
 
     /**
      * Splits the specified SQL code into individual SQL statements and returns them
      * or `false` if there's a single statement.
+     *
      * @param string $sql
-     * @param array $params
+     * @param array  $params
+     *
      * @return string[]|false
      */
     private function splitStatements($sql, $params)
@@ -90,13 +96,16 @@ class Command extends \yii\db\Command
         foreach ($codeToken->getChildren() as $statement) {
             $statements[] = [$statement->getSql(), $this->extractUsedParams($statement, $params)];
         }
+
         return $statements;
     }
 
     /**
      * Returns named bindings used in the specified statement token.
+     *
      * @param SqlToken $statement
-     * @param array $params
+     * @param array    $params
+     *
      * @return array
      */
     private function extractUsedParams(SqlToken $statement, $params)
@@ -107,10 +116,11 @@ class Command extends \yii\db\Command
             $phName = ltrim($match['placeholder'], ':');
             if (isset($params[$phName])) {
                 $result[$phName] = $params[$phName];
-            } elseif (isset($params[':' . $phName])) {
-                $result[':' . $phName] = $params[':' . $phName];
+            } elseif (isset($params[':'.$phName])) {
+                $result[':'.$phName] = $params[':'.$phName];
             }
         }
+
         return $result;
     }
 }

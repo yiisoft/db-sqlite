@@ -1,13 +1,13 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
 namespace yii\db\sqlite;
 
-use yii\exceptions\NotSupportedException;
 use yii\db\CheckConstraint;
 use yii\db\ColumnSchema;
 use yii\db\Constraint;
@@ -19,6 +19,7 @@ use yii\db\IndexConstraint;
 use yii\db\SqlToken;
 use yii\db\TableSchema;
 use yii\db\Transaction;
+use yii\exceptions\NotSupportedException;
 use Yiisoft\Arrays\ArrayHelper;
 
 /**
@@ -28,6 +29,7 @@ use Yiisoft\Arrays\ArrayHelper;
  * This can be either [[Transaction::READ_UNCOMMITTED]] or [[Transaction::SERIALIZABLE]].
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
+ *
  * @since 2.0
  */
 class Schema extends \yii\db\Schema implements ConstraintFinderInterface
@@ -38,34 +40,34 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
      * @var array mapping from physical column types (keys) to abstract column types (values)
      */
     public $typeMap = [
-        'tinyint' => self::TYPE_TINYINT,
-        'bit' => self::TYPE_SMALLINT,
-        'boolean' => self::TYPE_BOOLEAN,
-        'bool' => self::TYPE_BOOLEAN,
-        'smallint' => self::TYPE_SMALLINT,
-        'mediumint' => self::TYPE_INTEGER,
-        'int' => self::TYPE_INTEGER,
-        'integer' => self::TYPE_INTEGER,
-        'bigint' => self::TYPE_BIGINT,
-        'float' => self::TYPE_FLOAT,
-        'double' => self::TYPE_DOUBLE,
-        'real' => self::TYPE_FLOAT,
-        'decimal' => self::TYPE_DECIMAL,
-        'numeric' => self::TYPE_DECIMAL,
-        'tinytext' => self::TYPE_TEXT,
+        'tinyint'    => self::TYPE_TINYINT,
+        'bit'        => self::TYPE_SMALLINT,
+        'boolean'    => self::TYPE_BOOLEAN,
+        'bool'       => self::TYPE_BOOLEAN,
+        'smallint'   => self::TYPE_SMALLINT,
+        'mediumint'  => self::TYPE_INTEGER,
+        'int'        => self::TYPE_INTEGER,
+        'integer'    => self::TYPE_INTEGER,
+        'bigint'     => self::TYPE_BIGINT,
+        'float'      => self::TYPE_FLOAT,
+        'double'     => self::TYPE_DOUBLE,
+        'real'       => self::TYPE_FLOAT,
+        'decimal'    => self::TYPE_DECIMAL,
+        'numeric'    => self::TYPE_DECIMAL,
+        'tinytext'   => self::TYPE_TEXT,
         'mediumtext' => self::TYPE_TEXT,
-        'longtext' => self::TYPE_TEXT,
-        'text' => self::TYPE_TEXT,
-        'varchar' => self::TYPE_STRING,
-        'string' => self::TYPE_STRING,
-        'char' => self::TYPE_CHAR,
-        'blob' => self::TYPE_BINARY,
-        'datetime' => self::TYPE_DATETIME,
-        'year' => self::TYPE_DATE,
-        'date' => self::TYPE_DATE,
-        'time' => self::TYPE_TIME,
-        'timestamp' => self::TYPE_TIMESTAMP,
-        'enum' => self::TYPE_STRING,
+        'longtext'   => self::TYPE_TEXT,
+        'text'       => self::TYPE_TEXT,
+        'varchar'    => self::TYPE_STRING,
+        'string'     => self::TYPE_STRING,
+        'char'       => self::TYPE_CHAR,
+        'blob'       => self::TYPE_BINARY,
+        'datetime'   => self::TYPE_DATETIME,
+        'year'       => self::TYPE_DATE,
+        'date'       => self::TYPE_DATE,
+        'time'       => self::TYPE_TIME,
+        'timestamp'  => self::TYPE_TIMESTAMP,
+        'enum'       => self::TYPE_STRING,
     ];
 
     /**
@@ -77,13 +79,13 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
      */
     protected $columnQuoteCharacter = '`';
 
-
     /**
      * {@inheritdoc}
      */
     protected function findTableNames($schema = '')
     {
         $sql = "SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name<>'sqlite_sequence' ORDER BY tbl_name";
+
         return $this->db->createCommand($sql)->queryColumn();
     }
 
@@ -98,10 +100,9 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
 
         if ($this->findColumns($table)) {
             $this->findConstraints($table);
+
             return $table;
         }
-
-        return null;
     }
 
     /**
@@ -117,18 +118,18 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
      */
     protected function loadTableForeignKeys($tableName)
     {
-        $foreignKeys = $this->db->createCommand('PRAGMA FOREIGN_KEY_LIST (' . $this->quoteValue($tableName) . ')')->queryAll();
+        $foreignKeys = $this->db->createCommand('PRAGMA FOREIGN_KEY_LIST ('.$this->quoteValue($tableName).')')->queryAll();
         $foreignKeys = $this->normalizePdoRowKeyCase($foreignKeys, true);
         $foreignKeys = ArrayHelper::index($foreignKeys, null, 'table');
         ArrayHelper::multisort($foreignKeys, 'seq', SORT_ASC, SORT_NUMERIC);
         $result = [];
         foreach ($foreignKeys as $table => $foreignKey) {
             $result[] = new ForeignKeyConstraint([
-                'columnNames' => ArrayHelper::getColumn($foreignKey, 'from'),
-                'foreignTableName' => $table,
+                'columnNames'        => ArrayHelper::getColumn($foreignKey, 'from'),
+                'foreignTableName'   => $table,
                 'foreignColumnNames' => ArrayHelper::getColumn($foreignKey, 'to'),
-                'onDelete' => $foreignKey[0]['on_delete'] ?? null,
-                'onUpdate' => $foreignKey[0]['on_update'] ?? null,
+                'onDelete'           => $foreignKey[0]['on_delete'] ?? null,
+                'onUpdate'           => $foreignKey[0]['on_update'] ?? null,
             ]);
         }
 
@@ -182,7 +183,7 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
                 $name = $createTableToken[$firstMatchIndex - 1]->content;
             }
             $result[] = new CheckConstraint([
-                'name' => $name,
+                'name'       => $name,
                 'expression' => $checkSql,
             ]);
         }
@@ -192,6 +193,7 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
 
     /**
      * {@inheritdoc}
+     *
      * @throws NotSupportedException if this method is called.
      */
     protected function loadTableDefaultValues($tableName)
@@ -202,6 +204,7 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
     /**
      * Creates a query builder for the MySQL database.
      * This method may be overridden by child classes to create a DBMS-specific query builder.
+     *
      * @return QueryBuilder query builder instance
      */
     public function createQueryBuilder()
@@ -211,6 +214,7 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
 
     /**
      * {@inheritdoc}
+     *
      * @return ColumnSchemaBuilder column schema builder instance
      */
     public function createColumnSchemaBuilder($type, $length = null)
@@ -220,12 +224,14 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
 
     /**
      * Collects the table column metadata.
+     *
      * @param TableSchema $table the table metadata
+     *
      * @return bool whether the table exists in the database
      */
     protected function findColumns($table)
     {
-        $sql = 'PRAGMA table_info(' . $this->quoteSimpleTableName($table->name) . ')';
+        $sql = 'PRAGMA table_info('.$this->quoteSimpleTableName($table->name).')';
         $columns = $this->db->createCommand($sql)->queryAll();
         if (empty($columns)) {
             return false;
@@ -248,11 +254,12 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
 
     /**
      * Collects the foreign key column details for the given table.
+     *
      * @param TableSchema $table the table metadata
      */
     protected function findConstraints($table)
     {
-        $sql = 'PRAGMA foreign_key_list(' . $this->quoteSimpleTableName($table->name) . ')';
+        $sql = 'PRAGMA foreign_key_list('.$this->quoteSimpleTableName($table->name).')';
         $keys = $this->db->createCommand($sql)->queryAll();
         foreach ($keys as $key) {
             $id = (int) $key['id'];
@@ -278,17 +285,18 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
      * ```
      *
      * @param TableSchema $table the table metadata
+     *
      * @return array all unique indexes for the given table.
      */
     public function findUniqueIndexes($table)
     {
-        $sql = 'PRAGMA index_list(' . $this->quoteSimpleTableName($table->name) . ')';
+        $sql = 'PRAGMA index_list('.$this->quoteSimpleTableName($table->name).')';
         $indexes = $this->db->createCommand($sql)->queryAll();
         $uniqueIndexes = [];
 
         foreach ($indexes as $index) {
             $indexName = $index['name'];
-            $indexInfo = $this->db->createCommand('PRAGMA index_info(' . $this->quoteValue($index['name']) . ')')->queryAll();
+            $indexInfo = $this->db->createCommand('PRAGMA index_info('.$this->quoteValue($index['name']).')')->queryAll();
 
             if ($index['unique']) {
                 $uniqueIndexes[$indexName] = [];
@@ -303,7 +311,9 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
 
     /**
      * Loads the column information into a [[ColumnSchema]] object.
+     *
      * @param array $info column information
+     *
      * @return ColumnSchema the column schema object
      */
     protected function loadColumnSchema($info)
@@ -358,10 +368,13 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
 
     /**
      * Sets the isolation level of the current transaction.
+     *
      * @param string $level The transaction isolation level to use for this transaction.
-     * This can be either [[Transaction::READ_UNCOMMITTED]] or [[Transaction::SERIALIZABLE]].
+     *                      This can be either [[Transaction::READ_UNCOMMITTED]] or [[Transaction::SERIALIZABLE]].
+     *
      * @throws NotSupportedException when unsupported isolation levels are used.
-     * SQLite only supports SERIALIZABLE and READ UNCOMMITTED.
+     *                               SQLite only supports SERIALIZABLE and READ UNCOMMITTED.
+     *
      * @see http://www.sqlite.org/pragma.html#pragma_read_uncommitted
      */
     public function setTransactionIsolationLevel($level)
@@ -374,35 +387,39 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
                 $this->db->createCommand('PRAGMA read_uncommitted = True;')->execute();
                 break;
             default:
-                throw new NotSupportedException(get_class($this) . ' only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.');
+                throw new NotSupportedException(get_class($this).' only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.');
         }
     }
 
     /**
      * Returns table columns info.
+     *
      * @param string $tableName table name
+     *
      * @return array
      */
     private function loadTableColumnsInfo($tableName)
     {
-        $tableColumns = $this->db->createCommand('PRAGMA TABLE_INFO (' . $this->quoteValue($tableName) . ')')->queryAll();
+        $tableColumns = $this->db->createCommand('PRAGMA TABLE_INFO ('.$this->quoteValue($tableName).')')->queryAll();
         $tableColumns = $this->normalizePdoRowKeyCase($tableColumns, true);
-        
+
         return ArrayHelper::index($tableColumns, 'cid');
     }
-    
+
     /**
      * Loads multiple types of constraints and returns the specified ones.
-     * @param string $tableName table name.
+     *
+     * @param string $tableName  table name.
      * @param string $returnType return type:
-     * - primaryKey
-     * - indexes
-     * - uniques
+     *                           - primaryKey
+     *                           - indexes
+     *                           - uniques
+     *
      * @return mixed constraints.
      */
     private function loadTableConstraints($tableName, $returnType)
     {
-        $indexes = $this->db->createCommand('PRAGMA INDEX_LIST (' . $this->quoteValue($tableName) . ')')->queryAll();
+        $indexes = $this->db->createCommand('PRAGMA INDEX_LIST ('.$this->quoteValue($tableName).')')->queryAll();
         $indexes = $this->normalizePdoRowKeyCase($indexes, true);
         $tableColumns = null;
         if (!empty($indexes) && !isset($indexes[0]['origin'])) {
@@ -414,11 +431,11 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
         }
         $result = [
             'primaryKey' => null,
-            'indexes' => [],
-            'uniques' => [],
+            'indexes'    => [],
+            'uniques'    => [],
         ];
         foreach ($indexes as $index) {
-            $columns = $this->db->createCommand('PRAGMA INDEX_INFO (' . $this->quoteValue($index['name']) . ')')->queryAll();
+            $columns = $this->db->createCommand('PRAGMA INDEX_INFO ('.$this->quoteValue($index['name']).')')->queryAll();
             $columns = $this->normalizePdoRowKeyCase($columns, true);
             ArrayHelper::multisort($columns, 'seqno', SORT_ASC, SORT_NUMERIC);
             if ($tableColumns !== null) {
@@ -431,14 +448,14 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
                 }
             }
             $result['indexes'][] = new IndexConstraint([
-                'isPrimary' => $index['origin'] === 'pk',
-                'isUnique' => (bool) $index['unique'],
-                'name' => $index['name'],
+                'isPrimary'   => $index['origin'] === 'pk',
+                'isUnique'    => (bool) $index['unique'],
+                'name'        => $index['name'],
                 'columnNames' => ArrayHelper::getColumn($columns, 'name'),
             ]);
             if ($index['origin'] === 'u') {
                 $result['uniques'][] = new Constraint([
-                    'name' => $index['name'],
+                    'name'        => $index['name'],
                     'columnNames' => ArrayHelper::getColumn($columns, 'name'),
                 ]);
             } elseif ($index['origin'] === 'pk') {
@@ -447,7 +464,7 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
                 ]);
             }
         }
-        
+
         if ($result['primaryKey'] === null) {
             /*
              * Additional check for PK in case of INTEGER PRIMARY KEY with ROWID
@@ -465,7 +482,7 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
                 }
             }
         }
-        
+
         foreach ($result as $type => $data) {
             $this->setTableMetadata($tableName, $type, $data);
         }
@@ -475,8 +492,11 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
 
     /**
      * Return whether the specified identifier is a SQLite system identifier.
+     *
      * @param string $identifier
+     *
      * @return bool
+     *
      * @see https://www.sqlite.org/src/artifact/74108007d286232f
      */
     private function isSystemIdentifier($identifier)
