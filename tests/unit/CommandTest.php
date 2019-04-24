@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -26,6 +27,7 @@ class CommandTest extends \yii\db\tests\unit\CommandTest
 
     /**
      * @dataProvider upsertProvider
+     *
      * @param array $firstData
      * @param array $secondData
      */
@@ -33,6 +35,7 @@ class CommandTest extends \yii\db\tests\unit\CommandTest
     {
         if (version_compare($this->getConnection(false)->getServerVersion(), '3.8.3', '<')) {
             $this->markTestSkipped('SQLite < 3.8.3 does not support "WITH" keyword.');
+
             return;
         }
 
@@ -77,11 +80,11 @@ SQL;
         ])->execute();
         $this->assertSame([
             [
-                'intcol' => '41',
+                'intcol'  => '41',
                 'textcol' => 'foo',
             ],
             [
-                'intcol' => '42',
+                'intcol'  => '42',
                 'textcol' => 'bar',
             ],
         ], $db->createCommand('SELECT * FROM {{T_multistatement}}')->queryAll());
@@ -92,13 +95,13 @@ SELECT * FROM {{T_multistatement}}
 SQL;
         $this->assertSame([
             [
-                'intcol' => '410',
+                'intcol'  => '410',
                 'textcol' => 'foo',
             ],
         ], $db->createCommand($sql, [
             'newInt' => 410,
-            'val1' => 'foo',
-            'val2' => 'bar',
+            'val1'   => 'foo',
+            'val2'   => 'bar',
         ])->queryAll());
     }
 

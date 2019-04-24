@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -65,6 +66,7 @@ class QueryBuilderTest extends \yii\db\tests\unit\QueryBuilderTest
     {
         $result = parent::indexesProvider();
         $result['drop'][0] = 'DROP INDEX [[CN_constraints_2_single]]';
+
         return $result;
     }
 
@@ -97,6 +99,7 @@ class QueryBuilderTest extends \yii\db\tests\unit\QueryBuilderTest
     {
         $data = parent::batchInsertProvider();
         $data['escape-danger-chars']['expected'] = "INSERT INTO `customer` (`address`) VALUES ('SQL-danger chars are escaped: ''); --')";
+
         return $data;
     }
 
@@ -197,6 +200,7 @@ class QueryBuilderTest extends \yii\db\tests\unit\QueryBuilderTest
         foreach ($concreteData as $testName => $data) {
             $newData[$testName] = array_replace($newData[$testName], $data);
         }
+
         return $newData;
     }
 }

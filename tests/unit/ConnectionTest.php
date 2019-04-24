@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -9,9 +10,9 @@ namespace yii\db\sqlite\tests\unit;
 
 use yii\db\Connection;
 use yii\db\Transaction;
+use yii\helpers\Yii;
 use yii\tests\data\ar\ActiveRecord;
 use yii\tests\data\ar\Customer;
-use yii\helpers\Yii;
 
 /**
  * @group db
@@ -157,6 +158,7 @@ class ConnectionTest extends \yii\db\tests\unit\ConnectionTest
     {
         $db = $this->prepareMasterSlave(1, 1);
         $this->assertTrue($db->enableSlaves);
+
         try {
             $db->useMaster(function (Connection $db) {
                 throw new \Exception('fail');
@@ -171,6 +173,7 @@ class ConnectionTest extends \yii\db\tests\unit\ConnectionTest
     /**
      * @param int $masterCount
      * @param int $slaveCount
+     *
      * @return Connection
      */
     protected function prepareMasterSlave($masterCount, $slaveCount)
@@ -181,18 +184,18 @@ class ConnectionTest extends \yii\db\tests\unit\ConnectionTest
 
         $config = [
             '__class' => \yii\db\Connection::class,
-            'dsn' => "sqlite:$basePath/yii2test.sq3",
+            'dsn'     => "sqlite:$basePath/yii2test.sq3",
         ];
         $this->prepareDatabase($config, $fixture)->close();
 
-        for ($i = 0; $i < $masterCount; ++$i) {
+        for ($i = 0; $i < $masterCount; $i++) {
             $master = ['dsn' => "sqlite:$basePath/yii2test_master{$i}.sq3"];
             $db = $this->prepareDatabase($master, $fixture);
             $db->close();
             $config['masters'][] = $master;
         }
 
-        for ($i = 0; $i < $slaveCount; ++$i) {
+        for ($i = 0; $i < $slaveCount; $i++) {
             $slave = ['dsn' => "sqlite:$basePath/yii2test_slave{$i}.sq3"];
             $db = $this->prepareDatabase($slave, $fixture);
             $db->close();
