@@ -19,7 +19,7 @@ use yii\db\IndexConstraint;
 use yii\db\SqlToken;
 use yii\db\TableSchema;
 use yii\db\Transaction;
-use yii\helpers\ArrayHelper;
+use Yiisoft\Arrays\ArrayHelper;
 
 /**
  * Schema is the class for retrieving metadata from a SQLite (2/3) database.

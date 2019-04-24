@@ -8,7 +8,7 @@
 namespace yii\db\sqlite;
 
 use yii\db\SqlToken;
-use yii\helpers\StringHelper;
+use Yiisoft\Strings\StringHelper;
 
 /**
  * Command represents an SQLite's SQL statement to be executed against a database.

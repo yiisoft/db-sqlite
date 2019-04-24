@@ -14,7 +14,7 @@ use yii\db\Constraint;
 use yii\db\Expression;
 use yii\db\ExpressionInterface;
 use yii\db\Query;
-use yii\helpers\StringHelper;
+use Yiisoft\Strings\StringHelper;
 
 /**
  * QueryBuilder is the query builder for SQLite databases.
