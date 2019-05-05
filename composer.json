@@ -83,12 +83,12 @@
     },
     "autoload": {
         "psr-4": {
-            "yii\\db\\sqlite\\": "src"
+            "Yiisoft\\Db\\Sqlite\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "yii\\db\\sqlite\\tests\\": "tests"
+            "Yiisoft\\Db\\Sqlite\\Tests\\": "tests"
         }
     },
     "extra": {
