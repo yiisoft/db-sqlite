@@ -12,7 +12,7 @@ namespace yii\db\sqlite\tests\unit;
  * @group db
  * @group sqlite
  */
-class ActiveRecordTest extends \yii\activerecord\tests\unit\ActiveRecordTest
+class ActiveRecordTest extends \Yiisoft\ActiveRecord\Tests\Unit\ActiveRecordTest
 {
     protected $driverName = 'sqlite';
 }
