@@ -8,6 +8,8 @@
 
 namespace Yiisoft\Db\Sqlite;
 
+use yii\exceptions\NotSupportedException;
+use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\CheckConstraint;
 use Yiisoft\Db\ColumnSchema;
 use Yiisoft\Db\Constraint;
@@ -19,8 +21,6 @@ use Yiisoft\Db\IndexConstraint;
 use Yiisoft\Db\SqlToken;
 use Yiisoft\Db\TableSchema;
 use Yiisoft\Db\Transaction;
-use yii\exceptions\NotSupportedException;
-use Yiisoft\Arrays\ArrayHelper;
 
 /**
  * Schema is the class for retrieving metadata from a SQLite (2/3) database.
