@@ -8,13 +8,13 @@
 
 namespace Yiisoft\Db\Sqlite;
 
+use yii\exceptions\InvalidArgumentException;
+use yii\exceptions\NotSupportedException;
 use Yiisoft\Db\Connection;
 use Yiisoft\Db\Constraint;
 use Yiisoft\Db\Expression;
 use Yiisoft\Db\ExpressionInterface;
 use Yiisoft\Db\Query;
-use yii\exceptions\InvalidArgumentException;
-use yii\exceptions\NotSupportedException;
 use Yiisoft\Strings\StringHelper;
 
 /**

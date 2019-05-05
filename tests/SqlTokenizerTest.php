@@ -8,9 +8,9 @@
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
+use yii\tests\TestCase;
 use Yiisoft\Db\Sqlite\SqlTokenizer;
 use Yiisoft\Db\SqlToken;
-use yii\tests\TestCase;
 
 /**
  * @group db

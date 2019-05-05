@@ -8,11 +8,11 @@
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
-use Yiisoft\Db\Connection;
-use Yiisoft\Db\Transaction;
 use yii\helpers\Yii;
 use yii\tests\data\ar\ActiveRecord;
 use yii\tests\data\ar\Customer;
+use Yiisoft\Db\Connection;
+use Yiisoft\Db\Transaction;
 
 /**
  * @group db

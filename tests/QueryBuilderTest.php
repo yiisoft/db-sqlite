@@ -8,9 +8,9 @@
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
+use yii\tests\data\base\TraversableObject;
 use Yiisoft\Db\Query;
 use Yiisoft\Db\Schema;
-use yii\tests\data\base\TraversableObject;
 
 /**
  * @group db
