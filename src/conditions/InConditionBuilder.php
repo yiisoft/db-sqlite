@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\db\sqlite\conditions;
+namespace Yiisoft\Db\Sqlite\Conditions;
 
 use yii\exceptions\NotSupportedException;
 
@@ -17,7 +17,7 @@ use yii\exceptions\NotSupportedException;
  *
  * @since 2.0.14
  */
-class InConditionBuilder extends \yii\db\conditions\InConditionBuilder
+class InConditionBuilder extends \Yiisoft\Db\Conditions\InConditionBuilder
 {
     /**
      * {@inheritdoc}

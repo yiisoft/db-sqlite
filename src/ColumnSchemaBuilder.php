@@ -6,9 +6,9 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\db\sqlite;
+namespace Yiisoft\Db\Sqlite;
 
-use yii\db\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
+use Yiisoft\Db\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
 
 /**
  * ColumnSchemaBuilder is the schema builder for Sqlite databases.

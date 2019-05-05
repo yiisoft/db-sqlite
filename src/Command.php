@@ -6,9 +6,9 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\db\sqlite;
+namespace Yiisoft\Db\Sqlite;
 
-use yii\db\SqlToken;
+use Yiisoft\Db\SqlToken;
 use Yiisoft\Strings\StringHelper;
 
 /**
@@ -20,7 +20,7 @@ use Yiisoft\Strings\StringHelper;
  *
  * @since 2.0.14
  */
-class Command extends \yii\db\Command
+class Command extends \Yiisoft\Db\Command
 {
     /**
      * {@inheritdoc}

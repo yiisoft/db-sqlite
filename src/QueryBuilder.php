@@ -6,13 +6,13 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\db\sqlite;
+namespace Yiisoft\Db\Sqlite;
 
-use yii\db\Connection;
-use yii\db\Constraint;
-use yii\db\Expression;
-use yii\db\ExpressionInterface;
-use yii\db\Query;
+use Yiisoft\Db\Connection;
+use Yiisoft\Db\Constraint;
+use Yiisoft\Db\Expression;
+use Yiisoft\Db\ExpressionInterface;
+use Yiisoft\Db\Query;
 use yii\exceptions\InvalidArgumentException;
 use yii\exceptions\NotSupportedException;
 use Yiisoft\Strings\StringHelper;
@@ -24,7 +24,7 @@ use Yiisoft\Strings\StringHelper;
  *
  * @since 2.0
  */
-class QueryBuilder extends \yii\db\QueryBuilder
+class QueryBuilder extends \Yiisoft\Db\QueryBuilder
 {
     /**
      * @var array mapping from abstract column types (keys) to physical column types (values).
@@ -59,8 +59,8 @@ class QueryBuilder extends \yii\db\QueryBuilder
     protected function defaultExpressionBuilders()
     {
         return array_merge(parent::defaultExpressionBuilders(), [
-            \yii\db\conditions\LikeCondition::class => conditions\LikeConditionBuilder::class,
-            \yii\db\conditions\InCondition::class   => conditions\InConditionBuilder::class,
+            \Yiisoft\Db\Conditions\LikeCondition::class => conditions\LikeConditionBuilder::class,
+            \Yiisoft\Db\Conditions\InCondition::class   => conditions\InConditionBuilder::class,
         ]);
     }
 

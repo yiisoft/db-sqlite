@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\db\sqlite;
+namespace Yiisoft\Db\Sqlite;
 
 /**
  * SqlTokenizer splits SQLite query into individual SQL tokens.
@@ -19,7 +19,7 @@ namespace yii\db\sqlite;
  *
  * @since 2.0.13
  */
-class SqlTokenizer extends \yii\db\SqlTokenizer
+class SqlTokenizer extends \Yiisoft\Db\SqlTokenizer
 {
     /**
      * {@inheritdoc}

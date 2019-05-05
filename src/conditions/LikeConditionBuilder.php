@@ -6,12 +6,12 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\db\sqlite\conditions;
+namespace Yiisoft\Db\Sqlite\Conditions;
 
 /**
  * {@inheritdoc}
  */
-class LikeConditionBuilder extends \yii\db\conditions\LikeConditionBuilder
+class LikeConditionBuilder extends \Yiisoft\Db\Conditions\LikeConditionBuilder
 {
     /**
      * {@inheritdoc}
