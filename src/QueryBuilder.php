@@ -59,8 +59,8 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
     protected function defaultExpressionBuilders()
     {
         return array_merge(parent::defaultExpressionBuilders(), [
-            \Yiisoft\Db\Conditions\LikeCondition::class => conditions\LikeConditionBuilder::class,
-            \Yiisoft\Db\Conditions\InCondition::class   => conditions\InConditionBuilder::class,
+            \Yiisoft\Db\Conditions\LikeCondition::class => Conditions\LikeConditionBuilder::class,
+            \Yiisoft\Db\Conditions\InCondition::class   => Conditions\InConditionBuilder::class,
         ]);
     }
 
