@@ -97,7 +97,13 @@
         "config-plugin": {
             "params": "config/params.php",
             "common": "config/common.php",
-            "tests": ["$common", "config/tests.php"]
+            "tests": [
+                "$common",
+                "config/tests.php"
+            ]
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }
