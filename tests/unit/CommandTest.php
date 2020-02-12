@@ -1,28 +1,24 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
 
-namespace Yiisoft\Db\Sqlite\Tests;
+declare(strict_types=1);
 
-/**
- * @group db
- * @group sqlite
- */
-class CommandTest extends \Yiisoft\Db\Tests\CommandTest
+namespace Yiisoft\Db\Tests\Sqlite;
+
+use Yiisoft\Db\Tests\CommandTest as AbstractCommandTest;
+
+final class CommandTest extends AbstractCommandTest
 {
-    protected $driverName = 'sqlite';
+    protected ?string $driverName = 'sqlite';
 
-    public function testAutoQuoting()
+    public function testAutoQuoting(): void
     {
         $db = $this->getConnection(false);
 
         $sql = 'SELECT [[id]], [[t.name]] FROM {{customer}} t';
+
         $command = $db->createCommand($sql);
-        $this->assertEquals('SELECT `id`, `t`.`name` FROM `customer` t', $command->sql);
+
+        $this->assertEquals('SELECT `id`, `t`.`name` FROM `customer` t', $command->getSql());
     }
 
     /**
@@ -42,29 +38,30 @@ class CommandTest extends \Yiisoft\Db\Tests\CommandTest
         parent::testUpsert($firstData, $secondData);
     }
 
-    public function testAddDropPrimaryKey()
+    public function testAddDropPrimaryKey(): void
     {
         $this->markTestSkipped('SQLite does not support adding/dropping primary keys.');
     }
 
-    public function testAddDropForeignKey()
+    public function testAddDropForeignKey(): void
     {
         $this->markTestSkipped('SQLite does not support adding/dropping foreign keys.');
     }
 
-    public function testAddDropUnique()
+    public function testAddDropUnique(): void
     {
         $this->markTestSkipped('SQLite does not support adding/dropping unique constraints.');
     }
 
-    public function testAddDropCheck()
+    public function testAddDropCheck(): void
     {
         $this->markTestSkipped('SQLite does not support adding/dropping check constraints.');
     }
 
     public function testMultiStatementSupport()
     {
-        $db = $this->getConnection(false);
+        $db = $this->getConnection(false, true);
+
         $sql = <<<'SQL'
 DROP TABLE IF EXISTS {{T_multistatement}};
 CREATE TABLE {{T_multistatement}} (
@@ -74,38 +71,42 @@ CREATE TABLE {{T_multistatement}} (
 INSERT INTO {{T_multistatement}} VALUES(41, :val1);
 INSERT INTO {{T_multistatement}} VALUES(42, :val2);
 SQL;
+
         $db->createCommand($sql, [
             'val1' => 'foo',
             'val2' => 'bar',
         ])->execute();
+
         $this->assertSame([
             [
-                'intcol'  => '41',
+                'intcol' => '41',
                 'textcol' => 'foo',
             ],
             [
-                'intcol'  => '42',
+                'intcol' => '42',
                 'textcol' => 'bar',
             ],
         ], $db->createCommand('SELECT * FROM {{T_multistatement}}')->queryAll());
+
         $sql = <<<'SQL'
 UPDATE {{T_multistatement}} SET [[intcol]] = :newInt WHERE [[textcol]] = :val1;
 DELETE FROM {{T_multistatement}} WHERE [[textcol]] = :val2;
 SELECT * FROM {{T_multistatement}}
 SQL;
+
         $this->assertSame([
             [
-                'intcol'  => '410',
+                'intcol' => '410',
                 'textcol' => 'foo',
             ],
         ], $db->createCommand($sql, [
             'newInt' => 410,
-            'val1'   => 'foo',
-            'val2'   => 'bar',
+            'val1' => 'foo',
+            'val2' => 'bar',
         ])->queryAll());
     }
 
-    public function batchInsertSqlProvider()
+    public function batchInsertSqlProvider(): array
     {
         $parent = parent::batchInsertSqlProvider();
         unset($parent['wrongBehavior']); // Produces SQL syntax error: General error: 1 near ".": syntax error

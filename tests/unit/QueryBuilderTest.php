@@ -1,28 +1,21 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
 
-namespace Yiisoft\Db\Sqlite\Tests;
+declare(strict_types=1);
 
-use yii\tests\data\base\TraversableObject;
-use Yiisoft\Db\Query;
-use Yiisoft\Db\Schema;
+namespace Yiisoft\Db\Tests\Sqlite;
 
-/**
- * @group db
- * @group sqlite
- */
-class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
+use Yiisoft\Db\Querys\Query;
+use Yiisoft\Db\Schemas\Schema;
+use Yiisoft\Db\Tests\TraversableObject;
+use Yiisoft\Db\Tests\QueryBuilderTest as AbstractQueryBuilderTest;
+
+final class QueryBuilderTest extends AbstractQueryBuilderTest
 {
-    protected $driverName = 'sqlite';
+    protected ?string $driverName = 'sqlite';
 
-    protected $likeEscapeCharSql = " ESCAPE '\\'";
+    protected string $likeEscapeCharSql = " ESCAPE '\\'";
 
-    public function columnTypes()
+    public function columnTypes(): array
     {
         return array_merge(parent::columnTypes(), [
             [
@@ -33,7 +26,7 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
         ]);
     }
 
-    public function conditionProvider()
+    public function conditionProvider(): array
     {
         return array_merge(parent::conditionProvider(), [
             'composite in using array objects' => [
@@ -62,7 +55,7 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
         $this->markTestSkipped('Adding/dropping foreign keys is not supported in SQLite.');
     }
 
-    public function indexesProvider()
+    public function indexesProvider(): array
     {
         $result = parent::indexesProvider();
         $result['drop'][0] = 'DROP INDEX [[CN_constraints_2_single]]';
@@ -85,17 +78,17 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
         $this->markTestSkipped('Adding/dropping default constraints is not supported in SQLite.');
     }
 
-    public function testCommentColumn()
+    public function testCommentColumn(): void
     {
         $this->markTestSkipped('Comments are not supported in SQLite');
     }
 
-    public function testCommentTable()
+    public function testCommentTable(): void
     {
         $this->markTestSkipped('Comments are not supported in SQLite');
     }
 
-    public function batchInsertProvider()
+    public function batchInsertProvider(): array
     {
         $data = parent::batchInsertProvider();
         $data['escape-danger-chars']['expected'] = "INSERT INTO `customer` (`address`) VALUES ('SQL-danger chars are escaped: ''); --')";
@@ -106,7 +99,7 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
     public function testBatchInsertOnOlderVersions()
     {
         $db = $this->getConnection();
-        if (version_compare($db->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION), '3.7.11', '>=')) {
+        if (version_compare($db->getPdo()->getAttribute(\PDO::ATTR_SERVER_VERSION), '3.7.11', '>=')) {
             $this->markTestSkipped('This test is only relevant for SQLite < 3.7.11');
         }
         $sql = $this->getQueryBuilder()->batchInsert('{{customer}} t', ['t.id', 't.name'], [[1, 'a'], [2, 'b']]);
@@ -122,17 +115,24 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
     /**
      * {@inheritdoc}
      */
-    public function testBuildUnion()
+    public function testBuildUnion(): void
     {
+        $db = $this->getConnection();
+
         $expectedQuerySql = $this->replaceQuotes(
             'SELECT `id` FROM `TotalExample` `t1` WHERE (w > 0) AND (x < 2) UNION  SELECT `id` FROM `TotalTotalExample` `t2` WHERE w > 5 UNION ALL  SELECT `id` FROM `TotalTotalExample` `t3` WHERE w = 3'
         );
-        $query = new Query();
-        $secondQuery = new Query();
+
+        $query = new Query($db);
+
+        $secondQuery = new Query($db);
+
         $secondQuery->select('id')
             ->from('TotalTotalExample t2')
             ->where('w > 5');
-        $thirdQuery = new Query();
+
+        $thirdQuery = new Query($db);
+
         $thirdQuery->select('id')
             ->from('TotalTotalExample t3')
             ->where('w = 3');
@@ -142,6 +142,7 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
             ->union($secondQuery)
             ->union($thirdQuery, true);
         [$actualQuerySql, $queryParams] = $this->getQueryBuilder()->build($query);
+
         $this->assertEquals($expectedQuerySql, $actualQuerySql);
         $this->assertEquals([], $queryParams);
     }
@@ -159,7 +160,7 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
         $this->assertEquals($expected, $sql);
     }
 
-    public function upsertProvider()
+    public function upsertProvider(): array
     {
         $concreteData = [
             'regular values' => [
@@ -195,12 +196,52 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
             'query, values and expressions without update part' => [
                 3 => 'WITH "EXCLUDED" (`email`, [[time]]) AS (SELECT :phEmail AS `email`, now() AS [[time]]) UPDATE {{%T_upsert}} SET `ts`=:qp1, [[orders]]=T_upsert.orders + 1 WHERE {{%T_upsert}}.`email`=(SELECT `email` FROM `EXCLUDED`); INSERT OR IGNORE INTO {{%T_upsert}} (`email`, [[time]]) SELECT :phEmail AS `email`, now() AS [[time]];',
             ],
+            'no columns to update' => [
+                3 => 'INSERT OR IGNORE INTO `T_upsert_1` (`a`) VALUES (:qp0)',
+            ],
         ];
+
         $newData = parent::upsertProvider();
+
         foreach ($concreteData as $testName => $data) {
             $newData[$testName] = array_replace($newData[$testName], $data);
         }
 
         return $newData;
+    }
+
+    public function testBuildWithQuery()
+    {
+        $db = $this->getConnection();
+
+        $expectedQuerySql = $this->replaceQuotes(
+             'WITH a1 AS (SELECT [[id]] FROM [[t1]] WHERE expr = 1), a2 AS (SELECT [[id]] FROM [[t2]] INNER JOIN [[a1]] ON t2.id = a1.id WHERE expr = 2 UNION  SELECT [[id]] FROM [[t3]] WHERE expr = 3) SELECT * FROM [[a2]]'
+        );
+
+        $with1Query = (new Query($db))
+            ->select('id')
+            ->from('t1')
+            ->where('expr = 1');
+
+        $with2Query = (new Query($db))
+            ->select('id')
+            ->from('t2')
+            ->innerJoin('a1', 't2.id = a1.id')
+            ->where('expr = 2');
+
+        $with3Query = (new Query($db))
+            ->select('id')
+            ->from('t3')
+            ->where('expr = 3');
+
+        $query = (new Query($db))
+            ->withQuery($with1Query, 'a1')
+            ->withQuery($with2Query->union($with3Query), 'a2')
+            ->from('a2');
+
+        [$actualQuerySql, $queryParams] = $this->getQueryBuilder()->build($query);
+
+        $this->assertEquals($expectedQuerySql, $actualQuerySql);
+        $this->assertEquals([], $queryParams);
     }
 }
