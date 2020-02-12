@@ -1,29 +1,20 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
 
-namespace Yiisoft\Db\Sqlite\Tests;
+declare(strict_types=1);
 
-use Yiisoft\Db\Schema;
+namespace Yiisoft\Db\Tests\Sqlite;
+
+use Yiisoft\Db\Schemas\Schema;
 use Yiisoft\Db\Sqlite\ColumnSchemaBuilder;
+use Yiisoft\Db\Tests\ColumnSchemaBuilderTest as AbstractColumnSchemaBuilderTest;
 
-/**
- * ColumnSchemaBuilderTest tests ColumnSchemaBuilder for SQLite.
- *
- * @group db
- * @group sqlite
- */
-class ColumnSchemaBuilderTest extends \Yiisoft\Db\Tests\ColumnSchemaBuilderTest
+final class ColumnSchemaBuilderTest extends AbstractColumnSchemaBuilderTest
 {
-    public $driverName = 'sqlite';
+    public ?string $driverName = 'sqlite';
 
     /**
      * @param string $type
-     * @param int    $length
+     * @param int $length
      *
      * @return ColumnSchemaBuilder
      */
@@ -35,7 +26,7 @@ class ColumnSchemaBuilderTest extends \Yiisoft\Db\Tests\ColumnSchemaBuilderTest
     /**
      * @return array
      */
-    public function typesProvider()
+    public function typesProvider(): array
     {
         return [
             ['integer UNSIGNED', Schema::TYPE_INTEGER, null, [

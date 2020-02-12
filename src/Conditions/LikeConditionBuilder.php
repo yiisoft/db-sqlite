@@ -1,20 +1,18 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
+
+declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Conditions;
+
+use Yiisoft\Db\Querys\Conditions\LikeConditionBuilder as BaseLikeConditionBuilder;
 
 /**
  * {@inheritdoc}
  */
-class LikeConditionBuilder extends \Yiisoft\Db\Conditions\LikeConditionBuilder
+class LikeConditionBuilder extends BaseLikeConditionBuilder
 {
     /**
      * {@inheritdoc}
      */
-    protected $escapeCharacter = '\\';
+    protected ?string $escapeCharacter = '\\';
 }

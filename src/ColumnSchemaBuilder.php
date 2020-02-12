@@ -1,28 +1,20 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
+
+declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use Yiisoft\Db\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
+use Yiisoft\Db\Schemas\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
 
 /**
  * ColumnSchemaBuilder is the schema builder for Sqlite databases.
- *
- * @author Chris Harris <chris@buckshotsoftware.com>
- *
- * @since 2.0.8
  */
 class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
 {
     /**
      * {@inheritdoc}
      */
-    protected function buildUnsignedString()
+    protected function buildUnsignedString(): string
     {
         return $this->isUnsigned ? ' UNSIGNED' : '';
     }
@@ -30,7 +22,7 @@ class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         switch ($this->getTypeCategory()) {
             case self::CATEGORY_PK:

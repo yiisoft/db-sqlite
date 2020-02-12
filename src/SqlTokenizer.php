@@ -1,37 +1,32 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
+
+declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
+use Yiisoft\Db\Tokens\SqlTokenizer as BaseSqlTokenizer;
+
 /**
  * SqlTokenizer splits SQLite query into individual SQL tokens.
+ *
  * It's used to obtain a `CHECK` constraint information from a `CREATE TABLE` SQL code.
  *
- * @see http://www.sqlite.org/draft/tokenreq.html
- * @see https://sqlite.org/lang.html
- *
- * @author Sergey Makinen <sergey@makinen.ru>
- *
- * @since 2.0.13
+ * {@see http://www.sqlite.org/draft/tokenreq.html}
+ * {@see https://sqlite.org/lang.html}
  */
-class SqlTokenizer extends \Yiisoft\Db\SqlTokenizer
+class SqlTokenizer extends BaseSqlTokenizer
 {
     /**
      * {@inheritdoc}
      */
-    protected function isWhitespace(&$length)
+    protected function isWhitespace(&$length): bool
     {
         static $whitespaces = [
             "\f" => true,
             "\n" => true,
             "\r" => true,
             "\t" => true,
-            ' '  => true,
+            ' ' => true,
         ];
 
         $length = 1;
@@ -42,7 +37,7 @@ class SqlTokenizer extends \Yiisoft\Db\SqlTokenizer
     /**
      * {@inheritdoc}
      */
-    protected function isComment(&$length)
+    protected function isComment(int &$length): bool
     {
         static $comments = [
             '--' => true,
@@ -50,6 +45,7 @@ class SqlTokenizer extends \Yiisoft\Db\SqlTokenizer
         ];
 
         $length = 2;
+
         if (!isset($comments[$this->substring($length)])) {
             return false;
         }
@@ -66,7 +62,7 @@ class SqlTokenizer extends \Yiisoft\Db\SqlTokenizer
     /**
      * {@inheritdoc}
      */
-    protected function isOperator(&$length, &$content)
+    protected function isOperator(int &$length, ?string &$content): bool
     {
         static $operators = [
             '!=',
@@ -101,7 +97,7 @@ class SqlTokenizer extends \Yiisoft\Db\SqlTokenizer
     /**
      * {@inheritdoc}
      */
-    protected function isIdentifier(&$length, &$content)
+    protected function isIdentifier(int &$length, ?string &$content): bool
     {
         static $identifierDelimiters = [
             '"' => '"',
@@ -115,6 +111,7 @@ class SqlTokenizer extends \Yiisoft\Db\SqlTokenizer
 
         $delimiter = $identifierDelimiters[$this->substring(1)];
         $offset = $this->offset;
+
         while (true) {
             $offset = $this->indexAfter($delimiter, $offset + 1);
             if ($delimiter === ']' || $this->substring(1, true, $offset) !== $delimiter) {
@@ -123,6 +120,7 @@ class SqlTokenizer extends \Yiisoft\Db\SqlTokenizer
         }
         $length = $offset - $this->offset;
         $content = $this->substring($length - 2, true, $this->offset + 1);
+
         if ($delimiter !== ']') {
             $content = strtr($content, ["$delimiter$delimiter" => $delimiter]);
         }
@@ -133,13 +131,14 @@ class SqlTokenizer extends \Yiisoft\Db\SqlTokenizer
     /**
      * {@inheritdoc}
      */
-    protected function isStringLiteral(&$length, &$content)
+    protected function isStringLiteral(int &$length, ?string &$content): bool
     {
         if ($this->substring(1) !== "'") {
             return false;
         }
 
         $offset = $this->offset;
+
         while (true) {
             $offset = $this->indexAfter("'", $offset + 1);
             if ($this->substring(1, true, $offset) !== "'") {
@@ -155,136 +154,137 @@ class SqlTokenizer extends \Yiisoft\Db\SqlTokenizer
     /**
      * {@inheritdoc}
      */
-    protected function isKeyword($string, &$content)
+    protected function isKeyword(string $string, ?string &$content): bool
     {
         static $keywords = [
-            'ABORT'             => true,
-            'ACTION'            => true,
-            'ADD'               => true,
-            'AFTER'             => true,
-            'ALL'               => true,
-            'ALTER'             => true,
-            'ANALYZE'           => true,
-            'AND'               => true,
-            'AS'                => true,
-            'ASC'               => true,
-            'ATTACH'            => true,
-            'AUTOINCREMENT'     => true,
-            'BEFORE'            => true,
-            'BEGIN'             => true,
-            'BETWEEN'           => true,
-            'BY'                => true,
-            'CASCADE'           => true,
-            'CASE'              => true,
-            'CAST'              => true,
-            'CHECK'             => true,
-            'COLLATE'           => true,
-            'COLUMN'            => true,
-            'COMMIT'            => true,
-            'CONFLICT'          => true,
-            'CONSTRAINT'        => true,
-            'CREATE'            => true,
-            'CROSS'             => true,
-            'CURRENT_DATE'      => true,
-            'CURRENT_TIME'      => true,
+            'ABORT' => true,
+            'ACTION' => true,
+            'ADD' => true,
+            'AFTER' => true,
+            'ALL' => true,
+            'ALTER' => true,
+            'ANALYZE' => true,
+            'AND' => true,
+            'AS' => true,
+            'ASC' => true,
+            'ATTACH' => true,
+            'AUTOINCREMENT' => true,
+            'BEFORE' => true,
+            'BEGIN' => true,
+            'BETWEEN' => true,
+            'BY' => true,
+            'CASCADE' => true,
+            'CASE' => true,
+            'CAST' => true,
+            'CHECK' => true,
+            'COLLATE' => true,
+            'COLUMN' => true,
+            'COMMIT' => true,
+            'CONFLICT' => true,
+            'CONSTRAINT' => true,
+            'CREATE' => true,
+            'CROSS' => true,
+            'CURRENT_DATE' => true,
+            'CURRENT_TIME' => true,
             'CURRENT_TIMESTAMP' => true,
-            'DATABASE'          => true,
-            'DEFAULT'           => true,
-            'DEFERRABLE'        => true,
-            'DEFERRED'          => true,
-            'DELETE'            => true,
-            'DESC'              => true,
-            'DETACH'            => true,
-            'DISTINCT'          => true,
-            'DROP'              => true,
-            'EACH'              => true,
-            'ELSE'              => true,
-            'END'               => true,
-            'ESCAPE'            => true,
-            'EXCEPT'            => true,
-            'EXCLUSIVE'         => true,
-            'EXISTS'            => true,
-            'EXPLAIN'           => true,
-            'FAIL'              => true,
-            'FOR'               => true,
-            'FOREIGN'           => true,
-            'FROM'              => true,
-            'FULL'              => true,
-            'GLOB'              => true,
-            'GROUP'             => true,
-            'HAVING'            => true,
-            'IF'                => true,
-            'IGNORE'            => true,
-            'IMMEDIATE'         => true,
-            'IN'                => true,
-            'INDEX'             => true,
-            'INDEXED'           => true,
-            'INITIALLY'         => true,
-            'INNER'             => true,
-            'INSERT'            => true,
-            'INSTEAD'           => true,
-            'INTERSECT'         => true,
-            'INTO'              => true,
-            'IS'                => true,
-            'ISNULL'            => true,
-            'JOIN'              => true,
-            'KEY'               => true,
-            'LEFT'              => true,
-            'LIKE'              => true,
-            'LIMIT'             => true,
-            'MATCH'             => true,
-            'NATURAL'           => true,
-            'NO'                => true,
-            'NOT'               => true,
-            'NOTNULL'           => true,
-            'NULL'              => true,
-            'OF'                => true,
-            'OFFSET'            => true,
-            'ON'                => true,
-            'OR'                => true,
-            'ORDER'             => true,
-            'OUTER'             => true,
-            'PLAN'              => true,
-            'PRAGMA'            => true,
-            'PRIMARY'           => true,
-            'QUERY'             => true,
-            'RAISE'             => true,
-            'RECURSIVE'         => true,
-            'REFERENCES'        => true,
-            'REGEXP'            => true,
-            'REINDEX'           => true,
-            'RELEASE'           => true,
-            'RENAME'            => true,
-            'REPLACE'           => true,
-            'RESTRICT'          => true,
-            'RIGHT'             => true,
-            'ROLLBACK'          => true,
-            'ROW'               => true,
-            'SAVEPOINT'         => true,
-            'SELECT'            => true,
-            'SET'               => true,
-            'TABLE'             => true,
-            'TEMP'              => true,
-            'TEMPORARY'         => true,
-            'THEN'              => true,
-            'TO'                => true,
-            'TRANSACTION'       => true,
-            'TRIGGER'           => true,
-            'UNION'             => true,
-            'UNIQUE'            => true,
-            'UPDATE'            => true,
-            'USING'             => true,
-            'VACUUM'            => true,
-            'VALUES'            => true,
-            'VIEW'              => true,
-            'VIRTUAL'           => true,
-            'WHEN'              => true,
-            'WHERE'             => true,
-            'WITH'              => true,
-            'WITHOUT'           => true,
+            'DATABASE' => true,
+            'DEFAULT' => true,
+            'DEFERRABLE' => true,
+            'DEFERRED' => true,
+            'DELETE' => true,
+            'DESC' => true,
+            'DETACH' => true,
+            'DISTINCT' => true,
+            'DROP' => true,
+            'EACH' => true,
+            'ELSE' => true,
+            'END' => true,
+            'ESCAPE' => true,
+            'EXCEPT' => true,
+            'EXCLUSIVE' => true,
+            'EXISTS' => true,
+            'EXPLAIN' => true,
+            'FAIL' => true,
+            'FOR' => true,
+            'FOREIGN' => true,
+            'FROM' => true,
+            'FULL' => true,
+            'GLOB' => true,
+            'GROUP' => true,
+            'HAVING' => true,
+            'IF' => true,
+            'IGNORE' => true,
+            'IMMEDIATE' => true,
+            'IN' => true,
+            'INDEX' => true,
+            'INDEXED' => true,
+            'INITIALLY' => true,
+            'INNER' => true,
+            'INSERT' => true,
+            'INSTEAD' => true,
+            'INTERSECT' => true,
+            'INTO' => true,
+            'IS' => true,
+            'ISNULL' => true,
+            'JOIN' => true,
+            'KEY' => true,
+            'LEFT' => true,
+            'LIKE' => true,
+            'LIMIT' => true,
+            'MATCH' => true,
+            'NATURAL' => true,
+            'NO' => true,
+            'NOT' => true,
+            'NOTNULL' => true,
+            'NULL' => true,
+            'OF' => true,
+            'OFFSET' => true,
+            'ON' => true,
+            'OR' => true,
+            'ORDER' => true,
+            'OUTER' => true,
+            'PLAN' => true,
+            'PRAGMA' => true,
+            'PRIMARY' => true,
+            'QUERY' => true,
+            'RAISE' => true,
+            'RECURSIVE' => true,
+            'REFERENCES' => true,
+            'REGEXP' => true,
+            'REINDEX' => true,
+            'RELEASE' => true,
+            'RENAME' => true,
+            'REPLACE' => true,
+            'RESTRICT' => true,
+            'RIGHT' => true,
+            'ROLLBACK' => true,
+            'ROW' => true,
+            'SAVEPOINT' => true,
+            'SELECT' => true,
+            'SET' => true,
+            'TABLE' => true,
+            'TEMP' => true,
+            'TEMPORARY' => true,
+            'THEN' => true,
+            'TO' => true,
+            'TRANSACTION' => true,
+            'TRIGGER' => true,
+            'UNION' => true,
+            'UNIQUE' => true,
+            'UPDATE' => true,
+            'USING' => true,
+            'VACUUM' => true,
+            'VALUES' => true,
+            'VIEW' => true,
+            'VIRTUAL' => true,
+            'WHEN' => true,
+            'WHERE' => true,
+            'WITH' => true,
+            'WITHOUT' => true,
         ];
 
         $string = mb_strtoupper($string, 'UTF-8');
+
         if (!isset($keywords[$string])) {
             return false;
         }
