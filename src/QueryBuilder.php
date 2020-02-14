@@ -192,7 +192,7 @@ class QueryBuilder extends BaseQueryBuilder
      *
      * @return string the SQL statement for checking integrity
      */
-    public function checkIntegrity(bool $check = true, string $schema = '', string $table = ''): string
+    public function checkIntegrity(string $schema = '', string $table = '', bool $check = true): string
     {
         return 'PRAGMA foreign_keys=' . (int) $check;
     }
