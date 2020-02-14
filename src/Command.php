@@ -18,7 +18,7 @@ class Command extends BaseCommand
     /**
      * {@inheritdoc}
      */
-    public function execute(): ?int
+    public function execute(): int
     {
         $sql = $this->getSql();
 
@@ -30,7 +30,7 @@ class Command extends BaseCommand
             return parent::execute();
         }
 
-        $result = null;
+        $result = 0;
 
         foreach ($statements as $statement) {
             [$statementSql, $statementParams] = $statement;
