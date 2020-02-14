@@ -89,7 +89,6 @@ class Command extends BaseCommand
         $semicolonIndex = strpos($sql, ';');
 
         if ($semicolonIndex === false || $semicolonIndex === StringHelper::byteLength($sql) - 1) {
-
             return false;
         }
 
