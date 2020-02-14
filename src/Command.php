@@ -1,45 +1,43 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
+
+declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use Yiisoft\Db\SqlToken;
+use Yiisoft\Db\Commands\Command as BaseCommand;
+use Yiisoft\Db\Tokens\SqlToken;
 use Yiisoft\Strings\StringHelper;
 
 /**
  * Command represents an SQLite's SQL statement to be executed against a database.
  *
  * {@inheritdoc}
- *
- * @author Sergey Makinen <sergey@makinen.ru>
- *
- * @since 2.0.14
  */
-class Command extends \Yiisoft\Db\Command
+class Command extends BaseCommand
 {
     /**
      * {@inheritdoc}
      */
-    public function execute()
+    public function execute(): int
     {
         $sql = $this->getSql();
+
         $params = $this->params;
+
         $statements = $this->splitStatements($sql, $params);
+
         if ($statements === false) {
             return parent::execute();
         }
 
-        $result = null;
+        $result = 0;
+
         foreach ($statements as $statement) {
             [$statementSql, $statementParams] = $statement;
             $this->setSql($statementSql)->bindValues($statementParams);
             $result = parent::execute();
         }
+
         $this->setSql($sql)->bindValues($params);
 
         return $result;
@@ -51,48 +49,60 @@ class Command extends \Yiisoft\Db\Command
     protected function queryInternal($method, $fetchMode = null)
     {
         $sql = $this->getSql();
+
         $params = $this->params;
+
         $statements = $this->splitStatements($sql, $params);
+
         if ($statements === false) {
             return parent::queryInternal($method, $fetchMode);
         }
 
         [$lastStatementSql, $lastStatementParams] = array_pop($statements);
+
         foreach ($statements as $statement) {
             [$statementSql, $statementParams] = $statement;
             $this->setSql($statementSql)->bindValues($statementParams);
             parent::execute();
         }
+
         $this->setSql($lastStatementSql)->bindValues($lastStatementParams);
+
         $result = parent::queryInternal($method, $fetchMode);
+
         $this->setSql($sql)->bindValues($params);
 
         return $result;
     }
 
     /**
-     * Splits the specified SQL code into individual SQL statements and returns them
-     * or `false` if there's a single statement.
+     * Splits the specified SQL code into individual SQL statements and returns them or `false` if there's a single
+     * statement.
      *
      * @param string $sql
-     * @param array  $params
+     * @param array $params
      *
      * @return string[]|false
      */
     private function splitStatements($sql, $params)
     {
         $semicolonIndex = strpos($sql, ';');
+
         if ($semicolonIndex === false || $semicolonIndex === StringHelper::byteLength($sql) - 1) {
+
             return false;
         }
 
         $tokenizer = new SqlTokenizer($sql);
+
         $codeToken = $tokenizer->tokenize();
+
         if (count($codeToken->getChildren()) === 1) {
             return false;
         }
 
         $statements = [];
+
         foreach ($codeToken->getChildren() as $statement) {
             $statements[] = [$statement->getSql(), $this->extractUsedParams($statement, $params)];
         }
@@ -104,20 +114,21 @@ class Command extends \Yiisoft\Db\Command
      * Returns named bindings used in the specified statement token.
      *
      * @param SqlToken $statement
-     * @param array    $params
-     *
+     * @param array $params
      * @return array
      */
     private function extractUsedParams(SqlToken $statement, $params)
     {
         preg_match_all('/(?P<placeholder>[:][a-zA-Z0-9_]+)/', $statement->getSql(), $matches, PREG_SET_ORDER);
+
         $result = [];
+
         foreach ($matches as $match) {
             $phName = ltrim($match['placeholder'], ':');
             if (isset($params[$phName])) {
                 $result[$phName] = $params[$phName];
-            } elseif (isset($params[':'.$phName])) {
-                $result[':'.$phName] = $params[':'.$phName];
+            } elseif (isset($params[':' . $phName])) {
+                $result[':' . $phName] = $params[':' . $phName];
             }
         }
 
