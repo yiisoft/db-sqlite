@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Tests\Sqlite;
+namespace Yiisoft\Db\Sqlite\Tests;
 
 use Yiisoft\Db\Tests\CommandTest as AbstractCommandTest;
 
-final class CommandTest extends AbstractCommandTest
+class CommandTest extends AbstractCommandTest
 {
     protected ?string $driverName = 'sqlite';
 
