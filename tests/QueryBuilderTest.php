@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Tests\Sqlite;
+namespace Yiisoft\Db\Sqlite\Tests;
 
 use Yiisoft\Db\Querys\Query;
-use Yiisoft\Db\Schemas\Schema;
+use Yiisoft\Db\Sqlite\Schema;
 use Yiisoft\Db\Tests\TraversableObject;
 use Yiisoft\Db\Tests\QueryBuilderTest as AbstractQueryBuilderTest;
 
-final class QueryBuilderTest extends AbstractQueryBuilderTest
+class QueryBuilderTest extends AbstractQueryBuilderTest
 {
     protected ?string $driverName = 'sqlite';
 

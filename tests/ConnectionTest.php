@@ -2,22 +2,135 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Tests\Sqlite;
+namespace Yiisoft\Db\Sqlite\Tests;
 
 use Yiisoft\Db\Drivers\Connection;
+use Yiisoft\Db\Exceptions\InvalidConfigException;
 use Yiisoft\Db\Transactions\Transaction;
 use Yiisoft\Db\Tests\ConnectionTest as AbstractConnectionTest;
 
-final class ConnectionTest extends AbstractConnectionTest
+class ConnectionTest extends AbstractConnectionTest
 {
     protected ?string $driverName = 'sqlite';
 
     public function testConstruct(): void
     {
         $connection = $this->getConnection(false);
-        $params = $this->databases;
 
-        $this->assertEquals($params['dsn']['host'], $connection->getDsn());
+        $this->assertEquals($this->databases['dsn'], $connection->getDsn());
+    }
+
+    /**
+     * Test whether slave connection is recovered when call getSlavePdo() after close().
+     *
+     * @see https://github.com/yiisoft/yii2/issues/14165
+     */
+    public function testGetPdoAfterClose(): void
+    {
+        $connection = $this->getConnection();
+
+        $connection->slaves[] = [
+            'dsn' => $this->databases['dsn'],
+        ];
+
+        $this->assertNotNull($connection->getSlavePdo(false));
+
+        $connection->close();
+
+        $masterPdo = $connection->getMasterPdo();
+        $this->assertNotFalse($masterPdo);
+        $this->assertNotNull($masterPdo);
+
+        $slavePdo = $connection->getSlavePdo(false);
+        $this->assertNotFalse($slavePdo);
+        $this->assertNotNull($slavePdo);
+        $this->assertNotSame($masterPdo, $slavePdo);
+    }
+
+    public function testServerStatusCacheWorks(): void
+    {
+        $connection = $this->getConnection(true, false);
+
+        $connection->masters[] = [
+            'dsn' => $this->databases['dsn'],
+        ];
+
+        $connection->shuffleMasters = false;
+
+        $cacheKey = ['Yiisoft\Db\Drivers\Connection::openFromPoolSequentially', $connection->getDsn()];
+
+        $this->assertFalse($this->cache->has($cacheKey));
+
+        $connection->open();
+
+        $this->assertFalse(
+            $this->cache->has($cacheKey),
+            'Connection was successful – cache must not contain information about this DSN'
+        );
+
+        $connection->close();
+
+        $connection = $this->getConnection(true, false);
+
+        $cacheKey = ['Yiisoft\Db\Drivers\Connection::openFromPoolSequentially', 'host:invalid'];
+
+        $connection->masters[] = [
+            'dsn' => 'host:invalid',
+        ];
+
+        $connection->shuffleMasters = true;
+
+        try {
+            $connection->open();
+        } catch (InvalidConfigException $e) {
+        }
+
+        $this->assertTrue(
+            $this->cache->has($cacheKey),
+            'Connection was not successful – cache must contain information about this DSN'
+        );
+
+        $connection->close();
+    }
+
+    public function testServerStatusCacheCanBeDisabled(): void
+    {
+        $this->cache->clear();
+
+        $connection = $this->getConnection(true, false);
+
+        $connection->masters[] = [
+            'dsn' => $this->databases['dsn'],
+        ];
+
+        $connection->setSchemaCache(null);
+
+        $connection->shuffleMasters = false;
+
+        $cacheKey = ['Yiisoft\Db\Drivers\Connection::openFromPoolSequentially', $connection->getDsn()];
+
+        $this->assertFalse($this->cache->has($cacheKey));
+
+        $connection->open();
+
+        $this->assertFalse($this->cache->has($cacheKey), 'Caching is disabled');
+
+        $connection->close();
+
+        $cacheKey = ['Yiisoft\Db\Drivers\Connection::openFromPoolSequentially', 'host:invalid'];
+
+        $connection->masters[] = [
+            'dsn' => 'host:invalid',
+        ];
+
+        try {
+            $connection->open();
+        } catch (InvalidConfigException $e) {
+        }
+
+        $this->assertFalse($this->cache->has($cacheKey), 'Caching is disabled');
+
+        $connection->close();
     }
 
     public function testQuoteValue(): void
@@ -161,31 +274,19 @@ final class ConnectionTest extends AbstractConnectionTest
 
         for ($i = 0; $i < $masterCount; ++$i) {
             $this->prepareDatabase(true, true, [
-                'dsn' => [
-                    'driver' => 'sqlite',
-                    'host' =>  'sqlite:' .  dirname(__DIR__) . "/data/yii_test_master{$i}.sq3",
-                ]
+                'dsn' => 'sqlite:' .  __DIR__ . "/data/yii_test_master{$i}.sq3",
             ]);
             $db->masters[] = [
-                'cache'    => $this->cache,
-                'logger'   => $this->logger,
-                'profiler' => $this->profiler,
-                'dsn'      => 'sqlite:' .  dirname(__DIR__) . "/data/yii_test_master{$i}.sq3",
+                'dsn' => 'sqlite:' .  __DIR__ . "/data/yii_test_master{$i}.sq3",
             ];
         }
 
         for ($i = 0; $i < $slaveCount; ++$i) {
             $this->prepareDatabase(true, true, [
-                'dsn' => [
-                    'driver' => 'sqlite',
-                    'host' => 'sqlite:' .  dirname(__DIR__) . "/data/yii_test_slave{$i}.sq3",
-                ]
+                'dsn' =>  'sqlite:' .  __DIR__ . "/data/yii_test_slave{$i}.sq3",
             ]);
             $db->slaves[] = [
-                'cache'    => $this->cache,
-                'logger'   => $this->logger,
-                'profiler' => $this->profiler,
-                'dsn'      => 'sqlite:' .  dirname(__DIR__) . "/data/yii_test_slave{$i}.sq3",
+                'dsn' => 'sqlite:' .  __DIR__ . "/data/yii_test_slave{$i}.sq3",
             ];
         }
 

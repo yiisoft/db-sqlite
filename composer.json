@@ -34,11 +34,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Yiisoft\\Db\\Sqlite\\": "src"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
+            "Yiisoft\\Db\\Sqlite\\": "src",
             "Yiisoft\\Db\\Sqlite\\Tests\\": "tests"
         }
     },

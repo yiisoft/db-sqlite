@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Tests\Sqlite;
+namespace Yiisoft\Db\Sqlite\Tests;
 
-use Yiisoft\Db\Schemas\Schema;
 use Yiisoft\Db\Sqlite\ColumnSchemaBuilder;
+use Yiisoft\Db\Sqlite\Schema;
 use Yiisoft\Db\Tests\ColumnSchemaBuilderTest as AbstractColumnSchemaBuilderTest;
 
-final class ColumnSchemaBuilderTest extends AbstractColumnSchemaBuilderTest
+class ColumnSchemaBuilderTest extends AbstractColumnSchemaBuilderTest
 {
     public ?string $driverName = 'sqlite';
 
