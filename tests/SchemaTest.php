@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Tests\Sqlite;
+namespace Yiisoft\Db\Sqlite\Tests;
 
 use Yiisoft\Db\Constraints\Constraint;
 use Yiisoft\Db\Tests\AnyValue;
 use Yiisoft\Db\Tests\SchemaTest as AbstractSchemaTest;
 
-final class SchemaTest extends AbstractSchemaTest
+class SchemaTest extends AbstractSchemaTest
 {
     protected ?string $driverName = 'sqlite';
 
