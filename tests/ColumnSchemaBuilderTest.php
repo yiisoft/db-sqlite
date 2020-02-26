@@ -10,7 +10,7 @@ use Yiisoft\Db\Tests\ColumnSchemaBuilderTest as AbstractColumnSchemaBuilderTest;
 
 class ColumnSchemaBuilderTest extends AbstractColumnSchemaBuilderTest
 {
-    public ?string $driverName = 'sqlite';
+    protected ?string $driverName = 'sqlite';
 
     /**
      * @param string $type
