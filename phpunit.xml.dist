@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="./vendor/autoload.php"
-    backupGlobals="true"
-    colors="true"
-    verbose="true"
-    failOnRisky="true"
-    failOnWarning="true"
-    convertErrorsToExceptions="true"
-    convertNoticesToExceptions="true"
-    convertWarningsToExceptions="true"
-    stopOnFailure="false">
+
+<phpunit backupGlobals="false"
+         colors="true"
+         verbose="true"
+         bootstrap="tests/bootstrap.php"
+         failOnRisky="true"
+         failOnWarning="true">
+    <php>
+        <ini name="error_reporting" value="-1"/>
+    </php>
+
     <testsuites>
         <testsuite name="Yii Db Sqlite Tests">
             <directory>./tests</directory>
