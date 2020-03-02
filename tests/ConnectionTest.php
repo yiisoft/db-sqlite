@@ -29,9 +29,7 @@ class ConnectionTest extends AbstractConnectionTest
     {
         $connection = $this->getConnection();
 
-        $connection->slaves[] = [
-            'dsn' => $this->databases['dsn'],
-        ];
+        $connection->setSlaves('1', $this->databases['dsn']);
 
         $this->assertNotNull($connection->getSlavePdo(false));
 
@@ -51,11 +49,9 @@ class ConnectionTest extends AbstractConnectionTest
     {
         $connection = $this->getConnection(true, false);
 
-        $connection->masters[] = [
-            'dsn' => $this->databases['dsn'],
-        ];
+        $connection->setMasters('1', $this->databases['dsn']);
 
-        $connection->shuffleMasters = false;
+        $connection->setShuffleMasters(false);
 
         $cacheKey = ['Yiisoft\Db\Drivers\Connection::openFromPoolSequentially', $connection->getDsn()];
 
@@ -74,11 +70,9 @@ class ConnectionTest extends AbstractConnectionTest
 
         $cacheKey = ['Yiisoft\Db\Drivers\Connection::openFromPoolSequentially', 'host:invalid'];
 
-        $connection->masters[] = [
-            'dsn' => 'host:invalid',
-        ];
+        $connection->setMasters('1', 'host:invalid');
 
-        $connection->shuffleMasters = true;
+        $connection->setShuffleMasters(true);
 
         try {
             $connection->open();
@@ -99,13 +93,11 @@ class ConnectionTest extends AbstractConnectionTest
 
         $connection = $this->getConnection(true, false);
 
-        $connection->masters[] = [
-            'dsn' => $this->databases['dsn'],
-        ];
+        $connection->setMasters('1', $this->databases['dsn']);
 
         $connection->setSchemaCache(null);
 
-        $connection->shuffleMasters = false;
+        $connection->setShuffleMasters(false);
 
         $cacheKey = ['Yiisoft\Db\Drivers\Connection::openFromPoolSequentially', $connection->getDsn()];
 
@@ -119,9 +111,7 @@ class ConnectionTest extends AbstractConnectionTest
 
         $cacheKey = ['Yiisoft\Db\Drivers\Connection::openFromPoolSequentially', 'host:invalid'];
 
-        $connection->masters[] = [
-            'dsn' => 'host:invalid',
-        ];
+        $connection->setMasters('1', 'host:invalid');
 
         try {
             $connection->open();
@@ -136,6 +126,7 @@ class ConnectionTest extends AbstractConnectionTest
     public function testQuoteValue(): void
     {
         $connection = $this->getConnection(false);
+
         $this->assertEquals(123, $connection->quoteValue(123));
         $this->assertEquals("'string'", $connection->quoteValue('string'));
         $this->assertEquals("'It''s interesting'", $connection->quoteValue("It's interesting"));
@@ -164,25 +155,28 @@ class ConnectionTest extends AbstractConnectionTest
             $db = $this->prepareMasterSlave($masterCount, $slaveCount);
 
             $this->assertInstanceOf(Connection::class, $db->getSlave());
-            $this->assertTrue($db->getSlave()->getIsActive());
-            $this->assertFalse($db->getIsActive());
+            $this->assertTrue($db->getSlave()->isActive());
+            $this->assertFalse($db->isActive());
 
             // test SELECT uses slave
             $this->assertEquals(2, $db->createCommand('SELECT COUNT(*) FROM profile')->queryScalar());
-            $this->assertFalse($db->getIsActive());
+            $this->assertFalse($db->isActive());
 
             // test UPDATE uses master
             $db->createCommand("UPDATE profile SET description='test' WHERE id=1")->execute();
-            $this->assertTrue($db->getIsActive());
+            $this->assertTrue($db->isActive());
 
             if ($masterCount > 0) {
                 $this->assertInstanceOf(Connection::class, $db->getMaster());
-                $this->assertTrue($db->getMaster()->getIsActive());
+                $this->assertTrue($db->getMaster()->isActive());
             } else {
                 $this->assertNull($db->getMaster());
             }
 
-            $this->assertNotEquals('test', $db->createCommand('SELECT description FROM profile WHERE id=1')->queryScalar());
+            $this->assertNotEquals(
+                'test',
+                $db->createCommand('SELECT description FROM profile WHERE id=1')->queryScalar()
+            );
 
             $result = $db->useMaster(static function (Connection $db) {
                 return $db->createCommand('SELECT description FROM profile WHERE id=1')->queryScalar();
@@ -204,7 +198,7 @@ class ConnectionTest extends AbstractConnectionTest
 
         for ($i = $nodesCount * $retryPerNode; $i-- > 0;) {
             $db = $this->prepareMasterSlave($mastersCount, $slavesCount);
-            $db->shuffleMasters = true;
+            $db->setShuffleMasters(true);
 
             $hit_slaves[$db->getSlave()->getDsn()] = true;
             $hit_masters[$db->getMaster()->getDsn()] = true;
@@ -230,7 +224,7 @@ class ConnectionTest extends AbstractConnectionTest
 
         for ($i = $nodesCount * $retryPerNode; $i-- > 0;) {
             $db = $this->prepareMasterSlave($mastersCount, $slavesCount);
-            $db->shuffleMasters = false;
+            $db->setShuffleMasters(false);
 
             $hit_slaves[$db->getSlave()->getDsn()] = true;
             $hit_masters[$db->getMaster()->getDsn()] = true;
@@ -249,7 +243,7 @@ class ConnectionTest extends AbstractConnectionTest
     public function testRestoreMasterAfterException(): void
     {
         $db = $this->prepareMasterSlave(1, 1);
-        $this->assertTrue($db->enableSlaves);
+        $this->assertTrue($db->areSlavesEnabled());
 
         try {
             $db->useMaster(static function (Connection $db) {
@@ -260,7 +254,7 @@ class ConnectionTest extends AbstractConnectionTest
             // ok
         }
 
-        $this->assertTrue($db->enableSlaves);
+        $this->assertTrue($db->areSlavesEnabled());
     }
 
     public function testExceptionContainsRawQuery(): void
@@ -276,18 +270,16 @@ class ConnectionTest extends AbstractConnectionTest
             $this->prepareDatabase(true, true, [
                 'dsn' => 'sqlite:' .  __DIR__ . "/data/yii_test_master{$i}.sq3",
             ]);
-            $db->masters[] = [
-                'dsn' => 'sqlite:' .  __DIR__ . "/data/yii_test_master{$i}.sq3",
-            ];
+
+            $db->setMasters("$i", 'sqlite:' .  __DIR__ . "/data/yii_test_master{$i}.sq3");
         }
 
         for ($i = 0; $i < $slaveCount; ++$i) {
             $this->prepareDatabase(true, true, [
                 'dsn' =>  'sqlite:' .  __DIR__ . "/data/yii_test_slave{$i}.sq3",
             ]);
-            $db->slaves[] = [
-                'dsn' => 'sqlite:' .  __DIR__ . "/data/yii_test_slave{$i}.sq3",
-            ];
+
+            $db->setSlaves("$i", 'sqlite:' .  __DIR__ . "/data/yii_test_slave{$i}.sq3");
         }
 
         $db->close();
