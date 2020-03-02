@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
-use Yiisoft\Db\Sqlite\ColumnSchemaBuilder;
-use Yiisoft\Db\Sqlite\Schema;
+use Yiisoft\Db\Sqlite\Schema\ColumnSchemaBuilder;
+use Yiisoft\Db\Sqlite\Schema\Schema;
 use Yiisoft\Db\Tests\ColumnSchemaBuilderTest as AbstractColumnSchemaBuilderTest;
 
 class ColumnSchemaBuilderTest extends AbstractColumnSchemaBuilderTest

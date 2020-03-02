@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite;
-
-use Yiisoft\Db\Tokens\SqlTokenizer as BaseSqlTokenizer;
+namespace Yiisoft\Db\Sqlite\Token;
 
 /**
  * SqlTokenizer splits SQLite query into individual SQL tokens.
@@ -14,7 +12,7 @@ use Yiisoft\Db\Tokens\SqlTokenizer as BaseSqlTokenizer;
  * {@see http://www.sqlite.org/draft/tokenreq.html}
  * {@see https://sqlite.org/lang.html}
  */
-class SqlTokenizer extends BaseSqlTokenizer
+class SqlTokenizer extends BaseTokenizer
 {
     /**
      * {@inheritdoc}
