@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite;
+namespace Yiisoft\Db\Sqlite\Schema;
 
+use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\Constraints\CheckConstraint;
 use Yiisoft\Db\Constraints\Constraint;
 use Yiisoft\Db\Constraints\ConstraintFinderInterface;
@@ -12,12 +13,13 @@ use Yiisoft\Db\Constraints\ForeignKeyConstraint;
 use Yiisoft\Db\Constraints\IndexConstraint;
 use Yiisoft\Db\Exceptions\NotSupportedException;
 use Yiisoft\Db\Expressions\Expression;
-use Yiisoft\Db\Tokens\SqlToken;
 use Yiisoft\Db\Schemas\Schema as AbstractSchema;
 use Yiisoft\Db\Schemas\ColumnSchema;
 use Yiisoft\Db\Schemas\TableSchema;
+use Yiisoft\Db\Sqlite\Query\QueryBuilder;
+use Yiisoft\Db\Sqlite\Token\SqlToken;
+use Yiisoft\Db\Sqlite\Token\SqlTokenizer;
 use Yiisoft\Db\Transactions\Transaction;
-use Yiisoft\Arrays\ArrayHelper;
 
 /**
  * Schema is the class for retrieving metadata from a SQLite (2/3) database.
