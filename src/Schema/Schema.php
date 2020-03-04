@@ -88,7 +88,7 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
     /**
      * {@inheritdoc}
      */
-    protected function loadTableSchema($name)
+    protected function loadTableSchema(string $name): ?TableSchema
     {
         $table = new TableSchema();
 
