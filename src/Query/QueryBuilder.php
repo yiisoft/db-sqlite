@@ -547,13 +547,13 @@ class QueryBuilder extends BaseQueryBuilder
             '/(`.*`) ON ({{(%?)([\w\-]+)}\}\.{{((%?)[\w\-]+)\\}\\})|(`.*`) ON ({{(%?)([\w\-]+)\.([\w\-]+)\\}\\})/',
             static function ($matches) {
                 if (!empty($matches[1])) {
-                    return $matches[4].".".$matches[1]
-                     . ' ON {{' .$matches[3].$matches[5] . '}}';
+                    return $matches[4] . "." . $matches[1]
+                     . ' ON {{' . $matches[3] . $matches[5] . '}}';
                 }
 
                 if (!empty($matches[7])) {
-                    return $matches[10]. '.' .$matches[7]
-                     . ' ON {{' .$matches[9].$matches[11] . '}}';
+                    return $matches[10] . '.' . $matches[7]
+                     . ' ON {{' . $matches[9] . $matches[11] . '}}';
                 }
             },
             $sql
@@ -597,7 +597,12 @@ class QueryBuilder extends BaseQueryBuilder
         /** @var Constraint[] $constraints */
         $constraints = [];
 
-        [$uniqueNames, $insertNames, $updateNames] = $this->prepareUpsertColumns($table, $insertColumns, $updateColumns, $constraints);
+        [$uniqueNames, $insertNames, $updateNames] = $this->prepareUpsertColumns(
+            $table,
+            $insertColumns,
+            $updateColumns,
+            $constraints
+        );
 
         if (empty($uniqueNames)) {
             return $this->insert($table, $insertColumns, $params);
@@ -638,8 +643,8 @@ class QueryBuilder extends BaseQueryBuilder
         }
 
         $updateSql = 'WITH "EXCLUDED" (' . implode(', ', $insertNames)
-            . ') AS (' . (!empty($placeholders) ? 'VALUES (' . implode(', ', $placeholders) . ')' : ltrim($values, ' ')) . ') '
-            . $this->update($table, $updateColumns, $updateCondition, $params);
+            . ') AS (' . (!empty($placeholders) ? 'VALUES (' . implode(', ', $placeholders) . ')' : ltrim($values, ' '))
+            . ') ' . $this->update($table, $updateColumns, $updateCondition, $params);
 
         return "$updateSql; $insertSql;";
     }
