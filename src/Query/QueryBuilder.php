@@ -27,7 +27,7 @@ class QueryBuilder extends BaseQueryBuilder
     /**
      * @var array mapping from abstract column types (keys) to physical column types (values).
      */
-    public array $typeMap = [
+    protected array $typeMap = [
         Schema::TYPE_PK => 'integer PRIMARY KEY AUTOINCREMENT NOT NULL',
         Schema::TYPE_UPK => 'integer UNSIGNED PRIMARY KEY AUTOINCREMENT NOT NULL',
         Schema::TYPE_BIGPK => 'integer PRIMARY KEY AUTOINCREMENT NOT NULL',
@@ -491,43 +491,43 @@ class QueryBuilder extends BaseQueryBuilder
     {
         $query = $query->prepare($this);
 
-        $params = empty($params) ? $query->params : array_merge($params, $query->params);
+        $params = empty($params) ? $query->getParams() : array_merge($params, $query->getParams());
 
         $clauses = [
-            $this->buildSelect($query->select, $params, $query->distinct, $query->selectOption),
-            $this->buildFrom($query->from, $params),
-            $this->buildJoin($query->join, $params),
-            $this->buildWhere($query->where, $params),
-            $this->buildGroupBy($query->groupBy),
-            $this->buildHaving($query->having, $params),
+            $this->buildSelect($query->getSelect(), $params, $query->getDistinct(), $query->getSelectOption()),
+            $this->buildFrom($query->getFrom(), $params),
+            $this->buildJoin($query->getJoin(), $params),
+            $this->buildWhere($query->getWhere(), $params),
+            $this->buildGroupBy($query->getGroupBy()),
+            $this->buildHaving($query->getHaving(), $params),
         ];
 
         $sql = implode($this->separator, array_filter($clauses));
-        $sql = $this->buildOrderByAndLimit($sql, $query->orderBy, $query->limit, $query->offset);
+        $sql = $this->buildOrderByAndLimit($sql, $query->getOrderBy(), $query->getLimit(), $query->getOffset());
 
-        if (!empty($query->orderBy)) {
-            foreach ($query->orderBy as $expression) {
+        if (!empty($query->getOrderBy())) {
+            foreach ($query->getOrderBy() as $expression) {
                 if ($expression instanceof ExpressionInterface) {
                     $this->buildExpression($expression, $params);
                 }
             }
         }
 
-        if (!empty($query->groupBy)) {
-            foreach ($query->groupBy as $expression) {
+        if (!empty($query->getGroupBy())) {
+            foreach ($query->getGroupBy() as $expression) {
                 if ($expression instanceof ExpressionInterface) {
                     $this->buildExpression($expression, $params);
                 }
             }
         }
 
-        $union = $this->buildUnion($query->union, $params);
+        $union = $this->buildUnion($query->getUnion(), $params);
 
         if ($union !== '') {
             $sql = "$sql{$this->separator}$union";
         }
 
-        $with = $this->buildWithQueries($query->withQueries, $params);
+        $with = $this->buildWithQueries($query->getWithQueries(), $params);
 
         if ($with !== '') {
             $sql = "$with{$this->separator}$sql";
@@ -547,13 +547,13 @@ class QueryBuilder extends BaseQueryBuilder
             '/(`.*`) ON ({{(%?)([\w\-]+)}\}\.{{((%?)[\w\-]+)\\}\\})|(`.*`) ON ({{(%?)([\w\-]+)\.([\w\-]+)\\}\\})/',
             static function ($matches) {
                 if (!empty($matches[1])) {
-                    return $matches[4].".".$matches[1]
-                     . ' ON {{' .$matches[3].$matches[5] . '}}';
+                    return $matches[4] . "." . $matches[1]
+                     . ' ON {{' . $matches[3] . $matches[5] . '}}';
                 }
 
                 if (!empty($matches[7])) {
-                    return $matches[10]. '.' .$matches[7]
-                     . ' ON {{' .$matches[9].$matches[11] . '}}';
+                    return $matches[10] . '.' . $matches[7]
+                     . ' ON {{' . $matches[9] . $matches[11] . '}}';
                 }
             },
             $sql
@@ -597,7 +597,12 @@ class QueryBuilder extends BaseQueryBuilder
         /** @var Constraint[] $constraints */
         $constraints = [];
 
-        [$uniqueNames, $insertNames, $updateNames] = $this->prepareUpsertColumns($table, $insertColumns, $updateColumns, $constraints);
+        [$uniqueNames, $insertNames, $updateNames] = $this->prepareUpsertColumns(
+            $table,
+            $insertColumns,
+            $updateColumns,
+            $constraints
+        );
 
         if (empty($uniqueNames)) {
             return $this->insert($table, $insertColumns, $params);
@@ -638,8 +643,8 @@ class QueryBuilder extends BaseQueryBuilder
         }
 
         $updateSql = 'WITH "EXCLUDED" (' . implode(', ', $insertNames)
-            . ') AS (' . (!empty($placeholders) ? 'VALUES (' . implode(', ', $placeholders) . ')' : ltrim($values, ' ')) . ') '
-            . $this->update($table, $updateColumns, $updateCondition, $params);
+            . ') AS (' . (!empty($placeholders) ? 'VALUES (' . implode(', ', $placeholders) . ')' : ltrim($values, ' '))
+            . ') ' . $this->update($table, $updateColumns, $updateCondition, $params);
 
         return "$updateSql; $insertSql;";
     }
