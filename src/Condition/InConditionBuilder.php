@@ -35,7 +35,7 @@ class InConditionBuilder extends BaseInConditionBuilder
         $quotedColumns = [];
 
         foreach ($columns as $i => $column) {
-            $quotedColumns[$i] = strpos($column, '(') === false ? $this->queryBuilder->db->quoteColumnName($column) : $column;
+            $quotedColumns[$i] = strpos($column, '(') === false ? $this->queryBuilder->getDb()->quoteColumnName($column) : $column;
         }
 
         $vss = [];
