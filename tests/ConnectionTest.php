@@ -268,18 +268,18 @@ class ConnectionTest extends AbstractConnectionTest
 
         for ($i = 0; $i < $masterCount; ++$i) {
             $this->prepareDatabase(true, true, [
-                'dsn' => 'sqlite:' .  __DIR__ . "/data/yii_test_master{$i}.sq3",
+                'dsn' => 'sqlite:' . __DIR__ . "/data/yii_test_master{$i}.sq3",
             ]);
 
-            $db->setMasters("$i", 'sqlite:' .  __DIR__ . "/data/yii_test_master{$i}.sq3");
+            $db->setMasters("$i", 'sqlite:' . __DIR__ . "/data/yii_test_master{$i}.sq3");
         }
 
         for ($i = 0; $i < $slaveCount; ++$i) {
             $this->prepareDatabase(true, true, [
-                'dsn' =>  'sqlite:' .  __DIR__ . "/data/yii_test_slave{$i}.sq3",
+                'dsn' =>  'sqlite:' . __DIR__ . "/data/yii_test_slave{$i}.sq3",
             ]);
 
-            $db->setSlaves("$i", 'sqlite:' .  __DIR__ . "/data/yii_test_slave{$i}.sq3");
+            $db->setSlaves("$i", 'sqlite:' . __DIR__ . "/data/yii_test_slave{$i}.sq3");
         }
 
         $db->close();
