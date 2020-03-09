@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Command;
 
-use Yiisoft\Db\Commands\Command as BaseCommand;
+use Yiisoft\Db\Command\Command as BaseCommand;
 use Yiisoft\Db\Sqlite\Token\SqlToken;
 use Yiisoft\Db\Sqlite\Token\SqlTokenizer;
 use Yiisoft\Strings\StringHelper;

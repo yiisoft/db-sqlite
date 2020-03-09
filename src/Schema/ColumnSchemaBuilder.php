@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Schema;
 
-use Yiisoft\Db\Schemas\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
+use Yiisoft\Db\Schema\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
 
 /**
  * ColumnSchemaBuilder is the schema builder for Sqlite databases.
