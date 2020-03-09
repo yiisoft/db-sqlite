@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
-use Yiisoft\Db\Querys\Query;
+use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Sqlite\Schema\Schema;
 use Yiisoft\Db\Tests\TraversableObject;
 use Yiisoft\Db\Tests\QueryBuilderTest as AbstractQueryBuilderTest;
@@ -103,7 +103,10 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
             $this->markTestSkipped('This test is only relevant for SQLite < 3.7.11');
         }
         $sql = $this->getQueryBuilder()->batchInsert('{{customer}} t', ['t.id', 't.name'], [[1, 'a'], [2, 'b']]);
-        $this->assertEquals("INSERT INTO {{customer}} t (`t`.`id`, `t`.`name`) SELECT 1, 'a' UNION SELECT 2, 'b'", $sql);
+        $this->assertEquals(
+            "INSERT INTO {{customer}} t (`t`.`id`, `t`.`name`) SELECT 1, 'a' UNION SELECT 2, 'b'",
+            $sql
+        );
     }
 
     public function testRenameTable()

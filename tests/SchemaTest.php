@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
-use Yiisoft\Db\Constraints\Constraint;
+use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Tests\AnyValue;
 use Yiisoft\Db\Tests\SchemaTest as AbstractSchemaTest;
 

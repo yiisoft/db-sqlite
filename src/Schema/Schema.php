@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Schema;
 
 use Yiisoft\Arrays\ArrayHelper;
-use Yiisoft\Db\Constraints\CheckConstraint;
-use Yiisoft\Db\Constraints\Constraint;
-use Yiisoft\Db\Constraints\ConstraintFinderInterface;
-use Yiisoft\Db\Constraints\ConstraintFinderTrait;
-use Yiisoft\Db\Constraints\ForeignKeyConstraint;
-use Yiisoft\Db\Constraints\IndexConstraint;
-use Yiisoft\Db\Exceptions\NotSupportedException;
-use Yiisoft\Db\Expressions\Expression;
-use Yiisoft\Db\Schemas\Schema as AbstractSchema;
-use Yiisoft\Db\Schemas\ColumnSchema;
-use Yiisoft\Db\Schemas\TableSchema;
+use Yiisoft\Db\Constraint\CheckConstraint;
+use Yiisoft\Db\Constraint\Constraint;
+use Yiisoft\Db\Constraint\ConstraintFinderInterface;
+use Yiisoft\Db\Constraint\ConstraintFinderTrait;
+use Yiisoft\Db\Constraint\ForeignKeyConstraint;
+use Yiisoft\Db\Constraint\IndexConstraint;
+use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Schema\Schema as AbstractSchema;
+use Yiisoft\Db\Schema\ColumnSchema;
+use Yiisoft\Db\Schema\TableSchema;
 use Yiisoft\Db\Sqlite\Query\QueryBuilder;
 use Yiisoft\Db\Sqlite\Token\SqlToken;
 use Yiisoft\Db\Sqlite\Token\SqlTokenizer;
-use Yiisoft\Db\Transactions\Transaction;
+use Yiisoft\Db\Transaction\Transaction;
 
 /**
  * Schema is the class for retrieving metadata from a SQLite (2/3) database.
