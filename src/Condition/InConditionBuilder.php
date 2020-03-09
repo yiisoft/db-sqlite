@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Condition;
 
-use Yiisoft\Db\Exceptions\NotSupportedException;
-use Yiisoft\Db\Querys\Query;
-use Yiisoft\Db\Querys\Conditions\InConditionBuilder as BaseInConditionBuilder;
+use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\Query\Conditions\InConditionBuilder as BaseInConditionBuilder;
 
 /**
  * {@inheritdoc}

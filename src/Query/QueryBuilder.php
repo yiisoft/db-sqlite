@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Query;
 
-use Yiisoft\Db\Constraints\Constraint;
-use Yiisoft\Db\Drivers\Connection;
-use Yiisoft\Db\Exceptions\InvalidArgumentException;
-use Yiisoft\Db\Exceptions\NotSupportedException;
-use Yiisoft\Db\Expressions\Expression;
-use Yiisoft\Db\Expressions\ExpressionInterface;
-use Yiisoft\Db\Querys\Query;
-use Yiisoft\Db\Querys\QueryBuilder as BaseQueryBuilder;
-use Yiisoft\Db\Querys\Conditions\LikeCondition;
-use Yiisoft\Db\Querys\Conditions\InCondition;
+use Yiisoft\Db\Constraint\Constraint;
+use Yiisoft\Db\Connection\Connection;
+use Yiisoft\Db\Exception\InvalidArgumentException;
+use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Expression\ExpressionInterface;
+use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\Query\QueryBuilder as BaseQueryBuilder;
+use Yiisoft\Db\Query\Conditions\LikeCondition;
+use Yiisoft\Db\Query\Conditions\InCondition;
 use Yiisoft\Db\Sqlite\Condition\LikeConditionBuilder;
 use Yiisoft\Db\Sqlite\Condition\InConditionBuilder;
 use Yiisoft\Db\Sqlite\Schema\Schema;
