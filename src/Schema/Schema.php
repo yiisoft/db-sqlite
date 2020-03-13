@@ -256,15 +256,15 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
 
         foreach ($columns as $info) {
             $column = $this->loadColumnSchema($info);
-            $table->columns[$column->name] = $column;
-            if ($column->isPrimaryKey) {
-                $table->primaryKey[] = $column->name;
+            $table->columns[$column->getName()] = $column;
+            if ($column->getIsPrimaryKey()) {
+                $table->primaryKey[] = $column->getName();
             }
         }
 
-        if (count($table->primaryKey) === 1 && !strncasecmp($table->columns[$table->primaryKey[0]]->dbType, 'int', 3)) {
+        if (count($table->primaryKey) === 1 && !strncasecmp($table->columns[$table->primaryKey[0]]->getDbType(), 'int', 3)) {
             $table->sequenceName = '';
-            $table->columns[$table->primaryKey[0]]->autoIncrement = true;
+            $table->columns[$table->primaryKey[0]]->autoIncrement(true);
         }
 
         return true;
@@ -340,48 +340,49 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
     protected function loadColumnSchema($info): ColumnSchema
     {
         $column = $this->createColumnSchema();
-        $column->name = $info['name'];
-        $column->allowNull = !$info['notnull'];
-        $column->isPrimaryKey = $info['pk'] != 0;
-        $column->dbType = strtolower($info['type']);
-        $column->unsigned = strpos($column->dbType, 'unsigned') !== false;
-        $column->type = self::TYPE_STRING;
+        $column->name($info['name']);
+        $column->allowNull(!$info['notnull']);
+        $column->isPrimaryKey($info['pk'] != 0);
+        $column->dbType(strtolower($info['type']));
+        $column->unsigned(strpos($column->getDbType(), 'unsigned') !== false);
+        $column->type(self::TYPE_STRING);
 
-        if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->dbType, $matches)) {
+        if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->getDbType(), $matches)) {
             $type = strtolower($matches[1]);
 
             if (isset($this->typeMap[$type])) {
-                $column->type = $this->typeMap[$type];
+                $column->type($this->typeMap[$type]);
             }
 
             if (!empty($matches[2])) {
                 $values = explode(',', $matches[2]);
-                $column->size = $column->precision = (int) $values[0];
+                $column->precision((int) $values[0]);
+                $column->size((int) $values[0]);
                 if (isset($values[1])) {
-                    $column->scale = (int) $values[1];
+                    $column->scale((int) $values[1]);
                 }
-                if ($column->size === 1 && ($type === 'tinyint' || $type === 'bit')) {
-                    $column->type = 'boolean';
+                if ($column->getSize() === 1 && ($type === 'tinyint' || $type === 'bit')) {
+                    $column->type('boolean');
                 } elseif ($type === 'bit') {
-                    if ($column->size > 32) {
-                        $column->type = 'bigint';
-                    } elseif ($column->size === 32) {
-                        $column->type = 'integer';
+                    if ($column->getSize() > 32) {
+                        $column->type('bigint');
+                    } elseif ($column->getSize() === 32) {
+                        $column->type('integer');
                     }
                 }
             }
         }
 
-        $column->phpType = $this->getColumnPhpType($column);
+        $column->phpType($this->getColumnPhpType($column));
 
-        if (!$column->isPrimaryKey) {
+        if (!$column->getIsPrimaryKey()) {
             if ($info['dflt_value'] === 'null' || $info['dflt_value'] === '' || $info['dflt_value'] === null) {
-                $column->defaultValue = null;
-            } elseif ($column->type === 'timestamp' && $info['dflt_value'] === 'CURRENT_TIMESTAMP') {
-                $column->defaultValue = new Expression('CURRENT_TIMESTAMP');
+                $column->defaultValue(null);
+            } elseif ($column->getType() === 'timestamp' && $info['dflt_value'] === 'CURRENT_TIMESTAMP') {
+                $column->defaultValue(new Expression('CURRENT_TIMESTAMP'));
             } else {
                 $value = trim($info['dflt_value'], "'\"");
-                $column->defaultValue = $column->phpTypecast($value);
+                $column->defaultValue($column->phpTypecast($value));
             }
         }
 
