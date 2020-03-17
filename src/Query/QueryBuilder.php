@@ -163,10 +163,11 @@ class QueryBuilder extends BaseQueryBuilder
 
         $table = $db->getTableSchema($tableName);
 
-        if ($table !== null && $table->sequenceName !== null) {
+        if ($table !== null && $table->getSequenceName() !== null) {
             $tableName = $db->quoteTableName($tableName);
             if ($value === null) {
-                $key = $this->db->quoteColumnName(reset($table->primaryKey));
+                $pk = $table->getPrimaryKey();
+                $key = $this->db->quoteColumnName(reset($pk));
                 $value = $this->db->useMaster(function (Connection $db) use ($key, $tableName) {
                     return $db->createCommand("SELECT MAX($key) FROM $tableName")->queryScalar();
                 });
@@ -174,7 +175,7 @@ class QueryBuilder extends BaseQueryBuilder
                 $value = (int) $value - 1;
             }
 
-            return "UPDATE sqlite_sequence SET seq='$value' WHERE name='{$table->name}'";
+            return "UPDATE sqlite_sequence SET seq='$value' WHERE name='{$table->getName()}'";
         } elseif ($table === null) {
             throw new InvalidArgumentException("Table not found: $tableName");
         }

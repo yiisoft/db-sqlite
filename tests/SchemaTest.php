@@ -50,11 +50,12 @@ class SchemaTest extends AbstractSchemaTest
 
         $table = $schema->getTableSchema('composite_fk');
 
-        $this->assertCount(1, $table->foreignKeys);
-        $this->assertTrue(isset($table->foreignKeys[0]));
-        $this->assertEquals('order_item', $table->foreignKeys[0][0]);
-        $this->assertEquals('order_id', $table->foreignKeys[0]['order_id']);
-        $this->assertEquals('item_id', $table->foreignKeys[0]['item_id']);
+        $fk = $table->getForeignKeys();
+        $this->assertCount(1, $fk);
+        $this->assertTrue(isset($fk[0]));
+        $this->assertEquals('order_item', $fk[0][0]);
+        $this->assertEquals('order_id', $fk[0]['order_id']);
+        $this->assertEquals('item_id', $fk[0]['item_id']);
     }
 
     public function constraintsProvider()
