@@ -15,7 +15,6 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Schema\Schema as AbstractSchema;
 use Yiisoft\Db\Schema\ColumnSchema;
-use Yiisoft\Db\Schema\TableSchema;
 use Yiisoft\Db\Sqlite\Query\QueryBuilder;
 use Yiisoft\Db\Sqlite\Token\SqlToken;
 use Yiisoft\Db\Sqlite\Token\SqlTokenizer;
@@ -31,10 +30,13 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
 {
     use ConstraintFinderTrait;
 
+    protected string $tableQuoteCharacter = '`';
+    protected string $columnQuoteCharacter = '`';
+
     /**
      * @var array mapping from physical column types (keys) to abstract column types (values)
      */
-    public array $typeMap = [
+    private array $typeMap = [
         'tinyint' => self::TYPE_TINYINT,
         'bit' => self::TYPE_SMALLINT,
         'boolean' => self::TYPE_BOOLEAN,
@@ -65,35 +67,19 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
         'enum' => self::TYPE_STRING,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
-    protected string $tableQuoteCharacter = '`';
-
-    /**
-     * {@inheritdoc}
-     */
-    protected string $columnQuoteCharacter = '`';
-
-    /**
-     * {@inheritdoc}
-     */
     protected function findTableNames($schema = '')
     {
         $sql = "SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name<>'sqlite_sequence' ORDER BY tbl_name";
 
-        return $this->db->createCommand($sql)->queryColumn();
+        return $this->getDb()->createCommand($sql)->queryColumn();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function loadTableSchema(string $name): ?TableSchema
     {
         $table = new TableSchema();
 
-        $table->name = $name;
-        $table->fullName = $name;
+        $table->name($name);
+        $table->fullName($name);
 
         if ($this->findColumns($table)) {
             $this->findConstraints($table);
@@ -104,20 +90,14 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function loadTablePrimaryKey($tableName)
     {
         return $this->loadTableConstraints($tableName, 'primaryKey');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function loadTableForeignKeys($tableName)
     {
-        $foreignKeys = $this->db->createCommand(
+        $foreignKeys = $this->getDb()->createCommand(
             'PRAGMA FOREIGN_KEY_LIST (' . $this->quoteValue($tableName) . ')'
         )->queryAll();
 
@@ -144,28 +124,19 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function loadTableIndexes($tableName)
     {
         return $this->loadTableConstraints($tableName, 'indexes');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function loadTableUniques($tableName)
     {
         return $this->loadTableConstraints($tableName, 'uniques');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function loadTableChecks($tableName)
     {
-        $sql = $this->db->createCommand('SELECT `sql` FROM `sqlite_master` WHERE name = :tableName', [
+        $sql = $this->getDb()->createCommand('SELECT `sql` FROM `sqlite_master` WHERE name = :tableName', [
             ':tableName' => $tableName,
         ])->queryScalar();
 
@@ -206,11 +177,6 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws NotSupportedException if this method is called.
-     */
     protected function loadTableDefaultValues($tableName)
     {
         throw new NotSupportedException('SQLite does not support default value constraints.');
@@ -225,12 +191,10 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
      */
     public function createQueryBuilder()
     {
-        return new QueryBuilder($this->db);
+        return new QueryBuilder($this->getDb());
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return ColumnSchemaBuilder column schema builder instance
      */
     public function createColumnSchemaBuilder($type, $length = null)
@@ -247,8 +211,8 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
      */
     protected function findColumns($table): bool
     {
-        $sql = 'PRAGMA table_info(' . $this->quoteSimpleTableName($table->name) . ')';
-        $columns = $this->db->createCommand($sql)->queryAll();
+        $sql = 'PRAGMA table_info(' . $this->quoteSimpleTableName($table->getName()) . ')';
+        $columns = $this->getDb()->createCommand($sql)->queryAll();
 
         if (empty($columns)) {
             return false;
@@ -256,15 +220,16 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
 
         foreach ($columns as $info) {
             $column = $this->loadColumnSchema($info);
-            $table->columns[$column->getName()] = $column;
+            $table->columns($column->getName(), $column);
             if ($column->getIsPrimaryKey()) {
-                $table->primaryKey[] = $column->getName();
+                $table->primaryKey($column->getName());
             }
         }
 
-        if (count($table->primaryKey) === 1 && !strncasecmp($table->columns[$table->primaryKey[0]]->getDbType(), 'int', 3)) {
-            $table->sequenceName = '';
-            $table->columns[$table->primaryKey[0]]->autoIncrement(true);
+        $pk = $table->getPrimaryKey();
+        if (count($pk) === 1 && !strncasecmp($table->getColumn($pk[0])->getDbType(), 'int', 3)) {
+            $table->sequenceName('');
+            $table->getColumn($pk[0])->autoIncrement(true);
         }
 
         return true;
@@ -277,16 +242,17 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
      */
     protected function findConstraints($table)
     {
-        $sql = 'PRAGMA foreign_key_list(' . $this->quoteSimpleTableName($table->name) . ')';
-        $keys = $this->db->createCommand($sql)->queryAll();
+        $sql = 'PRAGMA foreign_key_list(' . $this->quoteSimpleTableName($table->getName()) . ')';
+        $keys = $this->getDb()->createCommand($sql)->queryAll();
 
         foreach ($keys as $key) {
             $id = (int) $key['id'];
-            if (!isset($table->foreignKeys[$id])) {
-                $table->foreignKeys[$id] = [$key['table'], $key['from'] => $key['to']];
+            $fk = $table->getForeignKeys();
+            if (!isset($fk[$id])) {
+                $table->foreignKey($id, ([$key['table'], $key['from'] => $key['to']]));
             } else {
-                // composite FK
-                $table->foreignKeys[$id][$key['from']] = $key['to'];
+                /** composite FK */
+                $table->compositeFK($id, $key['from'], $key['to']);
             }
         }
     }
@@ -309,13 +275,13 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
      */
     public function findUniqueIndexes($table)
     {
-        $sql = 'PRAGMA index_list(' . $this->quoteSimpleTableName($table->name) . ')';
-        $indexes = $this->db->createCommand($sql)->queryAll();
+        $sql = 'PRAGMA index_list(' . $this->quoteSimpleTableName($table->getName()) . ')';
+        $indexes = $this->getDb()->createCommand($sql)->queryAll();
         $uniqueIndexes = [];
 
         foreach ($indexes as $index) {
             $indexName = $index['name'];
-            $indexInfo = $this->db->createCommand(
+            $indexInfo = $this->getDb()->createCommand(
                 'PRAGMA index_info(' . $this->quoteValue($index['name']) . ')'
             )->queryAll();
 
@@ -392,11 +358,11 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
     /**
      * Sets the isolation level of the current transaction.
      *
-     * @param string $level The transaction isolation level to use for this transaction.
-     * This can be either {@see Transaction::READ_UNCOMMITTED} or {@see Transaction::SERIALIZABLE}.
+     * @param string $level The transaction isolation level to use for this transaction. This can be either
+     * {@see Transaction::READ_UNCOMMITTED} or {@see Transaction::SERIALIZABLE}.
      *
-     * @throws NotSupportedException when unsupported isolation levels are used.
-     * SQLite only supports SERIALIZABLE and READ UNCOMMITTED.
+     * @throws NotSupportedException when unsupported isolation levels are used. SQLite only supports SERIALIZABLE and
+     * READ UNCOMMITTED.
      *
      * {@see http://www.sqlite.org/pragma.html#pragma_read_uncommitted}
      */
@@ -404,10 +370,10 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
     {
         switch ($level) {
             case Transaction::SERIALIZABLE:
-                $this->db->createCommand('PRAGMA read_uncommitted = False;')->execute();
+                $this->getDb()->createCommand('PRAGMA read_uncommitted = False;')->execute();
                 break;
             case Transaction::READ_UNCOMMITTED:
-                $this->db->createCommand('PRAGMA read_uncommitted = True;')->execute();
+                $this->getDb()->createCommand('PRAGMA read_uncommitted = True;')->execute();
                 break;
             default:
                 throw new NotSupportedException(
@@ -425,7 +391,7 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
      */
     private function loadTableColumnsInfo($tableName): array
     {
-        $tableColumns = $this->db->createCommand(
+        $tableColumns = $this->getDb()->createCommand(
             'PRAGMA TABLE_INFO (' . $this->quoteValue($tableName) . ')'
         )->queryAll();
 
@@ -447,7 +413,7 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
      */
     private function loadTableConstraints($tableName, $returnType)
     {
-        $indexes = $this->db->createCommand('PRAGMA INDEX_LIST (' . $this->quoteValue($tableName) . ')')->queryAll();
+        $indexes = $this->getDb()->createCommand('PRAGMA INDEX_LIST (' . $this->quoteValue($tableName) . ')')->queryAll();
         $indexes = $this->normalizePdoRowKeyCase($indexes, true);
         $tableColumns = null;
 
@@ -466,7 +432,7 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
         ];
 
         foreach ($indexes as $index) {
-            $columns = $this->db->createCommand(
+            $columns = $this->getDb()->createCommand(
                 'PRAGMA INDEX_INFO (' . $this->quoteValue($index['name']) . ')'
             )->queryAll();
 
