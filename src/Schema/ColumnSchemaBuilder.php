@@ -16,7 +16,7 @@ class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
      */
     protected function buildUnsignedString(): string
     {
-        return $this->getIsUnsigned() ? ' UNSIGNED' : '';
+        return $this->isUnsigned() ? ' UNSIGNED' : '';
     }
 
     /**
