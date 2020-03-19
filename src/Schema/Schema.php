@@ -221,7 +221,7 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
         foreach ($columns as $info) {
             $column = $this->loadColumnSchema($info);
             $table->columns($column->getName(), $column);
-            if ($column->getIsPrimaryKey()) {
+            if ($column->isPrimaryKey()) {
                 $table->primaryKey($column->getName());
             }
         }
@@ -308,7 +308,7 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
         $column = $this->createColumnSchema();
         $column->name($info['name']);
         $column->allowNull(!$info['notnull']);
-        $column->isPrimaryKey($info['pk'] != 0);
+        $column->primaryKey($info['pk'] != 0);
         $column->dbType(strtolower($info['type']));
         $column->unsigned(strpos($column->getDbType(), 'unsigned') !== false);
         $column->type(self::TYPE_STRING);
@@ -341,7 +341,7 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
 
         $column->phpType($this->getColumnPhpType($column));
 
-        if (!$column->getIsPrimaryKey()) {
+        if (!$column->isPrimaryKey()) {
             if ($info['dflt_value'] === 'null' || $info['dflt_value'] === '' || $info['dflt_value'] === null) {
                 $column->defaultValue(null);
             } elseif ($column->getType() === 'timestamp' && $info['dflt_value'] === 'CURRENT_TIMESTAMP') {
