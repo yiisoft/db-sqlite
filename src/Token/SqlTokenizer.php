@@ -15,9 +15,15 @@ namespace Yiisoft\Db\Sqlite\Token;
 class SqlTokenizer extends BaseTokenizer
 {
     /**
-     * {@inheritdoc}
+     * Returns whether there's a whitespace at the current offset.
+     *
+     * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string.
+     *
+     * @param int|null $length length of the matched string.
+     *
+     * @return bool whether there's a whitespace at the current offset.
      */
-    protected function isWhitespace(&$length): bool
+    protected function isWhitespace(?int &$length): bool
     {
         static $whitespaces = [
             "\f" => true,
@@ -33,7 +39,13 @@ class SqlTokenizer extends BaseTokenizer
     }
 
     /**
-     * {@inheritdoc}
+     * Returns whether there's a commentary at the current offset.
+     *
+     * If this methos returns `true`, it has to set the `$length` parameter to the length of the matched string.
+     *
+     * @param int $length length of the matched string.
+     *
+     * @return bool whether there's a commentary at the current offset.
      */
     protected function isComment(int &$length): bool
     {
@@ -58,7 +70,15 @@ class SqlTokenizer extends BaseTokenizer
     }
 
     /**
-     * {@inheritdoc}
+     * Returns whether there's an operator at the current offset.
+     *
+     * If this methos returns `true`, it has to set the `$length` parameter to the length of the matched string. It may
+     * also set `$content` to a string that will be used as a token content.
+     *
+     * @param int $length  length of the matched string.
+     * @param string|null $content optional content instead of the matched string.
+     *
+     * @return bool whether there's an operator at the current offset.
      */
     protected function isOperator(int &$length, ?string &$content): bool
     {
@@ -93,7 +113,15 @@ class SqlTokenizer extends BaseTokenizer
     }
 
     /**
-     * {@inheritdoc}
+     * Returns whether there's an identifier at the current offset.
+     *
+     * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string. It may
+     * also set `$content` to a string that will be used as a token content.
+     *
+     * @param int $length length of the matched string.
+     * @param string|null $content optional content instead of the matched string.
+     *
+     * @return bool whether there's an identifier at the current offset.
      */
     protected function isIdentifier(int &$length, ?string &$content): bool
     {
@@ -127,7 +155,15 @@ class SqlTokenizer extends BaseTokenizer
     }
 
     /**
-     * {@inheritdoc}
+     * Returns whether there's a string literal at the current offset.
+     *
+     * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string. It may
+     * also set `$content` to a string that will be used as a token content.
+     *
+     * @param int $length  length of the matched string.
+     * @param string|null $content optional content instead of the matched string.
+     *
+     * @return bool whether there's a string literal at the current offset.
      */
     protected function isStringLiteral(int &$length, ?string &$content): bool
     {
@@ -150,7 +186,14 @@ class SqlTokenizer extends BaseTokenizer
     }
 
     /**
-     * {@inheritdoc}
+     * Returns whether the given string is a keyword.
+     *
+     * The method may set `$content` to a string that will be used as a token content.
+     *
+     * @param string $string  string to be matched.
+     * @param string|null $content optional content instead of the matched string.
+     *
+     * @return bool whether the given string is a keyword.
      */
     protected function isKeyword(string $string, ?string &$content): bool
     {
@@ -281,7 +324,7 @@ class SqlTokenizer extends BaseTokenizer
             'WITHOUT' => true,
         ];
 
-        $string = mb_strtoupper($string, 'UTF-8');
+        $string = \mb_strtoupper($string, 'UTF-8');
 
         if (!isset($keywords[$string])) {
             return false;

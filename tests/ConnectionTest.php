@@ -262,7 +262,7 @@ class ConnectionTest extends AbstractConnectionTest
         $this->markTestSkipped('This test does not work on sqlite because preparing the failing query fails');
     }
 
-    protected function prepareMasterSlave($masterCount, $slaveCount)
+    protected function prepareMasterSlave($masterCount, $slaveCount): Connection
     {
         $db = $this->getConnection(true, true, true);
 

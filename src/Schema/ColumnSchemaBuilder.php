@@ -6,22 +6,18 @@ namespace Yiisoft\Db\Sqlite\Schema;
 
 use Yiisoft\Db\Schema\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
 
-/**
- * ColumnSchemaBuilder is the schema builder for Sqlite databases.
- */
 class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
 {
     /**
-     * {@inheritdoc}
+     * Builds the unsigned string for column. Defaults to unsupported.
+     *
+     * @return string a string containing UNSIGNED keyword.
      */
     protected function buildUnsignedString(): string
     {
         return $this->isUnsigned() ? ' UNSIGNED' : '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __toString(): string
     {
         switch ($this->getTypeCategory()) {
