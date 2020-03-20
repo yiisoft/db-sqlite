@@ -17,7 +17,7 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
 
     public function columnTypes(): array
     {
-        return array_merge(parent::columnTypes(), [
+        return \array_merge(parent::columnTypes(), [
             [
                 Schema::TYPE_PK,
                 $this->primaryKey()->first()->after('col_before'),
@@ -28,7 +28,7 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
 
     public function conditionProvider(): array
     {
-        return array_merge(parent::conditionProvider(), [
+        return \array_merge(parent::conditionProvider(), [
             'composite in using array objects' => [
                 ['in', new TraversableObject(['id', 'name']), new TraversableObject([
                     ['id' => 1, 'name' => 'oy'],
@@ -96,7 +96,7 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
         return $data;
     }
 
-    public function testBatchInsertOnOlderVersions()
+    public function testBatchInsertOnOlderVersions(): void
     {
         $db = $this->getConnection();
         if (version_compare($db->getPdo()->getAttribute(\PDO::ATTR_SERVER_VERSION), '3.7.11', '>=')) {
@@ -115,9 +115,6 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
         $this->assertEquals('ALTER TABLE `table_from` RENAME TO `table_to`', $sql);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function testBuildUnion(): void
     {
         $db = $this->getConnection();
@@ -150,7 +147,7 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
         $this->assertEquals([], $queryParams);
     }
 
-    public function testResetSequence()
+    public function testResetSequence(): void
     {
         $qb = $this->getQueryBuilder(true, true);
 

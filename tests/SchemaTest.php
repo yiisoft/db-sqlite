@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
-use Yiisoft\Db\Constraint\Constraint;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidConfigException;
+use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Tests\AnyValue;
 use Yiisoft\Db\Tests\SchemaTest as AbstractSchemaTest;
 
@@ -83,18 +85,22 @@ class SchemaTest extends AbstractSchemaTest
 
     /**
      * @dataProvider quoteTableNameDataProvider
+     *
      * @param $name
      * @param $expectedName
-     * @throws \yii\base\NotSupportedException
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
-    public function testQuoteTableName($name, $expectedName)
+    public function testQuoteTableName($name, $expectedName): void
     {
         $schema = $this->getConnection()->getSchema();
         $quotedName = $schema->quoteTableName($name);
         $this->assertEquals($expectedName, $quotedName);
     }
 
-    public function quoteTableNameDataProvider()
+    public function quoteTableNameDataProvider(): array
     {
         return [
             ['test', '`test`'],

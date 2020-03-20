@@ -177,7 +177,7 @@ class SqlToken implements \ArrayAccess
             $code = $code->parent;
         }
 
-        return mb_substr($code->content, $this->startOffset, $this->endOffset - $this->startOffset, 'UTF-8');
+        return \mb_substr($code->content, $this->startOffset, $this->endOffset - $this->startOffset, 'UTF-8');
     }
 
     /**
@@ -246,7 +246,7 @@ class SqlToken implements \ArrayAccess
         $firstMatchIndex = $lastMatchIndex = null;
         $wildcard = false;
 
-        for ($index = 0, $count = count($patternToken->children); $index < $count; $index++) {
+        for ($index = 0, $count = \count($patternToken->children); $index < $count; $index++) {
             /**
              *  Here we iterate token by token with an exception of "any" that toggles an iteration until we matched
              *  with a next pattern token or EOF.
@@ -256,7 +256,7 @@ class SqlToken implements \ArrayAccess
                 continue;
             }
 
-            for ($limit = $wildcard ? count($token->children) : $offset + 1; $offset < $limit; $offset++) {
+            for ($limit = $wildcard ? \count($token->children) : $offset + 1; $offset < $limit; $offset++) {
                 if (!$wildcard && !isset($token[$offset])) {
                     break;
                 }
@@ -297,7 +297,7 @@ class SqlToken implements \ArrayAccess
             return $offset;
         }
 
-        return count($this->children) + $offset;
+        return \count($this->children) + $offset;
     }
 
     /**
@@ -306,8 +306,8 @@ class SqlToken implements \ArrayAccess
     private function updateCollectionOffsets(): void
     {
         if (!empty($this->children)) {
-            $this->startOffset = reset($this->children)->startOffset;
-            $this->endOffset = end($this->children)->endOffset;
+            $this->startOffset = \reset($this->children)->startOffset;
+            $this->endOffset = \end($this->children)->endOffset;
         }
 
         if ($this->parent !== null) {
@@ -328,49 +328,74 @@ class SqlToken implements \ArrayAccess
      * - {@see TYPE_STRING_LITERAL}
      *
      * @param int $value token type. It has to be one of the following constants:
+     *
+     * @return self
      */
-    public function setType(int $value): void
+    public function type(int $value): self
     {
         $this->type = $value;
+
+        return $this;
     }
 
     /**
      * Set token content.
      *
-     * @param string|null $content token content.
+     * @param string|null $value
+     *
+     * @return self
      */
-    public function setContent(?string $value): void
+    public function content(?string $value): self
     {
         $this->content = $value;
+
+        return $this;
     }
 
     /**
      * Set original SQL token start position.
      *
      * @param int $value original SQL token start position.
+     *
+     * @return self
      */
-    public function setStartOffset(int $value): void
+    public function startOffset(int $value): self
     {
         $this->startOffset = $value;
+
+        return $this;
     }
 
     /**
      * Set original SQL token end position.
      *
      * @param int $value original SQL token end position.
+     *
+     * @return self
      */
-    public function setEndOffset(int $value): void
+    public function endOffset(int $value): self
     {
         $this->endOffset = $value;
+
+        return $this;
     }
 
     /**
      * Set parent token.
      *
      * @param SqlToken $value parent token.
+     *
+     * @return self
      */
-    public function setParent(SqlToken $value): void
+    public function parent(SqlToken $value): self
     {
         $this->parent = $value;
+
+        return $this;
+    }
+
+    public function getContent(): ?string
+    {
+        return $this->content;
     }
 }

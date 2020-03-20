@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidConfigException;
+use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Tests\CommandTest as AbstractCommandTest;
 
 class CommandTest extends AbstractCommandTest
@@ -26,6 +29,10 @@ class CommandTest extends AbstractCommandTest
      *
      * @param array $firstData
      * @param array $secondData
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
     public function testUpsert(array $firstData, array $secondData)
     {
@@ -58,7 +65,7 @@ class CommandTest extends AbstractCommandTest
         $this->markTestSkipped('SQLite does not support adding/dropping check constraints.');
     }
 
-    public function testMultiStatementSupport()
+    public function testMultiStatementSupport(): void
     {
         $db = $this->getConnection(false, true);
 
@@ -109,7 +116,7 @@ SQL;
     public function batchInsertSqlProvider(): array
     {
         $parent = parent::batchInsertSqlProvider();
-        unset($parent['wrongBehavior']); // Produces SQL syntax error: General error: 1 near ".": syntax error
+        unset($parent['wrongBehavior']); /** Produces SQL syntax error: General error: 1 near ".": syntax error */
 
         return $parent;
     }
