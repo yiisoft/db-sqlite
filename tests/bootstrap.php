@@ -1,9 +1,9 @@
 <?php
 
-// ensure we get report on all possible php errors
+/** ensure we get report on all possible php errors */
 error_reporting(E_ALL);
 
-(function (): void {
+(static function (): void {
     $composerAutoload = dirname(__DIR__) . '/vendor/autoload.php';
 
     if (!is_file($composerAutoload)) {

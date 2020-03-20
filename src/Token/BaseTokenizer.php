@@ -73,20 +73,21 @@ abstract class BaseTokenizer
      */
     public function tokenize(): SqlToken
     {
-        $this->length = mb_strlen($this->sql, 'UTF-8');
+        $this->length = \mb_strlen($this->sql, 'UTF-8');
         $this->offset = 0;
         $this->substrings = [];
         $this->buffer = '';
 
-        $this->token = new SqlToken();
-        $this->token->setType(SqlToken::TYPE_CODE);
-        $this->token->setContent($this->sql);
+        $this->token = (new SqlToken())
+            ->type(SqlToken::TYPE_CODE)
+            ->content($this->sql);
 
         $this->tokenStack = new \SplStack();
         $this->tokenStack->push($this->token);
 
-        $tk = new SqlToken();
-        $tk->setType(SqlToken::TYPE_STATEMENT);
+        $tk = (new SqlToken())
+            ->type(SqlToken::TYPE_STATEMENT);
+
         $this->token[] = $tk;
 
         $this->tokenStack->push($this->token[0]);
@@ -120,17 +121,18 @@ abstract class BaseTokenizer
     /**
      * Returns whether there's a whitespace at the current offset.
      *
-     * If this methos returns `true`, it has to set the `$length` parameter to the length of the matched string.
+     * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string.
      *
-     * @param int $length length of the matched string.
+     * @param int|null $length length of the matched string.
      *
      * @return bool whether there's a whitespace at the current offset.
      */
-    abstract protected function isWhitespace(int &$length): bool;
+    abstract protected function isWhitespace(?int &$length): bool;
 
     /**
      * Returns whether there's a commentary at the current offset.
-     * If this methos returns `true`, it has to set the `$length` parameter to the length of the matched string.
+     *
+     * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string.
      *
      * @param int $length length of the matched string.
      *
@@ -141,8 +143,8 @@ abstract class BaseTokenizer
     /**
      * Returns whether there's an operator at the current offset.
      *
-     * If this methos returns `true`, it has to set the `$length` parameter to the length of the matched string.
-     * It may also set `$content` to a string that will be used as a token content.
+     * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string. It may
+     * also set `$content` to a string that will be used as a token content.
      *
      * @param int $length  length of the matched string.
      * @param string|null $content optional content instead of the matched string.
@@ -154,8 +156,8 @@ abstract class BaseTokenizer
     /**
      * Returns whether there's an identifier at the current offset.
      *
-     * If this methos returns `true`, it has to set the `$length` parameter to the length of the matched string.
-     * It may also set `$content` to a string that will be used as a token content.
+     * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string. It may
+     * also set `$content` to a string that will be used as a token content.
      *
      * @param int $length length of the matched string.
      * @param string|null $content optional content instead of the matched string.
@@ -167,8 +169,8 @@ abstract class BaseTokenizer
     /**
      * Returns whether there's a string literal at the current offset.
      *
-     * If this methos returns `true`, it has to set the `$length` parameter to the length of the matched string.
-     * It may also set `$content` to a string that will be used as a token content.
+     * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string. It may
+     * also set `$content` to a string that will be used as a token content.
      *
      * @param int $length  length of the matched string.
      * @param string|null $content optional content instead of the matched string.
@@ -217,15 +219,15 @@ abstract class BaseTokenizer
             return false;
         }
 
-        if (!is_array(reset($with))) {
-            usort($with, function ($string1, $string2) {
-                return mb_strlen($string2, 'UTF-8') - mb_strlen($string1, 'UTF-8');
+        if (!\is_array(\reset($with))) {
+            \usort($with, function ($string1, $string2) {
+                return \mb_strlen($string2, 'UTF-8') - \mb_strlen($string1, 'UTF-8');
             });
 
             $map = [];
 
             foreach ($with as $string) {
-                $map[mb_strlen($string, 'UTF-8')][$caseSensitive ? $string : mb_strtoupper($string, 'UTF-8')] = true;
+                $map[\mb_strlen($string, 'UTF-8')][$caseSensitive ? $string : \mb_strtoupper($string, 'UTF-8')] = true;
             }
 
             $with = $map;
@@ -252,7 +254,7 @@ abstract class BaseTokenizer
      *
      * @return string result string, it may be empty if there's nothing to return.
      */
-    protected function substring(int $length, bool $caseSensitive = true, ?int $offset = null)
+    protected function substring(int $length, bool $caseSensitive = true, ?int $offset = null): string
     {
         if ($offset === null) {
             $offset = $this->offset;
@@ -265,10 +267,10 @@ abstract class BaseTokenizer
         $cacheKey = $offset . ',' . $length;
 
         if (!isset($this->substrings[$cacheKey . ',1'])) {
-            $this->substrings[$cacheKey . ',1'] = mb_substr($this->sql, $offset, $length, 'UTF-8');
+            $this->substrings[$cacheKey . ',1'] = \mb_substr($this->sql, $offset, $length, 'UTF-8');
         }
         if (!$caseSensitive && !isset($this->substrings[$cacheKey . ',0'])) {
-            $this->substrings[$cacheKey . ',0'] = mb_strtoupper($this->substrings[$cacheKey . ',1'], 'UTF-8');
+            $this->substrings[$cacheKey . ',0'] = \mb_strtoupper($this->substrings[$cacheKey . ',1'], 'UTF-8');
         }
 
         return $this->substrings[$cacheKey . ',' . (int) $caseSensitive];
@@ -288,16 +290,16 @@ abstract class BaseTokenizer
             $offset = $this->offset;
         }
 
-        if ($offset + mb_strlen($string, 'UTF-8') > $this->length) {
+        if ($offset + \mb_strlen($string, 'UTF-8') > $this->length) {
             return $this->length;
         }
 
-        $afterIndexOf = mb_strpos($this->sql, $string, $offset, 'UTF-8');
+        $afterIndexOf = \mb_strpos($this->sql, $string, $offset, 'UTF-8');
 
         if ($afterIndexOf === false) {
             $afterIndexOf = $this->length;
         } else {
-            $afterIndexOf += mb_strlen($string, 'UTF-8');
+            $afterIndexOf += \mb_strlen($string, 'UTF-8');
         }
 
         return $afterIndexOf;
@@ -321,12 +323,11 @@ abstract class BaseTokenizer
 
         $this->addTokenFromBuffer();
 
-        $tk = new SqlToken();
-
-        $tk->setType($isIdentifier ? SqlToken::TYPE_IDENTIFIER : SqlToken::TYPE_STRING_LITERAL);
-        $tk->setContent(\is_string($content) ? $content : $this->substring($length));
-        $tk->setStartOffset($this->offset);
-        $tk->setEndOffset($this->offset + $length);
+        $tk = (new SqlToken())
+            ->type($isIdentifier ? SqlToken::TYPE_IDENTIFIER : SqlToken::TYPE_STRING_LITERAL)
+            ->content(\is_string($content) ? $content : $this->substring($length))
+            ->startOffset($this->offset)
+            ->endOffset($this->offset + $length);
 
         $this->currentToken[] = $tk;
 
@@ -350,17 +351,17 @@ abstract class BaseTokenizer
 
         switch ($this->substring($length)) {
             case '(':
-                $tk = new SqlToken();
-
-                $tk->setType(SqlToken::TYPE_OPERATOR);
-                $tk->setContent(\is_string($content) ? $content : $this->substring($length));
-                $tk->setStartOffset($this->offset);
-                $tk->setEndOffset($this->offset + $length);
+                $tk = (new SqlToken())
+                    ->type(SqlToken::TYPE_OPERATOR)
+                    ->content(\is_string($content) ? $content : $this->substring($length))
+                    ->startOffset($this->offset)
+                    ->endOffset($this->offset + $length);
 
                 $this->currentToken[] = $tk;
 
-                $tk1 = new SqlToken();
-                $tk1->setType(SqlToken::TYPE_PARENTHESIS);
+                $tk1 = (new SqlToken())
+                    ->type(SqlToken::TYPE_PARENTHESIS);
+
                 $this->currentToken[] = $tk1;
 
                 $this->tokenStack->push($this->currentToken[-1]);
@@ -372,12 +373,11 @@ abstract class BaseTokenizer
                 $this->tokenStack->pop();
                 $this->currentToken = $this->tokenStack->top();
 
-                $tk = new SqlToken();
-
-                $tk->setType(SqlToken::TYPE_OPERATOR);
-                $tk->setContent(')');
-                $tk->setStartOffset($this->offset);
-                $tk->setEndOffset($this->offset + $length);
+                $tk = (new SqlToken())
+                    ->type(SqlToken::TYPE_OPERATOR)
+                    ->content(')')
+                    ->startOffset($this->offset)
+                    ->endOffset($this->offset + $length);
 
                 $this->currentToken[] = $tk;
 
@@ -387,20 +387,19 @@ abstract class BaseTokenizer
                     break;
                 }
 
-                $tk = new SqlToken();
-
-                $tk->setType(SqlToken::TYPE_OPERATOR);
-                $tk->setContent(\is_string($content) ? $content : $this->substring($length));
-                $tk->setStartOffset($this->offset);
-                $tk->setEndOffset($this->offset + $length);
+                $tk = (new SqlToken())
+                    ->type(SqlToken::TYPE_OPERATOR)
+                    ->content(\is_string($content) ? $content : $this->substring($length))
+                    ->startOffset($this->offset)
+                    ->endOffset($this->offset + $length);
 
                 $this->currentToken[] = $tk;
 
                 $this->tokenStack->pop();
                 $this->currentToken = $this->tokenStack->top();
 
-                $tk1 = new SqlToken();
-                $tk1->setType(SqlToken::TYPE_STATEMENT);
+                $tk1 = (new SqlToken())
+                    ->type(SqlToken::TYPE_STATEMENT);
 
                 $this->currentToken[] = $tk1;
                 $this->tokenStack->push($this->currentToken[-1]);
@@ -408,12 +407,11 @@ abstract class BaseTokenizer
 
                 break;
             default:
-                $tk = new SqlToken();
-
-                $tk->setType(SqlToken::TYPE_OPERATOR);
-                $tk->setContent(\is_string($content) ? $content : $this->substring($length));
-                $tk->setStartOffset($this->offset);
-                $tk->setEndOffset($this->offset + $length);
+                $tk = (new SqlToken())
+                    ->type(SqlToken::TYPE_OPERATOR)
+                    ->content(\is_string($content) ? $content : $this->substring($length))
+                    ->startOffset($this->offset)
+                    ->endOffset($this->offset + $length);
 
                 $this->currentToken[] = $tk;
 
@@ -434,12 +432,11 @@ abstract class BaseTokenizer
 
         $isKeyword = $this->isKeyword($this->buffer, $content);
 
-        $tk = new SqlToken();
-
-        $tk->setType($isKeyword ? SqlToken::TYPE_KEYWORD : SqlToken::TYPE_TOKEN);
-        $tk->setContent(\is_string($content) ? $content : $this->buffer);
-        $tk->setStartOffset($this->offset - mb_strlen($this->buffer, 'UTF-8'));
-        $tk->setEndOffset($this->offset);
+        $tk = (new SqlToken())
+            ->type($isKeyword ? SqlToken::TYPE_KEYWORD : SqlToken::TYPE_TOKEN)
+            ->content(\is_string($content) ? $content : $this->buffer)
+            ->startOffset($this->offset - \mb_strlen($this->buffer, 'UTF-8'))
+            ->endOffset($this->offset);
 
         $this->currentToken[] = $tk;
 
