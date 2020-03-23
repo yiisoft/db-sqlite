@@ -64,21 +64,21 @@ class SchemaTest extends AbstractSchemaTest
     {
         $result = parent::constraintsProvider();
 
-        $result['1: primary key'][2]->setName(null);
-        $result['1: check'][2][0]->setColumnNames(null);
-        $result['1: check'][2][0]->setExpression('"C_check" <> \'\'');
-        $result['1: unique'][2][0]->setName(AnyValue::getInstance());
-        $result['1: index'][2][1]->setName(AnyValue::getInstance());
+        $result['1: primary key'][2]->name(null);
+        $result['1: check'][2][0]->columnNames(null);
+        $result['1: check'][2][0]->expression('"C_check" <> \'\'');
+        $result['1: unique'][2][0]->name(AnyValue::getInstance());
+        $result['1: index'][2][1]->name(AnyValue::getInstance());
 
-        $result['2: primary key'][2]->setName(null);
-        $result['2: unique'][2][0]->setName(AnyValue::getInstance());
-        $result['2: index'][2][2]->setName(AnyValue::getInstance());
+        $result['2: primary key'][2]->name(null);
+        $result['2: unique'][2][0]->name(AnyValue::getInstance());
+        $result['2: index'][2][2]->name(AnyValue::getInstance());
 
-        $result['3: foreign key'][2][0]->setName(null);
+        $result['3: foreign key'][2][0]->name(null);
         $result['3: index'][2] = [];
 
-        $result['4: primary key'][2]->setName(null);
-        $result['4: unique'][2][0]->setName(AnyValue::getInstance());
+        $result['4: primary key'][2]->name(null);
+        $result['4: unique'][2][0]->name(AnyValue::getInstance());
 
         return $result;
     }
