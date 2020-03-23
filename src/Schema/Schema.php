@@ -160,13 +160,12 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
         $result = [];
 
         foreach ($foreignKeys as $table => $foreignKey) {
-            $fk = new ForeignKeyConstraint();
-
-            $fk->setColumnNames(ArrayHelper::getColumn($foreignKey, 'from'));
-            $fk->setForeignTableName($table);
-            $fk->setForeignColumnNames(ArrayHelper::getColumn($foreignKey, 'to'));
-            $fk->setOnDelete($foreignKey[0]['on_delete'] ?? null);
-            $fk->setOnUpdate($foreignKey[0]['on_update'] ?? null);
+            $fk = (new ForeignKeyConstraint())
+                ->columnNames(ArrayHelper::getColumn($foreignKey, 'from'))
+                ->foreignTableName($table)
+                ->foreignColumnNames(ArrayHelper::getColumn($foreignKey, 'to'))
+                ->onDelete($foreignKey[0]['on_delete'] ?? null)
+                ->onUpdate($foreignKey[0]['on_update'] ?? null);
 
             $result[] = $fk;
         }
@@ -250,9 +249,9 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
                 $name = $createTableToken[$firstMatchIndex - 1]->getContent();
             }
 
-            $ck = new CheckConstraint();
-            $ck->setName($name);
-            $ck->setExpression($checkSql);
+            $ck = (new CheckConstraint())
+                ->name($name)
+                ->expression($checkSql);
 
             $result[] = $ck;
         }
@@ -572,26 +571,23 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
                 }
             }
 
-            $ic = new IndexConstraint();
-
-            $ic->setIsPrimary($index['origin'] === 'pk');
-            $ic->setIsUnique((bool) $index['unique']);
-            $ic->setName($index['name']);
-            $ic->setColumnNames(ArrayHelper::getColumn($columns, 'name'));
+            $ic = (new IndexConstraint())
+                ->primary($index['origin'] === 'pk')
+                ->unique((bool) $index['unique'])
+                ->name($index['name'])
+                ->columnNames(ArrayHelper::getColumn($columns, 'name'));
 
             $result['indexes'][] = $ic;
 
             if ($index['origin'] === 'u') {
-                $ct = new Constraint();
-
-                $ct->setName($index['name']);
-                $ct->setColumnNames(ArrayHelper::getColumn($columns, 'name'));
+                $ct = (new Constraint())
+                    ->name($index['name'])
+                    ->columnNames(ArrayHelper::getColumn($columns, 'name'));
 
                 $result['uniques'][] = $ct;
             } elseif ($index['origin'] === 'pk') {
-                $ct = new Constraint();
-
-                $ct->setColumnNames(ArrayHelper::getColumn($columns, 'name'));
+                $ct = (new Constraint())
+                    ->columnNames(ArrayHelper::getColumn($columns, 'name'));
 
                 $result['primaryKey'] = $ct;
             }
@@ -610,8 +606,8 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
 
             foreach ($tableColumns as $tableColumn) {
                 if ($tableColumn['pk'] > 0) {
-                    $ct = new Constraint();
-                    $ct->setColumnNames([$tableColumn['name']]);
+                    $ct = (new Constraint())
+                        ->columnNames([$tableColumn['name']]);
 
                     $result['primaryKey'] = $ct;
                     break;
