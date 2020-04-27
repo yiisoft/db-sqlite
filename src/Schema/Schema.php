@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Schema;
 
 use Yiisoft\Arrays\ArrayHelper;
+use Yiisoft\Arrays\ArraySorter;
 use Yiisoft\Db\Constraint\CheckConstraint;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ConstraintFinderInterface;
@@ -155,7 +156,7 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
 
         $foreignKeys = ArrayHelper::index($foreignKeys, null, 'table');
 
-        ArrayHelper::multisort($foreignKeys, 'seq', SORT_ASC, SORT_NUMERIC);
+        ArraySorter::multisort($foreignKeys, 'seq', SORT_ASC, SORT_NUMERIC);
 
         $result = [];
 
@@ -559,7 +560,7 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
 
             $columns = $this->normalizePdoRowKeyCase($columns, true);
 
-            ArrayHelper::multisort($columns, 'seqno', SORT_ASC, SORT_NUMERIC);
+            ArraySorter::multisort($columns, 'seqno', SORT_ASC, SORT_NUMERIC);
 
             if ($tableColumns !== null) {
                 // SQLite may not have an "origin" column in INDEX_LIST
