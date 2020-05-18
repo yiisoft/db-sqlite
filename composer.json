@@ -26,6 +26,7 @@
     },
     "require-dev": {
         "yiisoft/composer-config-plugin": "^1.0@dev",
+        "phan/phan": "^3.0",
         "phpunit/phpunit": "^9.0",
         "yiisoft/aliases": "^3.0@dev",
         "yiisoft/log-target-file": "^3.0@dev",
@@ -51,6 +52,9 @@
                 "config/tests.php"
             ]
         }
+    },
+    "scripts": {
+        "phan": "phan --progress-bar -o analysis.txt"
     },
     "config": {
         "sort-packages": true
