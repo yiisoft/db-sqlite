@@ -9,6 +9,7 @@ use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
+use Yiisoft\Db\Exception\InvalidParamException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
@@ -19,6 +20,8 @@ use Yiisoft\Db\Query\QueryBuilder as BaseQueryBuilder;
 use Yiisoft\Db\Sqlite\Condition\InConditionBuilder;
 use Yiisoft\Db\Sqlite\Condition\LikeConditionBuilder;
 use Yiisoft\Db\Sqlite\Schema\Schema;
+use Yiisoft\Db\Sqlite\Token\SqlToken;
+use Yiisoft\Db\Sqlite\Token\SqlTokenizer;
 use Yiisoft\Strings\StringHelper;
 
 class QueryBuilder extends BaseQueryBuilder
@@ -294,6 +297,9 @@ class QueryBuilder extends BaseQueryBuilder
      * @param string $update the ON UPDATE option. Most DBMS support these options: RESTRICT, CASCADE, NO ACTION,
      * SET DEFAULT, SET NULL.
      *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws InvalidParamException
      * @throws NotSupportedException this is not supported by SQLite.
      *
      * @return string the SQL statement for adding a foreign key constraint to an existing table.
@@ -307,7 +313,62 @@ class QueryBuilder extends BaseQueryBuilder
         ?string $delete = null,
         ?string $update = null
     ): string {
-        throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
+        $schema = $refschema = '';
+
+        if (($pos = strpos($table, '.')) !== false) {
+            $schema = $this->unquoteTableName(substr($table, 0, $pos));
+            $table = substr($table, $pos + 1);
+        }
+
+        if (($pos_ref = strpos($refTable, '.')) !== false) {
+            $refschema = substr($refTable, 0, $pos_ref);
+            $refTable = substr($refTable, $pos_ref + 1);
+        }
+
+        if (($schema !== '' || ($refschema !== '' && $schema !== $refschema))) {
+            return '' ;
+        }
+
+        if ($schema !== '') {
+            $tmp_table_name =  "temp_{$schema}_" . $this->unquoteTableName($table);
+            $schema .= '.';
+            $unquoted_tablename = $schema . $this->unquoteTableName($table);
+            $quoted_tablename = $schema . $this->db->quoteTableName($table);
+        } else {
+            $unquoted_tablename = $this->unquoteTableName($table);
+            $quoted_tablename = $this->db->quoteTableName($table);
+            $tmp_table_name =  "temp_" . $this->unquoteTableName($table);
+        }
+
+        $fields_definitions_tokens = $this->getFieldDefinitionsTokens($unquoted_tablename);
+        $ddl_fields_defs = $fields_definitions_tokens->getSql();
+        $ddl_fields_defs .= ",\nCONSTRAINT " . $this->db->quoteColumnName($name) . " FOREIGN KEY (" .
+            join(",", (array)$columns) . ") REFERENCES $refTable(" . join(",", (array)$refColumns) . ")";
+
+        if ($update !== null) {
+            $ddl_fields_defs .= " ON UPDATE $update";
+        }
+
+        if ($delete !== null) {
+            $ddl_fields_defs .= " ON DELETE $delete";
+        }
+
+        $foreign_keys_state = $this->foreignKeysState();
+        $return_queries = [];
+        $return_queries[] = "PRAGMA foreign_keys = off";
+        $return_queries[] = "SAVEPOINT add_foreign_key_to_$tmp_table_name";
+        $return_queries[] = "CREATE TEMP TABLE " . $this->db->quoteTableName($tmp_table_name)
+            . " AS SELECT * FROM $quoted_tablename";
+        $return_queries[] = "DROP TABLE $quoted_tablename";
+        $return_queries[] = "CREATE TABLE $quoted_tablename (" . trim($ddl_fields_defs, " \n\r\t,") . ")";
+        $return_queries[] = "INSERT INTO $quoted_tablename SELECT * FROM " . $this->db->quoteTableName($tmp_table_name);
+        $return_queries[] = "DROP TABLE " . $this->db->quoteTableName($tmp_table_name);
+        $return_queries = array_merge($return_queries, $this->getIndexSqls($unquoted_tablename));
+
+        $return_queries[] = "RELEASE add_foreign_key_to_$tmp_table_name";
+        $return_queries[] = "PRAGMA foreign_keys = $foreign_keys_state";
+
+        return implode(";", $return_queries);
     }
 
     /**
@@ -315,15 +376,104 @@ class QueryBuilder extends BaseQueryBuilder
      *
      * @param string $name the name of the foreign key constraint to be dropped. The name will be properly quoted
      * by the method.
-     * @param string $table the table whose foreign is to be dropped. The name will be properly quoted by the method.
+     * @param string $tableName
      *
-     * @throws NotSupportedException this is not supported by SQLite.
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws InvalidParamException
+     * @throws NotSupportedException
      *
      * @return string the SQL statement for dropping a foreign key constraint.
      */
-    public function dropForeignKey(string $name, string $table): string
+    public function dropForeignKey(string $name, string $tableName): string
     {
-        throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
+        $return_queries = [];
+        $ddl_fields_def = '';
+        $sql_fields_to_insert = [];
+        $skipping = false;
+        $foreign_found = false;
+        $quoted_foreign_name = $this->db->quoteColumnName($name);
+        $quoted_tablename = $this->db->quoteTableName($tableName);
+        $unquoted_tablename = $this->unquoteTableName($tableName);
+        $fields_definitions_tokens = $this->getFieldDefinitionsTokens($unquoted_tablename);
+        $offset = 0;
+        $constraint_pos = 0;
+
+        /** Traverse the tokens looking for either an identifier (field name) or a foreign key */
+        while ($fields_definitions_tokens->offsetExists($offset)) {
+            $token = $fields_definitions_tokens[$offset++];
+            /**
+             * These searchs could be done with another SqlTokenizer, but I don't konw how to do them, the documentation
+             * for sqltokenizer si really scarse.
+             */
+            $tokenType = $token->getType();
+            if ($tokenType === SqlToken::TYPE_IDENTIFIER) {
+                $identifier = (string) $token;
+                $sql_fields_to_insert[] = $identifier;
+            } elseif ($tokenType === SqlToken::TYPE_KEYWORD) {
+                $keyword = (string) $token;
+                if ($keyword === 'CONSTRAINT' || $keyword === 'FOREIGN') {
+                    /** Constraint key found */
+                    $other_offset = $offset;
+                    if ($keyword === 'CONSTRAINT') {
+                        $constraint_name = (string) $fields_definitions_tokens[$other_offset];
+                    } else {
+                        $constraint_name = $this->db->quoteColumnName((string) $constraint_pos);
+                    }
+                    if (($constraint_name === $quoted_foreign_name) || (is_int($name) && $constraint_pos === $name)) {
+                        /** Found foreign key $name, skip it */
+                        $foreign_found = true;
+                        $skipping = true;
+                        $offset = $other_offset;
+                    }
+                    $constraint_pos++;
+                }
+            } else {
+                throw new NotSupportedException("Unexpected: $token");
+            }
+
+            if (!$skipping) {
+                $ddl_fields_def .= $token . " ";
+            }
+
+            /** Skip or keep until the next */
+            while ($fields_definitions_tokens->offsetExists($offset)) {
+                $skip_token = $fields_definitions_tokens[$offset];
+                if (!$skipping) {
+                    $ddl_fields_def .= (string)$skip_token . " ";
+                }
+                $skipTokenType = $skip_token->getType();
+                if ($skipTokenType === SqlToken::TYPE_OPERATOR && (string)$skip_token == ',') {
+                    $ddl_fields_def .= "\n";
+                    ++$offset;
+                    $skipping = false;
+                    break;
+                }
+                ++$offset;
+            }
+        }
+
+        if (!$foreign_found) {
+            throw new InvalidParamException("foreign key constraint '$name' not found in table '$tableName'");
+        }
+
+        $foreign_keys_state = $this->foreignKeysState();
+        $return_queries[] = "PRAGMA foreign_keys = 0";
+        $return_queries[] = "SAVEPOINT drop_column_$unquoted_tablename";
+        $return_queries[] = "CREATE TABLE " . $this->db->quoteTableName("temp_$unquoted_tablename")
+            . " AS SELECT * FROM $quoted_tablename";
+        $return_queries[] = "DROP TABLE $quoted_tablename";
+        $return_queries[] = "CREATE TABLE $quoted_tablename (" . trim($ddl_fields_def, " \n\r\t,") . ")";
+        $return_queries[] = "INSERT INTO $quoted_tablename SELECT " . join(",", $sql_fields_to_insert) . " FROM "
+             . $this->db->quoteTableName("temp_$unquoted_tablename");
+        $return_queries[] = "DROP TABLE " . $this->db->quoteTableName("temp_$unquoted_tablename");
+
+        $return_queries = array_merge($return_queries, $this->getIndexSqls($unquoted_tablename));
+
+        $return_queries[] = "RELEASE drop_column_$unquoted_tablename";
+        $return_queries[] = "PRAGMA foreign_keys = $foreign_keys_state";
+
+        return implode(";", $return_queries);
     }
 
     /**
@@ -370,13 +520,50 @@ class QueryBuilder extends BaseQueryBuilder
      * @param string $table the table that the primary key constraint will be added to.
      * @param string|array $columns comma separated string or array of columns that the primary key will consist of.
      *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws InvalidParamException
      * @throws NotSupportedException this is not supported by SQLite.
      *
      * @return string the SQL statement for adding a primary key constraint to an existing table.
      */
     public function addPrimaryKey(string $name, string $table, $columns): string
     {
-        throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
+        $return_queries = [];
+        $schema = '';
+
+        if (($pos = strpos($table, '.')) !== false) {
+            $schema = $this->unquoteTableName(substr($table, 0, $pos));
+            $table = substr($table, $pos + 1);
+            $unquoted_tablename = $schema . '.' . $this->unquoteTableName($table);
+            $quoted_tablename = $schema . '.' . $this->db->quoteTableName($table);
+            $tmp_table_name =  "temp_{$schema}_" . $this->unquoteTableName($table);
+        } else {
+            $unquoted_tablename = $this->unquoteTableName($table);
+            $quoted_tablename = $this->db->quoteTableName($table);
+            $tmp_table_name =  "temp_" . $this->unquoteTableName($table);
+        }
+
+        $fields_definitions_tokens = $this->getFieldDefinitionsTokens($unquoted_tablename);
+        $ddl_fields_defs = $fields_definitions_tokens->getSql();
+        $ddl_fields_defs .= ", CONSTRAINT " . $this->db->quoteColumnName($name) . " PRIMARY KEY (" .
+            join(",", (array)$columns) . ")";
+        $foreign_keys_state = $this->foreignKeysState();
+        $return_queries[] = "PRAGMA foreign_keys = 0";
+        $return_queries[] = "SAVEPOINT add_primary_key_to_$tmp_table_name";
+        $return_queries[] = "CREATE TABLE " . $this->db->quoteTableName($tmp_table_name) .
+            " AS SELECT * FROM $quoted_tablename";
+        $return_queries[] = "DROP TABLE $quoted_tablename";
+        $return_queries[] = "CREATE TABLE $quoted_tablename (" . trim($ddl_fields_defs, " \n\r\t,") . ")";
+        $return_queries[] = "INSERT INTO $quoted_tablename SELECT * FROM " . $this->db->quoteTableName($tmp_table_name);
+        $return_queries[] = "DROP TABLE " . $this->db->quoteTableName($tmp_table_name);
+
+        $return_queries = array_merge($return_queries, $this->getIndexSqls($unquoted_tablename));
+
+        $return_queries[] = "RELEASE add_primary_key_to_$tmp_table_name";
+        $return_queries[] = "PRAGMA foreign_keys = $foreign_keys_state";
+
+        return implode(";", $return_queries);
     }
 
     /**
@@ -404,13 +591,15 @@ class QueryBuilder extends BaseQueryBuilder
      * multiple columns, separate them with commas. The name will be properly quoted by the method.
      *
      * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
      * @throws NotSupportedException
      *
      * @return string the SQL statement for adding an unique constraint to an existing table.
      */
     public function addUnique(string $name, string $table, $columns): string
     {
-        throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
+        return $this->createIndex($name, $table, $columns, true);
     }
 
     /**
@@ -421,14 +610,11 @@ class QueryBuilder extends BaseQueryBuilder
      * @param string $table the table whose unique constraint is to be dropped. The name will be properly quoted by the
      * method.
      *
-     * @throws Exception
-     * @throws NotSupportedException
-     *
      * @return string the SQL statement for dropping an unique constraint.
      */
     public function dropUnique(string $name, string $table): string
     {
-        throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
+        return "DROP INDEX $name";
     }
 
     /**
@@ -695,13 +881,13 @@ class QueryBuilder extends BaseQueryBuilder
             '/(`.*`) ON ({{(%?)([\w\-]+)}\}\.{{((%?)[\w\-]+)\\}\\})|(`.*`) ON ({{(%?)([\w\-]+)\.([\w\-]+)\\}\\})/',
             static function ($matches) {
                 if (!empty($matches[1])) {
-                    return $matches[4] . "." . $matches[1]
-                     . ' ON {{' . $matches[3] . $matches[5] . '}}';
+                    return $matches[4] . "." . $matches[1] .
+                        ' ON {{' . $matches[3] . $matches[5] . '}}';
                 }
 
                 if (!empty($matches[7])) {
-                    return $matches[10] . '.' . $matches[7]
-                     . ' ON {{' . $matches[9] . $matches[11] . '}}';
+                    return $matches[10] . '.' . $matches[7] .
+                        ' ON {{' . $matches[9] . $matches[11] . '}}';
                 }
             },
             $sql
@@ -829,5 +1015,136 @@ class QueryBuilder extends BaseQueryBuilder
             : \ltrim($values, ' ')) . ') ' . $this->update($table, $updateColumns, $updateCondition, $params);
 
         return "$updateSql; $insertSql;";
+    }
+
+    private function unquoteTableName(string $tableName): string
+    {
+        return $this->db->getSchema()->unquoteSimpleTableName($this->db->quoteSql($tableName));
+    }
+
+    private function getFieldDefinitionsTokens($tableName)
+    {
+        $create_table = $this->getCreateTable($tableName);
+
+        /** Parse de CREATE TABLE statement to skip any use of this column, namely field definitions and FOREIGN KEYS */
+        $code = (new SqlTokenizer($create_table))->tokenize();
+        $pattern = (new SqlTokenizer('any CREATE any TABLE any()'))->tokenize();
+        if (!$code[0]->matches($pattern, 0, $firstMatchIndex, $lastMatchIndex)) {
+            throw new InvalidParamException("Table not found: $tableName");
+        }
+
+        /** Get the fields definition and foreign keys tokens */
+        return $code[0][$lastMatchIndex - 1];
+    }
+
+    private function getCreateTable($tableName)
+    {
+        if (($pos = strpos($tableName, '.')) !== false) {
+            $schema = substr($tableName, 0, $pos + 1);
+            $tableName = substr($tableName, $pos + 1);
+        } else {
+            $schema = '';
+        }
+
+        $create_table = $this->db->createCommand(
+            "select SQL from {$schema}SQLite_Master where tbl_name = '$tableName' and type='table'"
+        )->queryScalar();
+
+        if ($create_table === null) {
+            throw new InvalidParamException("Table not found: $tableName");
+        }
+
+        return trim($create_table);
+    }
+
+    private function foreignKeysState()
+    {
+        return $this->db->createCommand("PRAGMA foreign_keys")->queryScalar();
+    }
+
+    private function getIndexSqls($tableName, $skipColumn = null, $newColumn = null)
+    {
+        /** Get all indexes on this table */
+        $indexes = $this->db->createCommand(
+            "select SQL from SQLite_Master where tbl_name = '$tableName' and type='index'"
+        )->queryAll();
+
+        if ($skipColumn === null) {
+            return array_column($indexes, "sql");
+        }
+
+        $quoted_skip_column = $this->db->quoteColumnName((string) $skipColumn);
+        if ($newColumn === null) {
+            /** Skip indexes which contain this column */
+            foreach ($indexes as $key => $index) {
+                $code = (new SqlTokenizer($index["sql"]))->tokenize();
+                $pattern = (new SqlTokenizer('any CREATE any INDEX any ON any()'))->tokenize();
+
+                /** Extract the list of fields of this index */
+                if (!$code[0]->matches($pattern, 0, $firstMatchIndex, $lastMatchIndex)) {
+                    throw new InvalidParamException("Index definition error: $index");
+                }
+
+                $found = false;
+                $indexFieldsDef = $code[0][$lastMatchIndex - 1];
+                $offset = 0;
+                while ($indexFieldsDef->offsetExists($offset)) {
+                    $token = $indexFieldsDef[$offset];
+                    $tokenType = $token->getType();
+                    if ($tokenType === SqlToken::TYPE_IDENTIFIER) {
+                        if ((string) $token === $skipColumn || (string) $token === $quoted_skip_column) {
+                            $found = true;
+                            unset($indexes[$key]);
+                            break;
+                        }
+                    }
+                    ++$offset;
+                }
+
+                if (!$found) {
+                    /** If the index contains this column, do not add it */
+                    $indexes[$key] = $index["sql"];
+                }
+            }
+        } else {
+            foreach ($indexes as $key => $index) {
+                $code = (new SqlTokenizer($index["sql"]))->tokenize();
+                $pattern = (new SqlTokenizer('any CREATE any INDEX any ON any ()'))->tokenize();
+
+                /** Extract the list of fields of this index */
+                if (!$code[0]->matches($pattern, 0, $firstMatchIndex, $lastMatchIndex)) {
+                    throw new InvalidParamException("Index definition error: $index");
+                }
+
+                $found = false;
+                $indexFieldsDef = $code[0][$lastMatchIndex - 1];
+                $new_index_def = '';
+
+                for ($i = 0; $i < $lastMatchIndex - 1; ++$i) {
+                    $new_index_def .= (string)$code[0][$i] . " ";
+                }
+
+                $offset = 0;
+                while ($indexFieldsDef->offsetExists($offset)) {
+                    $token = $indexFieldsDef[$offset];
+                    $tokenType = $token->getType();
+                    if ($tokenType === SqlToken::TYPE_IDENTIFIER) {
+                        if ((string) $token === $skipColumn || (string) $token === $quoted_skip_column) {
+                            $token = $this->db->quoteColumnName((string) $newColumn);
+                        }
+                    }
+                    $new_index_def .= $token;
+                    ++$offset;
+                }
+
+                while ($code[0]->offsetExists($lastMatchIndex)) {
+                    $new_index_def .= (string)$code[0][$lastMatchIndex++] . " ";
+                }
+
+                $indexes[$key] = $this->dropIndex((string) $code[0][2], $tableName) . ";$new_index_def";
+            }
+        }
+
+        return $indexes;
     }
 }

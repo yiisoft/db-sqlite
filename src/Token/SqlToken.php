@@ -398,4 +398,9 @@ class SqlToken implements \ArrayAccess
     {
         return $this->content;
     }
+
+    public function getType(): int
+    {
+        return $this->type;
+    }
 }
