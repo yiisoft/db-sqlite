@@ -24,6 +24,18 @@ use Yiisoft\Db\Sqlite\Token\SqlToken;
 use Yiisoft\Db\Sqlite\Token\SqlTokenizer;
 use Yiisoft\Strings\StringHelper;
 
+use function array_column;
+use function array_filter;
+use function array_merge;
+use function implode;
+use function is_float;
+use function is_string;
+use function ltrim;
+use function strpos;
+use function substr;
+use function trim;
+use function version_compare;
+
 class QueryBuilder extends BaseQueryBuilder
 {
     /**
@@ -109,7 +121,7 @@ class QueryBuilder extends BaseQueryBuilder
          */
         $this->db->open();
 
-        if (\version_compare($this->db->getServerVersion(), '3.7.11', '>=')) {
+        if (version_compare($this->db->getServerVersion(), '3.7.11', '>=')) {
             return parent::batchInsert($table, $columns, $rows, $params);
         }
 
@@ -129,9 +141,9 @@ class QueryBuilder extends BaseQueryBuilder
                 if (isset($columnSchemas[$columns[$i]])) {
                     $value = $columnSchemas[$columns[$i]]->dbTypecast($value);
                 }
-                if (\is_string($value)) {
+                if (is_string($value)) {
                     $value = $schema->quoteValue($value);
-                } elseif (\is_float($value)) {
+                } elseif (is_float($value)) {
                     // ensure type cast always has . as decimal separator in all locales
                     $value = StringHelper::floatToString($value);
                 } elseif ($value === false) {
@@ -143,7 +155,7 @@ class QueryBuilder extends BaseQueryBuilder
                 }
                 $vs[] = $value;
             }
-            $values[] = \implode(', ', $vs);
+            $values[] = implode(', ', $vs);
         }
 
         if (empty($values)) {
@@ -343,7 +355,7 @@ class QueryBuilder extends BaseQueryBuilder
         $fields_definitions_tokens = $this->getFieldDefinitionsTokens($unquoted_tablename);
         $ddl_fields_defs = $fields_definitions_tokens->getSql();
         $ddl_fields_defs .= ",\nCONSTRAINT " . $this->db->quoteColumnName($name) . " FOREIGN KEY (" .
-            join(",", (array)$columns) . ") REFERENCES $refTable(" . join(",", (array)$refColumns) . ")";
+            implode(",", (array)$columns) . ") REFERENCES $refTable(" . implode(",", (array)$refColumns) . ")";
 
         if ($update !== null) {
             $ddl_fields_defs .= " ON UPDATE $update";
@@ -464,7 +476,7 @@ class QueryBuilder extends BaseQueryBuilder
             . " AS SELECT * FROM $quoted_tablename";
         $return_queries[] = "DROP TABLE $quoted_tablename";
         $return_queries[] = "CREATE TABLE $quoted_tablename (" . trim($ddl_fields_def, " \n\r\t,") . ")";
-        $return_queries[] = "INSERT INTO $quoted_tablename SELECT " . join(",", $sql_fields_to_insert) . " FROM "
+        $return_queries[] = "INSERT INTO $quoted_tablename SELECT " . implode(",", $sql_fields_to_insert) . " FROM "
              . $this->db->quoteTableName("temp_$unquoted_tablename");
         $return_queries[] = "DROP TABLE " . $this->db->quoteTableName("temp_$unquoted_tablename");
 
@@ -547,7 +559,7 @@ class QueryBuilder extends BaseQueryBuilder
         $fields_definitions_tokens = $this->getFieldDefinitionsTokens($unquoted_tablename);
         $ddl_fields_defs = $fields_definitions_tokens->getSql();
         $ddl_fields_defs .= ", CONSTRAINT " . $this->db->quoteColumnName($name) . " PRIMARY KEY (" .
-            join(",", (array)$columns) . ")";
+            implode(",", (array)$columns) . ")";
         $foreign_keys_state = $this->foreignKeysState();
         $return_queries[] = "PRAGMA foreign_keys = 0";
         $return_queries[] = "SAVEPOINT add_primary_key_to_$tmp_table_name";
@@ -807,7 +819,7 @@ class QueryBuilder extends BaseQueryBuilder
     {
         $query = $query->prepare($this);
 
-        $params = empty($params) ? $query->getParams() : \array_merge($params, $query->getParams());
+        $params = empty($params) ? $query->getParams() : array_merge($params, $query->getParams());
 
         $clauses = [
             $this->buildSelect($query->getSelect(), $params, $query->getDistinct(), $query->getSelectOption()),
@@ -818,7 +830,7 @@ class QueryBuilder extends BaseQueryBuilder
             $this->buildHaving($query->getHaving(), $params),
         ];
 
-        $sql = \implode($this->separator, \array_filter($clauses));
+        $sql = implode($this->separator, array_filter($clauses));
         $sql = $this->buildOrderByAndLimit($sql, $query->getOrderBy(), $query->getLimit(), $query->getOffset());
 
         if (!empty($query->getOrderBy())) {
@@ -924,7 +936,7 @@ class QueryBuilder extends BaseQueryBuilder
             $result .= ' UNION ' . ($union['all'] ? 'ALL ' : '') . ' ' . $unions[$i]['query'];
         }
 
-        return \trim($result);
+        return trim($result);
     }
 
     /**
@@ -979,8 +991,8 @@ class QueryBuilder extends BaseQueryBuilder
         [, $placeholders, $values, $params] = $this->prepareInsertValues($table, $insertColumns, $params);
 
         $insertSql = 'INSERT OR IGNORE INTO ' . $this->db->quoteTableName($table)
-            . (!empty($insertNames) ? ' (' . \implode(', ', $insertNames) . ')' : '')
-            . (!empty($placeholders) ? ' VALUES (' . \implode(', ', $placeholders) . ')' : $values);
+            . (!empty($insertNames) ? ' (' . implode(', ', $insertNames) . ')' : '')
+            . (!empty($placeholders) ? ' VALUES (' . implode(', ', $placeholders) . ')' : $values);
 
         if ($updateColumns === false) {
             return $insertSql;
@@ -1010,9 +1022,9 @@ class QueryBuilder extends BaseQueryBuilder
             }
         }
 
-        $updateSql = 'WITH "EXCLUDED" (' . \implode(', ', $insertNames)
-            . ') AS (' . (!empty($placeholders) ? 'VALUES (' . \implode(', ', $placeholders) . ')'
-            : \ltrim($values, ' ')) . ') ' . $this->update($table, $updateColumns, $updateCondition, $params);
+        $updateSql = 'WITH "EXCLUDED" (' . implode(', ', $insertNames)
+            . ') AS (' . (!empty($placeholders) ? 'VALUES (' . implode(', ', $placeholders) . ')'
+            : ltrim($values, ' ')) . ') ' . $this->update($table, $updateColumns, $updateCondition, $params);
 
         return "$updateSql; $insertSql;";
     }
@@ -1062,7 +1074,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $this->db->createCommand("PRAGMA foreign_keys")->queryScalar();
     }
 
-    private function getIndexSqls($tableName, $skipColumn = null, $newColumn = null)
+    private function getIndexSqls(string $tableName, $skipColumn = null, $newColumn = null): array
     {
         /** Get all indexes on this table */
         $indexes = $this->db->createCommand(
@@ -1116,12 +1128,11 @@ class QueryBuilder extends BaseQueryBuilder
                     throw new InvalidParamException("Index definition error: $index");
                 }
 
-                $found = false;
                 $indexFieldsDef = $code[0][$lastMatchIndex - 1];
                 $new_index_def = '';
 
                 for ($i = 0; $i < $lastMatchIndex - 1; ++$i) {
-                    $new_index_def .= (string)$code[0][$i] . " ";
+                    $new_index_def .= $code[0][$i] . " ";
                 }
 
                 $offset = 0;
@@ -1138,7 +1149,7 @@ class QueryBuilder extends BaseQueryBuilder
                 }
 
                 while ($code[0]->offsetExists($lastMatchIndex)) {
-                    $new_index_def .= (string)$code[0][$lastMatchIndex++] . " ";
+                    $new_index_def .= $code[0][$lastMatchIndex++] . " ";
                 }
 
                 $indexes[$key] = $this->dropIndex((string) $code[0][2], $tableName) . ";$new_index_def";
