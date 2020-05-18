@@ -18,6 +18,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
+        "ext-pdo_sqlite": "^7.4",
         "php": "^7.4",
         "yiisoft/arrays": "^3.0@dev",
         "yiisoft/db": "^3.0@dev",

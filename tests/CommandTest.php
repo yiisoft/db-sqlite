@@ -50,16 +50,6 @@ class CommandTest extends AbstractCommandTest
         $this->markTestSkipped('SQLite does not support adding/dropping primary keys.');
     }
 
-    public function testAddDropForeignKey(): void
-    {
-        $this->markTestSkipped('SQLite does not support adding/dropping foreign keys.');
-    }
-
-    public function testAddDropUnique(): void
-    {
-        $this->markTestSkipped('SQLite does not support adding/dropping unique constraints.');
-    }
-
     public function testAddDropCheck(): void
     {
         $this->markTestSkipped('SQLite does not support adding/dropping check constraints.');

@@ -246,7 +246,10 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
             $name = null;
             $pattern = (new SqlTokenizer('CONSTRAINT any'))->tokenize();
 
-            if (isset($createTableToken[$firstMatchIndex - 2]) && $createTableToken->matches($pattern, $firstMatchIndex - 2)) {
+            if (
+                isset($createTableToken[$firstMatchIndex - 2])
+                && $createTableToken->matches($pattern, $firstMatchIndex - 2)
+            ) {
                 $name = $createTableToken[$firstMatchIndex - 1]->getContent();
             }
 
@@ -506,7 +509,7 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
      *
      * @return array
      */
-    private function loadTableColumnsInfo($tableName): array
+    private function loadTableColumnsInfo(string $tableName): array
     {
         $tableColumns = $this->getDb()->createCommand(
             'PRAGMA TABLE_INFO (' . $this->quoteValue($tableName) . ')'
@@ -529,14 +532,27 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
      *
      * @return mixed constraints.
      */
-    private function loadTableConstraints($tableName, $returnType)
+    private function loadTableConstraints(string $tableName, string $returnType)
     {
-        $indexes = $this->getDb()->createCommand(
+        $tableColumns = null;
+
+        $index = $this->getDb()->createCommand(
             'PRAGMA INDEX_LIST (' . $this->quoteValue($tableName) . ')'
         )->queryAll();
 
+        $unique = $this->getDb()->createCommand(
+            "SELECT
+                '0' as 'seq',
+                name,
+                '1' as 'unique',
+                'u' as 'origin',
+                '0' as 'partial'
+            FROM sqlite_master
+            WHERE type='index' AND sql LIKE 'CREATE UNIQUE INDEX%' AND tbl_name='$tableName'"
+        )->queryAll();
+
+        $indexes = array_merge($index, $unique);
         $indexes = $this->normalizePdoRowKeyCase($indexes, true);
-        $tableColumns = null;
 
         if (!empty($indexes) && !isset($indexes[0]['origin'])) {
             /**
@@ -565,6 +581,7 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
             if ($tableColumns !== null) {
                 // SQLite may not have an "origin" column in INDEX_LIST
                 $index['origin'] = 'c';
+
                 if (!empty($columns) && $tableColumns[$columns[0]['cid']]['pk'] > 0) {
                     $index['origin'] = 'pk';
                 } elseif ($index['unique'] && $this->isSystemIdentifier($index['name'])) {
