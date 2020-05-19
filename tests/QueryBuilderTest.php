@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests;
 
 use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\Query\QueryBuilder;
 use Yiisoft\Db\Sqlite\Schema\Schema;
 use Yiisoft\Db\Tests\TraversableObject;
 use Yiisoft\Db\Tests\QueryBuilderTest as AbstractQueryBuilderTest;
