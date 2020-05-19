@@ -10,6 +10,9 @@ use Yiisoft\Db\Exception\IntegrityException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Tests\CommandTest as AbstractCommandTest;
 
+use function str_replace;
+use function version_compare;
+
 class CommandTest extends AbstractCommandTest
 {
     protected ?string $driverName = 'sqlite';
@@ -107,6 +110,7 @@ SQL;
     public function batchInsertSqlProvider(): array
     {
         $parent = parent::batchInsertSqlProvider();
+
         unset($parent['wrongBehavior']); /** Produces SQL syntax error: General error: 1 near ".": syntax error */
 
         return $parent;
@@ -161,13 +165,17 @@ SQL;
             'INSERT INTO students(student_name, department_id) VALUES ("John", 1);'
         )->execute();
 
-        $this->expectException(IntegrityException::class);
-        $this->expectExceptionMessage(
+        $expectedMessageError = str_replace(
+            "\r\n",
+            "\n",
             <<<EOD
 SQLSTATE[23000]: Integrity constraint violation: 19 FOREIGN KEY constraint failed
 The SQL being executed was: INSERT INTO students(student_name, department_id) VALUES ("Samdark", 5)
 EOD
         );
+
+        $this->expectException(IntegrityException::class);
+        $this->expectExceptionMessage($expectedMessageError);
 
         $db->createCommand(
             'INSERT INTO students(student_name, department_id) VALUES ("Samdark", 5);'
