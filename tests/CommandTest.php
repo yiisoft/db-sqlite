@@ -6,6 +6,7 @@ namespace Yiisoft\Db\Sqlite\Tests;
 
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
+use Yiisoft\Db\Exception\IntegrityException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Tests\CommandTest as AbstractCommandTest;
 
@@ -109,5 +110,67 @@ SQL;
         unset($parent['wrongBehavior']); /** Produces SQL syntax error: General error: 1 near ".": syntax error */
 
         return $parent;
+    }
+
+    public function testForeingKeyException(): void
+    {
+        $db = $this->getConnection(false);
+
+        $db->createCommand('PRAGMA foreign_keys = ON')->execute();
+
+        $tableMaster = 'departments';
+        $tableRelation = 'students';
+        $name = 'test_fk_constraint';
+
+        /** @var \Yiisoft\Db\Sqlite\Schema $schema */
+        $schema = $db->getSchema();
+
+        if ($schema->getTableSchema($tableRelation) !== null) {
+            $db->createCommand()->dropTable($tableRelation)->execute();
+        }
+
+        if ($schema->getTableSchema($tableMaster) !== null) {
+            $db->createCommand()->dropTable($tableMaster)->execute();
+        }
+
+        $db->createCommand()->createTable($tableMaster, [
+            'department_id' => 'integer not null primary key autoincrement',
+            'department_name' => 'nvarchar(50) null',
+        ])->execute();
+
+        $db->createCommand()->createTable($tableRelation, [
+            'student_id' => 'integer primary key autoincrement not null',
+            'student_name' => 'nvarchar(50) null',
+            'department_id' => 'integer not null',
+            'dateOfBirth' => 'date null'
+        ])->execute();
+
+        $db->createCommand()->addForeignKey(
+            $name,
+            $tableRelation,
+            ['Department_id'],
+            $tableMaster,
+            ['Department_id']
+        )->execute();
+
+        $db->createCommand(
+            "INSERT INTO departments VALUES (1, 'IT')"
+        )->execute();
+
+        $db->createCommand(
+            'INSERT INTO students(student_name, department_id) VALUES ("John", 1);'
+        )->execute();
+
+        $this->expectException(IntegrityException::class);
+        $this->expectExceptionMessage(
+            <<<EOD
+SQLSTATE[23000]: Integrity constraint violation: 19 FOREIGN KEY constraint failed
+The SQL being executed was: INSERT INTO students(student_name, department_id) VALUES ("Samdark", 5)
+EOD
+        );
+
+        $db->createCommand(
+            'INSERT INTO students(student_name, department_id) VALUES ("Samdark", 5);'
+        )->execute();
     }
 }
