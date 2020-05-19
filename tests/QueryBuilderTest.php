@@ -60,6 +60,17 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
         $result = parent::indexesProvider();
         $result['drop'][0] = 'DROP INDEX [[CN_constraints_2_single]]';
 
+        $indexName = 'myindex';
+        $schemaName = 'myschema';
+        $tableName = 'mytable';
+
+        $result['with schema'] = [
+            "CREATE INDEX {{{$schemaName}}}.[[$indexName]] ON {{{$tableName}}} ([[C_index_1]])",
+            function (QueryBuilder $qb) use ($tableName, $indexName, $schemaName) {
+                return $qb->createIndex($indexName, $schemaName . '.' . $tableName, 'C_index_1');
+            },
+        ];
+
         return $result;
     }
 
