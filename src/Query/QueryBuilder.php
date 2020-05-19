@@ -888,7 +888,7 @@ class QueryBuilder extends BaseQueryBuilder
 
         $schema = null;
         if (count($tableParts) === 2) {
-            list ($schema, $table) = $tableParts;
+            [$schema, $table] = $tableParts;
         }
 
         return ($unique ? 'CREATE UNIQUE INDEX ' : 'CREATE INDEX ')
