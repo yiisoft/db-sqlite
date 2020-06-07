@@ -8,7 +8,7 @@ name: mutation
 
 jobs:
   mutation:
-    name: INFECTION ${{ matrix.php-version }}-${{ matrix.os }}
+    name: PHP ${{ matrix.php-version }}-${{ matrix.os }}
 
     runs-on: ${{ matrix.os }}
 
