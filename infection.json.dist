@@ -12,6 +12,5 @@
     },
     "mutators": {
         "@default": true
-    },
-    "timeout": 45
+    }
 }
