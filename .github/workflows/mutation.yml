@@ -48,6 +48,6 @@ jobs:
 
       - name: Run test mutation infection with coverage
         continue-on-error: true
-        run: infection --threads=4 --only-covered
+        run: infection
         env:
           STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
