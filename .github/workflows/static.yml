@@ -1,10 +1,8 @@
 on:
-  pull_request:
-  push:
-    branches:
-      - "master"
+  - pull_request
+  - push
 
-name: mutation test
+name: static analysis with phan
 
 jobs:
   mutation:
@@ -27,9 +25,9 @@ jobs:
       - name: "Install PHP"
         uses: "shivammathur/setup-php@v2"
         with:
-          coverage: "pcov"
           php-version: "${{ matrix.php-version }}"
-          ini-values: memory_limit=-1
+          tools: cs2pr, phan
+          coverage: none
 
       - name: Determine composer cache directory
         run: echo "::set-env name=COMPOSER_CACHE_DIR::$(composer config cache-dir)"
@@ -44,11 +42,9 @@ jobs:
 
       - name: Install composer v. 2.0
         run: composer self-update --snapshot
-
+                    
       - name: Install dependencies with composer
         run: composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader
 
-      - name: Run test mutation infection with coverage
-        run: vendor/bin/infection
-        env:
-          STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
+      - name: Static analysis with phan
+        run: phan --no-progress-bar --output-mode checkstyle | cs2pr --graceful-warnings --colorize
