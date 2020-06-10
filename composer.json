@@ -26,7 +26,8 @@
     },
     "require-dev": {
         "infection/infection": "^0.16.3",
-        "phpunit/phpunit": "^9.2.0",
+        "phan/phan": "^3.0.2",
+        "phpunit/phpunit": "^9.2",
         "yiisoft/aliases": "^1.0",
         "yiisoft/composer-config-plugin": "^1.0@dev",
         "yiisoft/log-target-file": "^3.0@dev",
