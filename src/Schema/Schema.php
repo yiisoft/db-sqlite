@@ -34,9 +34,6 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
 {
     use ConstraintFinderTrait;
 
-    protected string $tableQuoteCharacter = '`';
-    protected string $columnQuoteCharacter = '`';
-
     /**
      * @var array mapping from physical column types (keys) to abstract column types (values)
      */
@@ -70,6 +67,18 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
         'timestamp' => self::TYPE_TIMESTAMP,
         'enum' => self::TYPE_STRING,
     ];
+
+    /**
+     * @var string|string[] character used to quote schema, table, etc. names. An array of 2 characters can be used in
+     * case starting and ending characters are different.
+     */
+    protected string $tableQuoteCharacter = '`';
+
+    /**
+     * @var string|string[] character used to quote column names. An array of 2 characters can be used in case starting
+     * and ending characters are different.
+     */
+    protected string $columnQuoteCharacter = '`';
 
     /**
      * Returns all table names in the database.
