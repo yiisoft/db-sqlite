@@ -72,13 +72,13 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
      * @var string|string[] character used to quote schema, table, etc. names. An array of 2 characters can be used in
      * case starting and ending characters are different.
      */
-    protected string $tableQuoteCharacter = '`';
+    protected $tableQuoteCharacter = '`';
 
     /**
      * @var string|string[] character used to quote column names. An array of 2 characters can be used in case starting
      * and ending characters are different.
      */
-    protected string $columnQuoteCharacter = '`';
+    protected $columnQuoteCharacter = '`';
 
     /**
      * Returns all table names in the database.
