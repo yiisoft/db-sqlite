@@ -22,6 +22,7 @@ use Yiisoft\Db\Sqlite\Condition\LikeConditionBuilder;
 use Yiisoft\Db\Sqlite\Schema\Schema;
 use Yiisoft\Db\Sqlite\Token\SqlToken;
 use Yiisoft\Db\Sqlite\Token\SqlTokenizer;
+use Yiisoft\Strings\NumericHelper;
 use Yiisoft\Strings\StringHelper;
 
 use function array_column;
@@ -145,7 +146,7 @@ class QueryBuilder extends BaseQueryBuilder
                     $value = $schema->quoteValue($value);
                 } elseif (is_float($value)) {
                     // ensure type cast always has . as decimal separator in all locales
-                    $value = StringHelper::floatToString($value);
+                    $value = NumericHelper::normalize($value);
                 } elseif ($value === false) {
                     $value = 0;
                 } elseif ($value === null) {
