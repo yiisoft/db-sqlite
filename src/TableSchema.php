@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite\Schema;
+namespace Yiisoft\Db\Sqlite;
 
 use Yiisoft\Db\Schema\TableSchema as AbstractTableSchema;
 
-class TableSchema extends AbstractTableSchema
+final class TableSchema extends AbstractTableSchema
 {
     private array $foreignKeys = [];
 

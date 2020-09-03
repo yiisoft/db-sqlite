@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Condition;
 
+use Traversable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\Conditions\InConditionBuilder as BaseInConditionBuilder;
 
-class InConditionBuilder extends BaseInConditionBuilder
+use function implode;
+use function is_array;
+use function strpos;
+
+final class InConditionBuilder extends BaseInConditionBuilder
 {
     /**
      * Builds SQL for IN condition.
@@ -26,7 +31,7 @@ class InConditionBuilder extends BaseInConditionBuilder
      */
     protected function buildSubqueryInCondition(string $operator, $columns, Query $values, array &$params = []): string
     {
-        if (\is_array($columns)) {
+        if (is_array($columns)) {
             throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
         }
 
@@ -36,14 +41,10 @@ class InConditionBuilder extends BaseInConditionBuilder
     /**
      * Builds SQL for IN condition.
      *
-     * @param string $operator
-     * @param array|\Traversable $columns
+     * @param string|null $operator
+     * @param array|Traversable $columns
      * @param array|object $values
      * @param array $params
-     *
-     * @throws NotSupportedException
-     * @throws Exception
-     * @throws InvalidConfigException
      *
      * @return string SQL.
      */
@@ -52,7 +53,7 @@ class InConditionBuilder extends BaseInConditionBuilder
         $quotedColumns = [];
 
         foreach ($columns as $i => $column) {
-            $quotedColumns[$i] = \strpos($column, '(') === false
+            $quotedColumns[$i] = strpos($column, '(') === false
                 ? $this->queryBuilder->getDb()->quoteColumnName($column) : $column;
         }
 
@@ -68,9 +69,9 @@ class InConditionBuilder extends BaseInConditionBuilder
                     $vs[] = $quotedColumns[$i] . ($operator === 'IN' ? ' IS' : ' IS NOT') . ' NULL';
                 }
             }
-            $vss[] = '(' . \implode($operator === 'IN' ? ' AND ' : ' OR ', $vs) . ')';
+            $vss[] = '(' . implode($operator === 'IN' ? ' AND ' : ' OR ', $vs) . ')';
         }
 
-        return '(' . \implode($operator === 'IN' ? ' OR ' : ' AND ', $vss) . ')';
+        return '(' . implode($operator === 'IN' ? ' OR ' : ' AND ', $vss) . ')';
     }
 }
