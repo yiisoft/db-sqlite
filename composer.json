@@ -18,8 +18,9 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "ext-pdo_sqlite": "^7.4",
         "php": "^7.4|^8.0",
+        "ext-mbstring": "*",
+        "ext-pdo_sqlite": "*",
         "yiisoft/arrays": "^3.0@dev",
         "yiisoft/db": "^3.0@dev",
         "yiisoft/strings": "^1.0"
@@ -36,7 +37,11 @@
     },
     "autoload": {
         "psr-4": {
-            "Yiisoft\\Db\\Sqlite\\": "src",
+            "Yiisoft\\Db\\Sqlite\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "Yiisoft\\Db\\Sqlite\\Tests\\": "tests"
         }
     },

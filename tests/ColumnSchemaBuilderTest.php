@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
-use Yiisoft\Db\Sqlite\Schema\ColumnSchemaBuilder;
-use Yiisoft\Db\Sqlite\Schema\Schema;
-use Yiisoft\Db\Tests\ColumnSchemaBuilderTest as AbstractColumnSchemaBuilderTest;
+use Yiisoft\Db\Sqlite\ColumnSchemaBuilder;
+use Yiisoft\Db\Sqlite\Schema;
+use Yiisoft\Db\TestUtility\TestColumnSchemaBuilderTrait;
 
-class ColumnSchemaBuilderTest extends AbstractColumnSchemaBuilderTest
+/**
+ * @group sqlite
+ */
+final class ColumnSchemaBuilderTest extends TestCase
 {
-    protected ?string $driverName = 'sqlite';
+    use TestColumnSchemaBuilderTrait;
 
     public function getColumnSchemaBuilder($type, $length = null): ColumnSchemaBuilder
     {
@@ -26,10 +29,22 @@ class ColumnSchemaBuilderTest extends AbstractColumnSchemaBuilderTest
             ['integer(10) UNSIGNED', Schema::TYPE_INTEGER, 10, [
                 ['unsigned'],
             ]],
-            // comments are ignored
             ['integer(10)', Schema::TYPE_INTEGER, 10, [
                 ['comment', 'test'],
             ]],
         ];
+    }
+
+    /**
+     * @dataProvider typesProvider
+     *
+     * @param string $expected
+     * @param string $type
+     * @param int|null $length
+     * @param mixed $calls
+     */
+    public function testCustomTypes(string $expected, string $type, ?int $length, $calls): void
+    {
+        $this->checkBuildString($expected, $type, $length, $calls);
     }
 }

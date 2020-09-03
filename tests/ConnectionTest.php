@@ -4,145 +4,156 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
-use Yiisoft\Db\Connection\Connection;
+use PDO;
+use Yiisoft\Db\Connection\ConnectionInterface;
+use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
+use Yiisoft\Db\Sqlite\Connection;
 use Yiisoft\Db\Transaction\Transaction;
-use Yiisoft\Db\Tests\ConnectionTest as AbstractConnectionTest;
+use Yiisoft\Db\TestUtility\TestConnectionTrait;
 
-class ConnectionTest extends AbstractConnectionTest
+/**
+ * @group sqlite
+ */
+final class ConnectionTest extends TestCase
 {
-    protected ?string $driverName = 'sqlite';
+    use TestConnectionTrait;
+
+    public function testConnection(): void
+    {
+        $this->assertIsObject($this->getConnection(true));
+    }
 
     public function testConstruct(): void
     {
-        $connection = $this->getConnection(false);
+        $db = $this->getConnection();
 
-        $this->assertEquals($this->databases['dsn'], $connection->getDsn());
+        $this->assertEquals($this->cache, $db->getSchemaCache());
+        $this->assertEquals($this->logger, $db->getLogger());
+        $this->assertEquals($this->profiler, $db->getProfiler());
+        $this->assertEquals('sqlite:' . __DIR__ . '/Data/yiitest.sq3', $db->getDsn());
+    }
+
+    public function testExceptionContainsRawQuery(): void
+    {
+        $db = $this->getConnection();
+
+        if ($db->getTableSchema('qlog1', true) === null) {
+            $db->createCommand()->createTable('qlog1', ['id' => 'pk'])->execute();
+        }
+
+        $db->setEmulatePrepare(true);
+
+        /* profiling and logging */
+        $db->setEnableLogging(true);
+        $db->setEnableProfiling(true);
+
+        $this->runExceptionTest($db);
+
+        /* profiling only */
+        $db->setEnableLogging(false);
+        $db->setEnableProfiling(true);
+
+        $this->runExceptionTest($db);
+
+        /* logging only */
+        $db->setEnableLogging(true);
+        $db->setEnableProfiling(false);
+
+        $this->runExceptionTest($db);
+
+        /* disabled */
+        $db->setEnableLogging(false);
+        $db->setEnableProfiling(false);
+
+        $this->runExceptionTest($db);
     }
 
     /**
-     * Test whether slave connection is recovered when call getSlavePdo() after close().
+     * @param ConnectionInterface $db
+     */
+    private function runExceptionTest(ConnectionInterface $db): void
+    {
+        $thrown = false;
+
+        try {
+            $db->createCommand('INSERT INTO qlog1(a) VALUES(:a);', [':a' => 1])->execute();
+        } catch (Exception $e) {
+            $this->assertStringContainsString(
+                'INSERT INTO qlog1(a) VALUES(:a);',
+                $e->getMessage(),
+                'Exceptions message should contain raw SQL query: ' . (string) $e
+            );
+
+            $thrown = true;
+        }
+
+        $this->assertTrue($thrown, 'An exception should have been thrown by the command.');
+
+        $thrown = false;
+
+        try {
+            $db->createCommand(
+                'SELECT * FROM qlog1 WHERE id=:a ORDER BY nonexistingcolumn;',
+                [':a' => 1]
+            )->queryAll();
+        } catch (Exception $e) {
+            $this->assertStringContainsString(
+                'SELECT * FROM qlog1 WHERE id=:a ORDER BY nonexistingcolumn;',
+                $e->getMessage(),
+                'Exceptions message should contain raw SQL query: ' . (string) $e
+            );
+
+            $thrown = true;
+        }
+
+        $this->assertTrue($thrown, 'An exception should have been thrown by the command.');
+    }
+
+    public function testGetDriverName(): void
+    {
+        $db = $this->getConnection();
+
+        $this->assertEquals('sqlite', $db->getDriverName());
+    }
+
+    /**
+     * Test whether slave connection is recovered when call `getSlavePdo()` after `close()`.
      *
-     * @see https://github.com/yiisoft/yii2/issues/14165
+     * {@see https://github.com/yiisoft/yii2/issues/14165}
      */
     public function testGetPdoAfterClose(): void
     {
-        $connection = $this->getConnection();
+        $db = $this->getConnection();
 
-        $connection->setSlaves('1', $this->databases['dsn']);
+        $db->setSlaves(
+            '1',
+            [
+                '__class' => Connection::class,
+                '__construct()' => [
+                    $this->cache,
+                    $this->logger,
+                    $this->profiler,
+                    'sqlite:' . __DIR__ . "/Data/yii_test_slave.sq3"
 
-        $this->assertNotNull($connection->getSlavePdo(false));
+                ]
+            ]
+        );
 
-        $connection->close();
+        $this->assertNotNull($db->getSlavePdo(false));
 
-        $masterPdo = $connection->getMasterPdo();
+        $db->close();
+
+        $masterPdo = $db->getMasterPdo();
+
         $this->assertNotFalse($masterPdo);
         $this->assertNotNull($masterPdo);
 
-        $slavePdo = $connection->getSlavePdo(false);
+        $slavePdo = $db->getSlavePdo(false);
+
         $this->assertNotFalse($slavePdo);
         $this->assertNotNull($slavePdo);
         $this->assertNotSame($masterPdo, $slavePdo);
-    }
-
-    public function testServerStatusCacheWorks(): void
-    {
-        $connection = $this->getConnection(true, false);
-
-        $connection->setMasters('1', $this->databases['dsn']);
-
-        $connection->setShuffleMasters(false);
-
-        $cacheKey = ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', $connection->getDsn()];
-
-        $this->assertFalse($this->cache->has($cacheKey));
-
-        $connection->open();
-
-        $this->assertFalse(
-            $this->cache->has($cacheKey),
-            'Connection was successful – cache must not contain information about this DSN'
-        );
-
-        $connection->close();
-
-        $connection = $this->getConnection(true, false);
-
-        $cacheKey = ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', 'host:invalid'];
-
-        $connection->setMasters('1', 'host:invalid');
-
-        $connection->setShuffleMasters(true);
-
-        try {
-            $connection->open();
-        } catch (InvalidConfigException $e) {
-        }
-
-        $this->assertTrue(
-            $this->cache->has($cacheKey),
-            'Connection was not successful – cache must contain information about this DSN'
-        );
-
-        $connection->close();
-    }
-
-    public function testServerStatusCacheCanBeDisabled(): void
-    {
-        $this->cache->clear();
-
-        $connection = $this->getConnection(true, false);
-
-        $connection->setMasters('1', $this->databases['dsn']);
-
-        $connection->setSchemaCache(null);
-
-        $connection->setShuffleMasters(false);
-
-        $cacheKey = ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', $connection->getDsn()];
-
-        $this->assertFalse($this->cache->has($cacheKey));
-
-        $connection->open();
-
-        $this->assertFalse($this->cache->has($cacheKey), 'Caching is disabled');
-
-        $connection->close();
-
-        $cacheKey = ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', 'host:invalid'];
-
-        $connection->setMasters('1', 'host:invalid');
-
-        try {
-            $connection->open();
-        } catch (InvalidConfigException $e) {
-        }
-
-        $this->assertFalse($this->cache->has($cacheKey), 'Caching is disabled');
-
-        $connection->close();
-    }
-
-    public function testQuoteValue(): void
-    {
-        $connection = $this->getConnection(false);
-
-        $this->assertEquals(123, $connection->quoteValue(123));
-        $this->assertEquals("'string'", $connection->quoteValue('string'));
-        $this->assertEquals("'It''s interesting'", $connection->quoteValue("It's interesting"));
-    }
-
-    public function testTransactionIsolation(): void
-    {
-        $connection = $this->getConnection(true);
-
-        $transaction = $connection->beginTransaction(Transaction::READ_UNCOMMITTED);
-        $transaction->rollBack();
-
-        $transaction = $connection->beginTransaction(Transaction::SERIALIZABLE);
-        $transaction->rollBack();
-
-        $this->assertTrue(true); // No exceptions means test is passed.
     }
 
     public function testMasterSlave(): void
@@ -158,11 +169,11 @@ class ConnectionTest extends AbstractConnectionTest
             $this->assertTrue($db->getSlave()->isActive());
             $this->assertFalse($db->isActive());
 
-            // test SELECT uses slave
+            /* test SELECT uses slave */
             $this->assertEquals(2, $db->createCommand('SELECT COUNT(*) FROM profile')->queryScalar());
             $this->assertFalse($db->isActive());
 
-            // test UPDATE uses master
+            /* test UPDATE uses master */
             $db->createCommand("UPDATE profile SET description='test' WHERE id=1")->execute();
             $this->assertTrue($db->isActive());
 
@@ -236,8 +247,42 @@ class ConnectionTest extends AbstractConnectionTest
 
         $this->assertCount(1, $hit_masters, 'same master hit');
 
-        // slaves are always random
+        /* slaves are always random */
         $this->assertCount($slavesCount, $hit_slaves, 'all slaves hit');
+    }
+
+    public function testOpenClose(): void
+    {
+        $db = $this->getConnection();
+
+        $this->assertFalse($db->isActive());
+        $this->assertNull($db->getPDO());
+
+        $db->open();
+
+        $this->assertTrue($db->isActive());
+        $this->assertInstanceOf(PDO::class, $db->getPDO());
+
+        $db->close();
+
+        $this->assertFalse($db->isActive());
+        $this->assertNull($db->getPDO());
+
+        $db = new Connection($this->cache, $this->logger, $this->profiler, 'unknown::memory:');
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('could not find driver');
+
+        $db->open();
+    }
+
+    public function testQuoteValue(): void
+    {
+        $connection = $this->getConnection();
+
+        $this->assertEquals(123, $connection->quoteValue(123));
+        $this->assertEquals("'string'", $connection->quoteValue('string'));
+        $this->assertEquals("'It''s interesting'", $connection->quoteValue("It's interesting"));
     }
 
     public function testRestoreMasterAfterException(): void
@@ -247,39 +292,190 @@ class ConnectionTest extends AbstractConnectionTest
 
         try {
             $db->useMaster(static function (Connection $db) {
-                throw new \Exception('fail');
+                throw new Exception('fail');
             });
             $this->fail('Exceptions was caught somewhere');
-        } catch (\Exception $e) {
-            // ok
+        } catch (Exception $e) {
+            /* ok */
         }
 
         $this->assertTrue($db->areSlavesEnabled());
     }
 
-    public function testExceptionContainsRawQuery(): void
+    public function testServerStatusCacheWorks(): void
     {
-        $this->markTestSkipped('This test does not work on sqlite because preparing the failing query fails');
+        $db = $this->getConnection();
+
+        $db->setMasters(
+            '1',
+            [
+                '__class' => Connection::class,
+                '__construct()' => [
+                    $this->cache,
+                    $this->logger,
+                    $this->profiler,
+                    'sqlite:' . __DIR__ . "/Data/yii_test_master.sq3"
+                ]
+            ]
+        );
+
+        $db->setShuffleMasters(false);
+
+        $cacheKey = ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', $db->getDsn()];
+
+        $this->assertFalse($this->cache->has($cacheKey));
+
+        $db->open();
+
+        $this->assertFalse(
+            $this->cache->has($cacheKey),
+            'Connection was successful – cache must not contain information about this DSN'
+        );
+
+        $db->close();
+
+        $db = $this->getConnection();
+
+        $cacheKey = ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', 'host:invalid'];
+
+        $db->setMasters(
+            '1',
+            [
+                '__class' => Connection::class,
+                '__construct()' => [
+                    $this->cache,
+                    $this->logger,
+                    $this->profiler,
+                    'host:invalid'
+                ]
+            ]
+        );
+
+        $db->setShuffleMasters(true);
+
+        try {
+            $db->open();
+        } catch (InvalidConfigException $e) {
+        }
+
+        $this->assertTrue(
+            $this->cache->has($cacheKey),
+            'Connection was not successful – cache must contain information about this DSN'
+        );
+
+        $db->close();
+    }
+
+    public function testServerStatusCacheCanBeDisabled(): void
+    {
+        $this->cache->clear();
+
+        $db = $this->getConnection();
+
+        $db->setMasters(
+            '1',
+            [
+                '__class' => Connection::class,
+                '__construct()' => [
+                    $this->cache,
+                    $this->logger,
+                    $this->profiler,
+                    'sqlite:' . __DIR__ . "/Data/yii_test_master.sq3"
+                ]
+            ]
+        );
+
+        $db->setSchemaCache(null);
+
+        $db->setShuffleMasters(false);
+
+        $cacheKey = ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', $db->getDsn()];
+
+        $this->assertFalse($this->cache->has($cacheKey));
+
+        $db->open();
+
+        $this->assertFalse($this->cache->has($cacheKey), 'Caching is disabled');
+
+        $db->close();
+
+        $cacheKey = ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', 'host:invalid'];
+
+        $db->setMasters(
+            '1',
+            [
+                '__class' => Connection::class,
+                '__construct()' => [
+                    $this->cache,
+                    $this->logger,
+                    $this->profiler,
+                    'host:invalid'
+                ]
+            ]
+        );
+
+        try {
+            $db->open();
+        } catch (InvalidConfigException $e) {
+        }
+
+        $this->assertFalse($this->cache->has($cacheKey), 'Caching is disabled');
+
+        $db->close();
+    }
+
+    public function testTransactionIsolation(): void
+    {
+        $connection = $this->getConnection(true);
+
+        $transaction = $connection->beginTransaction(Transaction::READ_UNCOMMITTED);
+
+        $transaction->rollBack();
+
+        $transaction = $connection->beginTransaction(Transaction::SERIALIZABLE);
+
+        $transaction->rollBack();
+
+        /* No exceptions means test is passed. */
+        $this->assertTrue(true);
     }
 
     protected function prepareMasterSlave($masterCount, $slaveCount): Connection
     {
-        $db = $this->getConnection(true, true, true);
+        $db = $this->getConnection(true);
 
         for ($i = 0; $i < $masterCount; ++$i) {
-            $this->prepareDatabase(true, true, [
-                'dsn' => 'sqlite:' . __DIR__ . "/data/yii_test_master{$i}.sq3",
-            ]);
+            $this->prepareDatabase(null, 'sqlite:' . __DIR__ . "/Data/yii_test_master{$i}.sq3");
 
-            $db->setMasters("$i", 'sqlite:' . __DIR__ . "/data/yii_test_master{$i}.sq3");
+            $db->setMasters(
+                "$i",
+                [
+                    '__class' => Connection::class,
+                    '__construct()' => [
+                        $this->cache,
+                        $this->logger,
+                        $this->profiler,
+                        'sqlite:' . __DIR__ . "/Data/yii_test_master{$i}.sq3"
+                    ]
+                ]
+            );
         }
 
         for ($i = 0; $i < $slaveCount; ++$i) {
-            $this->prepareDatabase(true, true, [
-                'dsn' =>  'sqlite:' . __DIR__ . "/data/yii_test_slave{$i}.sq3",
-            ]);
+            $this->prepareDatabase(null, 'sqlite:' . __DIR__ . "/Data/yii_test_slave{$i}.sq3");
 
-            $db->setSlaves("$i", 'sqlite:' . __DIR__ . "/data/yii_test_slave{$i}.sq3");
+            $db->setSlaves(
+                "$i",
+                [
+                    '__class' => Connection::class,
+                    '__construct()' => [
+                        $this->cache,
+                        $this->logger,
+                        $this->profiler,
+                        'sqlite:' . __DIR__ . "/Data/yii_test_slave{$i}.sq3"
+                    ]
+                ]
+            );
         }
 
         $db->close();
