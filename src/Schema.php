@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite\Schema;
+namespace Yiisoft\Db\Sqlite;
 
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Arrays\ArraySorter;
@@ -19,10 +19,15 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Schema\ColumnSchema;
 use Yiisoft\Db\Schema\Schema as AbstractSchema;
-use Yiisoft\Db\Sqlite\Query\QueryBuilder;
-use Yiisoft\Db\Sqlite\Token\SqlToken;
-use Yiisoft\Db\Sqlite\Token\SqlTokenizer;
 use Yiisoft\Db\Transaction\Transaction;
+
+use function count;
+use function explode;
+use function preg_match;
+use function strncasecmp;
+use function strncmp;
+use function strtolower;
+use function trim;
 
 /**
  * Schema is the class for retrieving metadata from a SQLite (2/3) database.
@@ -30,7 +35,7 @@ use Yiisoft\Db\Transaction\Transaction;
  * @property string $transactionIsolationLevel The transaction isolation level to use for this transaction. This can be
  * either {@see Transaction::READ_UNCOMMITTED} or {@see Transaction::SERIALIZABLE}.
  */
-class Schema extends AbstractSchema implements ConstraintFinderInterface
+final class Schema extends AbstractSchema implements ConstraintFinderInterface
 {
     use ConstraintFinderTrait;
 
@@ -342,7 +347,7 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
         }
 
         $pk = $table->getPrimaryKey();
-        if (\count($pk) === 1 && !\strncasecmp($table->getColumn($pk[0])->getDbType(), 'int', 3)) {
+        if (count($pk) === 1 && !strncasecmp($table->getColumn($pk[0])->getDbType(), 'int', 3)) {
             $table->sequenceName('');
             $table->getColumn($pk[0])->autoIncrement(true);
         }
@@ -432,19 +437,19 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
         $column->name($info['name']);
         $column->allowNull(!$info['notnull']);
         $column->primaryKey($info['pk'] != 0);
-        $column->dbType(\strtolower($info['type']));
+        $column->dbType(strtolower($info['type']));
         $column->unsigned(\strpos($column->getDbType(), 'unsigned') !== false);
         $column->type(self::TYPE_STRING);
 
-        if (\preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->getDbType(), $matches)) {
-            $type = \strtolower($matches[1]);
+        if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->getDbType(), $matches)) {
+            $type = strtolower($matches[1]);
 
             if (isset($this->typeMap[$type])) {
                 $column->type($this->typeMap[$type]);
             }
 
             if (!empty($matches[2])) {
-                $values = \explode(',', $matches[2]);
+                $values = explode(',', $matches[2]);
                 $column->precision((int) $values[0]);
                 $column->size((int) $values[0]);
                 if (isset($values[1])) {
@@ -470,7 +475,7 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
             } elseif ($column->getType() === 'timestamp' && $info['dflt_value'] === 'CURRENT_TIMESTAMP') {
                 $column->defaultValue(new Expression('CURRENT_TIMESTAMP'));
             } else {
-                $value = \trim($info['dflt_value'], "'\"");
+                $value = trim($info['dflt_value'], "'\"");
                 $column->defaultValue($column->phpTypecast($value));
             }
         }
@@ -660,6 +665,18 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
      */
     private function isSystemIdentifier($identifier): bool
     {
-        return \strncmp($identifier, 'sqlite_', 7) === 0;
+        return strncmp($identifier, 'sqlite_', 7) === 0;
+    }
+
+    /**
+     * Creates a column schema for the database.
+     *
+     * This method may be overridden by child classes to create a DBMS-specific column schema.
+     *
+     * @return ColumnSchema column schema instance.
+     */
+    private function createColumnSchema(): ColumnSchema
+    {
+        return new ColumnSchema();
     }
 }

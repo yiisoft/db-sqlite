@@ -2,7 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite\Token;
+namespace Yiisoft\Db\Sqlite;
+
+use ArrayAccess;
+use function array_splice;
+use function count;
+use function end;
+use function in_array;
+use function mb_substr;
+use function reset;
 
 /**
  * SqlToken represents SQL tokens produced by {@see SqlTokenizer} or its child classes.
@@ -13,7 +21,7 @@ namespace Yiisoft\Db\Sqlite\Token;
  * read-only.
  * @property string $sql SQL code. This property is read-only.
  */
-class SqlToken implements \ArrayAccess
+final class SqlToken implements ArrayAccess
 {
     public const TYPE_CODE = 0;
     public const TYPE_STATEMENT = 1;
@@ -44,7 +52,7 @@ class SqlToken implements \ArrayAccess
     /**
      * Returns whether there is a child token at the specified offset.
      *
-     * This method is required by the SPL {@see \ArrayAccess} interface. It is implicitly called when you use something
+     * This method is required by the SPL {@see ArrayAccess} interface. It is implicitly called when you use something
      * like `isset($token[$offset])`.
      *
      * @param int $offset child token offset.
@@ -59,7 +67,7 @@ class SqlToken implements \ArrayAccess
     /**
      * Returns a child token at the specified offset.
      *
-     * This method is required by the SPL {@see \ArrayAccess} interface. It is implicitly called when you use something
+     * This method is required by the SPL {@see ArrayAccess} interface. It is implicitly called when you use something
      * like `$child = $token[$offset];`.
      *
      * @param int $offset child token offset.
@@ -76,7 +84,7 @@ class SqlToken implements \ArrayAccess
     /**
      * Adds a child token to the token.
      *
-     * This method is required by the SPL {@see \ArrayAccess} interface. It is implicitly called when you use something
+     * This method is required by the SPL {@see ArrayAccess} interface. It is implicitly called when you use something
      * like `$token[$offset] = $child;`.
      *
      * @param int|null $offset child token offset.
@@ -98,7 +106,7 @@ class SqlToken implements \ArrayAccess
     /**
      * Removes a child token at the specified offset.
      *
-     * This method is required by the SPL {@see \ArrayAccess} interface. It is implicitly called when you use something
+     * This method is required by the SPL {@see ArrayAccess} interface. It is implicitly called when you use something
      * like `unset($token[$offset])`.
      *
      * @param int $offset child token offset.
@@ -108,7 +116,7 @@ class SqlToken implements \ArrayAccess
         $offset = $this->calculateOffset($offset);
 
         if (isset($this->children[$offset])) {
-            \array_splice($this->children, $offset, 1);
+            array_splice($this->children, $offset, 1);
         }
 
         $this->updateCollectionOffsets();
@@ -148,7 +156,7 @@ class SqlToken implements \ArrayAccess
      */
     public function getIsCollection(): bool
     {
-        return \in_array($this->type, [
+        return in_array($this->type, [
             self::TYPE_CODE,
             self::TYPE_STATEMENT,
             self::TYPE_PARENTHESIS,
@@ -173,11 +181,12 @@ class SqlToken implements \ArrayAccess
     public function getSql(): string
     {
         $code = $this;
+
         while ($code->parent !== null) {
             $code = $code->parent;
         }
 
-        return \mb_substr($code->content, $this->startOffset, $this->endOffset - $this->startOffset, 'UTF-8');
+        return mb_substr($code->content, $this->startOffset, $this->endOffset - $this->startOffset, 'UTF-8');
     }
 
     /**
@@ -246,7 +255,7 @@ class SqlToken implements \ArrayAccess
         $firstMatchIndex = $lastMatchIndex = null;
         $wildcard = false;
 
-        for ($index = 0, $count = \count($patternToken->children); $index < $count; $index++) {
+        for ($index = 0, $count = count($patternToken->children); $index < $count; $index++) {
             /**
              *  Here we iterate token by token with an exception of "any" that toggles an iteration until we matched
              *  with a next pattern token or EOF.
@@ -256,7 +265,7 @@ class SqlToken implements \ArrayAccess
                 continue;
             }
 
-            for ($limit = $wildcard ? \count($token->children) : $offset + 1; $offset < $limit; $offset++) {
+            for ($limit = $wildcard ? count($token->children) : $offset + 1; $offset < $limit; $offset++) {
                 if (!$wildcard && !isset($token[$offset])) {
                     break;
                 }
@@ -297,7 +306,7 @@ class SqlToken implements \ArrayAccess
             return $offset;
         }
 
-        return \count($this->children) + $offset;
+        return count($this->children) + $offset;
     }
 
     /**
@@ -306,8 +315,8 @@ class SqlToken implements \ArrayAccess
     private function updateCollectionOffsets(): void
     {
         if (!empty($this->children)) {
-            $this->startOffset = \reset($this->children)->startOffset;
-            $this->endOffset = \end($this->children)->endOffset;
+            $this->startOffset = reset($this->children)->startOffset;
+            $this->endOffset = end($this->children)->endOffset;
         }
 
         if ($this->parent !== null) {

@@ -2,17 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite\Command;
+namespace Yiisoft\Db\Sqlite;
 
+use Throwable;
 use Yiisoft\Db\Command\Command as BaseCommand;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Sqlite\Token\SqlToken;
-use Yiisoft\Db\Sqlite\Token\SqlTokenizer;
 use Yiisoft\Strings\StringHelper;
 
-class Command extends BaseCommand
+use function ltrim;
+use function preg_match_all;
+use function strpos;
+
+final class Command extends BaseCommand
 {
     /**
      * Executes the SQL statement.
@@ -61,7 +64,7 @@ class Command extends BaseCommand
      * @throws Exception if the query causes any problem.
      * @throws InvalidConfigException
      * @throws NotSupportedException
-     * @throws \Throwable
+     * @throws Throwable
      *
      * @return mixed the method execution result.
      */
@@ -105,7 +108,7 @@ class Command extends BaseCommand
      */
     private function splitStatements($sql, $params)
     {
-        $semicolonIndex = \strpos($sql, ';');
+        $semicolonIndex = strpos($sql, ';');
 
         if ($semicolonIndex === false || $semicolonIndex === StringHelper::byteLength($sql) - 1) {
             return false;
@@ -138,7 +141,7 @@ class Command extends BaseCommand
      */
     private function extractUsedParams(SqlToken $statement, $params): array
     {
-        \preg_match_all('/(?P<placeholder>[:][a-zA-Z0-9_]+)/', $statement->getSql(), $matches, PREG_SET_ORDER);
+        preg_match_all('/(?P<placeholder>[:][a-zA-Z0-9_]+)/', $statement->getSql(), $matches, PREG_SET_ORDER);
 
         $result = [];
 

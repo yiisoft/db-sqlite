@@ -6,11 +6,14 @@ namespace Yiisoft\Db\Sqlite\Tests;
 
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\Tests\QueryTest as AbstractQueryTest;
+use Yiisoft\Db\TestUtility\TestQueryTrait;
 
-class QueryTest extends AbstractQueryTest
+/**
+ * @group sqlite
+ */
+final class QueryTest extends TestCase
 {
-    protected ?string $driverName = 'sqlite';
+    use TestQueryTrait;
 
     public function testUnion(): void
     {

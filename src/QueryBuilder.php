@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite\Query;
+namespace Yiisoft\Db\Sqlite;
 
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Constraint\Constraint;
@@ -12,6 +12,7 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\InvalidParamException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Expression\ExpressionBuilder;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\Conditions\InCondition;
 use Yiisoft\Db\Query\Conditions\LikeCondition;
@@ -19,11 +20,7 @@ use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryBuilder as BaseQueryBuilder;
 use Yiisoft\Db\Sqlite\Condition\InConditionBuilder;
 use Yiisoft\Db\Sqlite\Condition\LikeConditionBuilder;
-use Yiisoft\Db\Sqlite\Schema\Schema;
-use Yiisoft\Db\Sqlite\Token\SqlToken;
-use Yiisoft\Db\Sqlite\Token\SqlTokenizer;
 use Yiisoft\Strings\NumericHelper;
-use Yiisoft\Strings\StringHelper;
 
 use function array_column;
 use function array_filter;
@@ -32,12 +29,14 @@ use function implode;
 use function is_float;
 use function is_string;
 use function ltrim;
+use function reset;
 use function strpos;
+use function strrpos;
 use function substr;
 use function trim;
 use function version_compare;
 
-class QueryBuilder extends BaseQueryBuilder
+final class QueryBuilder extends BaseQueryBuilder
 {
     /**
      * @var array mapping from abstract column types (keys) to physical column types (values).
@@ -72,7 +71,7 @@ class QueryBuilder extends BaseQueryBuilder
      *
      * @return array
      *
-     * See {@see \Yiisoft\Db\Expression\ExpressionBuilder} docs for details.
+     * See {@see ExpressionBuilder} docs for details.
      */
     protected function defaultExpressionBuilders(): array
     {
@@ -145,7 +144,7 @@ class QueryBuilder extends BaseQueryBuilder
                 if (is_string($value)) {
                     $value = $schema->quoteValue($value);
                 } elseif (is_float($value)) {
-                    // ensure type cast always has . as decimal separator in all locales
+                    /* ensure type cast always has . as decimal separator in all locales */
                     $value = NumericHelper::normalize($value);
                 } elseif ($value === false) {
                     $value = 0;
@@ -199,7 +198,7 @@ class QueryBuilder extends BaseQueryBuilder
             $tableName = $db->quoteTableName($tableName);
             if ($value === null) {
                 $pk = $table->getPrimaryKey();
-                $key = $this->db->quoteColumnName(\reset($pk));
+                $key = $this->db->quoteColumnName(reset($pk));
                 $value = $this->db->useMaster(static function (Connection $db) use ($key, $tableName) {
                     return $db->createCommand("SELECT MAX($key) FROM $tableName")->queryScalar();
                 });
@@ -406,35 +405,45 @@ class QueryBuilder extends BaseQueryBuilder
         $skipping = false;
         $foreign_found = false;
         $quoted_foreign_name = $this->db->quoteColumnName($name);
+
         $quoted_tablename = $this->db->quoteTableName($tableName);
         $unquoted_tablename = $this->unquoteTableName($tableName);
+
         $fields_definitions_tokens = $this->getFieldDefinitionsTokens($unquoted_tablename);
+
         $offset = 0;
         $constraint_pos = 0;
 
-        /** Traverse the tokens looking for either an identifier (field name) or a foreign key */
+        /* Traverse the tokens looking for either an identifier (field name) or a foreign key */
         while ($fields_definitions_tokens->offsetExists($offset)) {
             $token = $fields_definitions_tokens[$offset++];
+
             /**
              * These searchs could be done with another SqlTokenizer, but I don't konw how to do them, the documentation
              * for sqltokenizer si really scarse.
              */
             $tokenType = $token->getType();
+
             if ($tokenType === SqlToken::TYPE_IDENTIFIER) {
                 $identifier = (string) $token;
                 $sql_fields_to_insert[] = $identifier;
             } elseif ($tokenType === SqlToken::TYPE_KEYWORD) {
                 $keyword = (string) $token;
+
                 if ($keyword === 'CONSTRAINT' || $keyword === 'FOREIGN') {
-                    /** Constraint key found */
+                    /* Constraint key found */
                     $other_offset = $offset;
+
                     if ($keyword === 'CONSTRAINT') {
-                        $constraint_name = (string) $fields_definitions_tokens[$other_offset];
+                        $constraint_name = $this->db->quoteColumnName(
+                            $fields_definitions_tokens[$other_offset]->getContent()
+                        );
                     } else {
-                        $constraint_name = $this->db->quoteColumnName((string) $constraint_pos);
+                        $constraint_name = $this->db->quoteColumnName(strval($constraint_pos));
                     }
+
                     if (($constraint_name === $quoted_foreign_name) || (is_int($name) && $constraint_pos === $name)) {
-                        /** Found foreign key $name, skip it */
+                        /* Found foreign key $name, skip it */
                         $foreign_found = true;
                         $skipping = true;
                         $offset = $other_offset;
@@ -449,19 +458,24 @@ class QueryBuilder extends BaseQueryBuilder
                 $ddl_fields_def .= $token . " ";
             }
 
-            /** Skip or keep until the next */
+            /* Skip or keep until the next */
             while ($fields_definitions_tokens->offsetExists($offset)) {
                 $skip_token = $fields_definitions_tokens[$offset];
+                $skip_next = $fields_definitions_tokens[$offset + 1];
+
                 if (!$skipping) {
-                    $ddl_fields_def .= (string)$skip_token . " ";
+                    $ddl_fields_def .= (string) $skip_token . ($skip_next == ',' ? '' : ' ');
                 }
+
                 $skipTokenType = $skip_token->getType();
-                if ($skipTokenType === SqlToken::TYPE_OPERATOR && (string)$skip_token == ',') {
+
+                if ($skipTokenType === SqlToken::TYPE_OPERATOR && $skip_token == ',') {
                     $ddl_fields_def .= "\n";
                     ++$offset;
                     $skipping = false;
                     break;
                 }
+
                 ++$offset;
             }
         }
@@ -471,6 +485,7 @@ class QueryBuilder extends BaseQueryBuilder
         }
 
         $foreign_keys_state = $this->foreignKeysState();
+
         $return_queries[] = "PRAGMA foreign_keys = 0";
         $return_queries[] = "SAVEPOINT drop_column_$unquoted_tablename";
         $return_queries[] = "CREATE TABLE " . $this->db->quoteTableName("temp_$unquoted_tablename")
@@ -480,9 +495,7 @@ class QueryBuilder extends BaseQueryBuilder
         $return_queries[] = "INSERT INTO $quoted_tablename SELECT " . implode(",", $sql_fields_to_insert) . " FROM "
              . $this->db->quoteTableName("temp_$unquoted_tablename");
         $return_queries[] = "DROP TABLE " . $this->db->quoteTableName("temp_$unquoted_tablename");
-
         $return_queries = array_merge($return_queries, $this->getIndexSqls($unquoted_tablename));
-
         $return_queries[] = "RELEASE drop_column_$unquoted_tablename";
         $return_queries[] = "PRAGMA foreign_keys = $foreign_keys_state";
 
@@ -1005,7 +1018,7 @@ class QueryBuilder extends BaseQueryBuilder
             foreach ($updateNames as $name) {
                 $quotedName = $this->db->quoteColumnName($name);
 
-                if (\strrpos($quotedName, '.') === false) {
+                if (strrpos($quotedName, '.') === false) {
                     $quotedName = "(SELECT $quotedName FROM `EXCLUDED`)";
                 }
                 $updateColumns[$name] = new Expression($quotedName);

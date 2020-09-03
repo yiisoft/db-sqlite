@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite\Token;
+namespace Yiisoft\Db\Sqlite;
+
+use function mb_strtoupper;
+use function strtr;
 
 /**
  * SqlTokenizer splits SQLite query into individual SQL tokens.
@@ -12,7 +15,7 @@ namespace Yiisoft\Db\Sqlite\Token;
  * {@see http://www.sqlite.org/draft/tokenreq.html}
  * {@see https://sqlite.org/lang.html}
  */
-class SqlTokenizer extends BaseTokenizer
+final class SqlTokenizer extends BaseTokenizer
 {
     /**
      * Returns whether there's a whitespace at the current offset.
@@ -324,7 +327,7 @@ class SqlTokenizer extends BaseTokenizer
             'WITHOUT' => true,
         ];
 
-        $string = \mb_strtoupper($string, 'UTF-8');
+        $string = mb_strtoupper($string, 'UTF-8');
 
         if (!isset($keywords[$string])) {
             return false;

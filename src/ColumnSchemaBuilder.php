@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite\Schema;
+namespace Yiisoft\Db\Sqlite;
 
 use Yiisoft\Db\Schema\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
 
-class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
+final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
 {
     /**
      * Builds the unsigned string for column. Defaults to unsupported.

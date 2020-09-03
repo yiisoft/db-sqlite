@@ -2,7 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite\Token;
+namespace Yiisoft\Db\Sqlite;
+
+use SplStack;
+use Yiisoft\Db\Exception\InvalidArgumentException;
+
+use function is_array;
+use function is_string;
+use function mb_strlen;
+use function mb_strpos;
+use function mb_strtoupper;
+use function mb_substr;
+use function reset;
+use function usort;
 
 /**
  * BaseTokenizer splits an SQL query into individual SQL tokens.
@@ -37,9 +49,9 @@ abstract class BaseTokenizer
     protected int $offset;
 
     /**
-     * @var \SplStack stack of active tokens.
+     * @var SplStack stack of active tokens.
      */
-    private $tokenStack;
+    private SplStack $tokenStack;
 
     /**
      * @var SqlToken|null active token. It's usually a top of the token stack.
@@ -73,7 +85,7 @@ abstract class BaseTokenizer
      */
     public function tokenize(): SqlToken
     {
-        $this->length = \mb_strlen($this->sql, 'UTF-8');
+        $this->length = mb_strlen($this->sql, 'UTF-8');
         $this->offset = 0;
         $this->substrings = [];
         $this->buffer = '';
@@ -82,7 +94,7 @@ abstract class BaseTokenizer
             ->type(SqlToken::TYPE_CODE)
             ->content($this->sql);
 
-        $this->tokenStack = new \SplStack();
+        $this->tokenStack = new SplStack();
         $this->tokenStack->push($this->token);
 
         $tk = (new SqlToken())
@@ -219,15 +231,15 @@ abstract class BaseTokenizer
             return false;
         }
 
-        if (!\is_array(\reset($with))) {
-            \usort($with, function ($string1, $string2) {
-                return \mb_strlen($string2, 'UTF-8') - \mb_strlen($string1, 'UTF-8');
+        if (!is_array(reset($with))) {
+            usort($with, static function ($string1, $string2) {
+                return mb_strlen($string2, 'UTF-8') - mb_strlen($string1, 'UTF-8');
             });
 
             $map = [];
 
             foreach ($with as $string) {
-                $map[\mb_strlen($string, 'UTF-8')][$caseSensitive ? $string : \mb_strtoupper($string, 'UTF-8')] = true;
+                $map[mb_strlen($string, 'UTF-8')][$caseSensitive ? $string : mb_strtoupper($string, 'UTF-8')] = true;
             }
 
             $with = $map;
@@ -267,10 +279,10 @@ abstract class BaseTokenizer
         $cacheKey = $offset . ',' . $length;
 
         if (!isset($this->substrings[$cacheKey . ',1'])) {
-            $this->substrings[$cacheKey . ',1'] = \mb_substr($this->sql, $offset, $length, 'UTF-8');
+            $this->substrings[$cacheKey . ',1'] = mb_substr($this->sql, $offset, $length, 'UTF-8');
         }
         if (!$caseSensitive && !isset($this->substrings[$cacheKey . ',0'])) {
-            $this->substrings[$cacheKey . ',0'] = \mb_strtoupper($this->substrings[$cacheKey . ',1'], 'UTF-8');
+            $this->substrings[$cacheKey . ',0'] = mb_strtoupper($this->substrings[$cacheKey . ',1'], 'UTF-8');
         }
 
         return $this->substrings[$cacheKey . ',' . (int) $caseSensitive];
@@ -290,16 +302,16 @@ abstract class BaseTokenizer
             $offset = $this->offset;
         }
 
-        if ($offset + \mb_strlen($string, 'UTF-8') > $this->length) {
+        if ($offset + mb_strlen($string, 'UTF-8') > $this->length) {
             return $this->length;
         }
 
-        $afterIndexOf = \mb_strpos($this->sql, $string, $offset, 'UTF-8');
+        $afterIndexOf = mb_strpos($this->sql, $string, $offset, 'UTF-8');
 
         if ($afterIndexOf === false) {
             $afterIndexOf = $this->length;
         } else {
-            $afterIndexOf += \mb_strlen($string, 'UTF-8');
+            $afterIndexOf += mb_strlen($string, 'UTF-8');
         }
 
         return $afterIndexOf;
@@ -325,7 +337,7 @@ abstract class BaseTokenizer
 
         $tk = (new SqlToken())
             ->type($isIdentifier ? SqlToken::TYPE_IDENTIFIER : SqlToken::TYPE_STRING_LITERAL)
-            ->content(\is_string($content) ? $content : $this->substring($length))
+            ->content(is_string($content) ? $content : $this->substring($length))
             ->startOffset($this->offset)
             ->endOffset($this->offset + $length);
 
@@ -353,7 +365,7 @@ abstract class BaseTokenizer
             case '(':
                 $tk = (new SqlToken())
                     ->type(SqlToken::TYPE_OPERATOR)
-                    ->content(\is_string($content) ? $content : $this->substring($length))
+                    ->content(is_string($content) ? $content : $this->substring($length))
                     ->startOffset($this->offset)
                     ->endOffset($this->offset + $length);
 
@@ -389,7 +401,7 @@ abstract class BaseTokenizer
 
                 $tk = (new SqlToken())
                     ->type(SqlToken::TYPE_OPERATOR)
-                    ->content(\is_string($content) ? $content : $this->substring($length))
+                    ->content(is_string($content) ? $content : $this->substring($length))
                     ->startOffset($this->offset)
                     ->endOffset($this->offset + $length);
 
@@ -409,7 +421,7 @@ abstract class BaseTokenizer
             default:
                 $tk = (new SqlToken())
                     ->type(SqlToken::TYPE_OPERATOR)
-                    ->content(\is_string($content) ? $content : $this->substring($length))
+                    ->content(is_string($content) ? $content : $this->substring($length))
                     ->startOffset($this->offset)
                     ->endOffset($this->offset + $length);
 
@@ -434,8 +446,8 @@ abstract class BaseTokenizer
 
         $tk = (new SqlToken())
             ->type($isKeyword ? SqlToken::TYPE_KEYWORD : SqlToken::TYPE_TOKEN)
-            ->content(\is_string($content) ? $content : $this->buffer)
-            ->startOffset($this->offset - \mb_strlen($this->buffer, 'UTF-8'))
+            ->content(is_string($content) ? $content : $this->buffer)
+            ->startOffset($this->offset - mb_strlen($this->buffer, 'UTF-8'))
             ->endOffset($this->offset);
 
         $this->currentToken[] = $tk;
@@ -448,12 +460,12 @@ abstract class BaseTokenizer
      *
      * @param int $length
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     private function advance(int $length): void
     {
         if ($length <= 0) {
-            throw new \InvalidArgumentException('Length must be greater than 0.');
+            throw new InvalidArgumentException('Length must be greater than 0.');
         }
 
         $this->offset += $length;
