@@ -6,24 +6,26 @@
          bootstrap="vendor/autoload.php"
          failOnRisky="true"
          failOnWarning="true"
-         executionOrder="default">
-    <php>
-        <ini name="error_reporting" value="-1"/>
-    </php>
+         executionOrder="default"
+         resolveDependencies="true">
 
-    <testsuites>
-        <testsuite name="Yii Db Sqlite Tests">
-            <directory>./tests</directory>
-        </testsuite>
-    </testsuites>
+  <coverage>
+    <include>
+      <directory>./src</directory>
+    </include>
+    <exclude>
+      <directory>./tests</directory>
+      <directory>./vendor</directory>
+    </exclude>
+  </coverage>
 
-    <filter>
-        <whitelist>
-            <directory>./</directory>
-            <exclude>
-                <directory>./tests</directory>
-                <directory>./vendor</directory>
-            </exclude>
-        </whitelist>
-    </filter>
+  <php>
+    <ini name="error_reporting" value="-1"/>
+  </php>
+
+  <testsuites>
+    <testsuite name="Sqlite">
+      <directory>./tests</directory>
+    </testsuite>
+  </testsuites>
 </phpunit>
