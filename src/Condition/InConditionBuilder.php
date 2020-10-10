@@ -6,10 +6,12 @@ namespace Yiisoft\Db\Sqlite\Condition;
 
 use Traversable;
 use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\Conditions\InConditionBuilder as BaseInConditionBuilder;
+use Yiisoft\Db\Sqlite\Connection;
 
 use function implode;
 use function is_array;
@@ -25,7 +27,7 @@ final class InConditionBuilder extends BaseInConditionBuilder
      * @param Query $values
      * @param array $params
      *
-     * @throws NotSupportedException
+     * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
      *
      * @return string SQL.
      */
@@ -43,18 +45,21 @@ final class InConditionBuilder extends BaseInConditionBuilder
      *
      * @param string|null $operator
      * @param array|Traversable $columns
-     * @param array|object $values
+     * @param iterable|array $values
      * @param array $params
      *
      * @return string SQL.
      */
     protected function buildCompositeInCondition(?string $operator, $columns, $values, array &$params = []): string
     {
+        /** @var Connection $db */
+        $db = $this->queryBuilder->getDb();
+
         $quotedColumns = [];
 
         foreach ($columns as $i => $column) {
             $quotedColumns[$i] = strpos($column, '(') === false
-                ? $this->queryBuilder->getDb()->quoteColumnName($column) : $column;
+                ? $db->quoteColumnName($column) : $column;
         }
 
         $vss = [];

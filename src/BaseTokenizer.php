@@ -69,7 +69,7 @@ abstract class BaseTokenizer
     private string $buffer = '';
 
     /**
-     * @var SqlToken resulting token of a last {@see tokenize()} call.
+     * @var SqlToken|null resulting token of a last {@see tokenize()} call.
      */
     private ?SqlToken $token = null;
 
@@ -80,6 +80,8 @@ abstract class BaseTokenizer
 
     /**
      * Tokenizes and returns a code type token.
+     *
+     * @throws InvalidArgumentException
      *
      * @return SqlToken code type token.
      */

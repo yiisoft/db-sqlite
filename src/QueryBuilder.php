@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use Yiisoft\Db\Connection\Connection;
+use Generator;
+use JsonException;
+use Throwable;
+use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
@@ -65,6 +68,16 @@ final class QueryBuilder extends BaseQueryBuilder
         Schema::TYPE_MONEY => 'decimal(19,4)',
     ];
 
+    /** @psalm-var Connection $db */
+    private ConnectionInterface $db;
+
+    public function __construct(ConnectionInterface $db)
+    {
+        $this->db = $db;
+
+        parent::__construct($db);
+    }
+
     /**
      * Contains array of default expression builders. Extend this method and override it, if you want to change default
      * expression builders for this query builder.
@@ -98,15 +111,13 @@ final class QueryBuilder extends BaseQueryBuilder
      *
      * @param string $table the table that new rows will be inserted into.
      * @param array $columns the column names
-     * @param array|\Generator $rows the rows to be batch inserted into the table
+     * @param array|Generator $rows the rows to be batch inserted into the table
      * @param array $params
      *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws NotSupportedException
+     * @throws Exception|InvalidConfigException|InvalidArgumentException|NotSupportedException
      *
      * @return string the batch INSERT SQL statement.
+     *
      */
     public function batchInsert(string $table, array $columns, $rows, array &$params = []): string
     {
@@ -144,7 +155,7 @@ final class QueryBuilder extends BaseQueryBuilder
                 if (is_string($value)) {
                     $value = $schema->quoteValue($value);
                 } elseif (is_float($value)) {
-                    /* ensure type cast always has . as decimal separator in all locales */
+                    /** ensure type cast always has . as decimal separator in all locales */
                     $value = NumericHelper::normalize($value);
                 } elseif ($value === false) {
                     $value = 0;
@@ -180,11 +191,8 @@ final class QueryBuilder extends BaseQueryBuilder
      * @param mixed $value the value for the primary key of the next new row inserted. If this is not set, the next new
      * row's primary key will have a value 1.
      *
-     * @throws Exception
-     * @throws InvalidArgumentException if the table does not exist or there is no sequence associated with the table.
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     * @throws \Throwable
+     * @throws Exception|Throwable|InvalidArgumentException if the table does not exist or there is no sequence
+     * associated with the table.
      *
      * @return string the SQL statement for resetting sequence.
      */
@@ -207,7 +215,9 @@ final class QueryBuilder extends BaseQueryBuilder
             }
 
             return "UPDATE sqlite_sequence SET seq='$value' WHERE name='{$table->getName()}'";
-        } elseif ($table === null) {
+        }
+
+        if ($table === null) {
             throw new InvalidArgumentException("Table not found: $tableName");
         }
 
@@ -233,10 +243,6 @@ final class QueryBuilder extends BaseQueryBuilder
      *
      * @param string $table the table to be truncated. The name will be properly quoted by the method.
      *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     *
      * @return string the SQL statement for truncating a DB table.
      */
     public function truncateTable(string $table): string
@@ -249,10 +255,6 @@ final class QueryBuilder extends BaseQueryBuilder
      *
      * @param string $name the name of the index to be dropped. The name will be properly quoted by the method.
      * @param string $table the table whose index is to be dropped. The name will be properly quoted by the method.
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
      *
      * @return string the SQL statement for dropping an index.
      */
@@ -304,15 +306,12 @@ final class QueryBuilder extends BaseQueryBuilder
      * @param string $refTable the table that the foreign key references to.
      * @param string|array $refColumns the name of the column that the foreign key references to. If there are multiple
      * columns, separate them with commas or use an array to represent them.
-     * @param string $delete the ON DELETE option. Most DBMS support these options: RESTRICT, CASCADE, NO ACTION,
+     * @param string|null $delete the ON DELETE option. Most DBMS support these options: RESTRICT, CASCADE, NO ACTION,
      * SET DEFAULT, SET NULL.
-     * @param string $update the ON UPDATE option. Most DBMS support these options: RESTRICT, CASCADE, NO ACTION,
+     * @param string|null $update the ON UPDATE option. Most DBMS support these options: RESTRICT, CASCADE, NO ACTION,
      * SET DEFAULT, SET NULL.
      *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidParamException
-     * @throws NotSupportedException this is not supported by SQLite.
+     * @throws Exception|InvalidParamException
      *
      * @return string the SQL statement for adding a foreign key constraint to an existing table.
      */
@@ -341,6 +340,7 @@ final class QueryBuilder extends BaseQueryBuilder
             return '' ;
         }
 
+        /** @psalm-suppress TypeDoesNotContainType */
         if ($schema !== '') {
             $tmp_table_name =  "temp_{$schema}_" . $this->unquoteTableName($table);
             $schema .= '.';
@@ -388,16 +388,13 @@ final class QueryBuilder extends BaseQueryBuilder
      *
      * @param string $name the name of the foreign key constraint to be dropped. The name will be properly quoted
      * by the method.
-     * @param string $tableName
+     * @param string $table
      *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidParamException
-     * @throws NotSupportedException
+     * @throws Exception|InvalidParamException|NotSupportedException
      *
      * @return string the SQL statement for dropping a foreign key constraint.
      */
-    public function dropForeignKey(string $name, string $tableName): string
+    public function dropForeignKey(string $name, string $table): string
     {
         $return_queries = [];
         $ddl_fields_def = '';
@@ -406,15 +403,15 @@ final class QueryBuilder extends BaseQueryBuilder
         $foreign_found = false;
         $quoted_foreign_name = $this->db->quoteColumnName($name);
 
-        $quoted_tablename = $this->db->quoteTableName($tableName);
-        $unquoted_tablename = $this->unquoteTableName($tableName);
+        $quoted_tablename = $this->db->quoteTableName($table);
+        $unquoted_tablename = $this->unquoteTableName($table);
 
         $fields_definitions_tokens = $this->getFieldDefinitionsTokens($unquoted_tablename);
 
         $offset = 0;
         $constraint_pos = 0;
 
-        /* Traverse the tokens looking for either an identifier (field name) or a foreign key */
+        /** Traverse the tokens looking for either an identifier (field name) or a foreign key */
         while ($fields_definitions_tokens->offsetExists($offset)) {
             $token = $fields_definitions_tokens[$offset++];
 
@@ -431,7 +428,7 @@ final class QueryBuilder extends BaseQueryBuilder
                 $keyword = (string) $token;
 
                 if ($keyword === 'CONSTRAINT' || $keyword === 'FOREIGN') {
-                    /* Constraint key found */
+                    /** Constraint key found */
                     $other_offset = $offset;
 
                     if ($keyword === 'CONSTRAINT') {
@@ -439,11 +436,12 @@ final class QueryBuilder extends BaseQueryBuilder
                             $fields_definitions_tokens[$other_offset]->getContent()
                         );
                     } else {
-                        $constraint_name = $this->db->quoteColumnName(strval($constraint_pos));
+                        $constraint_name = $this->db->quoteColumnName((string) $constraint_pos);
                     }
 
+                    /** @psalm-suppress TypeDoesNotContainType */
                     if (($constraint_name === $quoted_foreign_name) || (is_int($name) && $constraint_pos === $name)) {
-                        /* Found foreign key $name, skip it */
+                        /** Found foreign key $name, skip it */
                         $foreign_found = true;
                         $skipping = true;
                         $offset = $other_offset;
@@ -458,7 +456,7 @@ final class QueryBuilder extends BaseQueryBuilder
                 $ddl_fields_def .= $token . " ";
             }
 
-            /* Skip or keep until the next */
+            /** Skip or keep until the next */
             while ($fields_definitions_tokens->offsetExists($offset)) {
                 $skip_token = $fields_definitions_tokens[$offset];
                 $skip_next = $fields_definitions_tokens[$offset + 1];
@@ -481,7 +479,7 @@ final class QueryBuilder extends BaseQueryBuilder
         }
 
         if (!$foreign_found) {
-            throw new InvalidParamException("foreign key constraint '$name' not found in table '$tableName'");
+            throw new InvalidParamException("foreign key constraint '$name' not found in table '$table'");
         }
 
         $foreign_keys_state = $this->foreignKeysState();
@@ -505,18 +503,14 @@ final class QueryBuilder extends BaseQueryBuilder
     /**
      * Builds a SQL statement for renaming a DB table.
      *
-     * @param string $table the table to be renamed. The name will be properly quoted by the method.
+     * @param string $oldName the table to be renamed. The name will be properly quoted by the method.
      * @param string $newName the new table name. The name will be properly quoted by the method.
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
      *
      * @return string the SQL statement for renaming a DB table.
      */
-    public function renameTable(string $table, string $newName): string
+    public function renameTable(string $oldName, string $newName): string
     {
-        return 'ALTER TABLE ' . $this->db->quoteTableName($table) . ' RENAME TO ' . $this->db->quoteTableName($newName);
+        return 'ALTER TABLE ' . $this->db->quoteTableName($oldName) . ' RENAME TO ' . $this->db->quoteTableName($newName);
     }
 
     /**
@@ -546,10 +540,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * @param string $table the table that the primary key constraint will be added to.
      * @param string|array $columns comma separated string or array of columns that the primary key will consist of.
      *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidParamException
-     * @throws NotSupportedException this is not supported by SQLite.
+     * @throws Exception|InvalidParamException
      *
      * @return string the SQL statement for adding a primary key constraint to an existing table.
      */
@@ -616,10 +607,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * @param string|array $columns the name of the column to that the constraint will be added on. If there are
      * multiple columns, separate them with commas. The name will be properly quoted by the method.
      *
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
+     * @throws Exception|InvalidArgumentException
      *
      * @return string the SQL statement for adding an unique constraint to an existing table.
      */
@@ -651,8 +639,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * the method.
      * @param string $expression the SQL of the `CHECK` constraint.
      *
-     * @throws Exception
-     * @throws NotSupportedException
+     * @throws Exception|NotSupportedException
      *
      * @return string the SQL statement for adding a check constraint to an existing table.
      */
@@ -669,8 +656,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * @param string $table the table whose check constraint is to be dropped. The name will be properly quoted by the
      * method.
      *
-     * @throws Exception
-     * @throws NotSupportedException
+     * @throws Exception|NotSupportedException
      *
      * @return string the SQL statement for dropping a check constraint.
      */
@@ -689,8 +675,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * quoted by the method.
      * @param mixed $value default value.
      *
-     * @throws Exception
-     * @throws NotSupportedException if this is not supported by the underlying DBMS.
+     * @throws Exception|NotSupportedException if this is not supported by the underlying DBMS.
      *
      * @return string the SQL statement for adding a default value constraint to an existing table.
      */
@@ -707,8 +692,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * @param string $table the table whose default value constraint is to be dropped. The name will be properly quoted
      * by the method.
      *
-     * @throws Exception
-     * @throws NotSupportedException if this is not supported by the underlying DBMS.
+     * @throws Exception|NotSupportedException if this is not supported by the underlying DBMS.
      *
      * @return string the SQL statement for dropping a default value constraint.
      */
@@ -726,8 +710,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * method.
      * @param string $comment the text of the comment to be added. The comment will be properly quoted by the method.
      *
-     * @throws Exception
-     * @throws NotSupportedException
+     * @throws Exception|NotSupportedException if this is not supported by the underlying DBMS.
      *
      * @return string the SQL statement for adding comment on column.
      */
@@ -743,8 +726,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * method.
      * @param string $comment the text of the comment to be added. The comment will be properly quoted by the method.
      *
-     * @throws Exception
-     * @throws NotSupportedException
+     * @throws Exception|NotSupportedException if this is not supported by the underlying DBMS.
      *
      * @return string the SQL statement for adding comment on table.
      */
@@ -761,8 +743,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * @param string $column the name of the column to be commented. The column name will be properly quoted by the
      * method.
      *
-     * @throws Exception
-     * @throws NotSupportedException
+     * @throws Exception|NotSupportedException if this is not supported by the underlying DBMS.
      *
      * @return string the SQL statement for adding comment on column.
      */
@@ -777,8 +758,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * @param string $table the table whose column is to be commented. The table name will be properly quoted by the
      * method.
      *
-     * @throws Exception
-     * @throws NotSupportedException
+     * @throws Exception|NotSupportedException if this is not supported by the underlying DBMS.
      *
      * @return string the SQL statement for adding comment on column.
      */
@@ -821,10 +801,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * @param array $params the parameters to be bound to the generated SQL statement. These parameters will be included
      * in the result with the additional parameters generated during the query building process.
      *
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
+     * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
      *
      * @return array the generated SQL statement (the first array element) and the corresponding parameters to be bound
      * to the SQL statement (the second array element). The parameters returned include those provided in `$params`.
@@ -889,10 +866,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * method, unless a parenthesis is found in the name.
      * @param bool $unique whether to add UNIQUE constraint on the created index.
      *
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
+     * @throws Exception|InvalidArgumentException
      *
      * @return string the SQL statement for creating a new index.
      */
@@ -915,10 +889,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * @param array $unions
      * @param array $params the binding parameters to be populated.
      *
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
+     * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
      *
      * @return string the UNION clause built from {@see Query::$union}.
      */
@@ -969,9 +940,8 @@ final class QueryBuilder extends BaseQueryBuilder
      * @param array $params the binding parameters that will be generated by this method.
      * They should be bound to the DB command later.
      *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException if this is not supported by the underlying DBMS.
+     * @throws Exception|JsonException|InvalidConfigException|NotSupportedException if this is not supported by the
+     * underlying DBMS.
      *
      * @return string the resulting SQL.
      */
@@ -1037,7 +1007,7 @@ final class QueryBuilder extends BaseQueryBuilder
         return $this->db->getSchema()->unquoteSimpleTableName($this->db->quoteSql($tableName));
     }
 
-    private function getFieldDefinitionsTokens($tableName)
+    private function getFieldDefinitionsTokens(string $tableName)
     {
         $create_table = $this->getCreateTable($tableName);
 
@@ -1052,7 +1022,7 @@ final class QueryBuilder extends BaseQueryBuilder
         return $code[0][$lastMatchIndex - 1];
     }
 
-    private function getCreateTable($tableName)
+    private function getCreateTable(string $tableName): string
     {
         if (($pos = strpos($tableName, '.')) !== false) {
             $schema = substr($tableName, 0, $pos + 1);
