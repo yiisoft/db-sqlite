@@ -89,16 +89,6 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      */
     protected $columnQuoteCharacter = '`';
 
-    /** @psalm-var Connection $db */
-    private ConnectionInterface $db;
-
-    public function __construct(ConnectionInterface $db)
-    {
-        $this->db = $db;
-
-        parent::__construct($db);
-    }
-
     /**
      * Returns all table names in the database.
      *
@@ -115,7 +105,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
     {
         $sql = "SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name<>'sqlite_sequence' ORDER BY tbl_name";
 
-        return $this->db->createCommand($sql)->queryColumn();
+        return $this->getDb()->createCommand($sql)->queryColumn();
     }
 
     /**
@@ -168,7 +158,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      */
     protected function loadTableForeignKeys(string $tableName): array
     {
-        $foreignKeys = $this->db->createCommand(
+        $foreignKeys = $this->getDb()->createCommand(
             'PRAGMA FOREIGN_KEY_LIST (' . $this->quoteValue($tableName) . ')'
         )->queryAll();
 
@@ -233,7 +223,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      */
     protected function loadTableChecks(string $tableName): array
     {
-        $sql = $this->db->createCommand('SELECT `sql` FROM `sqlite_master` WHERE name = :tableName', [
+        $sql = $this->getDb()->createCommand('SELECT `sql` FROM `sqlite_master` WHERE name = :tableName', [
             ':tableName' => $tableName,
         ])->queryScalar();
 
@@ -301,7 +291,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      */
     public function createQueryBuilder(): QueryBuilder
     {
-        return new QueryBuilder($this->db);
+        return new QueryBuilder($this->getDb());
     }
 
     /**
@@ -331,7 +321,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
     protected function findColumns(TableSchema $table): bool
     {
         $sql = 'PRAGMA table_info(' . $this->quoteSimpleTableName($table->getName()) . ')';
-        $columns = $this->db->createCommand($sql)->queryAll();
+        $columns = $this->getDb()->createCommand($sql)->queryAll();
 
         if (empty($columns)) {
             return false;
@@ -364,7 +354,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
     protected function findConstraints(TableSchema $table): void
     {
         $sql = 'PRAGMA foreign_key_list(' . $this->quoteSimpleTableName($table->getName()) . ')';
-        $keys = $this->db->createCommand($sql)->queryAll();
+        $keys = $this->getDb()->createCommand($sql)->queryAll();
 
         foreach ($keys as $key) {
             $id = (int) $key['id'];
@@ -399,12 +389,12 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
     public function findUniqueIndexes(TableSchema $table): array
     {
         $sql = 'PRAGMA index_list(' . $this->quoteSimpleTableName($table->getName()) . ')';
-        $indexes = $this->db->createCommand($sql)->queryAll();
+        $indexes = $this->getDb()->createCommand($sql)->queryAll();
         $uniqueIndexes = [];
 
         foreach ($indexes as $index) {
             $indexName = $index['name'];
-            $indexInfo = $this->db->createCommand(
+            $indexInfo = $this->getDb()->createCommand(
                 'PRAGMA index_info(' . $this->quoteValue($index['name']) . ')'
             )->queryAll();
 
@@ -484,7 +474,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      * @param string $level The transaction isolation level to use for this transaction. This can be either
      * {@see Transaction::READ_UNCOMMITTED} or {@see Transaction::SERIALIZABLE}.
      *
-     * @throws Exception|InvalidConfigException|Throwable|NotSupportedException|when unsupported isolation levels are
+     * @throws Exception|InvalidConfigException|Throwable|NotSupportedException when unsupported isolation levels are
      * used. SQLite only supports SERIALIZABLE and READ UNCOMMITTED.
      *
      * {@see http://www.sqlite.org/pragma.html#pragma_read_uncommitted}
@@ -493,10 +483,10 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
     {
         switch ($level) {
             case Transaction::SERIALIZABLE:
-                $this->db->createCommand('PRAGMA read_uncommitted = False;')->execute();
+                $this->getDb()->createCommand('PRAGMA read_uncommitted = False;')->execute();
                 break;
             case Transaction::READ_UNCOMMITTED:
-                $this->db->createCommand('PRAGMA read_uncommitted = True;')->execute();
+                $this->getDb()->createCommand('PRAGMA read_uncommitted = True;')->execute();
                 break;
             default:
                 throw new NotSupportedException(
@@ -516,7 +506,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      */
     private function loadTableColumnsInfo(string $tableName): array
     {
-        $tableColumns = $this->db->createCommand(
+        $tableColumns = $this->getDb()->createCommand(
             'PRAGMA TABLE_INFO (' . $this->quoteValue($tableName) . ')'
         )->queryAll();
 
@@ -539,11 +529,11 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
     {
         $tableColumns = null;
 
-        $index = $this->db->createCommand(
+        $index = $this->getDb()->createCommand(
             'PRAGMA INDEX_LIST (' . $this->quoteValue($tableName) . ')'
         )->queryAll();
 
-        $unique = $this->db->createCommand(
+        $unique = $this->getDb()->createCommand(
             "SELECT
                 '0' as 'seq',
                 name,
@@ -573,7 +563,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
         ];
 
         foreach ($indexes as $index) {
-            $columns = $this->db->createCommand(
+            $columns = $this->getDb()->createCommand(
                 'PRAGMA INDEX_INFO (' . $this->quoteValue($index['name']) . ')'
             )->queryAll();
 
