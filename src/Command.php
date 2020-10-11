@@ -7,10 +7,11 @@ namespace Yiisoft\Db\Sqlite;
 use Throwable;
 use Yiisoft\Db\Command\Command as BaseCommand;
 use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidConfigException;
-use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Strings\StringHelper;
 
+use function array_pop;
+use function count;
 use function ltrim;
 use function preg_match_all;
 use function strpos;
@@ -23,7 +24,7 @@ final class Command extends BaseCommand
      * This method should only be used for executing non-query SQL statement, such as `INSERT`, `DELETE`, `UPDATE` SQLs.
      * No result set will be returned.
      *
-     * @throws Exception execution failed.
+     * @throws Exception|Throwable execution failed.
      *
      * @return int number of rows affected by the execution.
      */
@@ -42,6 +43,7 @@ final class Command extends BaseCommand
         $result = 0;
 
         foreach ($statements as $statement) {
+            /** @var array $statement */
             [$statementSql, $statementParams] = $statement;
             $this->setSql($statementSql)->bindValues($statementParams);
             $result = parent::execute();
@@ -61,10 +63,7 @@ final class Command extends BaseCommand
      * modes. If this parameter is null, the value set in {@see fetchMode} will be used.
      *
      *
-     * @throws Exception if the query causes any problem.
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     * @throws Throwable
+     * @throws Throwable|Exception if the query causes any problem.
      *
      * @return mixed the method execution result.
      */
@@ -80,7 +79,11 @@ final class Command extends BaseCommand
             return parent::queryInternal($method, $fetchMode);
         }
 
-        [$lastStatementSql, $lastStatementParams] = \array_pop($statements);
+        /**
+         * @psalm-suppress InvalidArrayOffset
+         * @var array $statements
+         */
+        [$lastStatementSql, $lastStatementParams] = array_pop($statements);
 
         foreach ($statements as $statement) {
             [$statementSql, $statementParams] = $statement;
@@ -104,9 +107,13 @@ final class Command extends BaseCommand
      * @param string $sql
      * @param array $params
      *
-     * @return string[]|false
+     * @throws InvalidArgumentException
+     *
+     * @return array|bool (array|string)[][]|bool
+     *
+     * @psalm-return false|list<array{0: string, 1: array}>
      */
-    private function splitStatements($sql, $params)
+    private function splitStatements(string $sql, array $params)
     {
         $semicolonIndex = strpos($sql, ';');
 
@@ -118,7 +125,7 @@ final class Command extends BaseCommand
 
         $codeToken = $tokenizer->tokenize();
 
-        if (\count($codeToken->getChildren()) === 1) {
+        if (count($codeToken->getChildren()) === 1) {
             return false;
         }
 
