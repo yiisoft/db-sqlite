@@ -9,7 +9,7 @@ jobs:
     name: PHP ${{ matrix.php }}-${{ matrix.os }}
 
     env:
-      extensions: dom, json, pdo, pdo_sqlite
+      extensions: pdo, pdo_sqlite
       key: cache-v1
 
     runs-on: ${{ matrix.os }}
