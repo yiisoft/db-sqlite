@@ -11,6 +11,7 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Sqlite\Connection;
 use Yiisoft\Db\Transaction\Transaction;
 use Yiisoft\Db\TestUtility\TestConnectionTrait;
+use Yiisoft\Db\Transaction\TransactionInterface;
 
 /**
  * @group sqlite
@@ -436,11 +437,11 @@ final class ConnectionTest extends TestCase
     {
         $connection = $this->getConnection(true);
 
-        $transaction = $connection->beginTransaction(Transaction::READ_UNCOMMITTED);
+        $transaction = $connection->beginTransaction(TransactionInterface::READ_UNCOMMITTED);
 
         $transaction->rollBack();
 
-        $transaction = $connection->beginTransaction(Transaction::SERIALIZABLE);
+        $transaction = $connection->beginTransaction(TransactionInterface::SERIALIZABLE);
 
         $transaction->rollBack();
 
