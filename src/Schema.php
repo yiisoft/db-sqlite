@@ -7,7 +7,6 @@ namespace Yiisoft\Db\Sqlite;
 use Throwable;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Arrays\ArraySorter;
-use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Constraint\CheckConstraint;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ConstraintFinderInterface;
@@ -23,6 +22,7 @@ use Yiisoft\Db\Schema\ColumnSchema;
 use Yiisoft\Db\Schema\Schema as AbstractSchema;
 use Yiisoft\Db\Transaction\Transaction;
 
+use Yiisoft\Db\Transaction\TransactionInterface;
 use function count;
 use function explode;
 use function get_class;
@@ -37,7 +37,7 @@ use function trim;
  * Schema is the class for retrieving metadata from a SQLite (2/3) database.
  *
  * @property string $transactionIsolationLevel The transaction isolation level to use for this transaction. This can be
- * either {@see Transaction::READ_UNCOMMITTED} or {@see Transaction::SERIALIZABLE}.
+ * either {@see TransactionInterface::READ_UNCOMMITTED} or {@see TransactionInterface::SERIALIZABLE}.
  */
 final class Schema extends AbstractSchema implements ConstraintFinderInterface
 {
@@ -472,7 +472,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      * Sets the isolation level of the current transaction.
      *
      * @param string $level The transaction isolation level to use for this transaction. This can be either
-     * {@see Transaction::READ_UNCOMMITTED} or {@see Transaction::SERIALIZABLE}.
+     * {@see TransactionInterface::READ_UNCOMMITTED} or {@see TransactionInterface::SERIALIZABLE}.
      *
      * @throws Exception|InvalidConfigException|Throwable|NotSupportedException when unsupported isolation levels are
      * used. SQLite only supports SERIALIZABLE and READ UNCOMMITTED.
@@ -482,10 +482,10 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
     public function setTransactionIsolationLevel(string $level): void
     {
         switch ($level) {
-            case Transaction::SERIALIZABLE:
+            case TransactionInterface::SERIALIZABLE:
                 $this->getDb()->createCommand('PRAGMA read_uncommitted = False;')->execute();
                 break;
-            case Transaction::READ_UNCOMMITTED:
+            case TransactionInterface::READ_UNCOMMITTED:
                 $this->getDb()->createCommand('PRAGMA read_uncommitted = True;')->execute();
                 break;
             default:
