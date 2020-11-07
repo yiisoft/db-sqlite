@@ -482,10 +482,10 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
     public function setTransactionIsolationLevel(string $level): void
     {
         switch ($level) {
-            case TransactionInterface::SERIALIZABLE:
+            case Transaction::SERIALIZABLE:
                 $this->getDb()->createCommand('PRAGMA read_uncommitted = False;')->execute();
                 break;
-            case TransactionInterface::READ_UNCOMMITTED:
+            case Transaction::READ_UNCOMMITTED:
                 $this->getDb()->createCommand('PRAGMA read_uncommitted = True;')->execute();
                 break;
             default:
