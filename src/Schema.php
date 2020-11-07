@@ -37,7 +37,7 @@ use function trim;
  * Schema is the class for retrieving metadata from a SQLite (2/3) database.
  *
  * @property string $transactionIsolationLevel The transaction isolation level to use for this transaction. This can be
- * either {@see TransactionInterface::READ_UNCOMMITTED} or {@see TransactionInterface::SERIALIZABLE}.
+ * either {@see TransactionInterface::LEVEL_READ_UNCOMMITTED} or {@see TransactionInterface::LEVEL_SERIALIZABLE}.
  */
 final class Schema extends AbstractSchema implements ConstraintFinderInterface
 {
@@ -472,7 +472,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      * Sets the isolation level of the current transaction.
      *
      * @param string $level The transaction isolation level to use for this transaction. This can be either
-     * {@see TransactionInterface::READ_UNCOMMITTED} or {@see TransactionInterface::SERIALIZABLE}.
+     * {@see TransactionInterface::LEVEL_READ_UNCOMMITTED} or {@see TransactionInterface::LEVEL_SERIALIZABLE}.
      *
      * @throws Exception|InvalidConfigException|Throwable|NotSupportedException when unsupported isolation levels are
      * used. SQLite only supports SERIALIZABLE and READ UNCOMMITTED.
@@ -482,10 +482,10 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
     public function setTransactionIsolationLevel(string $level): void
     {
         switch ($level) {
-            case TransactionInterface::SERIALIZABLE:
+            case TransactionInterface::LEVEL_SERIALIZABLE:
                 $this->getDb()->createCommand('PRAGMA read_uncommitted = False;')->execute();
                 break;
-            case TransactionInterface::READ_UNCOMMITTED:
+            case TransactionInterface::LEVEL_READ_UNCOMMITTED:
                 $this->getDb()->createCommand('PRAGMA read_uncommitted = True;')->execute();
                 break;
             default:
