@@ -437,11 +437,11 @@ final class ConnectionTest extends TestCase
     {
         $connection = $this->getConnection(true);
 
-        $transaction = $connection->beginTransaction(TransactionInterface::LEVEL_READ_UNCOMMITTED);
+        $transaction = $connection->beginTransaction(Transaction::LEVEL_READ_UNCOMMITTED);
 
         $transaction->rollBack();
 
-        $transaction = $connection->beginTransaction(TransactionInterface::LEVEL_SERIALIZABLE);
+        $transaction = $connection->beginTransaction(Transaction::LEVEL_SERIALIZABLE);
 
         $transaction->rollBack();
 
