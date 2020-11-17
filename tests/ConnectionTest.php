@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests;
 
 use PDO;
+use Yiisoft\Cache\CacheKeyNormalizer;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -29,9 +30,10 @@ final class ConnectionTest extends TestCase
     {
         $db = $this->getConnection();
 
-        $this->assertEquals($this->connectionCache, $db->getConnectionCache());
         $this->assertEquals($this->logger, $db->getLogger());
         $this->assertEquals($this->profiler, $db->getProfiler());
+        $this->assertEquals($this->queryCache, $db->getQueryCache());
+        $this->assertEquals($this->schemaCache, $db->getSchemaCache());
         $this->assertEquals('sqlite:' . __DIR__ . '/Data/yiitest.sq3', $db->getDsn());
     }
 
@@ -266,7 +268,13 @@ final class ConnectionTest extends TestCase
         $this->assertFalse($db->isActive());
         $this->assertNull($db->getPDO());
 
-        $db = new Connection($this->connectionCache, $this->logger, $this->profiler, 'unknown::memory:');
+        $db = new Connection(
+            $this->logger,
+            $this->profiler,
+            $this->queryCache,
+            $this->schemaCache,
+            'unknown::memory:'
+        );
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('could not find driver');
@@ -316,7 +324,7 @@ final class ConnectionTest extends TestCase
 
         $db->setShuffleMasters(false);
 
-        $cacheKey = $this->buildKeyCache(
+        $cacheKey = (new CacheKeyNormalizer())->normalize(
             ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', $db->getDsn()]
         );
 
@@ -333,7 +341,7 @@ final class ConnectionTest extends TestCase
 
         $db = $this->getConnection();
 
-        $cacheKey = $this->buildKeyCache(
+        $cacheKey = (new CacheKeyNormalizer())->normalize(
             ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', 'host:invalid']
         );
 
@@ -378,11 +386,11 @@ final class ConnectionTest extends TestCase
             ]
         );
 
-        $db->getConnectionCache()->setEnableSchemaCache(false);
+        $db->getSchemaCache()->setEnableCache(false);
 
         $db->setShuffleMasters(false);
 
-        $cacheKey = $this->buildKeyCache(
+        $cacheKey = (new CacheKeyNormalizer())->normalize(
             ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', $db->getDsn()]
         );
 
@@ -394,7 +402,7 @@ final class ConnectionTest extends TestCase
 
         $db->close();
 
-        $cacheKey = $this->buildKeyCache(
+        $cacheKey = (new CacheKeyNormalizer())->normalize(
             ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', 'host:invalid']
         );
 

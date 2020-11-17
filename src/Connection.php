@@ -32,7 +32,7 @@ final class Connection extends AbstractConnection
             $sql = $this->quoteSql($sql);
         }
 
-        $command = new Command($this->getProfiler(), $this->getLogger(), $this, $sql);
+        $command = new Command($this->getProfiler(), $this->getLogger(), $this, $this->getQueryCache(), $sql);
 
         return $command->bindValues($params);
     }
@@ -44,7 +44,7 @@ final class Connection extends AbstractConnection
      */
     public function getSchema(): Schema
     {
-        return $this->schema ?? ($this->schema = new Schema($this));
+        return $this->schema ?? ($this->schema = new Schema($this, $this->getSchemaCache()));
     }
 
     /**
