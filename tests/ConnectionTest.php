@@ -9,9 +9,8 @@ use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Sqlite\Connection;
-use Yiisoft\Db\Transaction\Transaction;
 use Yiisoft\Db\TestUtility\TestConnectionTrait;
-use Yiisoft\Db\Transaction\TransactionInterface;
+use Yiisoft\Db\Transaction\Transaction;
 
 /**
  * @group sqlite
@@ -135,9 +134,8 @@ final class ConnectionTest extends TestCase
                     $this->cache,
                     $this->logger,
                     $this->profiler,
-                    'sqlite:' . __DIR__ . "/Data/yii_test_slave.sq3"
-
-                ]
+                    'sqlite:' . __DIR__ . '/Data/yii_test_slave.sq3',
+                ],
             ]
         );
 
@@ -315,8 +313,8 @@ final class ConnectionTest extends TestCase
                     $this->cache,
                     $this->logger,
                     $this->profiler,
-                    'sqlite:' . __DIR__ . "/Data/yii_test_master.sq3"
-                ]
+                    'sqlite:' . __DIR__ . '/Data/yii_test_master.sq3',
+                ],
             ]
         );
 
@@ -351,8 +349,8 @@ final class ConnectionTest extends TestCase
                     $this->cache,
                     $this->logger,
                     $this->profiler,
-                    'host:invalid'
-                ]
+                    'host:invalid',
+                ],
             ]
         );
 
@@ -385,8 +383,8 @@ final class ConnectionTest extends TestCase
                     $this->cache,
                     $this->logger,
                     $this->profiler,
-                    'sqlite:' . __DIR__ . "/Data/yii_test_master.sq3"
-                ]
+                    'sqlite:' . __DIR__ . '/Data/yii_test_master.sq3',
+                ],
             ]
         );
 
@@ -418,8 +416,8 @@ final class ConnectionTest extends TestCase
                     $this->cache,
                     $this->logger,
                     $this->profiler,
-                    'host:invalid'
-                ]
+                    'host:invalid',
+                ],
             ]
         );
 
@@ -464,8 +462,8 @@ final class ConnectionTest extends TestCase
                         $this->cache,
                         $this->logger,
                         $this->profiler,
-                        'sqlite:' . __DIR__ . "/Data/yii_test_master{$i}.sq3"
-                    ]
+                        'sqlite:' . __DIR__ . "/Data/yii_test_master{$i}.sq3",
+                    ],
                 ]
             );
         }
@@ -481,8 +479,8 @@ final class ConnectionTest extends TestCase
                         $this->cache,
                         $this->logger,
                         $this->profiler,
-                        'sqlite:' . __DIR__ . "/Data/yii_test_slave{$i}.sq3"
-                    ]
+                        'sqlite:' . __DIR__ . "/Data/yii_test_slave{$i}.sq3",
+                    ],
                 ]
             );
         }

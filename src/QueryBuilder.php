@@ -4,13 +4,26 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
+use function array_column;
+use function array_filter;
+use function array_merge;
 use Generator;
+use function implode;
+use function is_float;
+use function is_string;
 use JsonException;
+use function ltrim;
+use function reset;
+use function strpos;
+use function strrpos;
+use function substr;
 use Throwable;
-use Yiisoft\Db\Connection\ConnectionInterface;
+use function trim;
+use function version_compare;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
+
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\InvalidParamException;
 use Yiisoft\Db\Exception\NotSupportedException;
@@ -24,20 +37,6 @@ use Yiisoft\Db\Query\QueryBuilder as BaseQueryBuilder;
 use Yiisoft\Db\Sqlite\Condition\InConditionBuilder;
 use Yiisoft\Db\Sqlite\Condition\LikeConditionBuilder;
 use Yiisoft\Strings\NumericHelper;
-
-use function array_column;
-use function array_filter;
-use function array_merge;
-use function implode;
-use function is_float;
-use function is_string;
-use function ltrim;
-use function reset;
-use function strpos;
-use function strrpos;
-use function substr;
-use function trim;
-use function version_compare;
 
 final class QueryBuilder extends BaseQueryBuilder
 {
@@ -104,10 +103,9 @@ final class QueryBuilder extends BaseQueryBuilder
      * @param array|Generator $rows the rows to be batch inserted into the table
      * @param array $params
      *
-     * @throws Exception|InvalidConfigException|InvalidArgumentException|NotSupportedException
+     * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
      *
      * @return string the batch INSERT SQL statement.
-     *
      */
     public function batchInsert(string $table, array $columns, $rows, array &$params = []): string
     {
@@ -181,7 +179,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * @param mixed $value the value for the primary key of the next new row inserted. If this is not set, the next new
      * row's primary key will have a value 1.
      *
-     * @throws Exception|Throwable|InvalidArgumentException if the table does not exist or there is no sequence
+     * @throws Exception|InvalidArgumentException|Throwable if the table does not exist or there is no sequence
      * associated with the table.
      *
      * @return string the SQL statement for resetting sequence.
@@ -291,10 +289,10 @@ final class QueryBuilder extends BaseQueryBuilder
      *
      * @param string $name the name of the foreign key constraint.
      * @param string $table the table that the foreign key constraint will be added to.
-     * @param string|array $columns the name of the column to that the constraint will be added on. If there are
+     * @param array|string $columns the name of the column to that the constraint will be added on. If there are
      * multiple columns, separate them with commas or use an array to represent them.
      * @param string $refTable the table that the foreign key references to.
-     * @param string|array $refColumns the name of the column that the foreign key references to. If there are multiple
+     * @param array|string $refColumns the name of the column that the foreign key references to. If there are multiple
      * columns, separate them with commas or use an array to represent them.
      * @param string|null $delete the ON DELETE option. Most DBMS support these options: RESTRICT, CASCADE, NO ACTION,
      * SET DEFAULT, SET NULL.
@@ -332,20 +330,20 @@ final class QueryBuilder extends BaseQueryBuilder
 
         /** @psalm-suppress TypeDoesNotContainType */
         if ($schema !== '') {
-            $tmp_table_name =  "temp_{$schema}_" . $this->unquoteTableName($table);
+            $tmp_table_name = "temp_{$schema}_" . $this->unquoteTableName($table);
             $schema .= '.';
             $unquoted_tablename = $schema . $this->unquoteTableName($table);
             $quoted_tablename = $schema . $this->getDb()->quoteTableName($table);
         } else {
             $unquoted_tablename = $this->unquoteTableName($table);
             $quoted_tablename = $this->getDb()->quoteTableName($table);
-            $tmp_table_name =  "temp_" . $this->unquoteTableName($table);
+            $tmp_table_name = 'temp_' . $this->unquoteTableName($table);
         }
 
         $fields_definitions_tokens = $this->getFieldDefinitionsTokens($unquoted_tablename);
         $ddl_fields_defs = $fields_definitions_tokens->getSql();
-        $ddl_fields_defs .= ",\nCONSTRAINT " . $this->getDb()->quoteColumnName($name) . " FOREIGN KEY (" .
-            implode(",", (array)$columns) . ") REFERENCES $refTable(" . implode(",", (array)$refColumns) . ")";
+        $ddl_fields_defs .= ",\nCONSTRAINT " . $this->getDb()->quoteColumnName($name) . ' FOREIGN KEY (' .
+            implode(',', (array)$columns) . ") REFERENCES $refTable(" . implode(',', (array)$refColumns) . ')';
 
         if ($update !== null) {
             $ddl_fields_defs .= " ON UPDATE $update";
@@ -357,20 +355,20 @@ final class QueryBuilder extends BaseQueryBuilder
 
         $foreign_keys_state = $this->foreignKeysState();
         $return_queries = [];
-        $return_queries[] = "PRAGMA foreign_keys = off";
+        $return_queries[] = 'PRAGMA foreign_keys = off';
         $return_queries[] = "SAVEPOINT add_foreign_key_to_$tmp_table_name";
-        $return_queries[] = "CREATE TEMP TABLE " . $this->getDb()->quoteTableName($tmp_table_name)
+        $return_queries[] = 'CREATE TEMP TABLE ' . $this->getDb()->quoteTableName($tmp_table_name)
             . " AS SELECT * FROM $quoted_tablename";
         $return_queries[] = "DROP TABLE $quoted_tablename";
-        $return_queries[] = "CREATE TABLE $quoted_tablename (" . trim($ddl_fields_defs, " \n\r\t,") . ")";
+        $return_queries[] = "CREATE TABLE $quoted_tablename (" . trim($ddl_fields_defs, " \n\r\t,") . ')';
         $return_queries[] = "INSERT INTO $quoted_tablename SELECT * FROM " . $this->getDb()->quoteTableName($tmp_table_name);
-        $return_queries[] = "DROP TABLE " . $this->getDb()->quoteTableName($tmp_table_name);
+        $return_queries[] = 'DROP TABLE ' . $this->getDb()->quoteTableName($tmp_table_name);
         $return_queries = array_merge($return_queries, $this->getIndexSqls($unquoted_tablename));
 
         $return_queries[] = "RELEASE add_foreign_key_to_$tmp_table_name";
         $return_queries[] = "PRAGMA foreign_keys = $foreign_keys_state";
 
-        return implode(";", $return_queries);
+        return implode(';', $return_queries);
     }
 
     /**
@@ -443,7 +441,7 @@ final class QueryBuilder extends BaseQueryBuilder
             }
 
             if (!$skipping) {
-                $ddl_fields_def .= $token . " ";
+                $ddl_fields_def .= $token . ' ';
             }
 
             /** Skip or keep until the next */
@@ -474,20 +472,20 @@ final class QueryBuilder extends BaseQueryBuilder
 
         $foreign_keys_state = $this->foreignKeysState();
 
-        $return_queries[] = "PRAGMA foreign_keys = 0";
+        $return_queries[] = 'PRAGMA foreign_keys = 0';
         $return_queries[] = "SAVEPOINT drop_column_$unquoted_tablename";
-        $return_queries[] = "CREATE TABLE " . $this->getDb()->quoteTableName("temp_$unquoted_tablename")
+        $return_queries[] = 'CREATE TABLE ' . $this->getDb()->quoteTableName("temp_$unquoted_tablename")
             . " AS SELECT * FROM $quoted_tablename";
         $return_queries[] = "DROP TABLE $quoted_tablename";
-        $return_queries[] = "CREATE TABLE $quoted_tablename (" . trim($ddl_fields_def, " \n\r\t,") . ")";
-        $return_queries[] = "INSERT INTO $quoted_tablename SELECT " . implode(",", $sql_fields_to_insert) . " FROM "
+        $return_queries[] = "CREATE TABLE $quoted_tablename (" . trim($ddl_fields_def, " \n\r\t,") . ')';
+        $return_queries[] = "INSERT INTO $quoted_tablename SELECT " . implode(',', $sql_fields_to_insert) . ' FROM '
              . $this->getDb()->quoteTableName("temp_$unquoted_tablename");
-        $return_queries[] = "DROP TABLE " . $this->getDb()->quoteTableName("temp_$unquoted_tablename");
+        $return_queries[] = 'DROP TABLE ' . $this->getDb()->quoteTableName("temp_$unquoted_tablename");
         $return_queries = array_merge($return_queries, $this->getIndexSqls($unquoted_tablename));
         $return_queries[] = "RELEASE drop_column_$unquoted_tablename";
         $return_queries[] = "PRAGMA foreign_keys = $foreign_keys_state";
 
-        return implode(";", $return_queries);
+        return implode(';', $return_queries);
     }
 
     /**
@@ -528,7 +526,7 @@ final class QueryBuilder extends BaseQueryBuilder
      *
      * @param string $name the name of the primary key constraint.
      * @param string $table the table that the primary key constraint will be added to.
-     * @param string|array $columns comma separated string or array of columns that the primary key will consist of.
+     * @param array|string $columns comma separated string or array of columns that the primary key will consist of.
      *
      * @throws Exception|InvalidParamException
      *
@@ -544,33 +542,33 @@ final class QueryBuilder extends BaseQueryBuilder
             $table = substr($table, $pos + 1);
             $unquoted_tablename = $schema . '.' . $this->unquoteTableName($table);
             $quoted_tablename = $schema . '.' . $this->getDb()->quoteTableName($table);
-            $tmp_table_name =  "temp_{$schema}_" . $this->unquoteTableName($table);
+            $tmp_table_name = "temp_{$schema}_" . $this->unquoteTableName($table);
         } else {
             $unquoted_tablename = $this->unquoteTableName($table);
             $quoted_tablename = $this->getDb()->quoteTableName($table);
-            $tmp_table_name =  "temp_" . $this->unquoteTableName($table);
+            $tmp_table_name = 'temp_' . $this->unquoteTableName($table);
         }
 
         $fields_definitions_tokens = $this->getFieldDefinitionsTokens($unquoted_tablename);
         $ddl_fields_defs = $fields_definitions_tokens->getSql();
-        $ddl_fields_defs .= ", CONSTRAINT " . $this->getDb()->quoteColumnName($name) . " PRIMARY KEY (" .
-            implode(",", (array)$columns) . ")";
+        $ddl_fields_defs .= ', CONSTRAINT ' . $this->getDb()->quoteColumnName($name) . ' PRIMARY KEY (' .
+            implode(',', (array)$columns) . ')';
         $foreign_keys_state = $this->foreignKeysState();
-        $return_queries[] = "PRAGMA foreign_keys = 0";
+        $return_queries[] = 'PRAGMA foreign_keys = 0';
         $return_queries[] = "SAVEPOINT add_primary_key_to_$tmp_table_name";
-        $return_queries[] = "CREATE TABLE " . $this->getDb()->quoteTableName($tmp_table_name) .
+        $return_queries[] = 'CREATE TABLE ' . $this->getDb()->quoteTableName($tmp_table_name) .
             " AS SELECT * FROM $quoted_tablename";
         $return_queries[] = "DROP TABLE $quoted_tablename";
-        $return_queries[] = "CREATE TABLE $quoted_tablename (" . trim($ddl_fields_defs, " \n\r\t,") . ")";
+        $return_queries[] = "CREATE TABLE $quoted_tablename (" . trim($ddl_fields_defs, " \n\r\t,") . ')';
         $return_queries[] = "INSERT INTO $quoted_tablename SELECT * FROM " . $this->getDb()->quoteTableName($tmp_table_name);
-        $return_queries[] = "DROP TABLE " . $this->getDb()->quoteTableName($tmp_table_name);
+        $return_queries[] = 'DROP TABLE ' . $this->getDb()->quoteTableName($tmp_table_name);
 
         $return_queries = array_merge($return_queries, $this->getIndexSqls($unquoted_tablename));
 
         $return_queries[] = "RELEASE add_primary_key_to_$tmp_table_name";
         $return_queries[] = "PRAGMA foreign_keys = $foreign_keys_state";
 
-        return implode(";", $return_queries);
+        return implode(';', $return_queries);
     }
 
     /**
@@ -594,7 +592,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * @param string $name the name of the unique constraint. The name will be properly quoted by the method.
      * @param string $table the table that the unique constraint will be added to. The name will be properly quoted by
      * the method.
-     * @param string|array $columns the name of the column to that the constraint will be added on. If there are
+     * @param array|string $columns the name of the column to that the constraint will be added on. If there are
      * multiple columns, separate them with commas. The name will be properly quoted by the method.
      *
      * @throws Exception|InvalidArgumentException
@@ -851,7 +849,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * @param string $name the name of the index. The name will be properly quoted by the method.
      * @param string $table the table that the new index will be created for. The table name will be properly quoted by
      * the method.
-     * @param string|array $columns the column(s) that should be included in the index. If there are multiple columns,
+     * @param array|string $columns the column(s) that should be included in the index. If there are multiple columns,
      * separate them with commas or use an array to represent them. Each column name will be properly quoted by the
      * method, unless a parenthesis is found in the name.
      * @param bool $unique whether to add UNIQUE constraint on the created index.
@@ -930,7 +928,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * @param array $params the binding parameters that will be generated by this method.
      * They should be bound to the DB command later.
      *
-     * @throws Exception|JsonException|InvalidConfigException|NotSupportedException if this is not supported by the
+     * @throws Exception|InvalidConfigException|JsonException|NotSupportedException if this is not supported by the
      * underlying DBMS.
      *
      * @return string the resulting SQL.
@@ -1034,7 +1032,7 @@ final class QueryBuilder extends BaseQueryBuilder
 
     private function foreignKeysState()
     {
-        return $this->getDb()->createCommand("PRAGMA foreign_keys")->queryScalar();
+        return $this->getDb()->createCommand('PRAGMA foreign_keys')->queryScalar();
     }
 
     private function getIndexSqls(string $tableName, $skipColumn = null, $newColumn = null): array
@@ -1045,14 +1043,14 @@ final class QueryBuilder extends BaseQueryBuilder
         )->queryAll();
 
         if ($skipColumn === null) {
-            return array_column($indexes, "sql");
+            return array_column($indexes, 'sql');
         }
 
         $quoted_skip_column = $this->getDb()->quoteColumnName((string) $skipColumn);
         if ($newColumn === null) {
             /** Skip indexes which contain this column */
             foreach ($indexes as $key => $index) {
-                $code = (new SqlTokenizer($index["sql"]))->tokenize();
+                $code = (new SqlTokenizer($index['sql']))->tokenize();
                 $pattern = (new SqlTokenizer('any CREATE any INDEX any ON any()'))->tokenize();
 
                 /** Extract the list of fields of this index */
@@ -1078,12 +1076,12 @@ final class QueryBuilder extends BaseQueryBuilder
 
                 if (!$found) {
                     /** If the index contains this column, do not add it */
-                    $indexes[$key] = $index["sql"];
+                    $indexes[$key] = $index['sql'];
                 }
             }
         } else {
             foreach ($indexes as $key => $index) {
-                $code = (new SqlTokenizer($index["sql"]))->tokenize();
+                $code = (new SqlTokenizer($index['sql']))->tokenize();
                 $pattern = (new SqlTokenizer('any CREATE any INDEX any ON any ()'))->tokenize();
 
                 /** Extract the list of fields of this index */
@@ -1095,7 +1093,7 @@ final class QueryBuilder extends BaseQueryBuilder
                 $new_index_def = '';
 
                 for ($i = 0; $i < $lastMatchIndex - 1; ++$i) {
-                    $new_index_def .= $code[0][$i] . " ";
+                    $new_index_def .= $code[0][$i] . ' ';
                 }
 
                 $offset = 0;
@@ -1112,7 +1110,7 @@ final class QueryBuilder extends BaseQueryBuilder
                 }
 
                 while ($code[0]->offsetExists($lastMatchIndex)) {
-                    $new_index_def .= $code[0][$lastMatchIndex++] . " ";
+                    $new_index_def .= $code[0][$lastMatchIndex++] . ' ';
                 }
 
                 $indexes[$key] = $this->dropIndex((string) $code[0][2], $tableName) . ";$new_index_def";
