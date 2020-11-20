@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use ArrayAccess;
 use function array_splice;
+use ArrayAccess;
 use function count;
 use function end;
 use function in_array;
@@ -74,7 +74,7 @@ final class SqlToken implements ArrayAccess
      *
      * @return SqlToken|null the child token at the specified offset, `null` if there's no token.
      */
-    public function offsetGet($offset): ?SqlToken
+    public function offsetGet($offset): ?self
     {
         $offset = $this->calculateOffset($offset);
 
@@ -396,7 +396,7 @@ final class SqlToken implements ArrayAccess
      *
      * @return self
      */
-    public function parent(SqlToken $value): self
+    public function parent(self $value): self
     {
         $this->parent = $value;
 

@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use Throwable;
-use Yiisoft\Db\Command\Command as BaseCommand;
-use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidArgumentException;
-use Yiisoft\Strings\StringHelper;
-
 use function array_pop;
 use function count;
 use function ltrim;
 use function preg_match_all;
 use function strpos;
+
+use Throwable;
+use Yiisoft\Db\Command\Command as BaseCommand;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidArgumentException;
+use Yiisoft\Strings\StringHelper;
 
 final class Command extends BaseCommand
 {
@@ -62,8 +62,7 @@ final class Command extends BaseCommand
      * Please refer to [PHP manual](http://www.php.net/manual/en/function.PDOStatement-setFetchMode.php) for valid fetch
      * modes. If this parameter is null, the value set in {@see fetchMode} will be used.
      *
-     *
-     * @throws Throwable|Exception if the query causes any problem.
+     * @throws Exception|Throwable if the query causes any problem.
      *
      * @return mixed the method execution result.
      */
@@ -81,6 +80,7 @@ final class Command extends BaseCommand
 
         /**
          * @psalm-suppress InvalidArrayOffset
+         *
          * @var array $statements
          */
         [$lastStatementSql, $lastStatementParams] = array_pop($statements);

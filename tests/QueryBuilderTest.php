@@ -8,7 +8,6 @@ use Closure;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Sqlite\QueryBuilder;
-use Yiisoft\Db\Sqlite\Schema;
 use Yiisoft\Db\TestUtility\TestQueryBuilderTrait;
 use Yiisoft\Db\TestUtility\TraversableObject;
 
@@ -156,7 +155,7 @@ final class QueryBuilderTest extends TestCase
                         'CASCADE',
                         'CASCADE'
                     );
-                }
+                },
             ],
             'add (2 columns)' => [
                 'PRAGMA foreign_keys = off;SAVEPOINT add_foreign_key_to_temp_T_constraints_3;'
@@ -181,7 +180,7 @@ final class QueryBuilderTest extends TestCase
                         'CASCADE',
                         'CASCADE'
                     );
-                }
+                },
             ],
         ];
     }
@@ -201,7 +200,7 @@ final class QueryBuilderTest extends TestCase
     {
         $data = $this->batchInsertProviderTrait();
 
-        $data['escape-danger-chars']['expected'] = "INSERT INTO `customer` (`address`)"
+        $data['escape-danger-chars']['expected'] = 'INSERT INTO `customer` (`address`)'
             . " VALUES ('SQL-danger chars are escaped: ''); --')";
 
         return $data;
@@ -251,7 +250,7 @@ final class QueryBuilderTest extends TestCase
     /**
      * @dataProvider buildConditionsProvider
      *
-     * @param ExpressionInterface|array $condition
+     * @param array|ExpressionInterface $condition
      * @param string $expected
      * @param array $expectedParams
      *
@@ -333,7 +332,7 @@ final class QueryBuilderTest extends TestCase
     /**
      * @dataProvider buildLikeConditionsProviderTrait
      *
-     * @param object|array $condition
+     * @param array|object $condition
      * @param string $expected
      * @param array $expectedParams
      *
@@ -445,7 +444,7 @@ final class QueryBuilderTest extends TestCase
      * @dataProvider insertProviderTrait
      *
      * @param string $table
-     * @param ColumnSchema|array $columns
+     * @param array|ColumnSchema $columns
      * @param array $params
      * @param string $expectedSQL
      * @param array $expectedParams
@@ -550,7 +549,7 @@ final class QueryBuilderTest extends TestCase
      * @dataProvider upsertProvider
      *
      * @param string $table
-     * @param ColumnSchema|array $insertColumns
+     * @param array|ColumnSchema $insertColumns
      * @param array|bool|null $updateColumns
      * @param string|string[] $expectedSQL
      * @param array $expectedParams

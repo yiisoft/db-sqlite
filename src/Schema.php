@@ -4,7 +4,15 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
+use function count;
+use function explode;
+use function preg_match;
+use function strncasecmp;
+use function strncmp;
+use function strpos;
+use function strtolower;
 use Throwable;
+use function trim;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Arrays\ArraySorter;
 use Yiisoft\Db\Constraint\CheckConstraint;
@@ -13,6 +21,7 @@ use Yiisoft\Db\Constraint\ConstraintFinderInterface;
 use Yiisoft\Db\Constraint\ConstraintFinderTrait;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
 use Yiisoft\Db\Constraint\IndexConstraint;
+
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -21,17 +30,7 @@ use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Schema\ColumnSchema;
 use Yiisoft\Db\Schema\Schema as AbstractSchema;
 use Yiisoft\Db\Transaction\Transaction;
-
 use Yiisoft\Db\Transaction\TransactionInterface;
-use function count;
-use function explode;
-use function get_class;
-use function preg_match;
-use function strncasecmp;
-use function strncmp;
-use function strpos;
-use function strtolower;
-use function trim;
 
 /**
  * Schema is the class for retrieving metadata from a SQLite (2/3) database.
@@ -300,7 +299,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      * This method may be overridden by child classes to create a DBMS-specific column schema builder.
      *
      * @param string $type type of the column. See {@see ColumnSchemaBuilder::$type}.
-     * @param int|string|array|null $length length or precision of the column. See {@see ColumnSchemaBuilder::$length}.
+     * @param array|int|string|null $length length or precision of the column. See {@see ColumnSchemaBuilder::$length}.
      *
      * @return ColumnSchemaBuilder column schema builder instance.
      */
@@ -474,7 +473,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      * @param string $level The transaction isolation level to use for this transaction. This can be either
      * {@see TransactionInterface::READ_UNCOMMITTED} or {@see TransactionInterface::SERIALIZABLE}.
      *
-     * @throws Exception|InvalidConfigException|Throwable|NotSupportedException when unsupported isolation levels are
+     * @throws Exception|InvalidConfigException|NotSupportedException|Throwable when unsupported isolation levels are
      * used. SQLite only supports SERIALIZABLE and READ UNCOMMITTED.
      *
      * {@see http://www.sqlite.org/pragma.html#pragma_read_uncommitted}
@@ -490,7 +489,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
                 break;
             default:
                 throw new NotSupportedException(
-                    get_class($this) . ' only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.'
+                    self::class . ' only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.'
                 );
         }
     }
