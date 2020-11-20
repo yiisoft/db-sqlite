@@ -46,8 +46,8 @@ final class QueryTest extends TestCase
         $result = $query->column();
 
         $this->assertCount(2, $result);
-        $this->assertContains("2", $result);
-        $this->assertContains("3", $result);
-        $this->assertNotContains("1", $result);
+        $this->assertContains('2', $result);
+        $this->assertContains('3', $result);
+        $this->assertNotContains('1', $result);
     }
 }

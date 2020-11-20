@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
-use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidArgumentException;
-use Yiisoft\Db\Exception\InvalidConfigException;
-use Yiisoft\Db\Exception\IntegrityException;
-use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\TestUtility\TestCommandTrait;
-
 use function str_replace;
 use function version_compare;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\IntegrityException;
+use Yiisoft\Db\Exception\InvalidArgumentException;
+use Yiisoft\Db\Exception\InvalidConfigException;
+use Yiisoft\Db\Exception\NotSupportedException;
+
+use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\TestUtility\TestCommandTrait;
 
 /**
  * @group sqlite
@@ -64,7 +64,7 @@ final class CommandTest extends TestCase
             'student_id' => 'integer primary key autoincrement not null',
             'student_name' => 'nvarchar(50) null',
             'department_id' => 'integer not null',
-            'dateOfBirth' => 'date null'
+            'dateOfBirth' => 'date null',
         ])->execute();
 
         $db->createCommand()->addForeignKey(
@@ -199,12 +199,12 @@ SQL;
      *
      * @dataProvider bindParamsNonWhereProviderTrait
      *
+     * @param string $sql
+     *
      * @throws Exception
      * @throws InvalidArgumentException
      * @throws InvalidConfigException
      * @throws NotSupportedException
-     *
-     * @param string $sql
      */
     public function testBindParamsNonWhere(string $sql): void
     {
@@ -215,13 +215,13 @@ SQL;
             [
                 'name' => 'testParams',
                 'email' => 'testParams@example.com',
-                'address' => '1'
+                'address' => '1',
             ]
         )->execute();
 
         $params = [
             ':email' => 'testParams@example.com',
-            ':len'   => 5,
+            ':len' => 5,
         ];
 
         $command = $db->createCommand($sql, $params);

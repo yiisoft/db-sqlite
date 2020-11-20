@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Condition;
 
+use function implode;
+use function is_array;
+use function strpos;
 use Traversable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\Query\Conditions\InConditionBuilder as BaseInConditionBuilder;
-use Yiisoft\Db\Sqlite\Connection;
 
-use function implode;
-use function is_array;
-use function strpos;
+use Yiisoft\Db\Query\Conditions\InConditionBuilder as BaseInConditionBuilder;
+use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\Sqlite\Connection;
 
 final class InConditionBuilder extends BaseInConditionBuilder
 {
@@ -45,7 +45,7 @@ final class InConditionBuilder extends BaseInConditionBuilder
      *
      * @param string|null $operator
      * @param array|Traversable $columns
-     * @param iterable|array $values
+     * @param array|iterable $values
      * @param array $params
      *
      * @return string SQL.
