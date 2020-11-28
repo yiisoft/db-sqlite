@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
+use function explode;
+use function file_get_contents;
 use PHPUnit\Framework\TestCase as AbstractTestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -11,6 +13,8 @@ use Psr\SimpleCache\CacheInterface as SimpleCacheInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionObject;
+use function str_replace;
+use function trim;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
@@ -20,18 +24,12 @@ use Yiisoft\Db\Cache\SchemaCache;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Factory\DatabaseFactory;
-use Yiisoft\Db\Connection\Dsn;
 use Yiisoft\Db\Sqlite\Connection;
 use Yiisoft\Db\TestUtility\IsOneOfAssert;
 use Yiisoft\Di\Container;
 use Yiisoft\Factory\Definitions\Reference;
 use Yiisoft\Log\Logger;
 use Yiisoft\Profiler\Profiler;
-
-use function explode;
-use function file_get_contents;
-use function str_replace;
-use function trim;
 
 class TestCase extends AbstractTestCase
 {
@@ -84,8 +82,6 @@ class TestCase extends AbstractTestCase
      * @param string $expected
      * @param string $actual
      * @param string $message
-     *
-     * @return void
      */
     protected function assertEqualsWithoutLE(string $expected, string $actual, string $message = ''): void
     {
@@ -233,7 +229,7 @@ class TestCase extends AbstractTestCase
     /**
      * Adjust dbms specific escaping.
      *
-     * @param string|array $sql
+     * @param array|string $sql
      *
      * @return string
      */
@@ -278,7 +274,7 @@ class TestCase extends AbstractTestCase
         return [
             Aliases::class => [
                 '@root' => dirname(__DIR__, 1),
-                '@data' =>  '@root/tests/Data',
+                '@data' => '@root/tests/Data',
                 '@runtime' => '@data/runtime',
             ],
 
@@ -327,8 +323,8 @@ class TestCase extends AbstractTestCase
         return [
             'yiisoft/db-sqlite' => [
                 'dsn' => 'sqlite:' . __DIR__ . '/Data/yiitest.sq3',
-                'fixture' => __DIR__ . '/Data/sqlite.sql'
-            ]
+                'fixture' => __DIR__ . '/Data/sqlite.sql',
+            ],
         ];
     }
 }
