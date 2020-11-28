@@ -282,20 +282,20 @@ class TestCase extends AbstractTestCase
             CacheInterface::class => [
                 '__class' => Cache::class,
                 '__construct()' => [
-                    Reference::to(ArrayCache::class)
-                ]
+                    Reference::to(ArrayCache::class),
+                ],
             ],
 
             SimpleCacheInterface::class => CacheInterface::class,
 
             LoggerInterface::class => Logger::class,
 
-            ConnectionInterface::class  => [
+            ConnectionInterface::class => [
                 '__class' => Connection::class,
                 '__construct()' => [
-                    'dsn' => $params['yiisoft/db-sqlite']['dsn']
-                ]
-            ]
+                    'dsn' => $params['yiisoft/db-sqlite']['dsn'],
+                ],
+            ],
         ];
     }
 
@@ -310,8 +310,8 @@ class TestCase extends AbstractTestCase
                 [
                     '__class' => Connection::class,
                     '__construct()' => [
-                        'dsn' => $this->params()['yiisoft/db-sqlite']['dsn']
-                    ]
+                        'dsn' => $this->params()['yiisoft/db-sqlite']['dsn'],
+                    ],
                 ]
             );
         }
