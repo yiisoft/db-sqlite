@@ -421,7 +421,7 @@ final class SchemaTest extends TestCase
         $db = $this->getConnection();
         $schema = $this->getConnection()->getSchema();
 
-        $db->getSchemaCache()->setEnableCache(true);
+        $db->getSchemaCache()->setEnable(true);
         $db->setTablePrefix($tablePrefix);
 
         $noCacheTable = $schema->getTableSchema($tableName, true);
