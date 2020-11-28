@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use PDO;
-use Yiisoft\Db\Connection\Connection as AbstractConnection;
-
 use function constant;
+use PDO;
+
 use function strncmp;
 use function substr;
+use Yiisoft\Db\Connection\Connection as AbstractConnection;
 
 /**
  * Database connection class prefilled for MYSQL Server.

@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use SplStack;
-use Yiisoft\Db\Exception\InvalidArgumentException;
-
 use function is_array;
 use function is_string;
+
 use function mb_strlen;
 use function mb_strpos;
 use function mb_strtoupper;
 use function mb_substr;
 use function reset;
+use SplStack;
 use function usort;
+use Yiisoft\Db\Exception\InvalidArgumentException;
 
 /**
  * BaseTokenizer splits an SQL query into individual SQL tokens.
