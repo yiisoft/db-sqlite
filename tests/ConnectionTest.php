@@ -133,9 +133,8 @@ final class ConnectionTest extends TestCase
             [
                 '__class' => Connection::class,
                 '__construct()' => [
-                    'dsn' => 'sqlite:' . __DIR__ . "/Data/yii_test_slave.sq3"
-
-                ]
+                    'dsn' => 'sqlite:' . __DIR__ . '/Data/yii_test_slave.sq3',
+                ],
             ]
         );
 
@@ -316,8 +315,8 @@ final class ConnectionTest extends TestCase
             [
                 '__class' => Connection::class,
                 '__construct()' => [
-                    'dsn' => 'sqlite:' . __DIR__ . "/Data/yii_test_master.sq3"
-                ]
+                    'dsn' => 'sqlite:' . __DIR__ . '/Data/yii_test_master.sq3',
+                ],
             ]
         );
 
@@ -349,8 +348,8 @@ final class ConnectionTest extends TestCase
             [
                 '__class' => Connection::class,
                 '__construct()' => [
-                    'dsn' => 'host:invalid'
-                ]
+                    'dsn' => 'host:invalid',
+                ],
             ]
         );
 
@@ -380,8 +379,8 @@ final class ConnectionTest extends TestCase
             [
                 '__class' => Connection::class,
                 '__construct()' => [
-                    'dsn' => 'sqlite:' . __DIR__ . "/Data/yii_test_master.sq3"
-                ]
+                    'dsn' => 'sqlite:' . __DIR__ . '/Data/yii_test_master.sq3',
+                ],
             ]
         );
 
@@ -410,8 +409,8 @@ final class ConnectionTest extends TestCase
             [
                 '__class' => Connection::class,
                 '__construct()' => [
-                    'dsn' => 'host:invalid'
-                ]
+                    'dsn' => 'host:invalid',
+                ],
             ]
         );
 
@@ -453,8 +452,8 @@ final class ConnectionTest extends TestCase
                 [
                     '__class' => Connection::class,
                     '__construct()' => [
-                        'dsn' => 'sqlite:' . __DIR__ . "/Data/yii_test_master{$i}.sq3"
-                    ]
+                        'dsn' => 'sqlite:' . __DIR__ . "/Data/yii_test_master{$i}.sq3",
+                    ],
                 ]
             );
         }
@@ -467,8 +466,8 @@ final class ConnectionTest extends TestCase
                 [
                     '__class' => Connection::class,
                     '__construct()' => [
-                        'dsn' => 'sqlite:' . __DIR__ . "/Data/yii_test_slave{$i}.sq3"
-                    ]
+                        'dsn' => 'sqlite:' . __DIR__ . "/Data/yii_test_slave{$i}.sq3",
+                    ],
                 ]
             );
         }
