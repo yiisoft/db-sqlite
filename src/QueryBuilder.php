@@ -1031,7 +1031,7 @@ final class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
-     * @return false|null|string
+     * @return false|string|null
      */
     private function foreignKeysState()
     {
