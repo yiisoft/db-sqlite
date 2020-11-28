@@ -995,7 +995,7 @@ final class QueryBuilder extends BaseQueryBuilder
         return $this->getDb()->getSchema()->unquoteSimpleTableName($this->getDb()->quoteSql($tableName));
     }
 
-    private function getFieldDefinitionsTokens(string $tableName)
+    private function getFieldDefinitionsTokens(string $tableName): ?SqlToken
     {
         $create_table = $this->getCreateTable($tableName);
 
@@ -1030,6 +1030,9 @@ final class QueryBuilder extends BaseQueryBuilder
         return trim($create_table);
     }
 
+    /**
+     * @return false|null|string
+     */
     private function foreignKeysState()
     {
         return $this->getDb()->createCommand('PRAGMA foreign_keys')->queryScalar();
