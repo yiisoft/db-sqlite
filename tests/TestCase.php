@@ -4,29 +4,33 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
-use function explode;
-use function file_get_contents;
 use PHPUnit\Framework\TestCase as AbstractTestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface as SimpleCacheInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionObject;
-use function str_replace;
-use function trim;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface;
+use Yiisoft\Db\Cache\QueryCache;
+use Yiisoft\Db\Cache\SchemaCache;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Factory\DatabaseFactory;
 use Yiisoft\Db\Sqlite\Connection;
-
 use Yiisoft\Db\TestUtility\IsOneOfAssert;
 use Yiisoft\Di\Container;
+use Yiisoft\Factory\Definitions\Reference;
 use Yiisoft\Log\Logger;
 use Yiisoft\Profiler\Profiler;
+
+use function explode;
+use function file_get_contents;
+use function str_replace;
+use function trim;
 
 class TestCase extends AbstractTestCase
 {
@@ -60,6 +64,8 @@ class TestCase extends AbstractTestCase
             $this->container,
             $this->dataProvider,
             $this->logger,
+            $this->queryCache,
+            $this->schemaCache,
             $this->profiler
         );
     }
@@ -107,6 +113,8 @@ class TestCase extends AbstractTestCase
         $this->logger = $this->container->get(LoggerInterface::class);
         $this->profiler = $this->container->get(Profiler::class);
         $this->connection = $this->container->get(ConnectionInterface::class);
+        $this->queryCache = $this->container->get(QueryCache::class);
+        $this->schemaCache = $this->container->get(SchemaCache::class);
 
         DatabaseFactory::initialize($this->container, []);
     }
@@ -271,24 +279,23 @@ class TestCase extends AbstractTestCase
                 '@runtime' => '@data/runtime',
             ],
 
-            CacheInterface::class => static function () {
-                return new Cache(new ArrayCache());
-            },
+            CacheInterface::class => [
+                '__class' => Cache::class,
+                '__construct()' => [
+                    Reference::to(ArrayCache::class),
+                ],
+            ],
+
+            SimpleCacheInterface::class => CacheInterface::class,
 
             LoggerInterface::class => Logger::class,
 
-            Profiler::class => static function (ContainerInterface $container) {
-                return new Profiler($container->get(LoggerInterface::class));
-            },
-
-            ConnectionInterface::class => static function (ContainerInterface $container) use ($params) {
-                return new Connection(
-                    $container->get(CacheInterface::class),
-                    $container->get(LoggerInterface::class),
-                    $container->get(Profiler::class),
-                    $params['yiisoft/db-sqlite']['dsn'],
-                );
-            },
+            ConnectionInterface::class => [
+                '__class' => Connection::class,
+                '__construct()' => [
+                    'dsn' => $params['yiisoft/db-sqlite']['dsn'],
+                ],
+            ],
         ];
     }
 
@@ -299,7 +306,14 @@ class TestCase extends AbstractTestCase
         if ($dsn !== null) {
             $this->configContainer();
 
-            $db = new Connection($this->cache, $this->logger, $this->profiler, $dsn);
+            $db = DatabaseFactory::createClass(
+                [
+                    '__class' => Connection::class,
+                    '__construct()' => [
+                        'dsn' => $this->params()['yiisoft/db-sqlite']['dsn'],
+                    ],
+                ]
+            );
         }
 
         return $db;
