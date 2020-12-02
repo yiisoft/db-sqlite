@@ -172,11 +172,9 @@ class TestCase extends AbstractTestCase
         return $this->connection;
     }
 
-    protected function prepareDatabase(?string $fixture = null, ?string $dsn = null): void
+    protected function prepareDatabase(string $dsn = null): void
     {
-        if ($fixture === null) {
-            $fixture = $this->params()['yiisoft/db-sqlite']['fixture'];
-        }
+        $fixture = $this->params()['yiisoft/db-sqlite']['fixture'];
 
         if ($dsn !== null) {
             $this->connection = $this->createConnection($dsn);
@@ -299,7 +297,7 @@ class TestCase extends AbstractTestCase
         ];
     }
 
-    protected function createConnection(?string $dsn = null): ?Connection
+    protected function createConnection(string $dsn = null): ?Connection
     {
         $db = null;
 
@@ -310,7 +308,7 @@ class TestCase extends AbstractTestCase
                 [
                     '__class' => Connection::class,
                     '__construct()' => [
-                        'dsn' => $this->params()['yiisoft/db-sqlite']['dsn'],
+                        'dsn' => $dsn,
                     ],
                 ]
             );
