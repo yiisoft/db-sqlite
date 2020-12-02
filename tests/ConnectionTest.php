@@ -445,7 +445,7 @@ final class ConnectionTest extends TestCase
         $db = $this->getConnection(true);
 
         for ($i = 0; $i < $masterCount; ++$i) {
-            $this->prepareDatabase(null, 'sqlite:' . __DIR__ . "/Data/yii_test_master{$i}.sq3");
+            $this->prepareDatabase('sqlite:' . __DIR__ . "/Data/yii_test_master{$i}.sq3");
 
             $db->setMasters(
                 "$i",
@@ -459,7 +459,7 @@ final class ConnectionTest extends TestCase
         }
 
         for ($i = 0; $i < $slaveCount; ++$i) {
-            $this->prepareDatabase(null, 'sqlite:' . __DIR__ . "/Data/yii_test_slave{$i}.sq3");
+            $this->prepareDatabase('sqlite:' . __DIR__ . "/Data/yii_test_slave{$i}.sq3");
 
             $db->setSlaves(
                 "$i",
