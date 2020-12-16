@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests;
 
 use PDO;
-use Yiisoft\Cache\CacheKeyNormalizer;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -308,7 +307,7 @@ final class ConnectionTest extends TestCase
 
     public function testServerStatusCacheWorks(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getConnection(true);
 
         $db->setMasters(
             '1',
@@ -322,7 +321,7 @@ final class ConnectionTest extends TestCase
 
         $db->setShuffleMasters(false);
 
-        $cacheKey = (new CacheKeyNormalizer())->normalize(
+        $cacheKey = $this->normalize(
             ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', $db->getDsn()]
         );
 
@@ -339,7 +338,7 @@ final class ConnectionTest extends TestCase
 
         $db = $this->getConnection();
 
-        $cacheKey = (new CacheKeyNormalizer())->normalize(
+        $cacheKey = $this->normalize(
             ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', 'host:invalid']
         );
 
@@ -388,7 +387,7 @@ final class ConnectionTest extends TestCase
 
         $db->setShuffleMasters(false);
 
-        $cacheKey = (new CacheKeyNormalizer())->normalize(
+        $cacheKey = $this->normalize(
             ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', $db->getDsn()]
         );
 
@@ -400,7 +399,7 @@ final class ConnectionTest extends TestCase
 
         $db->close();
 
-        $cacheKey = (new CacheKeyNormalizer())->normalize(
+        $cacheKey = $this->normalize(
             ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', 'host:invalid']
         );
 
