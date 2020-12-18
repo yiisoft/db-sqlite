@@ -39,25 +39,18 @@ composer require yiisoft/db-sqlite
 
 ## Configuration
 
-Using yiisoft/composer-config-plugin automatically get the settings of `CacheInterface::class`, `LoggerInterface::class`, and `Profiler::class`.
+Using yiisoft/composer-config-plugin automatically get the settings of `Yiisoft\Cache\CacheInterface::class`, `LoggerInterface::class`, and `Profiler::class`.
 
 Di-Container:
 
 ```php
-use Psr\Log\LoggerInterface;
-use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Db\Sqlite\Connection as SqliteConnection;
-use Yiisoft\Factory\Definitions\Reference;
-use Yiisoft\Profiler\Profiler;
 
 return [
     SqliteConnection::class => [
         '__class' => SqliteConnection::class,
         '__construct()' => [
-            Reference::to(CacheInterface::class),
-            Reference::to(LoggerInterface::class),
-            Reference::to(Profiler::class),
-            $params['yiisoft/db-sqlite']['dsn']
+            'dsn' => $params['yiisoft/db-sqlite']['dsn']
         ]
     ]
 ];
