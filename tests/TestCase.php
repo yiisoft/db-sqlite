@@ -7,7 +7,7 @@ namespace Yiisoft\Db\Sqlite\Tests;
 use PHPUnit\Framework\TestCase as AbstractTestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Psr\SimpleCache\CacheInterface as SimpleCacheInterface;
+use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionObject;
@@ -35,7 +35,7 @@ use function trim;
 class TestCase extends AbstractTestCase
 {
     protected Aliases $aliases;
-    protected CacheInterface $cache;
+    protected ArrayCache $cache;
     protected Connection $connection;
     protected ContainerInterface $container;
     protected array $dataProvider;
@@ -109,7 +109,7 @@ class TestCase extends AbstractTestCase
         $this->container = new Container($this->config());
 
         $this->aliases = $this->container->get(Aliases::class);
-        $this->cache = $this->container->get(CacheInterface::class);
+        $this->cache = $this->container->get(ArrayCache::class);
         $this->logger = $this->container->get(LoggerInterface::class);
         $this->profiler = $this->container->get(Profiler::class);
         $this->connection = $this->container->get(ConnectionInterface::class);
@@ -170,6 +170,20 @@ class TestCase extends AbstractTestCase
         }
 
         return $this->connection;
+    }
+
+    protected function normalize($key): string
+    {
+        if (is_string($key) || is_int($key)) {
+            $key = (string) $key;
+            return ctype_alnum($key) && mb_strlen($key, '8bit') <= 32 ? $key : md5($key);
+        }
+
+        if (($key = json_encode($key)) === false) {
+            throw new InvalidArgumentException('Invalid key. ' . json_last_error_msg());
+        }
+
+        return md5($key);
     }
 
     protected function prepareDatabase(string $dsn = null): void
@@ -277,14 +291,14 @@ class TestCase extends AbstractTestCase
                 '@runtime' => '@data/runtime',
             ],
 
+            PsrCacheInterface::class => ArrayCache::class,
+
             CacheInterface::class => [
                 '__class' => Cache::class,
                 '__construct()' => [
                     Reference::to(ArrayCache::class),
                 ],
             ],
-
-            SimpleCacheInterface::class => CacheInterface::class,
 
             LoggerInterface::class => Logger::class,
 
