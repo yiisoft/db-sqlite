@@ -44,13 +44,14 @@ Using yiisoft/composer-config-plugin automatically get the settings of `Yiisoft\
 Di-Container:
 
 ```php
+use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Sqlite\Connection as SqliteConnection;
 
 return [
-    SqliteConnection::class => [
+    ConnectionInterface::class => [
         '__class' => SqliteConnection::class,
         '__construct()' => [
-            'dsn' => $params['yiisoft/db-sqlite']['dsn']
+            'dsn' => $params['yiisoft/db-sqlite']['dsn'],
         ]
     ]
 ];
@@ -61,7 +62,7 @@ Params.php
 ```php
 return [
     'yiisoft/db-sqlite' => [
-        'dsn' => 'sqlite:' . __DIR__ . '/Data/Runtime/yiitest.sq3'
+        'dsn' => 'sqlite:' . __DIR__ . '/Data/Runtime/yiitest.sq3',
     ]
 ];
 ```
