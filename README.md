@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://github.com/yiisoft" target="_blank">
-        <img src="https://avatars0.githubusercontent.com/u/993323" height="80px">
+        <img src="https://yiisoft.github.io/docs/images/yii_logo.svg" height="80px">
     </a>
     <a href="https://www.sqlite.org/" target="_blank">
         <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/SQLite370.svg" height="80px">
