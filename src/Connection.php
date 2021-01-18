@@ -16,8 +16,6 @@ use function substr;
  */
 final class Connection extends AbstractConnection
 {
-    private Schema $schema;
-
     /**
      * Creates a command for execution.
      *
@@ -44,7 +42,7 @@ final class Connection extends AbstractConnection
      */
     public function getSchema(): Schema
     {
-        return $this->schema = new Schema($this);
+        return new Schema($this);
     }
 
     /**
