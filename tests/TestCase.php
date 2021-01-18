@@ -39,10 +39,10 @@ use function trim;
 class TestCase extends AbstractTestCase
 {
     protected array $dataProvider;
-    protected array $likeParameterReplacements = [];
     protected string $likeEscapeCharSql = '';
+    protected array $likeParameterReplacements = [];
     protected Aliases $aliases;
-    protected ?Connection $connection;
+    protected Connection $connection;
     protected ContainerInterface $container;
     protected LoggerInterface $logger;
     protected ProfilerInterface $profiler;
@@ -68,9 +68,9 @@ class TestCase extends AbstractTestCase
             $this->container,
             $this->dataProvider,
             $this->logger,
-            $this->profiler,
             $this->queryCache,
             $this->schemaCache,
+            $this->profiler
         );
     }
 
@@ -134,8 +134,6 @@ class TestCase extends AbstractTestCase
      * @param array $args
      * @param bool $revoke whether to make method inaccessible after execution.
      *
-     * @throws ReflectionException
-     *
      * @return mixed
      */
     protected function invokeMethod(object $object, string $method, array $args = [], bool $revoke = true)
@@ -159,8 +157,12 @@ class TestCase extends AbstractTestCase
      *
      * @return Connection
      */
-    protected function getConnection($reset = false): ?Connection
+    protected function getConnection($reset = false): Connection
     {
+        if ($reset === false && isset($this->connection)) {
+            return $this->connection;
+        }
+
         if ($reset === false) {
             $this->configContainer();
             return $this->connection;
