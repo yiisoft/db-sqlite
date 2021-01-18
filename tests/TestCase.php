@@ -19,6 +19,10 @@ use Yiisoft\Db\Cache\SchemaCache;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Factory\DatabaseFactory;
+use Yiisoft\Db\Factory\LoggerFactory;
+use Yiisoft\Db\Factory\ProfilerFactory;
+use Yiisoft\Db\Factory\QueryCacheFactory;
+use Yiisoft\Db\Factory\SchemaCacheFactory;
 use Yiisoft\Db\Sqlite\Connection;
 use Yiisoft\Db\TestUtility\IsOneOfAssert;
 use Yiisoft\Di\Container;
@@ -34,15 +38,16 @@ use function trim;
 
 class TestCase extends AbstractTestCase
 {
-    protected Aliases $aliases;
-    protected CacheInterface $cache;
-    protected Connection $connection;
-    protected ContainerInterface $container;
     protected array $dataProvider;
-    protected string $likeEscapeCharSql = '';
     protected array $likeParameterReplacements = [];
+    protected string $likeEscapeCharSql = '';
+    protected Aliases $aliases;
+    protected ?Connection $connection;
+    protected ContainerInterface $container;
     protected LoggerInterface $logger;
     protected ProfilerInterface $profiler;
+    protected QueryCache $queryCache;
+    protected SchemaCache $schemaCache;
 
     protected function setUp(): void
     {
@@ -59,20 +64,19 @@ class TestCase extends AbstractTestCase
 
         unset(
             $this->aliases,
-            $this->cache,
             $this->connection,
             $this->container,
             $this->dataProvider,
             $this->logger,
+            $this->profiler,
             $this->queryCache,
             $this->schemaCache,
-            $this->profiler
         );
     }
 
     protected function buildKeyCache(array $key): string
     {
-        $jsonKey = json_encode($key);
+        $jsonKey = json_encode($key, JSON_THROW_ON_ERROR);
 
         return md5($jsonKey);
     }
@@ -108,15 +112,18 @@ class TestCase extends AbstractTestCase
     {
         $this->container = new Container($this->config());
 
+        DatabaseFactory::initialize($this->container);
+        LoggerFactory::initialize($this->container);
+        ProfilerFactory::initialize($this->container);
+        SchemaCacheFactory::initialize($this->container);
+        QueryCacheFactory::initialize($this->container);
+
         $this->aliases = $this->container->get(Aliases::class);
-        $this->cache = $this->container->get(CacheInterface::class);
+        $this->connection = $this->container->get(ConnectionInterface::class);
         $this->logger = $this->container->get(LoggerInterface::class);
         $this->profiler = $this->container->get(ProfilerInterface::class);
-        $this->connection = $this->container->get(ConnectionInterface::class);
         $this->queryCache = $this->container->get(QueryCache::class);
         $this->schemaCache = $this->container->get(SchemaCache::class);
-
-        DatabaseFactory::initialize($this->container, []);
     }
 
     /**
@@ -152,12 +159,8 @@ class TestCase extends AbstractTestCase
      *
      * @return Connection
      */
-    protected function getConnection($reset = false): Connection
+    protected function getConnection($reset = false): ?Connection
     {
-        if ($reset === false && isset($this->connection)) {
-            return $this->connection;
-        }
-
         if ($reset === false) {
             $this->configContainer();
             return $this->connection;
@@ -199,8 +202,6 @@ class TestCase extends AbstractTestCase
      * @param object $object
      * @param string $propertyName
      * @param bool $revoke whether to make property inaccessible after getting.
-     *
-     * @throws ReflectionException
      *
      * @return mixed
      */
@@ -244,8 +245,6 @@ class TestCase extends AbstractTestCase
      * @param string $propertyName
      * @param $value
      * @param bool $revoke whether to make property inaccessible after setting
-     *
-     * @throws ReflectionException
      */
     protected function setInaccessibleProperty(object $object, string $propertyName, $value, bool $revoke = true): void
     {

@@ -26,13 +26,13 @@ final class Connection extends AbstractConnection
      *
      * @return Command the DB command
      */
-    public function createCommand(?string $sql = null, array $params = []): Command
+    public function createCommand(string $sql = null, array $params = []): Command
     {
         if ($sql !== null) {
             $sql = $this->quoteSql($sql);
         }
 
-        $command = new Command($this->getProfiler(), $this->getLogger(), $this, $this->getQueryCache(), $sql);
+        $command = new Command($this, $sql);
 
         return $command->bindValues($params);
     }
@@ -44,7 +44,7 @@ final class Connection extends AbstractConnection
      */
     public function getSchema(): Schema
     {
-        return $this->schema = new Schema($this, $this->getSchemaCache());
+        return $this->schema = new Schema($this);
     }
 
     /**
