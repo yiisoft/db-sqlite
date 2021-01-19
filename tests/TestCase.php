@@ -17,12 +17,9 @@ use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Db\Cache\QueryCache;
 use Yiisoft\Db\Cache\SchemaCache;
 use Yiisoft\Db\Connection\ConnectionInterface;
+use Yiisoft\Db\Connection\LazyConnectionDependencies;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Factory\DatabaseFactory;
-use Yiisoft\Db\Factory\LoggerFactory;
-use Yiisoft\Db\Factory\ProfilerFactory;
-use Yiisoft\Db\Factory\QueryCacheFactory;
-use Yiisoft\Db\Factory\SchemaCacheFactory;
 use Yiisoft\Db\Sqlite\Connection;
 use Yiisoft\Db\TestUtility\IsOneOfAssert;
 use Yiisoft\Di\Container;
@@ -42,8 +39,10 @@ class TestCase extends AbstractTestCase
     protected string $likeEscapeCharSql = '';
     protected array $likeParameterReplacements = [];
     protected Aliases $aliases;
+    protected CacheInterface $cache;
     protected Connection $connection;
     protected ContainerInterface $container;
+    protected LazyConnectionDependencies $dependencies;
     protected LoggerInterface $logger;
     protected ProfilerInterface $profiler;
     protected QueryCache $queryCache;
@@ -64,9 +63,11 @@ class TestCase extends AbstractTestCase
 
         unset(
             $this->aliases,
+            $this->cache,
             $this->connection,
             $this->container,
             $this->dataProvider,
+            $this->dependencies,
             $this->logger,
             $this->queryCache,
             $this->schemaCache,
@@ -113,13 +114,11 @@ class TestCase extends AbstractTestCase
         $this->container = new Container($this->config());
 
         DatabaseFactory::initialize($this->container);
-        LoggerFactory::initialize($this->container);
-        ProfilerFactory::initialize($this->container);
-        SchemaCacheFactory::initialize($this->container);
-        QueryCacheFactory::initialize($this->container);
 
         $this->aliases = $this->container->get(Aliases::class);
+        $this->cache = $this->container->get(CacheInterface::class);
         $this->connection = $this->container->get(ConnectionInterface::class);
+        $this->dependencies = $this->container->get(LazyConnectionDependencies::class);
         $this->logger = $this->container->get(LoggerInterface::class);
         $this->profiler = $this->container->get(ProfilerInterface::class);
         $this->queryCache = $this->container->get(QueryCache::class);
@@ -286,6 +285,7 @@ class TestCase extends AbstractTestCase
             ],
 
             LoggerInterface::class => Logger::class,
+
             ProfilerInterface::class => Profiler::class,
 
             ConnectionInterface::class => [
