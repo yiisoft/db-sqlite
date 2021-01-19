@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase as AbstractTestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
-use ReflectionException;
 use ReflectionObject;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Cache\ArrayCache;
