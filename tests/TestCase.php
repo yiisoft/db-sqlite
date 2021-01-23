@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase as AbstractTestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
-use ReflectionException;
 use ReflectionObject;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Cache\ArrayCache;
@@ -17,6 +16,7 @@ use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Db\Cache\QueryCache;
 use Yiisoft\Db\Cache\SchemaCache;
 use Yiisoft\Db\Connection\ConnectionInterface;
+use Yiisoft\Db\Connection\LazyConnectionDependencies;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Factory\DatabaseFactory;
 use Yiisoft\Db\Sqlite\Connection;
@@ -34,15 +34,18 @@ use function trim;
 
 class TestCase extends AbstractTestCase
 {
+    protected array $dataProvider;
+    protected string $likeEscapeCharSql = '';
+    protected array $likeParameterReplacements = [];
     protected Aliases $aliases;
     protected CacheInterface $cache;
     protected Connection $connection;
     protected ContainerInterface $container;
-    protected array $dataProvider;
-    protected string $likeEscapeCharSql = '';
-    protected array $likeParameterReplacements = [];
+    protected LazyConnectionDependencies $dependencies;
     protected LoggerInterface $logger;
     protected ProfilerInterface $profiler;
+    protected QueryCache $queryCache;
+    protected SchemaCache $schemaCache;
 
     protected function setUp(): void
     {
@@ -63,6 +66,7 @@ class TestCase extends AbstractTestCase
             $this->connection,
             $this->container,
             $this->dataProvider,
+            $this->dependencies,
             $this->logger,
             $this->queryCache,
             $this->schemaCache,
@@ -72,7 +76,7 @@ class TestCase extends AbstractTestCase
 
     protected function buildKeyCache(array $key): string
     {
-        $jsonKey = json_encode($key);
+        $jsonKey = json_encode($key, JSON_THROW_ON_ERROR);
 
         return md5($jsonKey);
     }
@@ -108,15 +112,16 @@ class TestCase extends AbstractTestCase
     {
         $this->container = new Container($this->config());
 
+        DatabaseFactory::initialize($this->container);
+
         $this->aliases = $this->container->get(Aliases::class);
         $this->cache = $this->container->get(CacheInterface::class);
+        $this->connection = $this->container->get(ConnectionInterface::class);
+        $this->dependencies = $this->container->get(LazyConnectionDependencies::class);
         $this->logger = $this->container->get(LoggerInterface::class);
         $this->profiler = $this->container->get(ProfilerInterface::class);
-        $this->connection = $this->container->get(ConnectionInterface::class);
         $this->queryCache = $this->container->get(QueryCache::class);
         $this->schemaCache = $this->container->get(SchemaCache::class);
-
-        DatabaseFactory::initialize($this->container, []);
     }
 
     /**
@@ -126,8 +131,6 @@ class TestCase extends AbstractTestCase
      * @param string $method
      * @param array $args
      * @param bool $revoke whether to make method inaccessible after execution.
-     *
-     * @throws ReflectionException
      *
      * @return mixed
      */
@@ -200,8 +203,6 @@ class TestCase extends AbstractTestCase
      * @param string $propertyName
      * @param bool $revoke whether to make property inaccessible after getting.
      *
-     * @throws ReflectionException
-     *
      * @return mixed
      */
     protected function getInaccessibleProperty(object $object, string $propertyName, bool $revoke = true)
@@ -244,8 +245,6 @@ class TestCase extends AbstractTestCase
      * @param string $propertyName
      * @param $value
      * @param bool $revoke whether to make property inaccessible after setting
-     *
-     * @throws ReflectionException
      */
     protected function setInaccessibleProperty(object $object, string $propertyName, $value, bool $revoke = true): void
     {
@@ -285,6 +284,7 @@ class TestCase extends AbstractTestCase
             ],
 
             LoggerInterface::class => Logger::class,
+
             ProfilerInterface::class => Profiler::class,
 
             ConnectionInterface::class => [

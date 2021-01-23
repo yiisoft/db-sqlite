@@ -4,26 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use function array_column;
-use function array_filter;
-use function array_merge;
 use Generator;
-use function implode;
-use function is_float;
-use function is_string;
 use JsonException;
-use function ltrim;
-use function reset;
-use function strpos;
-use function strrpos;
-use function substr;
 use Throwable;
-use function trim;
-use function version_compare;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
-
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\InvalidParamException;
 use Yiisoft\Db\Exception\NotSupportedException;
@@ -37,6 +23,20 @@ use Yiisoft\Db\Query\QueryBuilder as BaseQueryBuilder;
 use Yiisoft\Db\Sqlite\Condition\InConditionBuilder;
 use Yiisoft\Db\Sqlite\Condition\LikeConditionBuilder;
 use Yiisoft\Strings\NumericHelper;
+
+use function array_column;
+use function array_filter;
+use function array_merge;
+use function implode;
+use function is_float;
+use function is_string;
+use function ltrim;
+use function reset;
+use function strpos;
+use function strrpos;
+use function substr;
+use function trim;
+use function version_compare;
 
 final class QueryBuilder extends BaseQueryBuilder
 {

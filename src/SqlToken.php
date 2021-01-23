@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use function array_splice;
 use ArrayAccess;
+
+use function array_splice;
 use function count;
 use function end;
 use function in_array;
