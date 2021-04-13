@@ -127,7 +127,7 @@ final class ConnectionTest extends TestCase
         $db->setSlaves(
             '1',
             [
-                '__class' => Connection::class,
+                'class' => Connection::class,
                 '__construct()' => [
                     'dsn' => 'sqlite:' . __DIR__ . '/Data/yii_test_slave.sq3',
                 ],
@@ -305,7 +305,7 @@ final class ConnectionTest extends TestCase
         $db->setMasters(
             '1',
             [
-                '__class' => Connection::class,
+                'class' => Connection::class,
                 '__construct()' => [
                     'dsn' => 'sqlite:' . __DIR__ . '/Data/yii_test_master.sq3',
                 ],
@@ -338,7 +338,7 @@ final class ConnectionTest extends TestCase
         $db->setMasters(
             '1',
             [
-                '__class' => Connection::class,
+                'class' => Connection::class,
                 '__construct()' => [
                     'dsn' => 'host:invalid',
                 ],
@@ -371,7 +371,7 @@ final class ConnectionTest extends TestCase
         $db->setMasters(
             '1',
             [
-                '__class' => Connection::class,
+                'class' => Connection::class,
                 '__construct()' => [
                     'dsn' => 'sqlite:' . __DIR__ . '/Data/yii_test_master.sq3',
                 ],
@@ -401,7 +401,7 @@ final class ConnectionTest extends TestCase
         $db->setMasters(
             '1',
             [
-                '__class' => Connection::class,
+                'class' => Connection::class,
                 '__construct()' => [
                     'dsn' => 'host:invalid',
                 ],
@@ -444,7 +444,7 @@ final class ConnectionTest extends TestCase
             $db->setMasters(
                 "$i",
                 [
-                    '__class' => Connection::class,
+                    'class' => Connection::class,
                     '__construct()' => [
                         'dsn' => 'sqlite:' . __DIR__ . "/Data/yii_test_master{$i}.sq3",
                     ],
@@ -458,7 +458,7 @@ final class ConnectionTest extends TestCase
             $db->setSlaves(
                 "$i",
                 [
-                    '__class' => Connection::class,
+                    'class' => Connection::class,
                     '__construct()' => [
                         'dsn' => 'sqlite:' . __DIR__ . "/Data/yii_test_slave{$i}.sq3",
                     ],
