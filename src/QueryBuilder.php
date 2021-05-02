@@ -793,6 +793,7 @@ final class QueryBuilder extends BaseQueryBuilder
      *
      * @return array the generated SQL statement (the first array element) and the corresponding parameters to be bound
      * to the SQL statement (the second array element). The parameters returned include those provided in `$params`.
+     * @psalm-return array{string, array<array-key, mixed>}
      */
     public function build(Query $query, array $params = []): array
     {
