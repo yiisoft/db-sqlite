@@ -262,7 +262,7 @@ final class ConnectionTest extends TestCase
         $this->assertFalse($db->isActive());
         $this->assertNull($db->getPDO());
 
-        $db = new Connection('unknown::memory:', $this->queryCache);
+        $db = new Connection('unknown::memory:', $this->queryCache, $this->schemaCache);
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('could not find driver');

@@ -93,6 +93,10 @@ class TestCase extends AbstractTestCase
      */
     protected function getConnection($reset = false): Connection
     {
+        if ($reset === false && isset($this->connection)) {
+            return $this->connection;
+        }
+
         if ($reset === false) {
             return $this->createConnection($this->params()['yiisoft/db-sqlite']['dsn']);
         }
