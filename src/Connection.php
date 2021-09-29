@@ -18,10 +18,12 @@ use function substr;
  */
 final class Connection extends AbstractConnection
 {
+    private QueryCache $queryCache;
     private SchemaCache $schemaCache;
 
     public function __construct(string $dsn, QueryCache $queryCache, SchemaCache $schemaCache)
     {
+        $this->queryCache = $queryCache;
         $this->schemaCache = $schemaCache;
 
         parent::__construct($dsn, $queryCache);
@@ -41,7 +43,7 @@ final class Connection extends AbstractConnection
             $sql = $this->quoteSql($sql);
         }
 
-        $command = new Command($this, $sql);
+        $command = new Command($this, $this->queryCache, $sql);
 
         if ($this->getLogger() !== null) {
             $command->setLogger($this->getLogger());
