@@ -112,8 +112,6 @@ class TestCase extends AbstractTestCase
     {
         $this->container = new Container($this->config());
 
-        DatabaseFactory::initialize($this->container);
-
         $this->aliases = $this->container->get(Aliases::class);
         $this->cache = $this->container->get(CacheInterface::class);
         $this->connection = $this->container->get(ConnectionInterface::class);
@@ -122,6 +120,13 @@ class TestCase extends AbstractTestCase
         $this->profiler = $this->container->get(ProfilerInterface::class);
         $this->queryCache = $this->container->get(QueryCache::class);
         $this->schemaCache = $this->container->get(SchemaCache::class);
+
+        DatabaseFactory::initialize(
+            $this->container,
+            [
+                SchemaCache::class => $this->schemaCache,
+            ],
+        );
     }
 
     /**
@@ -307,7 +312,7 @@ class TestCase extends AbstractTestCase
         if ($dsn !== null) {
             $this->configContainer();
 
-            $db = DatabaseFactory::createClass(
+            $db = DatabaseFactory::connection(
                 [
                     'class' => Connection::class,
                     '__construct()' => [

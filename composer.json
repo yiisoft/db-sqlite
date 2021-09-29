@@ -22,7 +22,7 @@
         "ext-mbstring": "*",
         "ext-pdo": "*",
         "yiisoft/arrays": "^1.0",
-        "yiisoft/db": "^3.0@dev",
+        "yiisoft/db": "dev-move-schemacache-to-schema-class as 3.0",
         "yiisoft/strings": "^2.0"
     },
     "require-dev": {
@@ -34,7 +34,8 @@
         "yiisoft/aliases": "^1.1|^2.0",
         "yiisoft/di": "^3.0@dev",
         "yiisoft/json": "^1.0",
-        "yiisoft/log": "^1.0"
+        "yiisoft/log": "^1.0",
+        "yiisoft/test-support": " ^1.0@dev"
     },
     "autoload": {
         "psr-4": {
@@ -57,5 +58,11 @@
     "scripts": {
         "test": "phpunit --testdox --no-interaction",
         "test-watch": "phpunit-watcher watch"
-    }
+    },
+    "repositories": [
+        {
+            "type": "github",
+            "url": "https://github.com/terabytesoftw/db"
+        }
+    ]
 }
