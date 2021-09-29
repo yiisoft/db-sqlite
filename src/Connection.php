@@ -43,6 +43,14 @@ final class Connection extends AbstractConnection
 
         $command = new Command($this, $sql);
 
+        if ($this->getLogger() !== null) {
+            $command->setLogger($this->getLogger());
+        }
+
+        if ($this->getProfiler() !== null) {
+            $command->setProfiler($this->getProfiler());
+        }
+
         return $command->bindValues($params);
     }
 
