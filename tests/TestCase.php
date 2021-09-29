@@ -7,8 +7,6 @@ namespace Yiisoft\Db\Sqlite\Tests;
 use PHPUnit\Framework\TestCase as AbstractTestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use ReflectionClass;
-use ReflectionObject;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
@@ -18,7 +16,6 @@ use Yiisoft\Db\Cache\SchemaCache;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Factory\DatabaseFactory;
-use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Sqlite\Connection;
 use Yiisoft\Db\Sqlite\Tests\TestSupport\TestTrait;
 use Yiisoft\Definitions\DynamicReference;
@@ -30,7 +27,6 @@ use Yiisoft\Profiler\ProfilerInterface;
 
 use function explode;
 use function file_get_contents;
-use function str_replace;
 use function trim;
 
 class TestCase extends AbstractTestCase
