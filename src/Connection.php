@@ -7,7 +7,6 @@ namespace Yiisoft\Db\Sqlite;
 use PDO;
 use Yiisoft\Db\Connection\Connection as AbstractConnection;
 use Yiisoft\Db\Factory\DatabaseFactory;
-use Yiisoft\Db\Cache\SchemaCache;
 
 use function constant;
 use function strncmp;
