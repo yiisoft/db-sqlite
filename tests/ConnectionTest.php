@@ -43,26 +43,26 @@ final class ConnectionTest extends TestCase
         $db->setEmulatePrepare(true);
 
         /* profiling and logging */
-        $db->setEnableLogging(true);
-        $db->setEnableProfiling(true);
+        $db->setLogger($this->logger);
+        $db->setProfiler($this->profiler);
 
         $this->runExceptionTest($db);
 
         /* profiling only */
-        $db->setEnableLogging(false);
-        $db->setEnableProfiling(true);
+        $db->setLogger();
+        $db->setProfiler($this->profiler);
 
         $this->runExceptionTest($db);
 
         /* logging only */
-        $db->setEnableLogging(true);
-        $db->setEnableProfiling(false);
+        $db->setLogger($this->logger);
+        $db->setProfiler();
 
         $this->runExceptionTest($db);
 
         /* disabled */
-        $db->setEnableLogging(false);
-        $db->setEnableProfiling(false);
+        $db->setLogger();
+        $db->setProfiler();
 
         $this->runExceptionTest($db);
     }
@@ -262,7 +262,7 @@ final class ConnectionTest extends TestCase
         $this->assertFalse($db->isActive());
         $this->assertNull($db->getPDO());
 
-        $db = new Connection('unknown::memory:', $this->dependencies);
+        $db = new Connection('unknown::memory:', $this->queryCache);
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('could not find driver');

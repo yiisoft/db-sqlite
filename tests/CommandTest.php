@@ -26,7 +26,7 @@ final class CommandTest extends TestCase
 
     public function testAutoQuoting(): void
     {
-        $db = $this->getConnection(false);
+        $db = $this->getConnection();
 
         $sql = 'SELECT [[id]], [[t.name]] FROM {{customer}} t';
 
@@ -37,7 +37,7 @@ final class CommandTest extends TestCase
 
     public function testForeingKeyException(): void
     {
-        $db = $this->getConnection(false);
+        $db = $this->getConnection();
 
         $db->createCommand('PRAGMA foreign_keys = ON')->execute();
 

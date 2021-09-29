@@ -16,13 +16,14 @@ use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Db\Cache\QueryCache;
 use Yiisoft\Db\Cache\SchemaCache;
 use Yiisoft\Db\Connection\ConnectionInterface;
-use Yiisoft\Db\Connection\LazyConnectionDependencies;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Factory\DatabaseFactory;
+use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Sqlite\Connection;
-use Yiisoft\Db\TestUtility\IsOneOfAssert;
-use Yiisoft\Di\Container;
+use Yiisoft\Db\Sqlite\Tests\TestSupport\TestTrait;
+use Yiisoft\Definitions\DynamicReference;
 use Yiisoft\Definitions\Reference;
+use Yiisoft\Di\Container;
 use Yiisoft\Log\Logger;
 use Yiisoft\Profiler\Profiler;
 use Yiisoft\Profiler\ProfilerInterface;
@@ -34,6 +35,8 @@ use function trim;
 
 class TestCase extends AbstractTestCase
 {
+    use TestTrait;
+
     protected array $dataProvider;
     protected string $likeEscapeCharSql = '';
     protected array $likeParameterReplacements = [];
@@ -41,7 +44,6 @@ class TestCase extends AbstractTestCase
     protected CacheInterface $cache;
     protected Connection $connection;
     protected ContainerInterface $container;
-    protected LazyConnectionDependencies $dependencies;
     protected LoggerInterface $logger;
     protected ProfilerInterface $profiler;
     protected QueryCache $queryCache;
@@ -66,46 +68,11 @@ class TestCase extends AbstractTestCase
             $this->connection,
             $this->container,
             $this->dataProvider,
-            $this->dependencies,
             $this->logger,
             $this->queryCache,
             $this->schemaCache,
             $this->profiler
         );
-    }
-
-    protected function buildKeyCache(array $key): string
-    {
-        $jsonKey = json_encode($key, JSON_THROW_ON_ERROR);
-
-        return md5($jsonKey);
-    }
-
-    /**
-     * Asserting two strings equality ignoring line endings.
-     *
-     * @param string $expected
-     * @param string $actual
-     * @param string $message
-     */
-    protected function assertEqualsWithoutLE(string $expected, string $actual, string $message = ''): void
-    {
-        $expected = str_replace("\r\n", "\n", $expected);
-        $actual = str_replace("\r\n", "\n", $actual);
-
-        $this->assertEquals($expected, $actual, $message);
-    }
-
-    /**
-     * Asserts that value is one of expected values.
-     *
-     * @param mixed $actual
-     * @param array $expected
-     * @param string $message
-     */
-    protected function assertIsOneOf($actual, array $expected, $message = ''): void
-    {
-        self::assertThat($actual, new IsOneOfAssert($expected), $message);
     }
 
     protected function configContainer(): void
@@ -115,44 +82,12 @@ class TestCase extends AbstractTestCase
         $this->aliases = $this->container->get(Aliases::class);
         $this->cache = $this->container->get(CacheInterface::class);
         $this->connection = $this->container->get(ConnectionInterface::class);
-        $this->dependencies = $this->container->get(LazyConnectionDependencies::class);
         $this->logger = $this->container->get(LoggerInterface::class);
         $this->profiler = $this->container->get(ProfilerInterface::class);
         $this->queryCache = $this->container->get(QueryCache::class);
         $this->schemaCache = $this->container->get(SchemaCache::class);
 
-        DatabaseFactory::initialize(
-            $this->container,
-            [
-                SchemaCache::class => $this->schemaCache,
-            ],
-        );
-    }
-
-    /**
-     * Invokes a inaccessible method.
-     *
-     * @param object $object
-     * @param string $method
-     * @param array $args
-     * @param bool $revoke whether to make method inaccessible after execution.
-     *
-     * @return mixed
-     */
-    protected function invokeMethod(object $object, string $method, array $args = [], bool $revoke = true)
-    {
-        $reflection = new ReflectionObject($object);
-
-        $method = $reflection->getMethod($method);
-
-        $method->setAccessible(true);
-
-        $result = $method->invokeArgs($object, $args);
-
-        if ($revoke) {
-            $method->setAccessible(false);
-        }
-        return $result;
+        DatabaseFactory::initialize($this->container, []);
     }
 
     /**
@@ -162,13 +97,8 @@ class TestCase extends AbstractTestCase
      */
     protected function getConnection($reset = false): Connection
     {
-        if ($reset === false && isset($this->connection)) {
-            return $this->connection;
-        }
-
         if ($reset === false) {
-            $this->configContainer();
-            return $this->connection;
+            return $this->createConnection($this->params()['yiisoft/db-sqlite']['dsn']);
         }
 
         try {
@@ -198,75 +128,6 @@ class TestCase extends AbstractTestCase
                     $this->connection->getPDO()->exec($line);
                 }
             }
-        }
-    }
-
-    /**
-     * Gets an inaccessible object property.
-     *
-     * @param object $object
-     * @param string $propertyName
-     * @param bool $revoke whether to make property inaccessible after getting.
-     *
-     * @return mixed
-     */
-    protected function getInaccessibleProperty(object $object, string $propertyName, bool $revoke = true)
-    {
-        $class = new ReflectionClass($object);
-
-        while (!$class->hasProperty($propertyName)) {
-            $class = $class->getParentClass();
-        }
-
-        $property = $class->getProperty($propertyName);
-
-        $property->setAccessible(true);
-
-        $result = $property->getValue($object);
-
-        if ($revoke) {
-            $property->setAccessible(false);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Adjust dbms specific escaping.
-     *
-     * @param array|string $sql
-     *
-     * @return string
-     */
-    protected function replaceQuotes($sql): string
-    {
-        return str_replace(['[[', ']]'], '`', $sql);
-    }
-
-    /**
-     * Sets an inaccessible object property to a designated value.
-     *
-     * @param object $object
-     * @param string $propertyName
-     * @param $value
-     * @param bool $revoke whether to make property inaccessible after setting
-     */
-    protected function setInaccessibleProperty(object $object, string $propertyName, $value, bool $revoke = true): void
-    {
-        $class = new ReflectionClass($object);
-
-        while (!$class->hasProperty($propertyName)) {
-            $class = $class->getParentClass();
-        }
-
-        $property = $class->getProperty($propertyName);
-
-        $property->setAccessible(true);
-
-        $property->setValue($object, $value);
-
-        if ($revoke) {
-            $property->setAccessible(false);
         }
     }
 
@@ -301,6 +162,8 @@ class TestCase extends AbstractTestCase
                 '__construct()' => [
                     'dsn' => $params['yiisoft/db-sqlite']['dsn'],
                 ],
+                'setLogger()' => [DynamicReference::to(LoggerInterface::class)],
+                'setProfiler()' => [DynamicReference::to(ProfilerInterface::class)],
             ],
         ];
     }
@@ -311,15 +174,7 @@ class TestCase extends AbstractTestCase
 
         if ($dsn !== null) {
             $this->configContainer();
-
-            $db = DatabaseFactory::connection(
-                [
-                    'class' => Connection::class,
-                    '__construct()' => [
-                        'dsn' => $dsn,
-                    ],
-                ]
-            );
+            $db = DatabaseFactory::connection(['class' => Connection::class, '__construct()' => ['dsn' => $dsn]]);
         }
 
         return $db;

@@ -6,6 +6,8 @@ namespace Yiisoft\Db\Sqlite;
 
 use PDO;
 use Yiisoft\Db\Connection\Connection as AbstractConnection;
+use Yiisoft\Db\Cache\QueryCache;
+use Yiisoft\Db\Cache\SchemaCache;
 use Yiisoft\Db\Factory\DatabaseFactory;
 
 use function constant;
@@ -17,6 +19,15 @@ use function substr;
  */
 final class Connection extends AbstractConnection
 {
+    private SchemaCache $schemaCache;
+
+    public function __construct(string $dsn, QueryCache $queryCache, SchemaCache $schemaCache)
+    {
+        $this->schemaCache = $schemaCache;
+
+        parent::__construct($dsn, $queryCache);
+    }
+
     /**
      * Creates a command for execution.
      *
@@ -43,7 +54,7 @@ final class Connection extends AbstractConnection
      */
     public function getSchema(): Schema
     {
-        return new Schema($this, DatabaseFactory::schemaCache());
+        return new Schema($this, $this->schemaCache);
     }
 
     /**
