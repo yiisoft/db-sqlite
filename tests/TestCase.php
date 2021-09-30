@@ -133,7 +133,7 @@ class TestCase extends AbstractTestCase
         $connection->setLogger($logger);
         $connection->setProfiler($profiler);
 
-        $simpleContainer = new SimpleContainer(
+        return new SimpleContainer(
             [
                 Aliases::class => $aliases,
                 CacheInterface::class => $cache,
@@ -144,8 +144,6 @@ class TestCase extends AbstractTestCase
                 ConnectionInterface::class => $connection,
             ]
         );
-
-        return $simpleContainer;
     }
 
     protected function createConnection(string $dsn = null): ?Connection
