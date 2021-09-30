@@ -126,12 +126,7 @@ final class ConnectionTest extends TestCase
 
         $db->setSlaves(
             '1',
-            [
-                'class' => Connection::class,
-                '__construct()' => [
-                    'dsn' => 'sqlite:' . __DIR__ . '/Data/yii_test_slave.sq3',
-                ],
-            ]
+            $this->createConnection('sqlite:' . __DIR__ . '/Data/yii_test_slave.sq3'),
         );
 
         $this->assertNotNull($db->getSlavePdo(false));
@@ -262,7 +257,7 @@ final class ConnectionTest extends TestCase
         $this->assertFalse($db->isActive());
         $this->assertNull($db->getPDO());
 
-        $db = new Connection('unknown::memory:', $this->queryCache, $this->schemaCache);
+        $db = $this->createConnection('unknown::memory:');
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('could not find driver');
@@ -304,12 +299,7 @@ final class ConnectionTest extends TestCase
 
         $db->setMasters(
             '1',
-            [
-                'class' => Connection::class,
-                '__construct()' => [
-                    'dsn' => 'sqlite:' . __DIR__ . '/Data/yii_test_master.sq3',
-                ],
-            ]
+            $this->createConnection('sqlite:' . __DIR__ . '/Data/yii_test_master.sq3'),
         );
 
         $db->setShuffleMasters(false);
@@ -337,12 +327,7 @@ final class ConnectionTest extends TestCase
 
         $db->setMasters(
             '1',
-            [
-                'class' => Connection::class,
-                '__construct()' => [
-                    'dsn' => 'host:invalid',
-                ],
-            ]
+            $this->createConnection('host:invalid'),
         );
 
         $db->setShuffleMasters(true);
@@ -370,12 +355,7 @@ final class ConnectionTest extends TestCase
 
         $db->setMasters(
             '1',
-            [
-                'class' => Connection::class,
-                '__construct()' => [
-                    'dsn' => 'sqlite:' . __DIR__ . '/Data/yii_test_master.sq3',
-                ],
-            ]
+            $this->createConnection('sqlite:' . __DIR__ . '/Data/yii_test_master.sq3'),
         );
 
         $this->schemaCache->setEnable(false);
@@ -400,12 +380,7 @@ final class ConnectionTest extends TestCase
 
         $db->setMasters(
             '1',
-            [
-                'class' => Connection::class,
-                '__construct()' => [
-                    'dsn' => 'host:invalid',
-                ],
-            ]
+            $this->createConnection('host:invalid'),
         );
 
         try {
@@ -443,12 +418,7 @@ final class ConnectionTest extends TestCase
 
             $db->setMasters(
                 "$i",
-                [
-                    'class' => Connection::class,
-                    '__construct()' => [
-                        'dsn' => 'sqlite:' . __DIR__ . "/Data/yii_test_master{$i}.sq3",
-                    ],
-                ]
+                $this->createConnection('sqlite:' . __DIR__ . "/Data/yii_test_master{$i}.sq3"),
             );
         }
 
@@ -457,12 +427,7 @@ final class ConnectionTest extends TestCase
 
             $db->setSlaves(
                 "$i",
-                [
-                    'class' => Connection::class,
-                    '__construct()' => [
-                        'dsn' => 'sqlite:' . __DIR__ . "/Data/yii_test_slave{$i}.sq3",
-                    ],
-                ]
+                $this->createConnection('sqlite:' . __DIR__ . "/Data/yii_test_slave{$i}.sq3"),
             );
         }
 

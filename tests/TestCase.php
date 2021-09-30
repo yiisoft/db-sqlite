@@ -15,7 +15,6 @@ use Yiisoft\Db\Cache\QueryCache;
 use Yiisoft\Db\Cache\SchemaCache;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Factory\DatabaseFactory;
 use Yiisoft\Db\Sqlite\Connection;
 use Yiisoft\Db\Sqlite\Tests\TestSupport\TestTrait;
 use Yiisoft\Definitions\DynamicReference;
@@ -82,8 +81,6 @@ class TestCase extends AbstractTestCase
         $this->profiler = $this->container->get(ProfilerInterface::class);
         $this->queryCache = $this->container->get(QueryCache::class);
         $this->schemaCache = $this->container->get(SchemaCache::class);
-
-        DatabaseFactory::initialize($this->container, []);
     }
 
     /**
@@ -173,8 +170,8 @@ class TestCase extends AbstractTestCase
         $db = null;
 
         if ($dsn !== null) {
-            $this->configContainer();
-            $db = DatabaseFactory::connection(['class' => Connection::class, '__construct()' => ['dsn' => $dsn]]);
+            $cache = new Cache(new ArrayCache());
+            $db = new Connection($dsn, new QueryCache($cache), new SchemaCache($cache));
         }
 
         return $db;
