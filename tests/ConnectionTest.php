@@ -124,7 +124,7 @@ final class ConnectionTest extends TestCase
     {
         $db = $this->getConnection();
 
-        $db->setSlaves(
+        $db->setSlave(
             '1',
             $this->createConnection('sqlite:' . __DIR__ . '/Runtime/yii_test_slave.sq3'),
         );
@@ -297,7 +297,7 @@ final class ConnectionTest extends TestCase
 
         $db = $this->getConnection(true);
 
-        $db->setMasters(
+        $db->setMaster(
             '1',
             $this->createConnection('sqlite:' . __DIR__ . '/Runtime/yii_test_master.sq3'),
         );
@@ -325,7 +325,7 @@ final class ConnectionTest extends TestCase
             ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', 'host:invalid']
         );
 
-        $db->setMasters(
+        $db->setMaster(
             '1',
             $this->createConnection('host:invalid'),
         );
@@ -353,7 +353,7 @@ final class ConnectionTest extends TestCase
 
         $db = $this->getConnection();
 
-        $db->setMasters(
+        $db->setMaster(
             '1',
             $this->createConnection('sqlite:' . __DIR__ . '/Runtime/yii_test_master.sq3'),
         );
@@ -378,7 +378,7 @@ final class ConnectionTest extends TestCase
             ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', 'host:invalid']
         );
 
-        $db->setMasters(
+        $db->setMaster(
             '1',
             $this->createConnection('host:invalid'),
         );
@@ -416,7 +416,7 @@ final class ConnectionTest extends TestCase
         for ($i = 0; $i < $masterCount; ++$i) {
             $this->prepareDatabase('sqlite:' . __DIR__ . "/Runtime/yii_test_master{$i}.sq3");
 
-            $db->setMasters(
+            $db->setMaster(
                 "$i",
                 $this->createConnection('sqlite:' . __DIR__ . "/Runtime/yii_test_master{$i}.sq3"),
             );
@@ -425,7 +425,7 @@ final class ConnectionTest extends TestCase
         for ($i = 0; $i < $slaveCount; ++$i) {
             $this->prepareDatabase('sqlite:' . __DIR__ . "/Runtime/yii_test_slave{$i}.sq3");
 
-            $db->setSlaves(
+            $db->setSlave(
                 "$i",
                 $this->createConnection('sqlite:' . __DIR__ . "/Runtime/yii_test_slave{$i}.sq3"),
             );

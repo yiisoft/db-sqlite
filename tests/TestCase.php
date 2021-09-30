@@ -20,7 +20,7 @@ class TestCase extends AbstractTestCase
     use TestTrait;
 
     protected const DB_DSN = 'sqlite:' . __DIR__ . '/Runtime/yiitest.sq3';
-    protected const DB_FIXTURES_PATH = __DIR__ . '/Runtime/sqlite.sql';
+    protected const DB_FIXTURES_PATH = __DIR__ . '/Fixture/sqlite.sql';
     protected array $dataProvider;
     protected string $likeEscapeCharSql = '';
     protected array $likeParameterReplacements = [];
