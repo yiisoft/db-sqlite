@@ -17,12 +17,10 @@ use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Sqlite\Connection;
 use Yiisoft\Db\Sqlite\Tests\TestSupport\TestTrait;
-use Yiisoft\Definitions\DynamicReference;
-use Yiisoft\Definitions\Reference;
-use Yiisoft\Di\Container;
 use Yiisoft\Log\Logger;
 use Yiisoft\Profiler\Profiler;
 use Yiisoft\Profiler\ProfilerInterface;
+use Yiisoft\Test\Support\Container\SimpleContainer;
 
 use function explode;
 use function file_get_contents;
@@ -38,7 +36,6 @@ class TestCase extends AbstractTestCase
     protected Aliases $aliases;
     protected CacheInterface $cache;
     protected Connection $connection;
-    protected ContainerInterface $container;
     protected LoggerInterface $logger;
     protected ProfilerInterface $profiler;
     protected QueryCache $queryCache;
@@ -48,7 +45,15 @@ class TestCase extends AbstractTestCase
     {
         parent::setUp();
 
-        $this->configContainer();
+        $container = $this->createContainer();
+
+        $this->aliases = $container->get(Aliases::class);
+        $this->cache = $container->get(CacheInterface::class);
+        $this->connection = $container->get(ConnectionInterface::class);
+        $this->logger = $container->get(LoggerInterface::class);
+        $this->profiler = $container->get(ProfilerInterface::class);
+        $this->queryCache = $container->get(QueryCache::class);
+        $this->schemaCache = $container->get(SchemaCache::class);
     }
 
     protected function tearDown(): void
@@ -61,26 +66,12 @@ class TestCase extends AbstractTestCase
             $this->aliases,
             $this->cache,
             $this->connection,
-            $this->container,
             $this->dataProvider,
             $this->logger,
             $this->queryCache,
             $this->schemaCache,
             $this->profiler
         );
-    }
-
-    protected function configContainer(): void
-    {
-        $this->container = new Container($this->config());
-
-        $this->aliases = $this->container->get(Aliases::class);
-        $this->cache = $this->container->get(CacheInterface::class);
-        $this->connection = $this->container->get(ConnectionInterface::class);
-        $this->logger = $this->container->get(LoggerInterface::class);
-        $this->profiler = $this->container->get(ProfilerInterface::class);
-        $this->queryCache = $this->container->get(QueryCache::class);
-        $this->schemaCache = $this->container->get(SchemaCache::class);
     }
 
     /**
@@ -128,41 +119,33 @@ class TestCase extends AbstractTestCase
         }
     }
 
-    private function config(): array
+    private function createContainer(): ContainerInterface
     {
-        $params = $this->params();
+        $aliases = new Aliases(
+            ['@root' => dirname(__DIR__, 1), '@data' => '@root/tests/Data', '@runtime' => '@data/runtime']
+        );
+        $cache = new Cache(new ArrayCache());
+        $logger = new Logger();
+        $profiler = new Profiler($logger);
+        $queryCache = new QueryCache($cache);
+        $schemaCache = new SchemaCache($cache);
+        $connection = new Connection($this->params()['yiisoft/db-sqlite']['dsn'], $queryCache, $schemaCache);
+        $connection->setLogger($logger);
+        $connection->setProfiler($profiler);
 
-        return [
-            Aliases::class => [
-                '__construct()' => [
-                    [
-                        '@root' => dirname(__DIR__, 1),
-                        '@data' => '@root/tests/Data',
-                        '@runtime' => '@data/runtime',
-                    ],
-                ],
-            ],
+        $simpleContainer = new SimpleContainer(
+            [
+                Aliases::class => $aliases,
+                CacheInterface::class => $cache,
+                LoggerInterface::class => $logger,
+                ProfilerInterface::class => $profiler,
+                QueryCache::class => $queryCache,
+                SchemaCache::class => $schemaCache,
+                ConnectionInterface::class => $connection,
+            ]
+        );
 
-            CacheInterface::class => [
-                'class' => Cache::class,
-                '__construct()' => [
-                    Reference::to(ArrayCache::class),
-                ],
-            ],
-
-            LoggerInterface::class => Logger::class,
-
-            ProfilerInterface::class => Profiler::class,
-
-            ConnectionInterface::class => [
-                'class' => Connection::class,
-                '__construct()' => [
-                    'dsn' => $params['yiisoft/db-sqlite']['dsn'],
-                ],
-                'setLogger()' => [DynamicReference::to(LoggerInterface::class)],
-                'setProfiler()' => [DynamicReference::to(ProfilerInterface::class)],
-            ],
-        ];
+        return $simpleContainer;
     }
 
     protected function createConnection(string $dsn = null): ?Connection
