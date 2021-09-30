@@ -5,15 +5,9 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests;
 
 use PHPUnit\Framework\TestCase as AbstractTestCase;
-use Psr\Container\ContainerInterface;
 use Yiisoft\Db\Connection\ConnectionInterface;
-use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Sqlite\Connection;
 use Yiisoft\Db\TestUtility\TestTrait;
-
-use function explode;
-use function file_get_contents;
-use function trim;
 
 class TestCase extends AbstractTestCase
 {
