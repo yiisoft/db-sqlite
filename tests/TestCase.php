@@ -52,4 +52,16 @@ class TestCase extends AbstractTestCase
 
         return $db;
     }
+
+    /**
+     * Adjust dbms specific escaping.
+     *
+     * @param array|string $sql
+     *
+     * @return string
+     */
+    protected function replaceQuotes($sql): string
+    {
+        return str_replace(['[[', ']]'], '`', $sql);
+    }
 }
