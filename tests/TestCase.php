@@ -13,8 +13,13 @@ class TestCase extends AbstractTestCase
 {
     use TestTrait;
 
+    protected const DB_CONNECTION_CLASS = \Yiisoft\Db\Sqlite\Connection::class;
+    protected const DB_DRIVERNAME = 'sqlite';
     protected const DB_DSN = 'sqlite:' . __DIR__ . '/Runtime/yiitest.sq3';
     protected const DB_FIXTURES_PATH = __DIR__ . '/Fixture/sqlite.sql';
+    protected const DB_USERNAME = '';
+    protected const DB_PASSWORD = '';
+    protected const DB_CHARSET = 'UTF8';
     protected array $dataProvider;
     protected string $likeEscapeCharSql = '';
     protected array $likeParameterReplacements = [];
@@ -38,30 +43,5 @@ class TestCase extends AbstractTestCase
             $this->schemaCache,
             $this->profiler
         );
-    }
-
-    protected function createConnection(string $dsn = null): ?ConnectionInterface
-    {
-        $db = null;
-
-        if ($dsn !== null) {
-            $db = new Connection($dsn, $this->createQueryCache(), $this->createSchemaCache());
-            $db->setLogger($this->createLogger());
-            $db->setProfiler($this->createProfiler());
-        }
-
-        return $db;
-    }
-
-    /**
-     * Adjust dbms specific escaping.
-     *
-     * @param array|string $sql
-     *
-     * @return string
-     */
-    protected function replaceQuotes($sql): string
-    {
-        return str_replace(['[[', ']]'], '`', $sql);
     }
 }
