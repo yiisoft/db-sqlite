@@ -22,7 +22,7 @@
         "ext-mbstring": "*",
         "ext-pdo": "*",
         "yiisoft/arrays": "^1.0",
-        "yiisoft/db": "^3.0@dev",
+        "yiisoft/db": "^3.0",
         "yiisoft/strings": "^2.0"
     },
     "require-dev": {
@@ -32,7 +32,6 @@
         "spatie/phpunit-watcher": "^1.23",
         "vimeo/psalm": "^4.4",
         "yiisoft/aliases": "^1.1|^2.0",
-        "yiisoft/di": "^3.0@dev",
         "yiisoft/json": "^1.0",
         "yiisoft/log": "^1.0"
     },
