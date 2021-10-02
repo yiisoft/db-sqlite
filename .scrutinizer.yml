@@ -5,16 +5,34 @@ filter:
     paths:
         - "src/*"
 
-tools:
-    php_code_coverage:
-        enabled: true
-
 build:
+    environment:
+        php:
+            version: 8.0.11
+
     nodes:
         analysis:
-            environment:
-                php: 7.4.12
-
             tests:
                 override:
                     - php-scrutinizer-run
+
+        tests-and-coverage:
+            dependencies:
+                override:
+                    - wget https://sqlite.org/2021/sqlite-autoconf-3340100.tar.gz --no-check-certificate
+                    - tar -xvf sqlite-autoconf-3340100.tar.gz && cd sqlite-autoconf-3340100
+                    - ./configure
+                    - make
+                    - sudo make install
+                    - export PATH="/usr/local/lib:$PATH"
+                    - cd ..
+                    - composer self-update
+                    - composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader --ansi
+
+                override:
+                    -
+                        command: "./vendor/bin/phpunit --coverage-clover ./coverage.xml"
+                        on_node: 1
+                        coverage:
+                            file: coverage.xml
+                            format: php-clover
