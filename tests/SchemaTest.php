@@ -456,4 +456,43 @@ final class SchemaTest extends TestCase
         $this->assertEquals($refreshedTable, $testRefreshedTable);
         $this->assertNotSame($testNoCacheTable, $testRefreshedTable);
     }
+
+    public function testsCountIndexUnique(): void
+    {
+        $db = $this->getConnection();
+
+        $tableName = 'test_uq';
+        $name = 'test_uq_constraint';
+
+        $schema = $db->getSchema();
+
+        if ($schema->getTableSchema($tableName) !== null) {
+            $db->createCommand()->dropTable($tableName)->execute();
+        }
+
+        $db->createCommand()->createTable($tableName, [
+            'int1' => 'integer not null',
+            'int2' => 'integer not null',
+        ])->execute();
+
+        $this->assertEmpty($schema->getTableIndexes($tableName, true));
+        $this->assertEmpty($schema->getTableUniques($tableName, true));
+
+        $db->createCommand()->addUnique($name, $tableName, ['int1'])->execute();
+
+        $this->assertCount(1, $schema->getTableIndexes($tableName, true));
+        $this->assertCount(1, $schema->getTableUniques($tableName, true));
+        $this->assertEquals(['int1'], $schema->getTableUniques($tableName, true)[0]->getColumnNames());
+
+        $db->createCommand()->dropUnique($name, $tableName)->execute();
+
+        $this->assertEmpty($schema->getTableIndexes($tableName, true));
+        $this->assertEmpty($schema->getTableUniques($tableName, true));
+
+        $db->createCommand()->addUnique($name, $tableName, ['int1', 'int2'])->execute();
+
+        $this->assertCount(1, $schema->getTableIndexes($tableName, true));
+        $this->assertCount(1, $schema->getTableUniques($tableName, true));
+        $this->assertEquals(['int1', 'int2'], $schema->getTableUniques($tableName, true)[0]->getColumnNames());
+    }
 }
