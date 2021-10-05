@@ -662,7 +662,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
     }
 
     /**
-     * @throws InvalidConfigException|Throwable|Exception
+     * @throws Exception|InvalidConfigException|Throwable
      */
     private function getPragmaInfo(string $name): array
     {
