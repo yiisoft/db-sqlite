@@ -547,7 +547,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
         ];
 
         foreach ($indexes as $index) {
-            $columns = $this->getPragmaInfo($index['name']);
+            $columns = $this->getPragmaIndexInfo($index['name']);
 
             if ($tableColumns !== null) {
                 /** SQLite may not have an "origin" column in INDEX_LIST */
@@ -595,7 +595,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
         $uniques = $this->normalizePdoRowKeyCase($uniqueIndex, true);
 
         foreach ($uniques as $unique) {
-            $columns = $this->getPragmaInfo($unique['name']);
+            $columns = $this->getPragmaIndexInfo($unique['name']);
 
             if ($unique['origin'] === 'u') {
                 $ct = (new Constraint())
@@ -664,7 +664,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
     /**
      * @throws Exception|InvalidConfigException|Throwable
      */
-    private function getPragmaInfo(string $name): array
+    private function getPragmaIndexInfo(string $name): array
     {
         $column = $this->getDb()->createCommand('PRAGMA INDEX_INFO (' . $this->quoteValue($name) . ')')->queryAll();
         $columns = $this->normalizePdoRowKeyCase($column, true);
