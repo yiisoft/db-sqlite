@@ -568,7 +568,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
 
             $result['indexes'][] = $ic;
 
-            if ($index['origin'] === 'u') {
+            if (($index['origin'] === 'u') || ($index['origin'] === 'c' && $index['unique'])) {
                 $ct = (new Constraint())
                     ->name($index['name'])
                     ->columnNames(ArrayHelper::getColumn($columns, 'name'));
@@ -579,30 +579,6 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
                     ->columnNames(ArrayHelper::getColumn($columns, 'name'));
 
                 $result['primaryKey'] = $ct;
-            }
-        }
-
-        $uniqueIndex = $this->getDb()->createCommand(
-            "SELECT
-                '0' as 'seq',
-                name,
-                '1' as 'unique',
-                'u' as 'origin',
-                '0' as 'partial'
-            FROM sqlite_master
-            WHERE type='index' AND sql LIKE 'CREATE UNIQUE INDEX%' AND tbl_name='$tableName'"
-        )->queryAll();
-        $uniques = $this->normalizePdoRowKeyCase($uniqueIndex, true);
-
-        foreach ($uniques as $unique) {
-            $columns = $this->getPragmaIndexInfo($unique['name']);
-
-            if ($unique['origin'] === 'u') {
-                $ct = (new Constraint())
-                    ->name($unique['name'])
-                    ->columnNames(ArrayHelper::getColumn($columns, 'name'));
-
-                $result['uniques'][] = $ct;
             }
         }
 
