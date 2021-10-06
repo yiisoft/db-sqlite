@@ -26,7 +26,6 @@ use function count;
 use function explode;
 use function preg_match;
 use function strncasecmp;
-use function strncmp;
 use function strpos;
 use function strtolower;
 use function trim;
