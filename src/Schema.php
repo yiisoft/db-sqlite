@@ -555,8 +555,6 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
 
                 if (!empty($columns) && $tableColumns[$columns[0]['cid']]['pk'] > 0) {
                     $index['origin'] = 'pk';
-                } elseif ($index['unique'] && $this->isSystemIdentifier($index['name'])) {
-                    $index['origin'] = 'u';
                 }
             }
 
@@ -568,13 +566,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
 
             $result['indexes'][] = $ic;
 
-            if ($index['origin'] === 'u') {
-                $ct = (new Constraint())
-                    ->name($index['name'])
-                    ->columnNames(ArrayHelper::getColumn($columns, 'name'));
-
-                $result['uniques'][] = $ct;
-            } elseif ($index['origin'] === 'pk') {
+            if ($index['origin'] === 'pk') {
                 $ct = (new Constraint())
                     ->columnNames(ArrayHelper::getColumn($columns, 'name'));
 
