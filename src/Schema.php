@@ -610,20 +610,6 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
     }
 
     /**
-     * Return whether the specified identifier is a SQLite system identifier.
-     *
-     * @param string $identifier
-     *
-     * @return bool
-     *
-     * {@see https://www.sqlite.org/src/artifact/74108007d286232f}
-     */
-    private function isSystemIdentifier(string $identifier): bool
-    {
-        return strncmp($identifier, 'sqlite_', 7) === 0;
-    }
-
-    /**
      * Creates a column schema for the database.
      *
      * This method may be overridden by child classes to create a DBMS-specific column schema.
