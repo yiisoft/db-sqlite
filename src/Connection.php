@@ -67,22 +67,13 @@ final class Connection extends AbstractConnection
     }
 
     /**
-     * Creates the PDO instance.
+     * Returns the name of the DB driver.
      *
-     * This method is called by {@see open} to establish a DB connection. The default implementation will create a PHP
-     * PDO instance. You may override this method if the default PDO needs to be adapted for certain DBMS.
-     *
-     * @return PDO the pdo instance
+     * @return string name of the DB driver
      */
-    protected function createPdoInstance(): PDO
+    public function getDriverName(): string
     {
-        $dsn = $this->getDsn();
-
-        if (strncmp('sqlite:@', $dsn, 8) === 0) {
-            $dsn = 'sqlite:' . substr($dsn, 7);
-        }
-
-        return new PDO($dsn, $this->getUsername(), $this->getPassword(), $this->getAttributes());
+        return 'sqlite';
     }
 
     /**
@@ -98,24 +89,32 @@ final class Connection extends AbstractConnection
      */
     protected function initConnection(): void
     {
-        $pdo = $this->getPDO();
+        $pdo = $this->getPDO() ?? $this->createPdoInstance();
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        if ($pdo !== null) {
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            if ($this->getEmulatePrepare() !== null && constant('PDO::ATTR_EMULATE_PREPARES')) {
-                $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, $this->getEmulatePrepare());
-            }
+        if ($this->getEmulatePrepare() !== null && constant('PDO::ATTR_EMULATE_PREPARES')) {
+            $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, $this->getEmulatePrepare());
         }
+
+        $this->setPDO($pdo);
     }
 
     /**
-     * Returns the name of the DB driver.
+     * Creates the PDO instance.
      *
-     * @return string name of the DB driver
+     * This method is called by {@see open} to establish a DB connection. The default implementation will create a PHP
+     * PDO instance. You may override this method if the default PDO needs to be adapted for certain DBMS.
+     *
+     * @return PDO the pdo instance
      */
-    public function getDriverName(): string
+    private function createPdoInstance(): PDO
     {
-        return 'sqlite';
+        $dsn = $this->getDsn();
+
+        if (strncmp('sqlite:@', $dsn, 8) === 0) {
+            $dsn = 'sqlite:' . substr($dsn, 7);
+        }
+
+        return new PDO($dsn, $this->getUsername(), $this->getPassword(), $this->getAttributes());
     }
 }
