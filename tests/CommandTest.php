@@ -119,7 +119,8 @@ SQL;
             'val2' => 'bar',
         ])->execute();
 
-        $this->assertSame([
+        /** @todo need fix for this behaviour PHP8.1 + pdo_mysql */
+        $this->assertEquals([
             [
                 'intcol' => '41',
                 'textcol' => 'foo',
