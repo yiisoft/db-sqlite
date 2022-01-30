@@ -9,8 +9,6 @@ use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Arrays\ArraySorter;
 use Yiisoft\Db\Constraint\CheckConstraint;
 use Yiisoft\Db\Constraint\Constraint;
-use Yiisoft\Db\Constraint\ConstraintFinderInterface;
-use Yiisoft\Db\Constraint\ConstraintFinderTrait;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
 use Yiisoft\Db\Constraint\IndexConstraint;
 use Yiisoft\Db\Exception\Exception;
@@ -36,10 +34,8 @@ use function trim;
  * @property string $transactionIsolationLevel The transaction isolation level to use for this transaction. This can be
  * either {@see Transaction::READ_UNCOMMITTED} or {@see Transaction::SERIALIZABLE}.
  */
-final class Schema extends AbstractSchema implements ConstraintFinderInterface
+final class Schema extends AbstractSchema
 {
-    use ConstraintFinderTrait;
-
     /**
      * @var array mapping from physical column types (keys) to abstract column types (values)
      */
