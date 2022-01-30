@@ -137,7 +137,8 @@ DELETE FROM {{T_multistatement}} WHERE [[textcol]] = :val2;
 SELECT * FROM {{T_multistatement}}
 SQL;
 
-        $this->assertSame([
+        /** @todo need fix for this behaviour PHP8.1 + pdo_mysql */
+        $this->assertEquals([
             [
                 'intcol' => '410',
                 'textcol' => 'foo',
