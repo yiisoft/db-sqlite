@@ -32,7 +32,6 @@ final class SqlToken implements ArrayAccess
     public const TYPE_OPERATOR = 5;
     public const TYPE_IDENTIFIER = 6;
     public const TYPE_STRING_LITERAL = 7;
-
     private int $type = self::TYPE_TOKEN;
     private ?string $content = null;
     private ?int $startOffset = null;
@@ -157,11 +156,7 @@ final class SqlToken implements ArrayAccess
      */
     public function getIsCollection(): bool
     {
-        return in_array($this->type, [
-            self::TYPE_CODE,
-            self::TYPE_STATEMENT,
-            self::TYPE_PARENTHESIS,
-        ], true);
+        return in_array($this->type, [self::TYPE_CODE, self::TYPE_STATEMENT, self::TYPE_PARENTHESIS], true);
     }
 
     /**
@@ -181,13 +176,23 @@ final class SqlToken implements ArrayAccess
      */
     public function getSql(): string
     {
+        $sql = '';
         $code = $this;
 
         while ($code->parent !== null) {
             $code = $code->parent;
         }
 
-        return mb_substr($code->content, $this->startOffset, $this->endOffset - $this->startOffset, 'UTF-8');
+        if ($code->content !== null) {
+            $sql = mb_substr(
+                $code->content,
+                (int) $this->startOffset,
+                (int) $this->endOffset - (int) $this->startOffset,
+                'UTF-8',
+            );
+        }
+
+        return $sql;
     }
 
     /**
@@ -216,13 +221,13 @@ final class SqlToken implements ArrayAccess
         ?int &$firstMatchIndex = null,
         ?int &$lastMatchIndex = null
     ): bool {
-        if (!$patternToken->getHasChildren()) {
-            return false;
+        $result = false;
+
+        if ($patternToken->getHasChildren() && ($patternToken[0] instanceof self)) {
+            $result = $this->tokensMatch($patternToken[0], $this, $offset, $firstMatchIndex, $lastMatchIndex);
         }
 
-        $patternToken = $patternToken[0];
-
-        return $this->tokensMatch($patternToken, $this, $offset, $firstMatchIndex, $lastMatchIndex);
+        return $result;
     }
 
     /**
@@ -243,7 +248,10 @@ final class SqlToken implements ArrayAccess
         ?int &$firstMatchIndex = null,
         ?int &$lastMatchIndex = null
     ): bool {
-        if ($patternToken->getIsCollection() !== $token->getIsCollection() || (!$patternToken->getIsCollection() && $patternToken->content !== $token->content)) {
+        if (
+            $patternToken->getIsCollection() !== $token->getIsCollection() ||
+            (!$patternToken->getIsCollection() && $patternToken->content !== $token->content)
+        ) {
             return false;
         }
 
@@ -261,7 +269,7 @@ final class SqlToken implements ArrayAccess
              *  Here we iterate token by token with an exception of "any" that toggles an iteration until we matched
              *  with a next pattern token or EOF.
              */
-            if ($patternToken[$index]->content === 'any') {
+            if ($patternToken[$index] instanceof self && $patternToken[$index]->content === 'any') {
                 $wildcard = true;
                 continue;
             }
@@ -271,7 +279,11 @@ final class SqlToken implements ArrayAccess
                     break;
                 }
 
-                if (!$this->tokensMatch($patternToken[$index], $token[$offset])) {
+                if (
+                    $patternToken[$index] instanceof self &&
+                    $token[$offset] instanceof self  &&
+                    !$this->tokensMatch($patternToken[$index], $token[$offset])
+                ) {
                     continue;
                 }
 

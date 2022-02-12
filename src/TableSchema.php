@@ -8,11 +8,12 @@ use Yiisoft\Db\Schema\TableSchema as AbstractTableSchema;
 
 final class TableSchema extends AbstractTableSchema
 {
+    /**
+     * @psalm-var array<array-key, array>
+     */
     private array $foreignKeys = [];
 
     /**
-     * @return array foreign keys of this table. Each array element is of the following structure:
-     *
      * ```php
      * [
      *  'ForeignTableName',
@@ -20,6 +21,8 @@ final class TableSchema extends AbstractTableSchema
      *  'fk2' => 'pk2',  // if composite foreign key
      * ]
      * ```
+     *
+     * @return array foreign keys of this table. Each array element is of the following structure:
      */
     public function getForeignKeys(): array
     {
@@ -36,6 +39,9 @@ final class TableSchema extends AbstractTableSchema
         $this->foreignKeys[$id] = $to;
     }
 
+    /**
+     * @psalm-param array<array-key, array> $value
+     */
     public function foreignKeys(array $value): void
     {
         $this->foreignKeys = $value;
