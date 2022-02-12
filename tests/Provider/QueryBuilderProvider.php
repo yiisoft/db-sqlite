@@ -82,7 +82,6 @@ final class QueryBuilderProvider extends TestCase
         return $result;
     }
 
-
     public function deleteProvider(): array
     {
         return (new BaseQueryBuilderProvider($this->getConnection()))->deleteProvider();

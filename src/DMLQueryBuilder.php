@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use Generator;
 use InvalidArgumentException;
-use Throwable;
 use Yiisoft\Db\Constraint\Constraint;
-use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\DMLQueryBuilder as AbstractDMLQueryBuilder;

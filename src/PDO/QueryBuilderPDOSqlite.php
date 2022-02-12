@@ -5,15 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\PDO;
 
 use Generator;
-use JsonException;
-use Throwable;
 use Yiisoft\Db\Command\CommandInterface;
-use Yiisoft\Db\Connection\ConnectionInterface;
-use Yiisoft\Db\Constraint\Constraint;
-use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidArgumentException;
-use Yiisoft\Db\Exception\InvalidConfigException;
-use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionBuilder;
 use Yiisoft\Db\Expression\ExpressionInterface;
@@ -28,18 +20,11 @@ use Yiisoft\Db\Sqlite\Condition\InConditionBuilder;
 use Yiisoft\Db\Sqlite\Condition\LikeConditionBuilder;
 use Yiisoft\Db\Sqlite\DDLQueryBuilder;
 use Yiisoft\Db\Sqlite\DMLQueryBuilder;
-use Yiisoft\Strings\NumericHelper;
 
 use function array_filter;
 use function array_merge;
 use function implode;
-use function is_float;
-use function is_string;
-use function ltrim;
-use function reset;
-use function strrpos;
 use function trim;
-use function version_compare;
 
 final class QueryBuilderPDOSqlite extends QueryBuilder
 {

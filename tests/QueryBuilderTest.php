@@ -6,14 +6,10 @@ namespace Yiisoft\Db\Sqlite\Tests;
 
 use Closure;
 use Yiisoft\Arrays\ArrayHelper;
-use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\Query\QueryBuilderInterface;
-use Yiisoft\Db\Sqlite\PDO\QueryBuilderPDOSqlite;
 use Yiisoft\Db\Sqlite\PDO\SchemaPDOSqlite;
 use Yiisoft\Db\TestSupport\TestQueryBuilderTrait;
-use Yiisoft\Db\TestSupport\TraversableObject;
 
 /**
  * @group sqlite

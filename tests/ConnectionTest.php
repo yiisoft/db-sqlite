@@ -277,8 +277,6 @@ final class ConnectionTest extends TestCase
             $this->cache->psr()->has($cacheKey),
             'Connection was not successful – cache must contain information about this DSN'
         );
-
-
     }
 
     public function testServerStatusCacheCanBeDisabled(): void
