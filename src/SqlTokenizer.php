@@ -22,20 +22,13 @@ final class SqlTokenizer extends BaseTokenizer
      *
      * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string.
      *
-     * @param int|null $length length of the matched string.
+     * @param int $length length of the matched string.
      *
      * @return bool whether there's a whitespace at the current offset.
      */
-    protected function isWhitespace(?int &$length): bool
+    protected function isWhitespace(int &$length): bool
     {
-        static $whitespaces = [
-            "\f" => true,
-            "\n" => true,
-            "\r" => true,
-            "\t" => true,
-            ' ' => true,
-        ];
-
+        $whitespaces = ["\f" => true, "\n" => true, "\r" => true, "\t" => true, ' ' => true];
         $length = 1;
 
         return isset($whitespaces[$this->substring($length)]);
@@ -52,22 +45,15 @@ final class SqlTokenizer extends BaseTokenizer
      */
     protected function isComment(int &$length): bool
     {
-        static $comments = [
-            '--' => true,
-            '/*' => true,
-        ];
-
+        $comments = ['--' => true, '/*' => true];
         $length = 2;
 
         if (!isset($comments[$this->substring($length)])) {
             return false;
         }
 
-        if ($this->substring($length) === '--') {
-            $length = $this->indexAfter("\n") - $this->offset;
-        } else {
-            $length = $this->indexAfter('*/') - $this->offset;
-        }
+        $char = $this->substring($length) === '--' ? "\n" : '*/';
+        $length = $this->indexAfter($char) - $this->offset;
 
         return true;
     }
@@ -85,7 +71,7 @@ final class SqlTokenizer extends BaseTokenizer
      */
     protected function isOperator(int &$length, ?string &$content): bool
     {
-        static $operators = [
+        $operators = [
             '!=',
             '%',
             '&',
@@ -128,11 +114,7 @@ final class SqlTokenizer extends BaseTokenizer
      */
     protected function isIdentifier(int &$length, ?string &$content): bool
     {
-        static $identifierDelimiters = [
-            '"' => '"',
-            '[' => ']',
-            '`' => '`',
-        ];
+        $identifierDelimiters = ['"' => '"', '[' => ']', '`' => '`'];
 
         if (!isset($identifierDelimiters[$this->substring(1)])) {
             return false;
@@ -147,6 +129,7 @@ final class SqlTokenizer extends BaseTokenizer
                 break;
             }
         }
+
         $length = $offset - $this->offset;
         $content = $this->substring($length - 2, true, $this->offset + 1);
 
@@ -182,6 +165,7 @@ final class SqlTokenizer extends BaseTokenizer
                 break;
             }
         }
+
         $length = $offset - $this->offset;
         $content = strtr($this->substring($length - 2, true, $this->offset + 1), ["''" => "'"]);
 
@@ -200,7 +184,7 @@ final class SqlTokenizer extends BaseTokenizer
      */
     protected function isKeyword(string $string, ?string &$content): bool
     {
-        static $keywords = [
+        $keywords = [
             'ABORT' => true,
             'ACTION' => true,
             'ADD' => true,

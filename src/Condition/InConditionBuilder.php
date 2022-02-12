@@ -4,21 +4,26 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Condition;
 
-use function implode;
-use function is_array;
-use function strpos;
 use Traversable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-
 use Yiisoft\Db\Query\Conditions\InConditionBuilder as BaseInConditionBuilder;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\Sqlite\Connection;
+use Yiisoft\Db\Query\QueryBuilderInterface;
+
+use function implode;
+use function is_array;
+use function strpos;
 
 final class InConditionBuilder extends BaseInConditionBuilder
 {
+    public function __construct(private QueryBuilderInterface $queryBuilder)
+    {
+        parent::__construct($queryBuilder);
+    }
+
     /**
      * Builds SQL for IN condition.
      *
@@ -52,14 +57,12 @@ final class InConditionBuilder extends BaseInConditionBuilder
      */
     protected function buildCompositeInCondition(?string $operator, $columns, $values, array &$params = []): string
     {
-        /** @var Connection $db */
-        $db = $this->queryBuilder->getDb();
-
         $quotedColumns = [];
 
+        /** @psalm-var array<array-key, string>|Traversable $columns */
         foreach ($columns as $i => $column) {
             $quotedColumns[$i] = strpos($column, '(') === false
-                ? $db->quoteColumnName($column) : $column;
+                ? $this->queryBuilder->quoter()->quoteColumnName($column) : $column;
         }
 
         $vss = [];

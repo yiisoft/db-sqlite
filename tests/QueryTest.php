@@ -6,7 +6,9 @@ namespace Yiisoft\Db\Sqlite\Tests;
 
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\TestUtility\TestQueryTrait;
+use Yiisoft\Db\TestSupport\TestQueryTrait;
+
+use function version_compare;
 
 /**
  * @group sqlite
@@ -20,17 +22,10 @@ final class QueryTest extends TestCase
         $db = $this->getConnection();
 
         $query = new Query($db);
-
         $query->select(['id', 'name'])
             ->from('item')
-            ->union(
-                (new Query($db))
-                    ->select(['id', 'name'])
-                    ->from(['category'])
-            );
-
+            ->union((new Query($db))->select(['id', 'name'])->from(['category']));
         $result = $query->all();
-
         $this->assertNotEmpty($result);
         $this->assertCount(7, $result);
     }
@@ -38,16 +33,18 @@ final class QueryTest extends TestCase
     public function testLimitOffsetWithExpression(): void
     {
         $query = (new Query($this->getConnection()))->from('customer')->select('id')->orderBy('id');
-
-        $query
-            ->limit(new Expression('1 + 1'))
-            ->offset(new Expression('1 + 0'));
-
+        $query->limit(new Expression('1 + 1'))->offset(new Expression('1 + 0'));
         $result = $query->column();
 
-        $this->assertCount(2, $result);
-        $this->assertTrue(in_array('2', $result, false));
-        $this->assertTrue(in_array('3', $result, false));
-        $this->assertFalse(in_array('1', $result, false));
+        // check
+        if (version_compare(PHP_VERSION, '8.1', '>=')) {
+            $this->assertContains(2, $result);
+            $this->assertContains(3, $result);
+            $this->assertNotContains(1, $result);
+        } else {
+            $this->assertContains('2', $result);
+            $this->assertContains('3', $result);
+            $this->assertNotContains('1', $result);
+        }
     }
 }

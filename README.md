@@ -18,8 +18,7 @@ It is used in [Yii Framework] but is supposed to be usable separately.
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/db-sqlite/v/stable.png)](https://packagist.org/packages/yiisoft/db-sqlite)
 [![Total Downloads](https://poser.pugx.org/yiisoft/db-sqlite/downloads.png)](https://packagist.org/packages/yiisoft/db-sqlite)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/yiisoft/db-sqlite/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/db-sqlite/?branch=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/yiisoft/db-sqlite/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/db-sqlite/?branch=master)
+[![codecov](https://codecov.io/gh/yiisoft/db-sqlite/branch/master/graph/badge.svg?token=YXUHCPPITH)](https://codecov.io/gh/yiisoft/db-sqlite)
 
 
 ## Support version
