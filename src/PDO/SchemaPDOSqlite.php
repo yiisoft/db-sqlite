@@ -148,7 +148,7 @@ final class SchemaPDOSqlite extends Schema
     }
 
     /**
-     * @throws Exception|InvalidConfigException|InvalidCallException|Throwable
+     * @throws Exception|InvalidCallException|InvalidConfigException|Throwable
      */
     public function insert(string $table, array $columns): bool|array
     {

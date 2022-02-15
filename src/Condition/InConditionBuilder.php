@@ -53,7 +53,7 @@ final class InConditionBuilder extends BaseInConditionBuilder
      * Builds SQL for IN condition.
      *
      * @param string|null $operator
-     * @param Traversable|array $columns
+     * @param array|Traversable $columns
      * @param array|iterable $values
      * @param array $params
      *
