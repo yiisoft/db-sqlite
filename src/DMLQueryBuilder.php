@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use InvalidArgumentException;
+use JsonException;
+use Throwable;
 use Yiisoft\Db\Constraint\Constraint;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidArgumentException;
+use Yiisoft\Db\Exception\InvalidConfigException;
+use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\DMLQueryBuilder as AbstractDMLQueryBuilder;
@@ -19,6 +24,9 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         parent::__construct($queryBuilder);
     }
 
+    /**
+     * @throws Exception|Throwable
+     */
     public function resetSequence(string $tableName, mixed $value = null): string
     {
         $table = $this->queryBuilder->schema()->getTableSchema($tableName);
@@ -43,6 +51,9 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         throw new InvalidArgumentException("There is not sequence associated with table '$tableName'.'");
     }
 
+    /**
+     * @throws Exception|InvalidArgumentException|InvalidConfigException|JsonException|NotSupportedException
+     */
     public function upsert(string $table, Query|array $insertColumns, bool|array $updateColumns, array &$params): string
     {
         /** @var Constraint[] $constraints */

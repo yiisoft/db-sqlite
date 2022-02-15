@@ -87,17 +87,17 @@ final class SqlToken implements ArrayAccess
      * This method is required by the SPL {@see ArrayAccess} interface. It is implicitly called when you use something
      * like `$token[$offset] = $child;`.
      *
-     * @param int|null $offset child token offset.
-     * @param SqlToken $token  token to be added.
+     * @param mixed $offset child token offset.
+     * @param mixed $value  token to be added.
      */
-    public function offsetSet($offset, $token): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
-        $token->parent = $this;
+        $value->parent = $this;
 
         if ($offset === null) {
-            $this->children[] = $token;
+            $this->children[] = $value;
         } else {
-            $this->children[$this->calculateOffset($offset)] = $token;
+            $this->children[$this->calculateOffset($offset)] = $value;
         }
 
         $this->updateCollectionOffsets();
@@ -207,7 +207,7 @@ final class SqlToken implements ArrayAccess
      * }
      * ```
      *
-     * @param SqlToken $patternToken tokenized SQL code to match against. In addition to normal SQL, the `any` keyword
+     * @param SqlToken $patternToken tokenized SQL codes to match against. In addition to normal SQL, the `any` keyword
      * is supported which will match any number of keywords, identifiers, whitespaces.
      * @param int $offset token children offset to start lookup with.
      * @param int|null $firstMatchIndex token children offset where a successful match begins.
@@ -266,7 +266,7 @@ final class SqlToken implements ArrayAccess
 
         for ($index = 0, $count = count($patternToken->children); $index < $count; $index++) {
             /**
-             *  Here we iterate token by token with an exception of "any" that toggles an iteration until we matched
+             *  Here we iterate token by token with an exception to "any" that toggles an iteration until we matched
              *  with a next pattern token or EOF.
              */
             if ($patternToken[$index] instanceof self && $patternToken[$index]->content === 'any') {
@@ -289,11 +289,9 @@ final class SqlToken implements ArrayAccess
 
                 if ($firstMatchIndex === null) {
                     $firstMatchIndex = $offset;
-                    $lastMatchIndex = $offset;
-                } else {
-                    $lastMatchIndex = $offset;
                 }
 
+                $lastMatchIndex = $offset;
                 $wildcard = false;
                 $offset++;
 
@@ -332,9 +330,7 @@ final class SqlToken implements ArrayAccess
             $this->endOffset = end($this->children)->endOffset;
         }
 
-        if ($this->parent !== null) {
-            $this->parent->updateCollectionOffsets();
-        }
+        $this->parent?->updateCollectionOffsets();
     }
 
     /**

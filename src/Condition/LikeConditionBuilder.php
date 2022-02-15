@@ -11,7 +11,7 @@ final class LikeConditionBuilder extends BaseLikeConditionBuilder
 {
     protected ?string $escapeCharacter = '\\';
 
-    public function __construct(private QueryBuilderInterface $queryBuilder)
+    public function __construct(QueryBuilderInterface $queryBuilder)
     {
         parent::__construct($queryBuilder);
     }

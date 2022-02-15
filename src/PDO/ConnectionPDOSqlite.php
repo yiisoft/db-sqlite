@@ -153,6 +153,9 @@ final class ConnectionPDOSqlite extends Connection implements ConnectionPDOInter
         return $this->pdo;
     }
 
+    /**
+     * @throws Exception|InvalidConfigException
+     */
     public function getQueryBuilder(): QueryBuilderInterface
     {
         if ($this->queryBuilder === null) {
