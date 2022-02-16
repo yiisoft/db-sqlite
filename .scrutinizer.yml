@@ -8,9 +8,9 @@ filter:
 build:
   environment:
     php:
-      version: 8.0.11
+      version: 8.0.15
       ini:
-        "xdebug.mode": coverage
+        xdebug.mode: coverage
 
   nodes:
     analysis:
@@ -18,7 +18,7 @@ build:
         override:
           - php-scrutinizer-run
 
-    tests-and-coverage:
+    phpunit:
       dependencies:
         override:
           - wget https://sqlite.org/2021/sqlite-autoconf-3340100.tar.gz --no-check-certificate
@@ -33,7 +33,7 @@ build:
 
       tests:
         override:
-          - command: "./vendor/bin/phpunit --coverage-clover ./coverage.xml"
+          - command: ./vendor/bin/phpunit --coverage-clover ./coverage.xml
             on_node: 1
             coverage:
               file: coverage.xml
