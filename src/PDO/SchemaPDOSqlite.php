@@ -147,6 +147,9 @@ final class SchemaPDOSqlite extends Schema
         )->queryColumn();
     }
 
+    /**
+     * @throws Exception|InvalidCallException|InvalidConfigException|Throwable
+     */
     public function insert(string $table, array $columns): bool|array
     {
         $command = $this->db->createCommand()->insert($table, $columns);
@@ -260,7 +263,9 @@ final class SchemaPDOSqlite extends Schema
      *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|Throwable
      *
-     * @return array|IndexConstraint[] indexes for the given table.
+     * @return array indexes for the given table.
+     *
+     * @psalm-return array|IndexConstraint[]
      */
     protected function loadTableIndexes(string $tableName): array
     {
@@ -276,7 +281,9 @@ final class SchemaPDOSqlite extends Schema
      *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|Throwable
      *
-     * @return array|Constraint[] unique constraints for the given table.
+     * @return array unique constraints for the given table.
+     *
+     * @psalm-return array|Constraint[]
      */
     protected function loadTableUniques(string $tableName): array
     {
@@ -360,7 +367,7 @@ final class SchemaPDOSqlite extends Schema
      *
      * @return ColumnSchemaBuilder column schema builder instance.
      */
-    public function createColumnSchemaBuilder(string $type, $length = null): ColumnSchemaBuilder
+    public function createColumnSchemaBuilder(string $type, array|int|string $length = null): ColumnSchemaBuilder
     {
         return new ColumnSchemaBuilder($type, $length);
     }
@@ -579,9 +586,11 @@ final class SchemaPDOSqlite extends Schema
      *
      * @throws Exception|InvalidConfigException|Throwable
      *
-     * @return (Constraint|IndexConstraint)[]|Constraint|null
+     * @return array|Constraint|null
+     *
+     * @psalm-return (Constraint|IndexConstraint)[]|Constraint|null
      */
-    private function loadTableConstraints(string $tableName, string $returnType)
+    private function loadTableConstraints(string $tableName, string $returnType): Constraint|array|null
     {
         $indexList = $this->getPragmaIndexList($tableName);
         /** @psalm-var PragmaIndexList $indexes */

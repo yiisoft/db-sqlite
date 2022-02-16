@@ -6,6 +6,7 @@ namespace Yiisoft\Db\Sqlite\PDO;
 
 use Generator;
 use Yiisoft\Db\Command\CommandInterface;
+use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionBuilder;
 use Yiisoft\Db\Expression\ExpressionInterface;
@@ -31,7 +32,7 @@ final class QueryBuilderPDOSqlite extends QueryBuilder
     /**
      * @var array mapping from abstract column types (keys) to physical column types (values).
      *
-     * @psalm-var array<string, string>
+     * @psalm-var string[] $typeMap
      */
     protected array $typeMap = [
         Schema::TYPE_PK => 'integer PRIMARY KEY AUTOINCREMENT NOT NULL',
@@ -79,16 +80,25 @@ final class QueryBuilderPDOSqlite extends QueryBuilder
         return $this->ddlBuilder->addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete, $update);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function addPrimaryKey(string $name, string $table, array|string $columns): string
     {
         return $this->ddlBuilder->addPrimaryKey($name, $table, $columns);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function addUnique(string $name, string $table, array|string $columns): string
     {
         return $this->ddlBuilder->addUnique($name, $table, $columns);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function alterColumn(string $table, string $column, string $type): string
     {
         return $this->ddlBuilder->alterColumn($table, $column, $type);
@@ -204,11 +214,17 @@ final class QueryBuilderPDOSqlite extends QueryBuilder
         return $this->command;
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function dropColumn(string $table, string $column): string
     {
         return $this->ddlBuilder->dropColumn($table, $column);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function dropForeignKey(string $name, string $table): string
     {
         return $this->ddlBuilder->dropForeignKey($name, $table);
@@ -219,11 +235,17 @@ final class QueryBuilderPDOSqlite extends QueryBuilder
         return $this->ddlBuilder->dropIndex($name, $table);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function dropPrimaryKey(string $name, string $table): string
     {
         return $this->ddlBuilder->dropPrimaryKey($name, $table);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function dropUnique(string $name, string $table): string
     {
         return $this->ddlBuilder->dropUnique($name, $table);
@@ -239,6 +261,9 @@ final class QueryBuilderPDOSqlite extends QueryBuilder
         return $this->schema;
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function renameColumn(string $table, string $oldName, string $newName): string
     {
         return $this->ddlBuilder->renameColumn($table, $oldName, $newName);

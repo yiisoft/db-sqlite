@@ -25,7 +25,7 @@ use function usort;
  *
  * ```php
  * $tokenizer = new SqlTokenizer("SELECT * FROM user WHERE id = 1");
- * $root = $tokeinzer->tokenize();
+ * $root = $tokenizer->tokenize();
  * $sqlTokens = $root->getChildren();
  * ```
  *
@@ -57,11 +57,11 @@ abstract class BaseTokenizer
     private SplStack $tokenStack;
 
     /**
-     * @var SqlToken|SqlToken[] active token. It's usually a top of the token stack.
+     * @psalm-var SqlToken|SqlToken[] active token. It's usually a top of the token stack.
      *
      * @psalm-suppress PropertyNotSetInConstructor
      */
-    private $currentToken;
+    private array|SqlToken $currentToken;
 
     /**
      * @var string[] cached substrings.
@@ -223,7 +223,7 @@ abstract class BaseTokenizer
      * Returns whether the longest common prefix equals to the SQL code of the same length at the current offset.
      *
      * @param array $with strings to be tested. The method `will` modify this parameter to speed up lookups.
-     * @param bool $caseSensitive whether to perform a case sensitive comparison.
+     * @param bool $caseSensitive whether to perform a case-sensitive comparison.
      * @param int $length length of the matched string.
      * @param string|null $content matched string.
      *
@@ -272,7 +272,7 @@ abstract class BaseTokenizer
      * Returns a string of the given length starting with the specified offset.
      *
      * @param int $length string length to be returned.
-     * @param bool $caseSensitive if it's `false`, the string will be uppercased.
+     * @param bool $caseSensitive if it's `false`, the string will be uppercase.
      * @param int|null $offset SQL code offset, defaults to current if `null` is passed.
      *
      * @return string result string, it may be empty if there's nothing to return.

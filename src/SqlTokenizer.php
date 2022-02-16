@@ -8,7 +8,7 @@ use function mb_strtoupper;
 use function strtr;
 
 /**
- * SqlTokenizer splits SQLite query into individual SQL tokens.
+ * SqlTokenizer splits SQLite queries into individual SQL tokens.
  *
  * It's used to obtain a `CHECK` constraint information from a `CREATE TABLE` SQL code.
  *
@@ -37,7 +37,7 @@ final class SqlTokenizer extends BaseTokenizer
     /**
      * Returns whether there's a commentary at the current offset.
      *
-     * If this methos returns `true`, it has to set the `$length` parameter to the length of the matched string.
+     * If these methods returns `true`, it has to set the `$length` parameter to the length of the matched string.
      *
      * @param int $length length of the matched string.
      *
@@ -61,7 +61,7 @@ final class SqlTokenizer extends BaseTokenizer
     /**
      * Returns whether there's an operator at the current offset.
      *
-     * If this methos returns `true`, it has to set the `$length` parameter to the length of the matched string. It may
+     * If these methods returns `true`, it has to set the `$length` parameter to the length of the matched string. It may
      * also set `$content` to a string that will be used as a token content.
      *
      * @param int $length  length of the matched string.

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Query\DDLQueryBuilder as AbstractDDLQueryBuilder;
 use Yiisoft\Db\Query\QueryBuilderInterface;
@@ -15,21 +17,33 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         parent::__construct($queryBuilder);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function addCheck(string $name, string $table, string $expression): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function addCommentOnColumn(string $table, string $column, string $comment): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function addCommentOnTable(string $table, string $comment): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function addForeignKey(
         string $name,
         string $table,
@@ -42,16 +56,25 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function addPrimaryKey(string $name, string $table, array|string $columns): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function addUnique(string $name, string $table, array|string $columns): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function alterColumn(string $table, string $column, string $type): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
@@ -62,6 +85,9 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         return 'PRAGMA foreign_keys=' . (int) $check;
     }
 
+    /**
+     * @throws Exception|InvalidArgumentException
+     */
     public function createIndex(string $name, string $table, array|string $columns, bool $unique = false): string
     {
         $tableParts = explode('.', $table);
@@ -78,26 +104,41 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
             . ' (' . $this->queryBuilder->buildColumns($columns) . ')';
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function dropCheck(string $name, string $table): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function dropColumn(string $table, string $column): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function dropCommentFromColumn(string $table, string $column): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function dropCommentFromTable(string $table): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function dropForeignKey(string $name, string $table): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
@@ -108,16 +149,25 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         return 'DROP INDEX ' . $this->queryBuilder->quoter()->quoteTableName($name);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function dropPrimaryKey(string $name, string $table): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function dropUnique(string $name, string $table): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function renameColumn(string $table, string $oldName, string $newName): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');

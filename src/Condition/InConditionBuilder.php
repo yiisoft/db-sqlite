@@ -9,13 +9,13 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\Conditions\InConditionBuilder as BaseInConditionBuilder;
-use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryBuilderInterface;
 
 use function implode;
 use function is_array;
-use function strpos;
+use function str_contains;
 
 final class InConditionBuilder extends BaseInConditionBuilder
 {
@@ -29,15 +29,19 @@ final class InConditionBuilder extends BaseInConditionBuilder
      *
      * @param string $operator
      * @param array|string $columns
-     * @param Query $values
+     * @param ExpressionInterface $values
      * @param array $params
      *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
      *
      * @return string SQL.
      */
-    protected function buildSubqueryInCondition(string $operator, $columns, Query $values, array &$params = []): string
-    {
+    protected function buildSubqueryInCondition(
+        string $operator,
+        array|string $columns,
+        ExpressionInterface $values,
+        array &$params = []
+    ): string {
         if (is_array($columns)) {
             throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
         }
@@ -55,13 +59,17 @@ final class InConditionBuilder extends BaseInConditionBuilder
      *
      * @return string SQL.
      */
-    protected function buildCompositeInCondition(?string $operator, $columns, $values, array &$params = []): string
-    {
+    protected function buildCompositeInCondition(
+        ?string $operator,
+        Traversable|array $columns,
+        $values,
+        array &$params = []
+    ): string {
         $quotedColumns = [];
 
-        /** @psalm-var array<array-key, string>|Traversable $columns */
+        /** @psalm-var string[]|Traversable $columns */
         foreach ($columns as $i => $column) {
-            $quotedColumns[$i] = strpos($column, '(') === false
+            $quotedColumns[$i] = !str_contains($column, '(')
                 ? $this->queryBuilder->quoter()->quoteColumnName($column) : $column;
         }
 
