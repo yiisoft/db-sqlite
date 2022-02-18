@@ -203,7 +203,6 @@ final class ConnectionPDOSqlite extends Connection implements ConnectionPDOInter
 
     public function getSlavePdo(bool $fallbackToMaster = true): ?PDO
     {
-        /** @var ConnectionPDOSqlite|null $db */
         $db = $this->getSlave(false);
 
         if ($db === null) {
@@ -225,7 +224,6 @@ final class ConnectionPDOSqlite extends Connection implements ConnectionPDOInter
         }
 
         if (!empty($this->masters)) {
-            /** @var ConnectionPDOSqlite|null */
             $db = $this->getMaster();
 
             if ($db !== null) {

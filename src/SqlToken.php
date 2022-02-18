@@ -97,7 +97,7 @@ final class SqlToken implements ArrayAccess
         if ($offset === null) {
             $this->children[] = $value;
         } else {
-            $this->children[$this->calculateOffset($offset)] = $value;
+            $this->children[$this->calculateOffset((int) $offset)] = $value;
         }
 
         $this->updateCollectionOffsets();

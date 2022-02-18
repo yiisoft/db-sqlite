@@ -60,6 +60,7 @@ final class CommandPDOSqlite extends Command
             $this->bindPendingParams();
         } catch (PDOException $e) {
             $message = $e->getMessage() . "\nFailed to prepare SQL: $sql";
+            /** @var array|null */
             $errorInfo = $e->errorInfo ?? null;
 
             throw new Exception($message, $errorInfo, $e);

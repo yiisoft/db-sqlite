@@ -60,8 +60,8 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         $constraints = [];
 
         /**
-         * @psalm-var array<array-key, string> $insertNames
-         * @psalm-var array<array-key, string> $updateNames
+         * @psalm-var string[] $insertNames
+         * @psalm-var string[] $updateNames
          * @psalm-var array<string, ExpressionInterface|string>|bool $updateColumns
          */
         [$uniqueNames, $insertNames, $updateNames] = $this->queryBuilder->prepareUpsertColumns(
@@ -76,7 +76,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         }
 
         /**
-         * @psalm-var array<array-key, string> $placeholders
+         * @psalm-var string[] $placeholders
          */
         [, $placeholders, $values, $params] = $this->queryBuilder->prepareInsertValues($table, $insertColumns, $params);
 
@@ -94,7 +94,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 
         foreach ($constraints as $constraint) {
             $constraintCondition = ['and'];
-            /** @psalm-var array<array-key, string> */
+            /** @psalm-var string[] */
             $columnsNames = $constraint->getColumnNames();
             foreach ($columnsNames as $name) {
                 $quotedName = $this->queryBuilder->quoter()->quoteColumnName($name);

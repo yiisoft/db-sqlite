@@ -166,7 +166,6 @@ final class SchemaPDOSqlite extends Schema
             $tablePrimaryKey = $tableSchema->getPrimaryKey();
         }
 
-        /** @var string $name */
         foreach ($tablePrimaryKey as $name) {
             if ($tableSchema?->getColumn($name)?->isAutoIncrement()) {
                 $result[$name] = $this->getLastInsertID((string) $tableSchema?->getSequenceName());
@@ -395,7 +394,7 @@ final class SchemaPDOSqlite extends Schema
             }
         }
 
-        $column = count($table->getPrimaryKey()) === 1 ? $table->getColumn((string) $table->getPrimaryKey()[0]) : null;
+        $column = count($table->getPrimaryKey()) === 1 ? $table->getColumn($table->getPrimaryKey()[0]) : null;
 
         if ($column !== null && !strncasecmp($column->getDbType(), 'int', 3)) {
             $table->sequenceName('');
@@ -672,7 +671,8 @@ final class SchemaPDOSqlite extends Schema
     private function getPragmaIndexInfo(string $name): array
     {
         $column = $this->db
-            ->createCommand('PRAGMA INDEX_INFO(' . $this->db->getQuoter()->quoteValue($name) . ')')->queryAll();
+            ->createCommand('PRAGMA INDEX_INFO(' . (string) $this->db->getQuoter()->quoteValue($name) . ')')
+            ->queryAll();
         /** @psalm-var Column */
         $column = $this->normalizePdoRowKeyCase($column, true);
         ArraySorter::multisort($column, 'seqno', SORT_ASC, SORT_NUMERIC);
@@ -686,7 +686,8 @@ final class SchemaPDOSqlite extends Schema
     private function getPragmaIndexList(string $tableName): array
     {
         return $this->db
-            ->createCommand('PRAGMA INDEX_LIST(' . $this->db->getQuoter()->quoteValue($tableName) . ')')->queryAll();
+            ->createCommand('PRAGMA INDEX_LIST(' . (string) $this->db->getQuoter()->quoteValue($tableName) . ')')
+            ->queryAll();
     }
 
     /**
