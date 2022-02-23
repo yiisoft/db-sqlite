@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite\Condition;
+namespace Yiisoft\Db\Sqlite\Builder;
 
 use Traversable;
 use Yiisoft\Db\Exception\Exception;
@@ -10,7 +10,7 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionInterface;
-use Yiisoft\Db\Query\Conditions\InConditionBuilder as BaseInConditionBuilder;
+use Yiisoft\Db\Query\Conditions\Builder\InConditionBuilder as BaseInConditionBuilder;
 use Yiisoft\Db\Query\QueryBuilderInterface;
 
 use function implode;
