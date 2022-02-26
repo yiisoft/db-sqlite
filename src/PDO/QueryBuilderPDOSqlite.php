@@ -14,11 +14,12 @@ use Yiisoft\Db\Query\Conditions\InCondition;
 use Yiisoft\Db\Query\Conditions\LikeCondition;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryBuilder;
+use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Schema\SchemaInterface;
-use Yiisoft\Db\Sqlite\Condition\InConditionBuilder;
-use Yiisoft\Db\Sqlite\Condition\LikeConditionBuilder;
+use Yiisoft\Db\Sqlite\Builder\InConditionBuilder;
+use Yiisoft\Db\Sqlite\Builder\LikeConditionBuilder;
 use Yiisoft\Db\Sqlite\DDLQueryBuilder;
 use Yiisoft\Db\Sqlite\DMLQueryBuilder;
 
@@ -109,7 +110,7 @@ final class QueryBuilderPDOSqlite extends QueryBuilder
         return $this->dmlBuilder->batchInsert($table, $columns, $rows, $params);
     }
 
-    public function build(Query $query, array $params = []): array
+    public function build(QueryInterface $query, array $params = []): array
     {
         $query = $query->prepare($this);
 
