@@ -137,7 +137,7 @@ final class CommandPDOSqlite extends Command
         return $result;
     }
 
-    protected function getCacheKey(string $method, ?int $fetchMode, string $rawSql): array
+    protected function getCacheKey(string $method, array|int|null $fetchMode, string $rawSql): array
     {
         return [
             __CLASS__,
