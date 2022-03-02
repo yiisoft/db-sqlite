@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Builder;
 
+use Iterator;
 use Traversable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
@@ -27,18 +28,13 @@ final class InConditionBuilder extends BaseInConditionBuilder
     /**
      * Builds SQL for IN condition.
      *
-     * @param string $operator
-     * @param array|string $columns
-     * @param ExpressionInterface $values
-     * @param array $params
-     *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
      *
      * @return string SQL.
      */
     protected function buildSubqueryInCondition(
         string $operator,
-        array|string $columns,
+        iterable|string|Iterator $columns,
         ExpressionInterface $values,
         array &$params = []
     ): string {
