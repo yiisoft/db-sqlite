@@ -110,7 +110,7 @@ final class QueryBuilderPDOSqlite extends QueryBuilder
         return $this->dmlBuilder->batchInsert($table, $columns, $rows, $params);
     }
 
-    public function build(ExpressionInterface $query, array $params = []): array
+    public function build(Query $query, array $params = []): array
     {
         $query = $query->prepare($this);
 
