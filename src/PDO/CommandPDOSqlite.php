@@ -73,7 +73,7 @@ final class CommandPDOSqlite extends Command
             return;
         }
 
-        $sql = $this->getSql() ?? '';
+        $sql = $this->getSql();
 
         if ($this->db->getTransaction()) {
             /** master is in a transaction. use the same connection. */
@@ -110,7 +110,7 @@ final class CommandPDOSqlite extends Command
      */
     public function execute(): int
     {
-        $sql = $this->getSql() ?? '';
+        $sql = $this->getSql();
 
         /** @var array<string, string> */
         $params = $this->params;
@@ -137,7 +137,7 @@ final class CommandPDOSqlite extends Command
         return $result;
     }
 
-    protected function getCacheKey(string $method, ?int $fetchMode, string $rawSql): array
+    protected function getCacheKey(string $method, array|int|null $fetchMode, string $rawSql): array
     {
         return [
             __CLASS__,
@@ -190,7 +190,7 @@ final class CommandPDOSqlite extends Command
      */
     protected function queryInternal(string $method, array|int $fetchMode = null): mixed
     {
-        $sql = $this->getSql() ?? '';
+        $sql = $this->getSql();
 
         /** @var array<string, string> */
         $params = $this->params;

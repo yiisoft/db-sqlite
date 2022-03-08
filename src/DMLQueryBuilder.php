@@ -14,8 +14,8 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\DMLQueryBuilder as AbstractDMLQueryBuilder;
-use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryBuilderInterface;
+use Yiisoft\Db\Query\QueryInterface;
 
 final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 {
@@ -54,8 +54,12 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
     /**
      * @throws Exception|InvalidArgumentException|InvalidConfigException|JsonException|NotSupportedException
      */
-    public function upsert(string $table, Query|array $insertColumns, bool|array $updateColumns, array &$params): string
-    {
+    public function upsert(
+        string $table,
+        QueryInterface|array $insertColumns,
+        bool|array $updateColumns,
+        array &$params
+    ): string {
         /** @var Constraint[] $constraints */
         $constraints = [];
 
