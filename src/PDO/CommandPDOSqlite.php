@@ -137,12 +137,10 @@ final class CommandPDOSqlite extends Command
         return $result;
     }
 
-    protected function getCacheKey(string $method, array|int|null $fetchMode, string $rawSql): array
+    protected function getCacheKey(string $rawSql): array
     {
         return [
             __CLASS__,
-            $method,
-            $fetchMode,
             $this->db->getDriver()->getDsn(),
             $this->db->getDriver()->getUsername(),
             $rawSql,
@@ -179,16 +177,13 @@ final class CommandPDOSqlite extends Command
     /**
      * Performs the actual DB query of a SQL statement.
      *
-     * @param string $method method of PDOStatement to be called
-     * @param array|int|null $fetchMode the result fetch mode.
-     * Please refer to [PHP manual](http://www.php.net/manual/en/function.PDOStatement-setFetchMode.php) for valid fetch
-     * modes. If this parameter is null, the value set in {@see fetchMode} will be used.
+     * @param boolean $returnDataReader - return results as DataReader
      *
      * @throws Exception|Throwable if the query causes any problem.
      *
      * @return mixed the method execution result.
      */
-    protected function queryInternal(string $method, array|int $fetchMode = null): mixed
+    protected function queryInternal(bool $returnDataReader = false): mixed
     {
         $sql = $this->getSql();
 
@@ -198,7 +193,7 @@ final class CommandPDOSqlite extends Command
         $statements = $this->splitStatements($sql, $params);
 
         if ($statements === false || $statements === []) {
-            return parent::queryInternal($method, $fetchMode);
+            return parent::queryInternal($returnDataReader);
         }
 
         [$lastStatementSql, $lastStatementParams] = array_pop($statements);
@@ -219,7 +214,7 @@ final class CommandPDOSqlite extends Command
         $this->setSql($lastStatementSql)->bindValues($lastStatementParams);
 
         /** @var string */
-        $result = parent::queryInternal($method, $fetchMode);
+        $result = parent::queryInternal();
 
         $this->setSql($sql)->bindValues($params);
 
