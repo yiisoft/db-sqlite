@@ -177,7 +177,7 @@ final class CommandPDOSqlite extends Command
     /**
      * Performs the actual DB query of a SQL statement.
      *
-     * @param boolean $returnDataReader - return results as DataReader
+     * @param bool $returnDataReader - return results as DataReader
      *
      * @throws Exception|Throwable if the query causes any problem.
      *
