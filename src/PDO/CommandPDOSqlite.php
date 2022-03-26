@@ -7,7 +7,7 @@ namespace Yiisoft\Db\Sqlite\PDO;
 use PDOException;
 use Throwable;
 use Yiisoft\Db\Cache\QueryCache;
-use Yiisoft\Db\Command\CommandPdo;
+use Yiisoft\Db\Command\CommandPDO;
 use Yiisoft\Db\Connection\ConnectionPDOInterface;
 use Yiisoft\Db\Exception\ConvertException;
 use Yiisoft\Db\Exception\Exception;
@@ -23,7 +23,7 @@ use function ltrim;
 use function preg_match_all;
 use function strpos;
 
-final class CommandPDOSqlite extends CommandPdo
+final class CommandPDOSqlite extends CommandPDO
 {
     public function __construct(private ConnectionPDOInterface $db, QueryCache $queryCache)
     {
