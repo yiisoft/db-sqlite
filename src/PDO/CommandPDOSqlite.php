@@ -7,7 +7,7 @@ namespace Yiisoft\Db\Sqlite\PDO;
 use PDOException;
 use Throwable;
 use Yiisoft\Db\Cache\QueryCache;
-use Yiisoft\Db\Command\Command;
+use Yiisoft\Db\Command\CommandPdo;
 use Yiisoft\Db\Connection\ConnectionPDOInterface;
 use Yiisoft\Db\Exception\ConvertException;
 use Yiisoft\Db\Exception\Exception;
@@ -23,7 +23,7 @@ use function ltrim;
 use function preg_match_all;
 use function strpos;
 
-final class CommandPDOSqlite extends Command
+final class CommandPDOSqlite extends CommandPdo
 {
     public function __construct(private ConnectionPDOInterface $db, QueryCache $queryCache)
     {
@@ -137,10 +137,11 @@ final class CommandPDOSqlite extends Command
         return $result;
     }
 
-    protected function getCacheKey(string $rawSql): array
+    protected function getCacheKey(int $queryMode, string $rawSql): array
     {
         return [
             __CLASS__,
+            $queryMode,
             $this->db->getDriver()->getDsn(),
             $this->db->getDriver()->getUsername(),
             $rawSql,
@@ -177,13 +178,13 @@ final class CommandPDOSqlite extends Command
     /**
      * Performs the actual DB query of a SQL statement.
      *
-     * @param bool $returnDataReader - return results as DataReader
+     * @param int $queryMode - return results as DataReader
      *
      * @throws Exception|Throwable if the query causes any problem.
      *
      * @return mixed the method execution result.
      */
-    protected function queryInternal(bool $returnDataReader = false): mixed
+    protected function queryInternal(int $queryMode): mixed
     {
         $sql = $this->getSql();
 
@@ -193,7 +194,7 @@ final class CommandPDOSqlite extends Command
         $statements = $this->splitStatements($sql, $params);
 
         if ($statements === false || $statements === []) {
-            return parent::queryInternal($returnDataReader);
+            return parent::queryInternal($queryMode);
         }
 
         [$lastStatementSql, $lastStatementParams] = array_pop($statements);
@@ -214,7 +215,7 @@ final class CommandPDOSqlite extends Command
         $this->setSql($lastStatementSql)->bindValues($lastStatementParams);
 
         /** @var string */
-        $result = parent::queryInternal();
+        $result = parent::queryInternal($queryMode);
 
         $this->setSql($sql)->bindValues($params);
 
