@@ -119,11 +119,13 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
             }
         }
 
+        /** @var array $params */
         $updateSql = 'WITH "EXCLUDED" ('
             . implode(', ', $insertNames)
             . ') AS (' . (!empty($placeholders)
                 ? 'VALUES (' . implode(', ', $placeholders) . ')'
-                : ltrim("$values", ' ')) . ') ' . $this->update($table, $updateColumns, $updateCondition, $params);
+                : ltrim("$values", ' ')) . ') ' .
+                $this->update($table, $updateColumns, $updateCondition, $params);
 
         return "$updateSql; $insertSql;";
     }

@@ -333,6 +333,8 @@ final class SchemaPDOSqlite extends Schema
      * @param array|int|string|null $length length or precision of the column. See {@see ColumnSchemaBuilder::$length}.
      *
      * @return ColumnSchemaBuilder column schema builder instance.
+     *
+     * @psalm-param array<array-key, string>|int|null|string $length
      */
     public function createColumnSchemaBuilder(string $type, array|int|string $length = null): ColumnSchemaBuilder
     {

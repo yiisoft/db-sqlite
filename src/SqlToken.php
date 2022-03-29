@@ -88,11 +88,13 @@ final class SqlToken implements ArrayAccess
      * like `$token[$offset] = $child;`.
      *
      * @param mixed $offset child token offset.
-     * @param mixed $value  token to be added.
+     * @param mixed $value token to be added.
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        $value->parent = $this;
+        if ($value instanceof self) {
+            $value->parent = $this;
+        }
 
         if ($offset === null) {
             $this->children[] = $value;
