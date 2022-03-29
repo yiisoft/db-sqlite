@@ -89,6 +89,8 @@ abstract class BaseTokenizer
      * @throws InvalidArgumentException
      *
      * @return SqlToken code type token.
+     *
+     * @psalm-suppress MixedPropertyTypeCoercion
      */
     public function tokenize(): SqlToken
     {

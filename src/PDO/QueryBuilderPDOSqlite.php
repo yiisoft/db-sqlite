@@ -9,6 +9,7 @@ use Yiisoft\Db\Command\CommandInterface;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionBuilder;
+use Yiisoft\Db\Expression\ExpressionBuilderInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\Conditions\InCondition;
 use Yiisoft\Db\Query\Conditions\LikeCondition;
@@ -127,19 +128,24 @@ final class QueryBuilderPDOSqlite extends QueryBuilder
             $this->buildHaving($query->getHaving(), $params),
         ];
 
+        $orderBy = $query->getOrderBy();
         $sql = implode($this->separator, array_filter($clauses));
-        $sql = $this->buildOrderByAndLimit($sql, $query->getOrderBy(), $query->getLimit(), $query->getOffset());
+        $sql = $this->buildOrderByAndLimit($sql, $orderBy, $query->getLimit(), $query->getOffset());
 
-        if (!empty($query->getOrderBy())) {
-            foreach ($query->getOrderBy() as $expression) {
+        if (!empty($orderBy)) {
+            /** @psalm-var array<string|ExpressionInterface> $orderBy */
+            foreach ($orderBy as $expression) {
                 if ($expression instanceof ExpressionInterface) {
                     $this->buildExpression($expression, $params);
                 }
             }
         }
 
-        if (!empty($query->getGroupBy())) {
-            foreach ($query->getGroupBy() as $expression) {
+        $groupBy = $query->getGroupBy();
+
+        if (!empty($groupBy)) {
+            /** @psalm-var array<string|ExpressionInterface> $groupBy */
+            foreach ($groupBy as $expression) {
                 if ($expression instanceof ExpressionInterface) {
                     $this->buildExpression($expression, $params);
                 }
@@ -190,13 +196,14 @@ final class QueryBuilderPDOSqlite extends QueryBuilder
 
         $result = '';
 
+        /** @psalm-var array<array-key, array{query: Query|null, all: bool}> $unions */
         foreach ($unions as $i => $union) {
             $query = $union['query'];
             if ($query instanceof Query) {
                 [$unions[$i]['query'], $params] = $this->build($query, $params);
             }
 
-            $result .= ' UNION ' . ($union['all'] ? 'ALL ' : '') . ' ' . $unions[$i]['query'];
+            $result .= ' UNION ' . ($union['all'] ? 'ALL ' : '') . ' ' . (string) $unions[$i]['query'];
         }
 
         return trim($result);
@@ -289,6 +296,8 @@ final class QueryBuilderPDOSqlite extends QueryBuilder
      * @return array
      *
      * See {@see ExpressionBuilder} docs for details.
+     *
+     * @psalm-return array<string, class-string<ExpressionBuilderInterface>>
      */
     protected function defaultExpressionBuilders(): array
     {
