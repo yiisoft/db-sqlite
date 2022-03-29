@@ -92,7 +92,7 @@ final class SqlToken implements ArrayAccess
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        if ($value instanceof SqlToken) {
+        if ($value instanceof self) {
             $value->parent = $this;
         }
 
