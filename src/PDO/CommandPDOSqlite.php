@@ -25,7 +25,7 @@ use function strpos;
 
 final class CommandPDOSqlite extends CommandPDO
 {
-    public function __construct(private ConnectionPDOInterface $db, QueryCache $queryCache)
+    public function __construct(protected ConnectionPDOInterface $db, QueryCache $queryCache)
     {
         parent::__construct($queryCache);
     }
@@ -63,39 +63,6 @@ final class CommandPDOSqlite extends CommandPDO
     public function queryBuilder(): QueryBuilderInterface
     {
         return $this->db->getQueryBuilder();
-    }
-
-    public function prepare(?bool $forRead = null): void
-    {
-        if (isset($this->pdoStatement)) {
-            $this->bindPendingParams();
-
-            return;
-        }
-
-        $sql = $this->getSql();
-
-        if ($this->db->getTransaction()) {
-            /** master is in a transaction. use the same connection. */
-            $forRead = false;
-        }
-
-        if ($forRead || ($forRead === null && $this->db->getSchema()->isReadQuery($sql))) {
-            $pdo = $this->db->getSlavePdo();
-        } else {
-            $pdo = $this->db->getMasterPdo();
-        }
-
-        try {
-            $this->pdoStatement = $pdo?->prepare($sql);
-            $this->bindPendingParams();
-        } catch (PDOException $e) {
-            $message = $e->getMessage() . "\nFailed to prepare SQL: $sql";
-            /** @var array|null */
-            $errorInfo = $e->errorInfo ?? null;
-
-            throw new Exception($message, $errorInfo, $e);
-        }
     }
 
     /**

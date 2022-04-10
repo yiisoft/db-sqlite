@@ -76,6 +76,8 @@ final class ConnectionTest extends TestCase
      */
     public function testGetPdoAfterClose(): void
     {
+        $this->markTestSkipped('Only for master/slave');
+
         $db = $this->getConnection();
 
         $db->setSlave(
@@ -98,6 +100,8 @@ final class ConnectionTest extends TestCase
 
     public function testMasterSlave(): void
     {
+        $this->markTestSkipped('Only for master/slave');
+
         $counts = [[0, 2], [1, 2], [2, 2]];
 
         foreach ($counts as $count) {
@@ -137,6 +141,8 @@ final class ConnectionTest extends TestCase
 
     public function testMastersShuffled(): void
     {
+        $this->markTestSkipped('Only for master/slave');
+
         $mastersCount = 2;
         $slavesCount = 2;
         $retryPerNode = 10;
@@ -163,6 +169,8 @@ final class ConnectionTest extends TestCase
 
     public function testMastersSequential(): void
     {
+        $this->markTestSkipped('Only for master/slave');
+
         $mastersCount = 2;
         $slavesCount = 2;
         $retryPerNode = 10;
@@ -222,6 +230,8 @@ final class ConnectionTest extends TestCase
 
     public function testRestoreMasterAfterException(): void
     {
+        $this->markTestSkipped('Only for master/slave');
+
         $db = $this->prepareMasterSlave(1, 1);
         $this->assertTrue($db->areSlavesEnabled());
 
@@ -239,6 +249,8 @@ final class ConnectionTest extends TestCase
 
     public function testServerStatusCacheWorks(): void
     {
+        $this->markTestSkipped('Only for master/slave');
+
         $cacheKeyNormalizer = new CacheKeyNormalizer();
         $db = $this->getConnection(true);
 
@@ -281,6 +293,8 @@ final class ConnectionTest extends TestCase
 
     public function testServerStatusCacheCanBeDisabled(): void
     {
+        $this->markTestSkipped('Only for master/slave');
+
         $cacheKeyNormalizer = new CacheKeyNormalizer();
         $db = $this->getConnection();
         $this->cache->psr()->clear();
@@ -348,6 +362,8 @@ final class ConnectionTest extends TestCase
 
     protected function prepareMasterSlave($masterCount, $slaveCount): ConnectionInterface
     {
+        $this->markTestSkipped('Only for master/slave');
+
         $db = $this->getConnection(true);
 
         for ($i = 0; $i < $masterCount; ++$i) {
