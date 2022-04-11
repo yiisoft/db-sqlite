@@ -25,11 +25,6 @@ use function strpos;
 
 final class CommandPDOSqlite extends CommandPDO
 {
-    public function __construct(protected ConnectionPDOInterface $db, QueryCache $queryCache)
-    {
-        parent::__construct($queryCache);
-    }
-
     /**
      * @inheritDoc
      */
