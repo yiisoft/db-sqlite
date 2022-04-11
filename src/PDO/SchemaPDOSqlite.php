@@ -142,9 +142,15 @@ final class SchemaPDOSqlite extends Schema
      */
     protected function findTableNames(string $schema = ''): array
     {
-        return $this->db->createCommand(
+        $tableNames = $this->db->createCommand(
             "SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name<>'sqlite_sequence' ORDER BY tbl_name"
         )->queryColumn();
+
+        if (!$tableNames) {
+            return [];
+        }
+
+        return $tableNames;
     }
 
     /**
