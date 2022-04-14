@@ -22,6 +22,19 @@ use function constant;
  */
 final class ConnectionPDOSqlite extends ConnectionPDO
 {
+    /**
+     * Reset the connection after cloning.
+     */
+    public function __clone()
+    {
+        parent::__clone();
+
+        if (strncmp($this->driver->getDsn(), 'sqlite::memory:', 15) !== 0) {
+            /** reset PDO connection, unless its sqlite in-memory, which can only have one connection */
+            $this->pdo = null;
+        }
+    }
+
     public function createCommand(?string $sql = null, array $params = []): CommandInterface
     {
         $command = new CommandPDOSqlite($this, $this->queryCache);
