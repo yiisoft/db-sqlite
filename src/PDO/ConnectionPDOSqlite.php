@@ -16,6 +16,7 @@ use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 use function constant;
+use function strncmp;
 
 /**
  * Database connection class prefilled for SQLite Server.
