@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\PDO;
 
 use PDO;
-use Yiisoft\Db\Cache\QueryCache;
-use Yiisoft\Db\Cache\SchemaCache;
 use Yiisoft\Db\Command\CommandInterface;
 use Yiisoft\Db\Connection\ConnectionPDO;
-use Yiisoft\Db\Driver\PDODriver;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Query\QueryBuilderInterface;
@@ -19,18 +16,24 @@ use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 use function constant;
+use function strncmp;
 
 /**
  * Database connection class prefilled for SQLite Server.
  */
 final class ConnectionPDOSqlite extends ConnectionPDO
 {
-    public function __construct(
-        protected PDODriver $driver,
-        protected QueryCache $queryCache,
-        protected SchemaCache $schemaCache
-    ) {
-        parent::__construct($queryCache);
+    /**
+     * Reset the connection after cloning.
+     */
+    public function __clone()
+    {
+        $this->transaction = null;
+
+        if (strncmp($this->driver->getDsn(), 'sqlite::memory:', 15) !== 0) {
+            /** reset PDO connection, unless its sqlite in-memory, which can only have one connection */
+            $this->pdo = null;
+        }
     }
 
     public function createCommand(?string $sql = null, array $params = []): CommandInterface
