@@ -15,6 +15,7 @@ class TestCase extends AbstractTestCase
     use TestTrait;
 
     protected string $drivername = 'sqlite';
+    protected string $dsn;
     protected string $username = '';
     protected string $password = '';
     protected string $charset = 'UTF8';
@@ -33,7 +34,8 @@ class TestCase extends AbstractTestCase
         string $dsn = 'sqlite:' . __DIR__ . '/Runtime/yiitest.sq3',
         string $fixture = __DIR__ . '/Fixture/sqlite.sql'
     ): ConnectionPDOSqlite {
-        $pdoDriver = new PDODriver($dsn, $this->username, $this->password);
+        $this->dsn = $dsn;
+        $pdoDriver = new PDODriver($this->dsn, $this->username, $this->password);
         $this->db = new ConnectionPDOSqlite($pdoDriver, $this->createQueryCache(), $this->createSchemaCache());
         $this->db->setLogger($this->createLogger());
         $this->db->setProfiler($this->createProfiler());
