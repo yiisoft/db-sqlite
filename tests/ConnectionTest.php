@@ -26,12 +26,6 @@ final class ConnectionTest extends TestCase
         $this->assertIsObject($this->getConnection(true));
     }
 
-    public function testConstruct(): void
-    {
-        $db = $this->getConnection();
-        $this->assertEquals('sqlite:' . __DIR__ . '/Runtime/yiitest.sq3', $db->getDriver()->getDsn());
-    }
-
     public function testExceptionContainsRawQuery(): void
     {
         $db = $this->getConnection();
