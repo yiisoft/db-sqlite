@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests;
 
 use Yiisoft\Db\Sqlite\ColumnSchemaBuilder;
-use Yiisoft\Db\Sqlite\PDO\SchemaPDOSqlite;
+use Yiisoft\Db\Sqlite\Schema;
 use Yiisoft\Db\TestSupport\TestColumnSchemaBuilderTrait;
 
 /**
@@ -23,13 +23,13 @@ final class ColumnSchemaBuilderTest extends TestCase
     public function typesProvider(): array
     {
         return [
-            ['integer UNSIGNED', SchemaPDOSqlite::TYPE_INTEGER, null, [
+            ['integer UNSIGNED', Schema::TYPE_INTEGER, null, [
                 ['unsigned'],
             ]],
-            ['integer(10) UNSIGNED', SchemaPDOSqlite::TYPE_INTEGER, 10, [
+            ['integer(10) UNSIGNED', Schema::TYPE_INTEGER, 10, [
                 ['unsigned'],
             ]],
-            ['integer(10)', SchemaPDOSqlite::TYPE_INTEGER, 10, [
+            ['integer(10)', Schema::TYPE_INTEGER, 10, [
                 ['comment', 'test'],
             ]],
         ];

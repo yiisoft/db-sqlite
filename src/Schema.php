@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite\PDO;
+namespace Yiisoft\Db\Sqlite;
 
-use PDO;
 use Throwable;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Arrays\ArraySorter;
 use Yiisoft\Db\Cache\SchemaCache;
-use Yiisoft\Db\Connection\ConnectionPDOInterface;
+use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Constraint\CheckConstraint;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
@@ -20,12 +19,9 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Schema\ColumnSchema;
-use Yiisoft\Db\Schema\Schema;
-use Yiisoft\Db\Sqlite\ColumnSchemaBuilder;
-use Yiisoft\Db\Sqlite\SqlToken;
-use Yiisoft\Db\Sqlite\SqlTokenizer;
-use Yiisoft\Db\Sqlite\TableSchema;
+use Yiisoft\Db\Schema\Schema as AbstractSchema;
 
+use Yiisoft\Db\Sqlite\PDO\TransactionPDOSqlite;
 use function count;
 use function explode;
 use function preg_match;
@@ -84,7 +80,7 @@ use function trim;
  *   array{cid:string, name:string, type:string, notnull:string, dflt_value:string|null, pk:string}
  * >
  */
-final class SchemaPDOSqlite extends Schema
+final class Schema extends AbstractSchema
 {
     /**
      * @var array mapping from physical column types (keys) to abstract column types (values)
@@ -122,7 +118,7 @@ final class SchemaPDOSqlite extends Schema
         'enum' => self::TYPE_STRING,
     ];
 
-    public function __construct(private ConnectionPDOInterface $db, SchemaCache $schemaCache)
+    public function __construct(private ConnectionInterface $db, SchemaCache $schemaCache)
     {
         parent::__construct($schemaCache);
     }
@@ -208,7 +204,7 @@ final class SchemaPDOSqlite extends Schema
         /** @psalm-var PragmaForeignKeyList */
         $foreignKeysList = $this->getPragmaForeignKeyList($tableName);
         /** @psalm-var NormalizePragmaForeignKeyList */
-        $foreignKeysList = $this->normalizePdoRowKeyCase($foreignKeysList, true);
+        $foreignKeysList = $this->normalizeRowKeyCase($foreignKeysList, true);
         /** @psalm-var NormalizePragmaForeignKeyList */
         $foreignKeysList = ArrayHelper::index($foreignKeysList, null, 'table');
         ArraySorter::multisort($foreignKeysList, 'seq', SORT_ASC, SORT_NUMERIC);
@@ -547,7 +543,7 @@ final class SchemaPDOSqlite extends Schema
     {
         $tableColumns = $this->getPragmaTableInfo($tableName);
         /** @psalm-var PragmaTableInfo */
-        $tableColumns = $this->normalizePdoRowKeyCase($tableColumns, true);
+        $tableColumns = $this->normalizeRowKeyCase($tableColumns, true);
 
         return ArrayHelper::index($tableColumns, 'cid');
     }
@@ -568,7 +564,7 @@ final class SchemaPDOSqlite extends Schema
     {
         $indexList = $this->getPragmaIndexList($tableName);
         /** @psalm-var PragmaIndexList $indexes */
-        $indexes = $this->normalizePdoRowKeyCase($indexList, true);
+        $indexes = $this->normalizeRowKeyCase($indexList, true);
         $result = ['primaryKey' => null, 'indexes' => [], 'uniques' => []];
 
         foreach ($indexes as $index) {
@@ -649,7 +645,7 @@ final class SchemaPDOSqlite extends Schema
             ->createCommand('PRAGMA INDEX_INFO(' . (string) $this->db->getQuoter()->quoteValue($name) . ')')
             ->queryAll();
         /** @psalm-var Column */
-        $column = $this->normalizePdoRowKeyCase($column, true);
+        $column = $this->normalizeRowKeyCase($column, true);
         ArraySorter::multisort($column, 'seqno', SORT_ASC, SORT_NUMERIC);
 
         return $column;
@@ -726,21 +722,15 @@ final class SchemaPDOSqlite extends Schema
     }
 
     /**
-     * Changes row's array key case to lower if PDO one is set to uppercase.
+     * Changes row's array key case to lower.
      *
      * @param array $row row's array or an array of row's arrays.
      * @param bool $multiple whether multiple rows or a single row passed.
      *
-     * @throws Exception
-     *
      * @return array normalized row or rows.
      */
-    protected function normalizePdoRowKeyCase(array $row, bool $multiple): array
+    protected function normalizeRowKeyCase(array $row, bool $multiple): array
     {
-        if ($this->db->getActivePDO()?->getAttribute(PDO::ATTR_CASE) !== PDO::CASE_UPPER) {
-            return $row;
-        }
-
         if ($multiple) {
             return array_map(static function (array $row) {
                 return array_change_key_case($row, CASE_LOWER);

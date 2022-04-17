@@ -8,7 +8,7 @@ use Closure;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\Sqlite\PDO\SchemaPDOSqlite;
+use Yiisoft\Db\Sqlite\Schema;
 use Yiisoft\Db\TestSupport\TestQueryBuilderTrait;
 
 /**
@@ -227,10 +227,10 @@ final class QueryBuilderTest extends TestCase
         foreach ($this->columnTypes() as [$column, $builder, $expected]) {
             if (
                 !(
-                    strncmp($column, SchemaPDOSqlite::TYPE_PK, 2) === 0 ||
-                    strncmp($column, SchemaPDOSqlite::TYPE_UPK, 3) === 0 ||
-                    strncmp($column, SchemaPDOSqlite::TYPE_BIGPK, 5) === 0 ||
-                    strncmp($column, SchemaPDOSqlite::TYPE_UBIGPK, 6) === 0 ||
+                    strncmp($column, Schema::TYPE_PK, 2) === 0 ||
+                    strncmp($column, Schema::TYPE_UPK, 3) === 0 ||
+                    strncmp($column, Schema::TYPE_BIGPK, 5) === 0 ||
+                    strncmp($column, Schema::TYPE_UBIGPK, 6) === 0 ||
                     strncmp(substr($column, -5), 'FIRST', 5) === 0
                 )
             ) {

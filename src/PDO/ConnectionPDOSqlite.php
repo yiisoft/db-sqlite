@@ -13,6 +13,7 @@ use Yiisoft\Db\Query\QueryBuilderInterface;
 use Yiisoft\Db\Schema\Quoter;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
+use Yiisoft\Db\Sqlite\Schema;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 use function constant;
@@ -93,7 +94,7 @@ final class ConnectionPDOSqlite extends ConnectionPDO
     public function getSchema(): SchemaInterface
     {
         if ($this->schema === null) {
-            $this->schema = new SchemaPDOSqlite($this, $this->schemaCache);
+            $this->schema = new Schema($this, $this->schemaCache);
         }
 
         return $this->schema;
