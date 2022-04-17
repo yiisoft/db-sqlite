@@ -20,8 +20,8 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Schema\ColumnSchema;
 use Yiisoft\Db\Schema\Schema as AbstractSchema;
+use Yiisoft\Db\Transaction\TransactionInterface;
 
-use Yiisoft\Db\Sqlite\PDO\TransactionPDOSqlite;
 use function count;
 use function explode;
 use function preg_match;
@@ -33,7 +33,7 @@ use function trim;
  * Schema is the class for retrieving metadata from a SQLite (2/3) database.
  *
  * @property string $transactionIsolationLevel The transaction isolation level to use for this transaction. This can be
- * either {@see TransactionPDOSqlite::READ_UNCOMMITTED} or {@see TransactionPDOSqlite::SERIALIZABLE}.
+ * either {@see TransactionInterface::READ_UNCOMMITTED} or {@see TransactionInterface::SERIALIZABLE}.
  *
  * @psalm-type Column = array<array-key, array{seqno:string, cid:string, name:string}>
  *
@@ -504,33 +504,6 @@ final class Schema extends AbstractSchema
     }
 
     /**
-     * Sets the isolation level of the current transaction.
-     *
-     * @param string $level The transaction isolation level to use for this transaction. This can be either
-     * {@see TransactionPDOSqlite::READ_UNCOMMITTED} or {@see TransactionPDOSqlite::SERIALIZABLE}.
-     *
-     * @throws Exception|InvalidConfigException|NotSupportedException|Throwable when unsupported isolation levels are
-     * used. SQLite only supports SERIALIZABLE and READ UNCOMMITTED.
-     *
-     * {@see http://www.sqlite.org/pragma.html#pragma_read_uncommitted}
-     */
-    public function setTransactionIsolationLevel(string $level): void
-    {
-        switch ($level) {
-            case TransactionPDOSqlite::SERIALIZABLE:
-                $this->db->createCommand('PRAGMA read_uncommitted = False;')->execute();
-                break;
-            case TransactionPDOSqlite::READ_UNCOMMITTED:
-                $this->db->createCommand('PRAGMA read_uncommitted = True;')->execute();
-                break;
-            default:
-                throw new NotSupportedException(
-                    self::class . ' only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.'
-                );
-        }
-    }
-
-    /**
      * Returns table columns info.
      *
      * @param string $tableName table name.
@@ -671,11 +644,6 @@ final class Schema extends AbstractSchema
         )->queryAll();
     }
 
-    public function rollBackSavepoint(string $name): void
-    {
-        $this->db->createCommand("ROLLBACK TO SAVEPOINT $name")->execute();
-    }
-
     /**
      * Returns the actual name of a given table name.
      *
@@ -749,34 +717,10 @@ final class Schema extends AbstractSchema
     }
 
     /**
-     * Creates a new savepoint.
-     *
-     * @param string $name the savepoint name
-     *
-     * @throws Exception|InvalidConfigException|Throwable
-     */
-    public function createSavepoint(string $name): void
-    {
-        $this->db->createCommand("SAVEPOINT $name")->execute();
-    }
-
-    /**
      * @inheritDoc
      */
     public function getLastInsertID(?string $sequenceName = null): string
     {
         return $this->db->getLastInsertID($sequenceName);
-    }
-
-    /**
-     * Releases an existing savepoint.
-     *
-     * @param string $name the savepoint name
-     *
-     * @throws Exception|InvalidConfigException|Throwable
-     */
-    public function releaseSavepoint(string $name): void
-    {
-        $this->db->createCommand("RELEASE SAVEPOINT $name")->execute();
     }
 }
