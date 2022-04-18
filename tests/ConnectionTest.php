@@ -9,8 +9,8 @@ use Yiisoft\Cache\CacheKeyNormalizer;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
-use Yiisoft\Db\Sqlite\PDO\TransactionPDOSqlite;
 use Yiisoft\Db\TestSupport\TestConnectionTrait;
+use Yiisoft\Db\Transaction\TransactionInterface;
 
 use function count;
 
@@ -327,9 +327,9 @@ final class ConnectionTest extends TestCase
     public function testTransactionIsolation(): void
     {
         $db = $this->getConnection(true);
-        $transaction = $db->beginTransaction(TransactionPDOSqlite::READ_UNCOMMITTED);
+        $transaction = $db->beginTransaction(TransactionInterface::READ_UNCOMMITTED);
         $transaction->rollBack();
-        $transaction = $db->beginTransaction(TransactionPDOSqlite::SERIALIZABLE);
+        $transaction = $db->beginTransaction(TransactionInterface::SERIALIZABLE);
         $transaction->rollBack();
 
         /* No exceptions means test is passed. */
@@ -343,7 +343,7 @@ final class ConnectionTest extends TestCase
         $result = $db->transaction(static function (ConnectionInterface $db) {
             $db->createCommand()->insert('profile', ['description' => 'test transaction shortcut'])->execute();
             return true;
-        }, TransactionPDOSqlite::READ_UNCOMMITTED);
+        }, TransactionInterface::READ_UNCOMMITTED);
 
         $this->assertTrue($result, 'transaction shortcut valid value should be returned from callback');
 
