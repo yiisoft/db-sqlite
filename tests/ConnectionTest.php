@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
-use PDO;
 use Yiisoft\Cache\CacheKeyNormalizer;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
@@ -188,28 +187,6 @@ final class ConnectionTest extends TestCase
         $this->assertCount(1, $hit_masters, 'same master hit');
         /* slaves are always random */
         $this->assertCount($slavesCount, $hit_slaves, 'all slaves hit');
-    }
-
-    public function testOpenClose(): void
-    {
-        $db = $this->getConnection();
-
-        $this->assertFalse($db->isActive());
-        $this->assertNull($db->getPDO());
-
-        $db->open();
-        $this->assertTrue($db->isActive());
-        $this->assertInstanceOf(PDO::class, $db->getPDO());
-
-        $db->close();
-        $this->assertFalse($db->isActive());
-        $this->assertNull($db->getPDO());
-
-        $db = $this->getConnection(false, 'unknown::memory:');
-
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('could not find driver');
-        $db->open();
     }
 
     public function testQuoteValue(): void
