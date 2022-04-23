@@ -534,4 +534,9 @@ final class SchemaTest extends TestCase
         $this->assertEquals($refreshedTable, $testRefreshedTable);
         $this->assertNotSame($testNoCacheTable, $testRefreshedTable);
     }
+
+    public function testGetSchemaDefaultValues(): void
+    {
+        $this->markTestSkipped('SQLite does not support default value constraints.');
+    }
 }

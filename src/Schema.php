@@ -184,7 +184,7 @@ final class Schema extends AbstractSchema
      */
     protected function loadTablePrimaryKey(string $tableName): ?Constraint
     {
-        $tablePrimaryKey = $this->loadTableConstraints($tableName, 'primaryKey');
+        $tablePrimaryKey = $this->loadTableConstraints($tableName, self::PRIMARY_KEY);
 
         return $tablePrimaryKey instanceof Constraint ? $tablePrimaryKey : null;
     }
@@ -237,7 +237,7 @@ final class Schema extends AbstractSchema
      */
     protected function loadTableIndexes(string $tableName): array
     {
-        $tableIndexes = $this->loadTableConstraints($tableName, 'indexes');
+        $tableIndexes = $this->loadTableConstraints($tableName, self::INDEXES);
 
         return is_array($tableIndexes) ? $tableIndexes : [];
     }
@@ -255,7 +255,7 @@ final class Schema extends AbstractSchema
      */
     protected function loadTableUniques(string $tableName): array
     {
-        $tableUniques = $this->loadTableConstraints($tableName, 'uniques');
+        $tableUniques = $this->loadTableConstraints($tableName, self::UNIQUES);
 
         return is_array($tableUniques) ? $tableUniques : [];
     }
@@ -476,12 +476,12 @@ final class Schema extends AbstractSchema
                 }
 
                 if ($column->getSize() === 1 && ($type === 'tinyint' || $type === 'bit')) {
-                    $column->type('boolean');
+                    $column->type(self::TYPE_BOOLEAN);
                 } elseif ($type === 'bit') {
                     if ($column->getSize() > 32) {
-                        $column->type('bigint');
+                        $column->type(self::TYPE_BIGINT);
                     } elseif ($column->getSize() === 32) {
-                        $column->type('integer');
+                        $column->type(self::TYPE_INTEGER);
                     }
                 }
             }
@@ -538,31 +538,35 @@ final class Schema extends AbstractSchema
         $indexList = $this->getPragmaIndexList($tableName);
         /** @psalm-var PragmaIndexList $indexes */
         $indexes = $this->normalizeRowKeyCase($indexList, true);
-        $result = ['primaryKey' => null, 'indexes' => [], 'uniques' => []];
+        $result = [
+            self::PRIMARY_KEY => null,
+            self::INDEXES => [],
+            self::UNIQUES => [],
+        ];
 
         foreach ($indexes as $index) {
             /** @psalm-var Column $columns */
             $columns = $this->getPragmaIndexInfo($index['name']);
 
-            $result['indexes'][] = (new IndexConstraint())
-                ->primary($index['origin'] === 'pk')
-                ->unique((bool) $index['unique'])
-                ->name($index['name'])
-                ->columnNames(ArrayHelper::getColumn($columns, 'name'));
+            if ($index['origin'] === 'pk') {
+                $result[self::PRIMARY_KEY] = (new Constraint())
+                    ->columnNames(ArrayHelper::getColumn($columns, 'name'));
+            }
 
             if ($index['origin'] === 'u') {
-                $result['uniques'][] = (new Constraint())
+                $result[self::UNIQUES][] = (new Constraint())
                     ->name($index['name'])
                     ->columnNames(ArrayHelper::getColumn($columns, 'name'));
             }
 
-            if ($index['origin'] === 'pk') {
-                $result['primaryKey'] = (new Constraint())
-                    ->columnNames(ArrayHelper::getColumn($columns, 'name'));
-            }
+            $result[self::INDEXES][] = (new IndexConstraint())
+                ->primary($index['origin'] === 'pk')
+                ->unique((bool) $index['unique'])
+                ->name($index['name'])
+                ->columnNames(ArrayHelper::getColumn($columns, 'name'));
         }
 
-        if (!isset($result['primaryKey'])) {
+        if (!isset($result[self::PRIMARY_KEY])) {
             /**
              * Additional check for PK in case of INTEGER PRIMARY KEY with ROWID.
              *
@@ -574,7 +578,7 @@ final class Schema extends AbstractSchema
 
             foreach ($tableColumns as $tableColumn) {
                 if ($tableColumn['pk'] > 0) {
-                    $result['primaryKey'] = (new Constraint())->columnNames([$tableColumn['name']]);
+                    $result[self::PRIMARY_KEY] = (new Constraint())->columnNames([$tableColumn['name']]);
                     break;
                 }
             }
