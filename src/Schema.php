@@ -564,7 +564,6 @@ final class Schema extends AbstractSchema
                 ->unique((bool) $index['unique'])
                 ->name($index['name'])
                 ->columnNames(ArrayHelper::getColumn($columns, 'name'));
-
         }
 
         if (!isset($result[self::PRIMARY_KEY])) {
