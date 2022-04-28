@@ -8,8 +8,6 @@ use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\TestSupport\TestQueryTrait;
 
-use function version_compare;
-
 /**
  * @group sqlite
  */
