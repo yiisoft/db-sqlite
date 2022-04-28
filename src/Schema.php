@@ -454,7 +454,7 @@ final class Schema extends AbstractSchema
         $column = $this->createColumnSchema();
         $column->name($info['name']);
         $column->allowNull(!$info['notnull']);
-        $column->primaryKey($info['pk'] !== '0');
+        $column->primaryKey($info['pk'] != '0');
         $column->dbType(strtolower($info['type']));
         $column->unsigned(str_contains($column->getDbType(), 'unsigned'));
         $column->type(self::TYPE_STRING);
