@@ -20,6 +20,7 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Schema\ColumnSchema;
 use Yiisoft\Db\Schema\Schema as AbstractSchema;
+use Yiisoft\Db\Schema\TableSchemaInterface;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 use function count;
@@ -345,13 +346,13 @@ final class Schema extends AbstractSchema
     /**
      * Collects the table column metadata.
      *
-     * @param TableSchema $table the table metadata.
+     * @param TableSchemaInterface $table the table metadata.
      *
      * @throws Exception|InvalidConfigException|Throwable
      *
      * @return bool whether the table exists in the database.
      */
-    protected function findColumns(TableSchema $table): bool
+    protected function findColumns(TableSchemaInterface $table): bool
     {
         /** @psalm-var PragmaTableInfo */
         $columns = $this->getPragmaTableInfo($table->getName());
@@ -378,11 +379,11 @@ final class Schema extends AbstractSchema
     /**
      * Collects the foreign key column details for the given table.
      *
-     * @param TableSchema $table the table metadata.
+     * @param TableSchemaInterface $table the table metadata.
      *
      * @throws Exception|InvalidConfigException|Throwable
      */
-    protected function findConstraints(TableSchema $table): void
+    protected function findConstraints(TableSchemaInterface $table): void
     {
         /** @psalm-var PragmaForeignKeyList */
         $foreignKeysList = $this->getPragmaForeignKeyList($table->getName());
@@ -412,13 +413,13 @@ final class Schema extends AbstractSchema
      * ]
      * ```
      *
-     * @param TableSchema $table the table metadata.
+     * @param TableSchemaInterface $table the table metadata.
      *
      * @throws Exception|InvalidConfigException|Throwable
      *
      * @return array all unique indexes for the given table.
      */
-    public function findUniqueIndexes(TableSchema $table): array
+    public function findUniqueIndexes(TableSchemaInterface $table): array
     {
         /** @psalm-var PragmaIndexList */
         $indexList = $this->getPragmaIndexList($table->getName());

@@ -6,6 +6,7 @@ namespace Yiisoft\Db\Sqlite\PDO;
 
 use PDO;
 use Yiisoft\Db\Command\CommandInterface;
+use Yiisoft\Db\Command\CommandPDOInterface;
 use Yiisoft\Db\Connection\ConnectionPDO;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -37,7 +38,7 @@ final class ConnectionPDOSqlite extends ConnectionPDO
         }
     }
 
-    public function createCommand(?string $sql = null, array $params = []): CommandInterface
+    public function createCommand(?string $sql = null, array $params = []): CommandPDOInterface
     {
         $command = new CommandPDOSqlite($this, $this->queryCache);
 
