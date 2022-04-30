@@ -6,7 +6,7 @@ namespace Yiisoft\Db\Sqlite\PDO;
 
 use PDOException;
 use Throwable;
-use Yiisoft\Db\Command\CommandPDO;
+use Yiisoft\Db\Driver\PDO\CommandPDO;
 use Yiisoft\Db\Exception\ConvertException;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
