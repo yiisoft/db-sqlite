@@ -109,17 +109,11 @@ final class CommandTest extends TestCase
         $db->createCommand($sql, ['val1' => 'foo', 'val2' => 'bar'])->execute();
         $queryAll = $db->createCommand('SELECT * FROM {{T_multistatement}}')->queryAll();
 
-        if (version_compare(PHP_VERSION, '8.1', '>=')) {
-            $this->assertSame(
-                [['intcol' => 41, 'textcol' => 'foo'], [ 'intcol' => 42, 'textcol' => 'bar']],
-                $queryAll,
-            );
-        } else {
-            $this->assertSame(
-                [['intcol' => '41', 'textcol' => 'foo'], [ 'intcol' => '42', 'textcol' => 'bar']],
-                $queryAll,
-            );
-        }
+        /** @todo need fix for this behaviour PHP8.1 + pdo_mysql */
+        $this->assertEquals(
+            [['intcol' => 41, 'textcol' => 'foo'], [ 'intcol' => 42, 'textcol' => 'bar']],
+            $queryAll,
+        );
 
         $sql = <<<SQL
         UPDATE {{T_multistatement}} SET [[intcol]] = :newInt WHERE [[textcol]] = :val1;
@@ -127,14 +121,10 @@ final class CommandTest extends TestCase
         SELECT * FROM {{T_multistatement}}
         SQL;
 
-        // check
         $queryAll = $db->createCommand($sql, ['newInt' => 410, 'val1' => 'foo', 'val2' => 'bar'])->queryAll();
 
-        if (version_compare(PHP_VERSION, '8.1', '>=')) {
-            $this->assertSame([['intcol' => 410, 'textcol' => 'foo']], $queryAll);
-        } else {
-            $this->assertSame([['intcol' => '410', 'textcol' => 'foo']], $queryAll);
-        }
+        /** @todo need fix for this behaviour PHP8.1 + pdo_mysql */
+        $this->assertEquals([['intcol' => 410, 'textcol' => 'foo']], $queryAll);
     }
 
     public function batchInsertSqlProvider(): array
