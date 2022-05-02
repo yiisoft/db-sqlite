@@ -104,7 +104,7 @@ final class QueryBuilderPDOSqlite extends QueryBuilder
     /**
      * @throws NotSupportedException
      */
-    public function alterColumn(string $table, string $column, string|ColumnSchemaBuilder $type): string
+    public function alterColumn(string $table, string $column, ColumnSchemaBuilder|string $type): string
     {
         return $this->ddlBuilder->alterColumn($table, $column, $type);
     }

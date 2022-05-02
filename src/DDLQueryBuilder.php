@@ -76,7 +76,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     /**
      * @throws NotSupportedException
      */
-    public function alterColumn(string $table, string $column, string|ColumnSchemaBuilder $type): string
+    public function alterColumn(string $table, string $column, ColumnSchemaBuilder|string $type): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
