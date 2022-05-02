@@ -212,6 +212,9 @@ final class SchemaTest extends TestCase
 
         $schema = $db->getSchema();
         $table = $schema->getTableSchema('composite_fk');
+
+        $this->assertNotNull($table);
+
         $fk = $table->getForeignKeys();
         $this->assertCount(1, $fk);
         $this->assertTrue(isset($fk[0]));
@@ -231,22 +234,34 @@ final class SchemaTest extends TestCase
 
         $db->createCommand()->createTable('uniqueIndex', ['somecol' => 'string', 'someCol2' => 'string'])->execute();
         $schema = $db->getSchema();
-        $uniqueIndexes = $schema->findUniqueIndexes($schema->getTableSchema('uniqueIndex', true));
+
+        $tableSchema = $schema->getTableSchema('uniqueIndex', true);
+        $this->assertNotNull($tableSchema);
+        $uniqueIndexes = $schema->findUniqueIndexes($tableSchema);
         $this->assertSame([], $uniqueIndexes);
 
         $db->createCommand()->createIndex('somecolUnique', 'uniqueIndex', 'somecol', true)->execute();
-        $uniqueIndexes = $schema->findUniqueIndexes($schema->getTableSchema('uniqueIndex', true));
+
+        $tableSchema = $schema->getTableSchema('uniqueIndex', true);
+        $this->assertNotNull($tableSchema);
+        $uniqueIndexes = $schema->findUniqueIndexes($tableSchema);
         $this->assertEquals(['somecolUnique' => ['somecol']], $uniqueIndexes);
 
         // create another column with upper case letter that fails postgres
         // see https://github.com/yiisoft/yii2/issues/10613
         $db->createCommand()->createIndex('someCol2Unique', 'uniqueIndex', 'someCol2', true)->execute();
-        $uniqueIndexes = $schema->findUniqueIndexes($schema->getTableSchema('uniqueIndex', true));
+
+        $tableSchema = $schema->getTableSchema('uniqueIndex', true);
+        $this->assertNotNull($tableSchema);
+        $uniqueIndexes = $schema->findUniqueIndexes($tableSchema);
         $this->assertEquals(['somecolUnique' => ['somecol'], 'someCol2Unique' => ['someCol2']], $uniqueIndexes);
 
         // see https://github.com/yiisoft/yii2/issues/13814
         $db->createCommand()->createIndex('another unique index', 'uniqueIndex', 'someCol2', true)->execute();
-        $uniqueIndexes = $schema->findUniqueIndexes($schema->getTableSchema('uniqueIndex', true));
+
+        $tableSchema = $schema->getTableSchema('uniqueIndex', true);
+        $this->assertNotNull($tableSchema);
+        $uniqueIndexes = $schema->findUniqueIndexes($tableSchema);
         $this->assertEquals(
             ['somecolUnique' => ['somecol'], 'someCol2Unique' => ['someCol2'], 'another unique index' => ['someCol2']],
             $uniqueIndexes,
@@ -336,7 +351,7 @@ final class SchemaTest extends TestCase
         $db = $this->getConnection(true);
 
         foreach ($pdoAttributes as $name => $value) {
-            $db->getPDO()->setAttribute($name, $value);
+            $db->getPDO()?->setAttribute($name, $value);
         }
 
         $schema = $db->getSchema();
@@ -368,7 +383,7 @@ final class SchemaTest extends TestCase
         $db = $this->getConnection(true);
 
         foreach ($pdoAttributes as $name => $value) {
-            $db->getPDO()->setAttribute($name, $value);
+            $db->getPDO()?->setAttribute($name, $value);
         }
 
         $schema = $db->getSchema();
@@ -509,6 +524,9 @@ final class SchemaTest extends TestCase
     ): void {
         $db = $this->getConnection(true);
         $schema = $db->getSchema();
+
+        $this->assertNotNull($this->schemaCache);
+
         $this->schemaCache->setEnable(true);
 
         $db->setTablePrefix($tablePrefix);

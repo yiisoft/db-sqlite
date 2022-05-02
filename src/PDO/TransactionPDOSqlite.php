@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\PDO;
 
 use Throwable;
+use Yiisoft\Db\Driver\PDO\TransactionPDO;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Transaction\TransactionInterface;
-use Yiisoft\Db\Transaction\TransactionPDO;
 
 final class TransactionPDOSqlite extends TransactionPDO
 {

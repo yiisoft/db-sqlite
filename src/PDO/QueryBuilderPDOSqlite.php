@@ -16,6 +16,7 @@ use Yiisoft\Db\Query\Conditions\LikeCondition;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryBuilder;
 use Yiisoft\Db\Query\QueryInterface;
+use Yiisoft\Db\Schema\ColumnSchemaBuilder;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Schema\SchemaInterface;
@@ -103,7 +104,7 @@ final class QueryBuilderPDOSqlite extends QueryBuilder
     /**
      * @throws NotSupportedException
      */
-    public function alterColumn(string $table, string $column, string $type): string
+    public function alterColumn(string $table, string $column, string|ColumnSchemaBuilder $type): string
     {
         return $this->ddlBuilder->alterColumn($table, $column, $type);
     }

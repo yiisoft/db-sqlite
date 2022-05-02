@@ -9,6 +9,7 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Query\DDLQueryBuilder as AbstractDDLQueryBuilder;
 use Yiisoft\Db\Query\QueryBuilderInterface;
+use Yiisoft\Db\Schema\ColumnSchemaBuilder;
 
 final class DDLQueryBuilder extends AbstractDDLQueryBuilder
 {
@@ -75,7 +76,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     /**
      * @throws NotSupportedException
      */
-    public function alterColumn(string $table, string $column, string $type): string
+    public function alterColumn(string $table, string $column, string|ColumnSchemaBuilder $type): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
