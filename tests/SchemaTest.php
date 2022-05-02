@@ -9,7 +9,7 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Schema\TableSchema;
+use Yiisoft\Db\Schema\TableSchemaInterface;
 use Yiisoft\Db\TestSupport\AnyValue;
 use Yiisoft\Db\TestSupport\TestSchemaTrait;
 
@@ -391,7 +391,7 @@ final class SchemaTest extends TestCase
         $this->assertCount(count($schema->getTableNames()), $tables);
 
         foreach ($tables as $table) {
-            $this->assertInstanceOf(TableSchema::class, $table);
+            $this->assertInstanceOf(TableSchemaInterface::class, $table);
         }
     }
 
@@ -531,7 +531,7 @@ final class SchemaTest extends TestCase
 
         $db->setTablePrefix($tablePrefix);
         $noCacheTable = $schema->getTableSchema($tableName, true);
-        $this->assertInstanceOf(TableSchema::class, $noCacheTable);
+        $this->assertInstanceOf(TableSchemaInterface::class, $noCacheTable);
 
         /* Compare */
         $db->setTablePrefix($testTablePrefix);
@@ -541,14 +541,14 @@ final class SchemaTest extends TestCase
         $db->setTablePrefix($tablePrefix);
         $schema->refreshTableSchema($tableName);
         $refreshedTable = $schema->getTableSchema($tableName, false);
-        $this->assertInstanceOf(TableSchema::class, $refreshedTable);
+        $this->assertInstanceOf(TableSchemaInterface::class, $refreshedTable);
         $this->assertNotSame($noCacheTable, $refreshedTable);
 
         /* Compare */
         $db->setTablePrefix($testTablePrefix);
         $schema->refreshTableSchema($testTablePrefix);
         $testRefreshedTable = $schema->getTableSchema($testTableName, false);
-        $this->assertInstanceOf(TableSchema::class, $testRefreshedTable);
+        $this->assertInstanceOf(TableSchemaInterface::class, $testRefreshedTable);
         $this->assertEquals($refreshedTable, $testRefreshedTable);
         $this->assertNotSame($testNoCacheTable, $testRefreshedTable);
     }

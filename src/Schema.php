@@ -156,9 +156,9 @@ final class Schema extends AbstractSchema
      *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|Throwable
      *
-     * @return TableSchema|null DBMS-dependent table metadata, `null` if the table does not exist.
+     * @return TableSchemaInterface|null DBMS-dependent table metadata, `null` if the table does not exist.
      */
-    protected function loadTableSchema(string $name): ?TableSchema
+    protected function loadTableSchema(string $name): ?TableSchemaInterface
     {
         $table = new TableSchema();
 
