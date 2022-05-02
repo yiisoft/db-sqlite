@@ -17,7 +17,7 @@ final class ColumnSchemaBuilderTest extends TestCase
 
     public function getColumnSchemaBuilder($type, $length = null): ColumnSchemaBuilder
     {
-        return new ColumnSchemaBuilder($type, $length, $this->getConnection());
+        return new ColumnSchemaBuilder($type, $length);
     }
 
     public function typesProvider(): array
