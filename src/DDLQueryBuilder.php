@@ -11,6 +11,8 @@ use Yiisoft\Db\Query\DDLQueryBuilder as AbstractDDLQueryBuilder;
 use Yiisoft\Db\Query\QueryBuilderInterface;
 use Yiisoft\Db\Schema\ColumnSchemaBuilder;
 
+use function count;
+
 final class DDLQueryBuilder extends AbstractDDLQueryBuilder
 {
     public function __construct(private QueryBuilderInterface $queryBuilder)
@@ -99,9 +101,9 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         }
 
         return ($unique ? 'CREATE UNIQUE INDEX ' : 'CREATE INDEX ')
-            . $this->queryBuilder->quoter()->quoteTableName(($schema ? $schema . '.' : '') . $name)
+            . $this->quoter->quoteTableName(($schema ? $schema . '.' : '') . $name)
             . ' ON '
-            . $this->queryBuilder->quoter()->quoteTableName($table)
+            . $this->quoter->quoteTableName($table)
             . ' (' . $this->queryBuilder->buildColumns($columns) . ')';
     }
 
@@ -147,7 +149,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
 
     public function dropIndex(string $name, string $table): string
     {
-        return 'DROP INDEX ' . $this->queryBuilder->quoter()->quoteTableName($name);
+        return 'DROP INDEX ' . $this->quoter->quoteTableName($name);
     }
 
     /**
@@ -177,13 +179,13 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     public function renameTable(string $oldName, string $newName): string
     {
         return 'ALTER TABLE '
-            . $this->queryBuilder->quoter()->quoteTableName($oldName)
+            . $this->quoter->quoteTableName($oldName)
             . ' RENAME TO '
-            . $this->queryBuilder->quoter()->quoteTableName($newName);
+            . $this->quoter->quoteTableName($newName);
     }
 
     public function truncateTable(string $table): string
     {
-        return 'DELETE FROM ' . $this->queryBuilder->quoter()->quoteTableName($table);
+        return 'DELETE FROM ' . $this->quoter->quoteTableName($table);
     }
 }

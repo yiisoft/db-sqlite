@@ -73,7 +73,6 @@ final class ConnectionPDOSqlite extends ConnectionPDO
     {
         if ($this->queryBuilder === null) {
             $this->queryBuilder = new QueryBuilderPDOSqlite(
-                $this->createCommand(),
                 $this->getQuoter(),
                 $this->getSchema(),
             );

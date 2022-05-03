@@ -17,6 +17,10 @@ use Yiisoft\Db\Query\DMLQueryBuilder as AbstractDMLQueryBuilder;
 use Yiisoft\Db\Query\QueryBuilderInterface;
 use Yiisoft\Db\Query\QueryInterface;
 
+use function implode;
+use function ltrim;
+use function reset;
+
 final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 {
     public function __construct(private QueryBuilderInterface $queryBuilder)
@@ -29,26 +33,27 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
      */
     public function resetSequence(string $tableName, mixed $value = null): string
     {
-        $table = $this->queryBuilder->schema()->getTableSchema($tableName);
-
-        if ($table !== null && $table->getSequenceName() !== null) {
-            $tableName = $this->queryBuilder->quoter()->quoteTableName($tableName);
-            if ($value === null) {
-                $pk = $table->getPrimaryKey();
-                $key = $this->queryBuilder->quoter()->quoteColumnName(reset($pk));
-                $value = $this->queryBuilder->command()->setSql("SELECT MAX($key) FROM $tableName")->queryScalar();
-            } else {
-                $value = (int) $value - 1;
-            }
-
-            return "UPDATE sqlite_sequence SET seq='$value' WHERE name='{$table->getName()}'";
-        }
+        $table = $this->schema->getTableSchema($tableName);
 
         if ($table === null) {
             throw new InvalidArgumentException("Table not found: $tableName");
         }
 
-        throw new InvalidArgumentException("There is not sequence associated with table '$tableName'.'");
+        $sequenceName = $table->getSequenceName();
+        if ($sequenceName === null) {
+            throw new InvalidArgumentException("There is not sequence associated with table '$tableName'.'");
+        }
+
+        $tableName = $this->quoter->quoteTableName($tableName);
+        if ($value !== null) {
+            $value = "'" . ((int) $value - 1) . "'";
+        } else {
+            $pk = $table->getPrimaryKey();
+            $key = $this->quoter->quoteColumnName(reset($pk));
+            $value = '(SELECT MAX(' . $key . ') FROM ' . $tableName . ')';
+        }
+
+        return "UPDATE sqlite_sequence SET seq=" . $value . " WHERE name='" . $table->getName() ."'";
     }
 
     /**
@@ -68,7 +73,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
          * @psalm-var string[] $updateNames
          * @psalm-var array<string, ExpressionInterface|string>|bool $updateColumns
          */
-        [$uniqueNames, $insertNames, $updateNames] = $this->queryBuilder->prepareUpsertColumns(
+        [$uniqueNames, $insertNames, $updateNames] = $this->prepareUpsertColumns(
             $table,
             $insertColumns,
             $updateColumns,
@@ -82,10 +87,10 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         /**
          * @psalm-var string[] $placeholders
          */
-        [, $placeholders, $values, $params] = $this->queryBuilder->prepareInsertValues($table, $insertColumns, $params);
+        [, $placeholders, $values, $params] = $this->prepareInsertValues($table, $insertColumns, $params);
 
         $insertSql = 'INSERT OR IGNORE INTO '
-            . $this->queryBuilder->quoter()->quoteTableName($table)
+            . $this->quoter->quoteTableName($table)
             . (!empty($insertNames) ? ' (' . implode(', ', $insertNames) . ')' : '')
             . (!empty($placeholders) ? ' VALUES (' . implode(', ', $placeholders) . ')' : "$values");
 
@@ -94,14 +99,14 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         }
 
         $updateCondition = ['or'];
-        $quotedTableName = $this->queryBuilder->quoter()->quoteTableName($table);
+        $quotedTableName = $this->quoter->quoteTableName($table);
 
         foreach ($constraints as $constraint) {
             $constraintCondition = ['and'];
             /** @psalm-var string[] */
             $columnsNames = $constraint->getColumnNames();
             foreach ($columnsNames as $name) {
-                $quotedName = $this->queryBuilder->quoter()->quoteColumnName($name);
+                $quotedName = $this->quoter->quoteColumnName($name);
                 $constraintCondition[] = "$quotedTableName.$quotedName=(SELECT $quotedName FROM `EXCLUDED`)";
             }
             $updateCondition[] = $constraintCondition;
@@ -110,7 +115,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         if ($updateColumns === true) {
             $updateColumns = [];
             foreach ($updateNames as $name) {
-                $quotedName = $this->queryBuilder->quoter()->quoteColumnName($name);
+                $quotedName = $this->quoter->quoteColumnName($name);
 
                 if (strrpos($quotedName, '.') === false) {
                     $quotedName = "(SELECT $quotedName FROM `EXCLUDED`)";
