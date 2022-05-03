@@ -297,13 +297,34 @@ final class QueryBuilderTest extends TestCase
         $db = $this->getConnection(true);
         $qb = $db->getQueryBuilder();
 
-        $expected = "UPDATE sqlite_sequence SET seq='5' WHERE name='item'";
-        $sql = $qb->resetSequence('item');
+        $checkSql = "SELECT seq FROM sqlite_sequence where name='testCreateTable'";
+
+        // change to max row
+        $expected = "UPDATE sqlite_sequence SET seq=(SELECT MAX(`id`) FROM `testCreateTable`) WHERE name='testCreateTable'";
+        $sql = $qb->resetSequence('testCreateTable');
         $this->assertEquals($expected, $sql);
 
-        $expected = "UPDATE sqlite_sequence SET seq='3' WHERE name='item'";
-        $sql = $qb->resetSequence('item', 4);
+        $db->createCommand($sql)->execute();
+        $result = $db->createCommand($checkSql)->queryScalar();
+        $this->assertEquals(1, $result);
+
+        // change up
+        $expected = "UPDATE sqlite_sequence SET seq='3' WHERE name='testCreateTable'";
+        $sql = $qb->resetSequence('testCreateTable', 4);
         $this->assertEquals($expected, $sql);
+
+        $db->createCommand($sql)->execute();
+        $result = $db->createCommand($checkSql)->queryScalar();
+        $this->assertEquals(3, $result);
+
+        // and again change to max rows
+        $expected = "UPDATE sqlite_sequence SET seq=(SELECT MAX(`id`) FROM `testCreateTable`) WHERE name='testCreateTable'";
+        $sql = $qb->resetSequence('testCreateTable');
+        $this->assertEquals($expected, $sql);
+
+        $db->createCommand($sql)->execute();
+        $result = $db->createCommand($checkSql)->queryScalar();
+        $this->assertEquals(1, $result);
     }
 
     /**
