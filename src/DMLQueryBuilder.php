@@ -53,7 +53,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
             $value = '(SELECT MAX(' . $key . ') FROM ' . $tableName . ')';
         }
 
-        return "UPDATE sqlite_sequence SET seq=" . $value . " WHERE name='" . $table->getName() ."'";
+        return "UPDATE sqlite_sequence SET seq=" . $value . " WHERE name='" . $table->getName() . "'";
     }
 
     /**
