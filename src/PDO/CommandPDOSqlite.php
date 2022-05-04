@@ -11,6 +11,7 @@ use Yiisoft\Db\Exception\ConvertException;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Query\QueryBuilderInterface;
+use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Sqlite\SqlToken;
 use Yiisoft\Db\Sqlite\SqlTokenizer;
 use Yiisoft\Strings\StringHelper;
@@ -36,7 +37,7 @@ final class CommandPDOSqlite extends CommandPDO
             return false;
         }
 
-        $tableSchema = $this->queryBuilder()->schema()->getTableSchema($table);
+        $tableSchema = $this->db->getSchema()->getTableSchema($table);
         $tablePrimaryKeys = $tableSchema?->getPrimaryKey() ?? [];
 
         $result = [];
@@ -56,6 +57,11 @@ final class CommandPDOSqlite extends CommandPDO
     public function queryBuilder(): QueryBuilderInterface
     {
         return $this->db->getQueryBuilder();
+    }
+
+    public function schema(): SchemaInterface
+    {
+        return $this->db->getSchema();
     }
 
     /**
