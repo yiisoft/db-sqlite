@@ -11,7 +11,10 @@ use Yiisoft\Db\Query\Conditions\InCondition;
 use Yiisoft\Db\Query\Conditions\LikeCondition;
 use Yiisoft\Db\Query\DQLQueryBuilder as AbstractDQLQueryBuilder;
 use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\Query\QueryBuilderInterface;
 use Yiisoft\Db\Query\QueryInterface;
+use Yiisoft\Db\Schema\QuoterInterface;
+use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Sqlite\Builder\InConditionBuilder;
 use Yiisoft\Db\Sqlite\Builder\LikeConditionBuilder;
 
@@ -22,6 +25,14 @@ use function trim;
 
 final class DQLQueryBuilder extends AbstractDQLQueryBuilder
 {
+    public function __construct(
+        private QueryBuilderInterface $queryBuilder,
+        QuoterInterface $quoter,
+        SchemaInterface $schema
+    ) {
+        parent::__construct($queryBuilder, $quoter, $schema);
+    }
+
     public function build(QueryInterface $query, array $params = []): array
     {
         $query = $query->prepare($this->queryBuilder);
