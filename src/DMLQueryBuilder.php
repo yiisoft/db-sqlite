@@ -61,6 +61,11 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         return 'UPDATE sqlite_sequence SET seq=' . $value . " WHERE name='" . $table->getName() . "'";
     }
 
+    public function truncateTable(string $table): string
+    {
+        return 'DELETE FROM ' . $this->quoter->quoteTableName($table);
+    }
+
     /**
      * @throws Exception|InvalidArgumentException|InvalidConfigException|JsonException|NotSupportedException
      */
