@@ -6,7 +6,7 @@ namespace Yiisoft\Db\Sqlite\Tests;
 
 use Exception;
 use PHPUnit\Framework\TestCase as AbstractTestCase;
-use Yiisoft\Db\Driver\PDO\PDODriver;
+use Yiisoft\Db\Sqlite\PDO\PDODriver;
 use Yiisoft\Db\Sqlite\PDO\ConnectionPDOSqlite;
 use Yiisoft\Db\TestSupport\TestTrait;
 
