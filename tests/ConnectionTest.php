@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
+use PDO;
 use Yiisoft\Cache\CacheKeyNormalizer;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
@@ -399,5 +400,12 @@ final class ConnectionTest extends TestCase
         }
 
         $this->assertTrue($thrown, 'An exception should have been thrown by the command.');
+    }
+
+    public function testSettingDefaultAttributes(): void
+    {
+        $db = $this->getConnection();
+        $this->assertEquals(PDO::ERRMODE_EXCEPTION, $db->getActivePDO()->getAttribute(PDO::ATTR_ERRMODE));
+        $db->close();
     }
 }
