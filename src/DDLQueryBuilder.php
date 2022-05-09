@@ -96,7 +96,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     /**
      * @throws Exception|InvalidArgumentException
      */
-    public function createIndex(string $name, string $table, array|string $columns, bool $unique = false): string
+    public function createIndex(string $name, string $table, array|string $columns, ?string $indexType = null, ?string $indexMethod = null): string
     {
         $tableParts = explode('.', $table);
 
@@ -105,7 +105,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
             [$schema, $table] = $tableParts;
         }
 
-        return ($unique ? 'CREATE UNIQUE INDEX ' : 'CREATE INDEX ')
+        return 'CREATE ' . ($indexType ? ($indexType . ' ') : '') . 'INDEX '
             . $this->quoter->quoteTableName(($schema ? $schema . '.' : '') . $name)
             . ' ON '
             . $this->quoter->quoteTableName($table)
@@ -187,10 +187,5 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
             . $this->quoter->quoteTableName($oldName)
             . ' RENAME TO '
             . $this->quoter->quoteTableName($newName);
-    }
-
-    public function truncateTable(string $table): string
-    {
-        return 'DELETE FROM ' . $this->quoter->quoteTableName($table);
     }
 }
