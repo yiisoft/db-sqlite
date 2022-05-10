@@ -34,9 +34,8 @@ final class QueryTest extends TestCase
         $query->limit(new Expression('1 + 1'))->offset(new Expression('1 + 0'));
         $result = $query->column();
 
-        /** @todo need fix for this behaviour PHP8.1 + pdo_mysql */
-        $this->assertTrue(in_array('2', $result, false));
-        $this->assertTrue(in_array('3', $result, false));
-        $this->assertFalse(in_array('1', $result, false));
+        $this->assertContains('2', $result);
+        $this->assertContains('3', $result);
+        $this->assertNotContains('1', $result);
     }
 }
