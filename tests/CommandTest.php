@@ -109,9 +109,8 @@ final class CommandTest extends TestCase
         $db->createCommand($sql, ['val1' => 'foo', 'val2' => 'bar'])->execute();
         $queryAll = $db->createCommand('SELECT * FROM {{T_multistatement}}')->queryAll();
 
-        /** @todo need fix for this behaviour PHP8.1 + pdo_mysql */
-        $this->assertEquals(
-            [['intcol' => 41, 'textcol' => 'foo'], [ 'intcol' => 42, 'textcol' => 'bar']],
+        $this->assertSame(
+            [['intcol' => '41', 'textcol' => 'foo'], [ 'intcol' => '42', 'textcol' => 'bar']],
             $queryAll,
         );
 
@@ -123,8 +122,7 @@ final class CommandTest extends TestCase
 
         $queryAll = $db->createCommand($sql, ['newInt' => 410, 'val1' => 'foo', 'val2' => 'bar'])->queryAll();
 
-        /** @todo need fix for this behaviour PHP8.1 + pdo_mysql */
-        $this->assertEquals([['intcol' => 410, 'textcol' => 'foo']], $queryAll);
+        $this->assertSame([['intcol' => '410', 'textcol' => 'foo']], $queryAll);
     }
 
     public function batchInsertSqlProvider(): array
