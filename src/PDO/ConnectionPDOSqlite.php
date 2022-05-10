@@ -61,11 +61,6 @@ final class ConnectionPDOSqlite extends ConnectionPDO
         return new TransactionPDOSqlite($this);
     }
 
-    public function getDriverName(): string
-    {
-        return 'sqlite';
-    }
-
     /**
      * @throws Exception|InvalidConfigException
      */
@@ -112,11 +107,10 @@ final class ConnectionPDOSqlite extends ConnectionPDO
      */
     protected function initConnection(): void
     {
-        $this->pdo = $this->driver->createConnection();
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
         if ($this->getEmulatePrepare() !== null && constant('PDO::ATTR_EMULATE_PREPARES')) {
-            $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, $this->getEmulatePrepare());
+            $this->driver->attributes([PDO::ATTR_EMULATE_PREPARES => $this->getEmulatePrepare()]);
         }
+
+        $this->pdo = $this->driver->createConnection();
     }
 }
