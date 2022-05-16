@@ -50,7 +50,7 @@ final class InConditionBuilder extends BaseInConditionBuilder
      *
      * @param string|null $operator
      * @param array|Traversable $columns
-     * @param array|Traversable $values
+     * @param iterable|Iterator $values
      * @param array $params
      *
      * @return string SQL.
@@ -58,7 +58,7 @@ final class InConditionBuilder extends BaseInConditionBuilder
     protected function buildCompositeInCondition(
         ?string $operator,
         Traversable|array $columns,
-        Traversable|array $values,
+        iterable|Iterator $values,
         array &$params = []
     ): string {
         $quotedColumns = [];

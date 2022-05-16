@@ -119,7 +119,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
         /** @psalm-var array<array-key, array{query: Query|null, all: bool}> $unions */
         foreach ($unions as $i => $union) {
             $query = $union['query'];
-            if ($query instanceof Query) {
+            if ($query instanceof QueryInterface) {
                 [$unions[$i]['query'], $params] = $this->build($query, $params);
             }
 
