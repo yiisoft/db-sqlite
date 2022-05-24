@@ -16,7 +16,6 @@ use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Sqlite\Schema;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
-use function constant;
 use function strncmp;
 
 /**
