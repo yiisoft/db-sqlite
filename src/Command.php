@@ -45,11 +45,15 @@ final class Command extends BaseCommand
         foreach ($statements as $statement) {
             /** @var array $statement */
             [$statementSql, $statementParams] = $statement;
-            $this->setSql($statementSql)->bindValues($statementParams);
+            $this
+                ->setSql($statementSql)
+                ->bindValues($statementParams);
             $result = parent::execute();
         }
 
-        $this->setSql($sql)->bindValues($params);
+        $this
+            ->setSql($sql)
+            ->bindValues($params);
 
         return $result;
     }
@@ -87,15 +91,21 @@ final class Command extends BaseCommand
 
         foreach ($statements as $statement) {
             [$statementSql, $statementParams] = $statement;
-            $this->setSql($statementSql)->bindValues($statementParams);
+            $this
+                ->setSql($statementSql)
+                ->bindValues($statementParams);
             parent::execute();
         }
 
-        $this->setSql($lastStatementSql)->bindValues($lastStatementParams);
+        $this
+            ->setSql($lastStatementSql)
+            ->bindValues($lastStatementParams);
 
         $result = parent::queryInternal($method, $fetchMode);
 
-        $this->setSql($sql)->bindValues($params);
+        $this
+            ->setSql($sql)
+            ->bindValues($params);
 
         return $result;
     }

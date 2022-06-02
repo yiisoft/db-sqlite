@@ -21,7 +21,8 @@ final class QueryTest extends TestCase
 
         $query = new Query($db);
 
-        $query->select(['id', 'name'])
+        $query
+            ->select(['id', 'name'])
             ->from('item')
             ->union(
                 (new Query($db))
@@ -37,7 +38,10 @@ final class QueryTest extends TestCase
 
     public function testLimitOffsetWithExpression(): void
     {
-        $query = (new Query($this->getConnection()))->from('customer')->select('id')->orderBy('id');
+        $query = (new Query($this->getConnection()))
+            ->from('customer')
+            ->select('id')
+            ->orderBy('id');
 
         $query
             ->limit(new Expression('1 + 1'))

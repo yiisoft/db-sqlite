@@ -37,7 +37,10 @@ final class ConnectionTest extends TestCase
         $db = $this->getConnection();
 
         if ($db->getTableSchema('qlog1', true) === null) {
-            $db->createCommand()->createTable('qlog1', ['id' => 'pk'])->execute();
+            $db
+                ->createCommand()
+                ->createTable('qlog1', ['id' => 'pk'])
+                ->execute();
         }
 
         $db->setEmulatePrepare(true);
@@ -75,7 +78,9 @@ final class ConnectionTest extends TestCase
         $thrown = false;
 
         try {
-            $db->createCommand('INSERT INTO qlog1(a) VALUES(:a);', [':a' => 1])->execute();
+            $db
+                ->createCommand('INSERT INTO qlog1(a) VALUES(:a);', [':a' => 1])
+                ->execute();
         } catch (Exception $e) {
             $this->assertStringContainsString(
                 'INSERT INTO qlog1(a) VALUES(:a);',
@@ -91,10 +96,12 @@ final class ConnectionTest extends TestCase
         $thrown = false;
 
         try {
-            $db->createCommand(
-                'SELECT * FROM qlog1 WHERE id=:a ORDER BY nonexistingcolumn;',
-                [':a' => 1]
-            )->queryAll();
+            $db
+                ->createCommand(
+                    'SELECT * FROM qlog1 WHERE id=:a ORDER BY nonexistingcolumn;',
+                    [':a' => 1]
+                )
+                ->queryAll();
         } catch (Exception $e) {
             $this->assertStringContainsString(
                 'SELECT * FROM qlog1 WHERE id=:a ORDER BY nonexistingcolumn;',
@@ -155,31 +162,43 @@ final class ConnectionTest extends TestCase
             $db = $this->prepareMasterSlave($masterCount, $slaveCount);
 
             $this->assertInstanceOf(Connection::class, $db->getSlave());
-            $this->assertTrue($db->getSlave()->isActive());
+            $this->assertTrue($db
+                ->getSlave()
+                ->isActive());
             $this->assertFalse($db->isActive());
 
             /* test SELECT uses slave */
-            $this->assertEquals(2, $db->createCommand('SELECT COUNT(*) FROM profile')->queryScalar());
+            $this->assertEquals(2, $db
+                ->createCommand('SELECT COUNT(*) FROM profile')
+                ->queryScalar());
             $this->assertFalse($db->isActive());
 
             /* test UPDATE uses master */
-            $db->createCommand("UPDATE profile SET description='test' WHERE id=1")->execute();
+            $db
+                ->createCommand("UPDATE profile SET description='test' WHERE id=1")
+                ->execute();
             $this->assertTrue($db->isActive());
 
             if ($masterCount > 0) {
                 $this->assertInstanceOf(Connection::class, $db->getMaster());
-                $this->assertTrue($db->getMaster()->isActive());
+                $this->assertTrue($db
+                    ->getMaster()
+                    ->isActive());
             } else {
                 $this->assertNull($db->getMaster());
             }
 
             $this->assertNotEquals(
                 'test',
-                $db->createCommand('SELECT description FROM profile WHERE id=1')->queryScalar()
+                $db
+                    ->createCommand('SELECT description FROM profile WHERE id=1')
+                    ->queryScalar()
             );
 
             $result = $db->useMaster(static function (Connection $db) {
-                return $db->createCommand('SELECT description FROM profile WHERE id=1')->queryScalar();
+                return $db
+                    ->createCommand('SELECT description FROM profile WHERE id=1')
+                    ->queryScalar();
             });
 
             $this->assertEquals('test', $result);
@@ -200,8 +219,12 @@ final class ConnectionTest extends TestCase
             $db = $this->prepareMasterSlave($mastersCount, $slavesCount);
             $db->setShuffleMasters(true);
 
-            $hit_slaves[$db->getSlave()->getDsn()] = true;
-            $hit_masters[$db->getMaster()->getDsn()] = true;
+            $hit_slaves[$db
+                ->getSlave()
+                ->getDsn()] = true;
+            $hit_masters[$db
+                ->getMaster()
+                ->getDsn()] = true;
 
             if (\count($hit_slaves) === $slavesCount && \count($hit_masters) === $mastersCount) {
                 break;
@@ -226,8 +249,12 @@ final class ConnectionTest extends TestCase
             $db = $this->prepareMasterSlave($mastersCount, $slavesCount);
             $db->setShuffleMasters(false);
 
-            $hit_slaves[$db->getSlave()->getDsn()] = true;
-            $hit_masters[$db->getMaster()->getDsn()] = true;
+            $hit_slaves[$db
+                ->getSlave()
+                ->getDsn()] = true;
+            $hit_masters[$db
+                ->getMaster()
+                ->getDsn()] = true;
 
             if (\count($hit_slaves) === $slavesCount) {
                 break;
@@ -308,12 +335,16 @@ final class ConnectionTest extends TestCase
             ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', $db->getDsn()]
         );
 
-        $this->assertFalse($this->cache->psr()->has($cacheKey));
+        $this->assertFalse($this->cache
+            ->psr()
+            ->has($cacheKey));
 
         $db->open();
 
         $this->assertFalse(
-            $this->cache->psr()->has($cacheKey),
+            $this->cache
+                ->psr()
+                ->has($cacheKey),
             'Connection was successful – cache must not contain information about this DSN'
         );
 
@@ -338,7 +369,9 @@ final class ConnectionTest extends TestCase
         }
 
         $this->assertTrue(
-            $this->cache->psr()->has($cacheKey),
+            $this->cache
+                ->psr()
+                ->has($cacheKey),
             'Connection was not successful – cache must contain information about this DSN'
         );
 
@@ -349,7 +382,9 @@ final class ConnectionTest extends TestCase
     {
         $cacheKeyNormalizer = new CacheKeyNormalizer();
 
-        $this->cache->psr()->clear();
+        $this->cache
+            ->psr()
+            ->clear();
 
         $db = $this->getConnection();
 
@@ -366,11 +401,15 @@ final class ConnectionTest extends TestCase
             ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', $db->getDsn()]
         );
 
-        $this->assertFalse($this->cache->psr()->has($cacheKey));
+        $this->assertFalse($this->cache
+            ->psr()
+            ->has($cacheKey));
 
         $db->open();
 
-        $this->assertFalse($this->cache->psr()->has($cacheKey), 'Caching is disabled');
+        $this->assertFalse($this->cache
+            ->psr()
+            ->has($cacheKey), 'Caching is disabled');
 
         $db->close();
 
@@ -388,7 +427,9 @@ final class ConnectionTest extends TestCase
         } catch (InvalidConfigException $e) {
         }
 
-        $this->assertFalse($this->cache->psr()->has($cacheKey), 'Caching is disabled');
+        $this->assertFalse($this->cache
+            ->psr()
+            ->has($cacheKey), 'Caching is disabled');
 
         $db->close();
     }

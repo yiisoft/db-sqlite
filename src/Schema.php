@@ -98,7 +98,10 @@ final class Schema extends AbstractSchema
     {
         $sql = "SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name<>'sqlite_sequence' ORDER BY tbl_name";
 
-        return $this->getDb()->createCommand($sql)->queryColumn();
+        return $this
+            ->getDb()
+            ->createCommand($sql)
+            ->queryColumn();
     }
 
     /**
@@ -151,9 +154,12 @@ final class Schema extends AbstractSchema
      */
     protected function loadTableForeignKeys(string $tableName): array
     {
-        $foreignKeys = $this->getDb()->createCommand(
-            'PRAGMA FOREIGN_KEY_LIST (' . $this->quoteValue($tableName) . ')'
-        )->queryAll();
+        $foreignKeys = $this
+            ->getDb()
+            ->createCommand(
+                'PRAGMA FOREIGN_KEY_LIST (' . $this->quoteValue($tableName) . ')'
+            )
+            ->queryAll();
 
         $foreignKeys = $this->normalizePdoRowKeyCase($foreignKeys, true);
 
@@ -216,9 +222,12 @@ final class Schema extends AbstractSchema
      */
     protected function loadTableChecks(string $tableName): array
     {
-        $sql = $this->getDb()->createCommand('SELECT `sql` FROM `sqlite_master` WHERE name = :tableName', [
-            ':tableName' => $tableName,
-        ])->queryScalar();
+        $sql = $this
+            ->getDb()
+            ->createCommand('SELECT `sql` FROM `sqlite_master` WHERE name = :tableName', [
+                ':tableName' => $tableName,
+            ])
+            ->queryScalar();
 
         /** @var SqlToken[]|SqlToken[][]|SqlToken[][][] $code */
         $code = (new SqlTokenizer($sql))->tokenize();
@@ -314,7 +323,10 @@ final class Schema extends AbstractSchema
     protected function findColumns(TableSchema $table): bool
     {
         $sql = 'PRAGMA table_info(' . $this->quoteSimpleTableName($table->getName()) . ')';
-        $columns = $this->getDb()->createCommand($sql)->queryAll();
+        $columns = $this
+            ->getDb()
+            ->createCommand($sql)
+            ->queryAll();
 
         if (empty($columns)) {
             return false;
@@ -329,9 +341,13 @@ final class Schema extends AbstractSchema
         }
 
         $pk = $table->getPrimaryKey();
-        if (count($pk) === 1 && !strncasecmp($table->getColumn($pk[0])->getDbType(), 'int', 3)) {
+        if (count($pk) === 1 && !strncasecmp($table
+                ->getColumn($pk[0])
+                ->getDbType(), 'int', 3)) {
             $table->sequenceName('');
-            $table->getColumn($pk[0])->autoIncrement(true);
+            $table
+                ->getColumn($pk[0])
+                ->autoIncrement(true);
         }
 
         return true;
@@ -347,7 +363,10 @@ final class Schema extends AbstractSchema
     protected function findConstraints(TableSchema $table): void
     {
         $sql = 'PRAGMA foreign_key_list(' . $this->quoteSimpleTableName($table->getName()) . ')';
-        $keys = $this->getDb()->createCommand($sql)->queryAll();
+        $keys = $this
+            ->getDb()
+            ->createCommand($sql)
+            ->queryAll();
 
         foreach ($keys as $key) {
             $id = (int) $key['id'];
@@ -382,14 +401,20 @@ final class Schema extends AbstractSchema
     public function findUniqueIndexes(TableSchema $table): array
     {
         $sql = 'PRAGMA index_list(' . $this->quoteSimpleTableName($table->getName()) . ')';
-        $indexes = $this->getDb()->createCommand($sql)->queryAll();
+        $indexes = $this
+            ->getDb()
+            ->createCommand($sql)
+            ->queryAll();
         $uniqueIndexes = [];
 
         foreach ($indexes as $index) {
             $indexName = $index['name'];
-            $indexInfo = $this->getDb()->createCommand(
-                'PRAGMA index_info(' . $this->quoteValue($index['name']) . ')'
-            )->queryAll();
+            $indexInfo = $this
+                ->getDb()
+                ->createCommand(
+                    'PRAGMA index_info(' . $this->quoteValue($index['name']) . ')'
+                )
+                ->queryAll();
 
             if ($index['unique']) {
                 $uniqueIndexes[$indexName] = [];
@@ -476,10 +501,16 @@ final class Schema extends AbstractSchema
     {
         switch ($level) {
             case Transaction::SERIALIZABLE:
-                $this->getDb()->createCommand('PRAGMA read_uncommitted = False;')->execute();
+                $this
+                    ->getDb()
+                    ->createCommand('PRAGMA read_uncommitted = False;')
+                    ->execute();
                 break;
             case Transaction::READ_UNCOMMITTED:
-                $this->getDb()->createCommand('PRAGMA read_uncommitted = True;')->execute();
+                $this
+                    ->getDb()
+                    ->createCommand('PRAGMA read_uncommitted = True;')
+                    ->execute();
                 break;
             default:
                 throw new NotSupportedException(
@@ -499,9 +530,12 @@ final class Schema extends AbstractSchema
      */
     private function loadTableColumnsInfo(string $tableName): array
     {
-        $tableColumns = $this->getDb()->createCommand(
-            'PRAGMA TABLE_INFO (' . $this->quoteValue($tableName) . ')'
-        )->queryAll();
+        $tableColumns = $this
+            ->getDb()
+            ->createCommand(
+                'PRAGMA TABLE_INFO (' . $this->quoteValue($tableName) . ')'
+            )
+            ->queryAll();
 
         $tableColumns = $this->normalizePdoRowKeyCase($tableColumns, true);
 
@@ -521,9 +555,12 @@ final class Schema extends AbstractSchema
     private function loadTableConstraints(string $tableName, string $returnType)
     {
         $tableColumns = null;
-        $indexList = $this->getDb()->createCommand(
-            'PRAGMA INDEX_LIST (' . $this->quoteValue($tableName) . ')'
-        )->queryAll();
+        $indexList = $this
+            ->getDb()
+            ->createCommand(
+                'PRAGMA INDEX_LIST (' . $this->quoteValue($tableName) . ')'
+            )
+            ->queryAll();
         $indexes = $this->normalizePdoRowKeyCase($indexList, true);
 
         if (!empty($indexes) && !isset($indexes[0]['origin'])) {
@@ -621,7 +658,10 @@ final class Schema extends AbstractSchema
      */
     private function getPragmaIndexInfo(string $name): array
     {
-        $column = $this->getDb()->createCommand('PRAGMA INDEX_INFO (' . $this->quoteValue($name) . ')')->queryAll();
+        $column = $this
+            ->getDb()
+            ->createCommand('PRAGMA INDEX_INFO (' . $this->quoteValue($name) . ')')
+            ->queryAll();
         $columns = $this->normalizePdoRowKeyCase($column, true);
         ArraySorter::multisort($columns, 'seqno', SORT_ASC, SORT_NUMERIC);
 

@@ -42,21 +42,26 @@ final class QueryBuilderTest extends TestCase
 
         $secondQuery = new Query($db);
 
-        $secondQuery->select('id')
+        $secondQuery
+            ->select('id')
             ->from('TotalTotalExample t2')
             ->where('w > 5');
 
         $thirdQuery = new Query($db);
 
-        $thirdQuery->select('id')
+        $thirdQuery
+            ->select('id')
             ->from('TotalTotalExample t3')
             ->where('w = 3');
-        $query->select('id')
+        $query
+            ->select('id')
             ->from('TotalExample t1')
             ->where(['and', 'w > 0', 'x < 2'])
             ->union($secondQuery)
             ->union($thirdQuery, true);
-        [$actualQuerySql, $queryParams] = $this->getQueryBuilder()->build($query);
+        [$actualQuerySql, $queryParams] = $this
+            ->getQueryBuilder()
+            ->build($query);
 
         $this->assertEquals($expectedQuerySql, $actualQuerySql);
         $this->assertEquals([], $queryParams);
@@ -93,7 +98,9 @@ final class QueryBuilderTest extends TestCase
             ->withQuery($with2Query->union($with3Query), 'a2')
             ->from('a2');
 
-        [$actualQuerySql, $queryParams] = $this->getQueryBuilder()->build($query);
+        [$actualQuerySql, $queryParams] = $this
+            ->getQueryBuilder()
+            ->build($query);
 
         $this->assertEquals($expectedQuerySql, $actualQuerySql);
         $this->assertEquals([], $queryParams);
@@ -101,7 +108,9 @@ final class QueryBuilderTest extends TestCase
 
     public function testRenameTable()
     {
-        $sql = $this->getQueryBuilder()->renameTable('table_from', 'table_to');
+        $sql = $this
+            ->getQueryBuilder()
+            ->renameTable('table_from', 'table_to');
         $this->assertEquals('ALTER TABLE `table_from` RENAME TO `table_to`', $sql);
     }
 
@@ -193,7 +202,9 @@ final class QueryBuilderTest extends TestCase
      */
     public function testAddDropForeignKey(string $sql, Closure $builder): void
     {
-        $this->assertEqualsWithoutLE($this->getConnection()->quoteSql($sql), $builder($this->getQueryBuilder()));
+        $this->assertEqualsWithoutLE($this
+            ->getConnection()
+            ->quoteSql($sql), $builder($this->getQueryBuilder()));
     }
 
     public function batchInsertProvider(): array
@@ -265,7 +276,9 @@ final class QueryBuilderTest extends TestCase
 
         $query = (new Query($db))->where($condition);
 
-        [$sql, $params] = $this->getQueryBuilder()->build($query);
+        [$sql, $params] = $this
+            ->getQueryBuilder()
+            ->build($query);
 
         $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $this->replaceQuotes($expected)), $sql);
         $this->assertEquals($expectedParams, $params);
@@ -287,7 +300,9 @@ final class QueryBuilderTest extends TestCase
     {
         $query = (new Query($this->getConnection()))->filterWhere($condition);
 
-        [$sql, $params] = $this->getQueryBuilder()->build($query);
+        [$sql, $params] = $this
+            ->getQueryBuilder()
+            ->build($query);
 
         $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $this->replaceQuotes($expected)), $sql);
         $this->assertEquals($expectedParams, $params);
@@ -324,7 +339,9 @@ final class QueryBuilderTest extends TestCase
     {
         $params = [];
 
-        $sql = $this->getQueryBuilder()->buildFrom([$table], $params);
+        $sql = $this
+            ->getQueryBuilder()
+            ->buildFrom([$table], $params);
 
         $this->assertEquals('FROM ' . $this->replaceQuotes($expected), $sql);
     }
@@ -347,7 +364,9 @@ final class QueryBuilderTest extends TestCase
 
         $query = (new Query($db))->where($condition);
 
-        [$sql, $params] = $this->getQueryBuilder()->build($query);
+        [$sql, $params] = $this
+            ->getQueryBuilder()
+            ->build($query);
 
         $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $this->replaceQuotes($expected)), $sql);
         $this->assertEquals($expectedParams, $params);
@@ -372,16 +391,20 @@ final class QueryBuilderTest extends TestCase
 
         $subQuery = new Query($db);
 
-        $subQuery->select('1')
+        $subQuery
+            ->select('1')
             ->from('Website w');
 
         $query = new Query($db);
 
-        $query->select('id')
+        $query
+            ->select('id')
             ->from('TotalExample t')
             ->where([$cond, $subQuery]);
 
-        [$actualQuerySql, $actualQueryParams] = $this->getQueryBuilder()->build($query);
+        [$actualQuerySql, $actualQueryParams] = $this
+            ->getQueryBuilder()
+            ->build($query);
 
         $this->assertEquals($expectedQuerySql, $actualQuerySql);
         $this->assertEquals($expectedQueryParams, $actualQueryParams);
@@ -414,7 +437,9 @@ final class QueryBuilderTest extends TestCase
      */
     public function testCreateDropIndex(string $sql, Closure $builder): void
     {
-        $this->assertSame($this->getConnection()->quoteSql($sql), $builder($this->getQueryBuilder()));
+        $this->assertSame($this
+            ->getConnection()
+            ->quoteSql($sql), $builder($this->getQueryBuilder()));
     }
 
     /**
@@ -434,7 +459,9 @@ final class QueryBuilderTest extends TestCase
     {
         $actualParams = [];
 
-        $actualSQL = $this->getQueryBuilder()->delete($table, $condition, $actualParams);
+        $actualSQL = $this
+            ->getQueryBuilder()
+            ->delete($table, $condition, $actualParams);
 
         $this->assertSame($expectedSQL, $actualSQL);
         $this->assertSame($expectedParams, $actualParams);
@@ -458,7 +485,9 @@ final class QueryBuilderTest extends TestCase
     {
         $actualParams = $params;
 
-        $actualSQL = $this->getQueryBuilder()->insert($table, $columns, $actualParams);
+        $actualSQL = $this
+            ->getQueryBuilder()
+            ->insert($table, $columns, $actualParams);
 
         $this->assertSame($expectedSQL, $actualSQL);
         $this->assertSame($expectedParams, $actualParams);
@@ -481,13 +510,15 @@ final class QueryBuilderTest extends TestCase
     public function testUpdate(
         string $table,
         array $columns,
-        $condition,
+               $condition,
         string $expectedSQL,
         array $expectedParams
     ): void {
         $actualParams = [];
 
-        $actualSQL = $this->getQueryBuilder()->update($table, $columns, $condition, $actualParams);
+        $actualSQL = $this
+            ->getQueryBuilder()
+            ->update($table, $columns, $condition, $actualParams);
 
         $this->assertSame($expectedSQL, $actualSQL);
         $this->assertSame($expectedParams, $actualParams);
@@ -561,7 +592,8 @@ final class QueryBuilderTest extends TestCase
     {
         $actualParams = [];
 
-        $actualSQL = $this->getQueryBuilder()
+        $actualSQL = $this
+            ->getQueryBuilder()
             ->upsert($table, $insertColumns, $updateColumns, $actualParams);
 
         if (is_string($expectedSQL)) {

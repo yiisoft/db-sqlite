@@ -235,7 +235,9 @@ final class SchemaTest extends TestCase
         $connection = $this->getConnection(true);
 
         foreach ($pdoAttributes as $name => $value) {
-            $connection->getPDO()->setAttribute($name, $value);
+            $connection
+                ->getPDO()
+                ->setAttribute($name, $value);
         }
 
         $schema = $connection->getSchema();
@@ -268,7 +270,9 @@ final class SchemaTest extends TestCase
         $db = $this->getConnection(true);
 
         foreach ($pdoAttributes as $name => $value) {
-            $db->getPDO()->setAttribute($name, $value);
+            $db
+                ->getPDO()
+                ->setAttribute($name, $value);
         }
 
         $schema = $db->getSchema();
@@ -306,7 +310,9 @@ final class SchemaTest extends TestCase
      */
     public function testQuoteTableName($name, $expectedName): void
     {
-        $schema = $this->getConnection()->getSchema();
+        $schema = $this
+            ->getConnection()
+            ->getSchema();
         $quotedName = $schema->quoteTableName($name);
         $this->assertEquals($expectedName, $quotedName);
     }
@@ -347,7 +353,9 @@ final class SchemaTest extends TestCase
             $this->expectException(NotSupportedException::class);
         }
 
-        $constraints = $this->getConnection()->getSchema()->{'getTable' . ucfirst($type)}($tableName);
+        $constraints = $this
+            ->getConnection()
+            ->getSchema()->{'getTable' . ucfirst($type)}($tableName);
 
         $this->assertMetadataEquals($expected, $constraints);
     }
@@ -370,7 +378,9 @@ final class SchemaTest extends TestCase
 
         $connection = $this->getConnection();
 
-        $connection->getSlavePdo()->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
+        $connection
+            ->getSlavePdo()
+            ->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
 
         $constraints = $connection->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
 
@@ -395,7 +405,9 @@ final class SchemaTest extends TestCase
 
         $connection = $this->getConnection();
 
-        $connection->getSlavePdo()->setAttribute(PDO::ATTR_CASE, PDO::CASE_UPPER);
+        $connection
+            ->getSlavePdo()
+            ->setAttribute(PDO::ATTR_CASE, PDO::CASE_UPPER);
 
         $constraints = $connection->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
 
@@ -419,7 +431,9 @@ final class SchemaTest extends TestCase
         string $testTableName
     ): void {
         $db = $this->getConnection();
-        $schema = $this->getConnection()->getSchema();
+        $schema = $this
+            ->getConnection()
+            ->getSchema();
 
         $this->schemaCache->setEnable(true);
 
@@ -467,32 +481,51 @@ final class SchemaTest extends TestCase
         $schema = $db->getSchema();
 
         if ($schema->getTableSchema($tableName) !== null) {
-            $db->createCommand()->dropTable($tableName)->execute();
+            $db
+                ->createCommand()
+                ->dropTable($tableName)
+                ->execute();
         }
 
-        $db->createCommand()->createTable($tableName, [
-            'int1' => 'integer not null',
-            'int2' => 'integer not null',
-        ])->execute();
+        $db
+            ->createCommand()
+            ->createTable($tableName, [
+                'int1' => 'integer not null',
+                'int2' => 'integer not null',
+            ])
+            ->execute();
 
         $this->assertEmpty($schema->getTableIndexes($tableName, true));
         $this->assertEmpty($schema->getTableUniques($tableName, true));
 
-        $db->createCommand()->addUnique($name, $tableName, ['int1'])->execute();
+        $db
+            ->createCommand()
+            ->addUnique($name, $tableName, ['int1'])
+            ->execute();
 
         $this->assertCount(1, $schema->getTableIndexes($tableName, true));
         $this->assertCount(1, $schema->getTableUniques($tableName, true));
-        $this->assertEquals(['int1'], $schema->getTableUniques($tableName, true)[0]->getColumnNames());
+        $this->assertEquals(['int1'], $schema
+            ->getTableUniques($tableName, true)
+            ->getColumnNames());
 
-        $db->createCommand()->dropUnique($name, $tableName)->execute();
+        $db
+            ->createCommand()
+            ->dropUnique($name, $tableName)
+            ->execute();
 
         $this->assertEmpty($schema->getTableIndexes($tableName, true));
         $this->assertEmpty($schema->getTableUniques($tableName, true));
 
-        $db->createCommand()->addUnique($name, $tableName, ['int1', 'int2'])->execute();
+        $db
+            ->createCommand()
+            ->addUnique($name, $tableName, ['int1', 'int2'])
+            ->execute();
 
         $this->assertCount(1, $schema->getTableIndexes($tableName, true));
         $this->assertCount(1, $schema->getTableUniques($tableName, true));
-        $this->assertEquals(['int1', 'int2'], $schema->getTableUniques($tableName, true)[0]->getColumnNames());
+        $this->assertEquals(['int1', 'int2'], $schema
+            ->getTableUniques($tableName, true)
+            ->getColumnNames());
     }
 }

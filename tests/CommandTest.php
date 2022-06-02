@@ -39,7 +39,9 @@ final class CommandTest extends TestCase
     {
         $db = $this->getConnection();
 
-        $db->createCommand('PRAGMA foreign_keys = ON')->execute();
+        $db
+            ->createCommand('PRAGMA foreign_keys = ON')
+            ->execute();
 
         $tableMaster = 'departments';
         $tableRelation = 'students';
@@ -48,40 +50,59 @@ final class CommandTest extends TestCase
         $schema = $db->getSchema();
 
         if ($schema->getTableSchema($tableRelation) !== null) {
-            $db->createCommand()->dropTable($tableRelation)->execute();
+            $db
+                ->createCommand()
+                ->dropTable($tableRelation)
+                ->execute();
         }
 
         if ($schema->getTableSchema($tableMaster) !== null) {
-            $db->createCommand()->dropTable($tableMaster)->execute();
+            $db
+                ->createCommand()
+                ->dropTable($tableMaster)
+                ->execute();
         }
 
-        $db->createCommand()->createTable($tableMaster, [
-            'department_id' => 'integer not null primary key autoincrement',
-            'department_name' => 'nvarchar(50) null',
-        ])->execute();
+        $db
+            ->createCommand()
+            ->createTable($tableMaster, [
+                'department_id' => 'integer not null primary key autoincrement',
+                'department_name' => 'nvarchar(50) null',
+            ])
+            ->execute();
 
-        $db->createCommand()->createTable($tableRelation, [
-            'student_id' => 'integer primary key autoincrement not null',
-            'student_name' => 'nvarchar(50) null',
-            'department_id' => 'integer not null',
-            'dateOfBirth' => 'date null',
-        ])->execute();
+        $db
+            ->createCommand()
+            ->createTable($tableRelation, [
+                'student_id' => 'integer primary key autoincrement not null',
+                'student_name' => 'nvarchar(50) null',
+                'department_id' => 'integer not null',
+                'dateOfBirth' => 'date null',
+            ])
+            ->execute();
 
-        $db->createCommand()->addForeignKey(
-            $name,
-            $tableRelation,
-            ['Department_id'],
-            $tableMaster,
-            ['Department_id']
-        )->execute();
+        $db
+            ->createCommand()
+            ->addForeignKey(
+                $name,
+                $tableRelation,
+                ['Department_id'],
+                $tableMaster,
+                ['Department_id']
+            )
+            ->execute();
 
-        $db->createCommand(
-            "INSERT INTO departments VALUES (1, 'IT')"
-        )->execute();
+        $db
+            ->createCommand(
+                "INSERT INTO departments VALUES (1, 'IT')"
+            )
+            ->execute();
 
-        $db->createCommand(
-            'INSERT INTO students(student_name, department_id) VALUES ("John", 1);'
-        )->execute();
+        $db
+            ->createCommand(
+                'INSERT INTO students(student_name, department_id) VALUES ("John", 1);'
+            )
+            ->execute();
 
         $expectedMessageError = str_replace(
             "\r\n",
@@ -95,9 +116,11 @@ EOD
         $this->expectException(IntegrityException::class);
         $this->expectExceptionMessage($expectedMessageError);
 
-        $db->createCommand(
-            'INSERT INTO students(student_name, department_id) VALUES ("Samdark", 5);'
-        )->execute();
+        $db
+            ->createCommand(
+                'INSERT INTO students(student_name, department_id) VALUES ("Samdark", 5);'
+            )
+            ->execute();
     }
 
     public function testMultiStatementSupport(): void
@@ -114,10 +137,12 @@ INSERT INTO {{T_multistatement}} VALUES(41, :val1);
 INSERT INTO {{T_multistatement}} VALUES(42, :val2);
 SQL;
 
-        $db->createCommand($sql, [
-            'val1' => 'foo',
-            'val2' => 'bar',
-        ])->execute();
+        $db
+            ->createCommand($sql, [
+                'val1' => 'foo',
+                'val2' => 'bar',
+            ])
+            ->execute();
 
         /** @todo need fix for this behaviour PHP8.1 + pdo_mysql */
         $this->assertEquals([
@@ -129,7 +154,9 @@ SQL;
                 'intcol' => '42',
                 'textcol' => 'bar',
             ],
-        ], $db->createCommand('SELECT * FROM {{T_multistatement}}')->queryAll());
+        ], $db
+            ->createCommand('SELECT * FROM {{T_multistatement}}')
+            ->queryAll());
 
         $sql = <<<'SQL'
 UPDATE {{T_multistatement}} SET [[intcol]] = :newInt WHERE [[textcol]] = :val1;
@@ -143,11 +170,13 @@ SQL;
                 'intcol' => '410',
                 'textcol' => 'foo',
             ],
-        ], $db->createCommand($sql, [
-            'newInt' => 410,
-            'val1' => 'foo',
-            'val2' => 'bar',
-        ])->queryAll());
+        ], $db
+            ->createCommand($sql, [
+                'newInt' => 410,
+                'val1' => 'foo',
+                'val2' => 'bar',
+            ])
+            ->queryAll());
     }
 
     public function batchInsertSqlProvider(): array
@@ -212,14 +241,17 @@ SQL;
     {
         $db = $this->getConnection();
 
-        $db->createCommand()->insert(
-            'customer',
-            [
-                'name' => 'testParams',
-                'email' => 'testParams@example.com',
-                'address' => '1',
-            ]
-        )->execute();
+        $db
+            ->createCommand()
+            ->insert(
+                'customer',
+                [
+                    'name' => 'testParams',
+                    'email' => 'testParams@example.com',
+                    'address' => '1',
+                ]
+            )
+            ->execute();
 
         $params = [
             ':email' => 'testParams@example.com',
@@ -272,17 +304,21 @@ SQL;
 
         $query = new Query($db);
 
-        $query->select($invalidSelectColumns)->from('{{customer}}');
+        $query
+            ->select($invalidSelectColumns)
+            ->from('{{customer}}');
 
         $command = $db->createCommand();
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected select query object with enumerated (named) parameters');
 
-        $command->insert(
-            '{{customer}}',
-            $query
-        )->execute();
+        $command
+            ->insert(
+                '{{customer}}',
+                $query
+            )
+            ->execute();
     }
 
     /**
@@ -297,7 +333,9 @@ SQL;
      */
     public function testUpsert(array $firstData, array $secondData)
     {
-        if (version_compare($this->getConnection()->getServerVersion(), '3.8.3', '<')) {
+        if (version_compare($this
+            ->getConnection()
+            ->getServerVersion(), '3.8.3', '<')) {
             $this->markTestSkipped('SQLite < 3.8.3 does not support "WITH" keyword.');
 
             return;
@@ -305,11 +343,15 @@ SQL;
 
         $db = $this->getConnection(true);
 
-        $this->assertEquals(0, $db->createCommand('SELECT COUNT(*) FROM {{T_upsert}}')->queryScalar());
+        $this->assertEquals(0, $db
+            ->createCommand('SELECT COUNT(*) FROM {{T_upsert}}')
+            ->queryScalar());
 
         $this->performAndCompareUpsertResult($db, $firstData);
 
-        $this->assertEquals(1, $db->createCommand('SELECT COUNT(*) FROM {{T_upsert}}')->queryScalar());
+        $this->assertEquals(1, $db
+            ->createCommand('SELECT COUNT(*) FROM {{T_upsert}}')
+            ->queryScalar());
 
         $this->performAndCompareUpsertResult($db, $secondData);
     }
