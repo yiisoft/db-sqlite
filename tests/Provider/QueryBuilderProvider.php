@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests\Provider;
 
 use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\Query\QueryBuilderInterface;
 use Yiisoft\Db\Sqlite\Tests\TestCase;
 use Yiisoft\Db\TestSupport\Provider\QueryBuilderProvider as BaseQueryBuilderProvider;
 use Yiisoft\Db\TestSupport\TraversableObject;

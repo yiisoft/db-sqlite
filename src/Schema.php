@@ -19,6 +19,7 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Schema\ColumnSchema;
+use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\Schema as AbstractSchema;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 use Yiisoft\Db\Transaction\TransactionInterface;
@@ -442,15 +443,15 @@ final class Schema extends AbstractSchema
     }
 
     /**
-     * Loads the column information into a {@see ColumnSchema} object.
+     * Loads the column information into a {@see ColumnSchemaInterface} object.
      *
      * @param array $info column information.
      *
-     * @return ColumnSchema the column schema object.
+     * @return ColumnSchemaInterface the column schema object.
      *
      * @psalm-param array{cid:string, name:string, type:string, notnull:string, dflt_value:string|null, pk:string} $info
      */
-    protected function loadColumnSchema(array $info): ColumnSchema
+    protected function loadColumnSchema(array $info): ColumnSchemaInterface
     {
         $column = $this->createColumnSchema();
         $column->name($info['name']);
@@ -597,9 +598,9 @@ final class Schema extends AbstractSchema
      *
      * This method may be overridden by child classes to create a DBMS-specific column schema.
      *
-     * @return ColumnSchema column schema instance.
+     * @return ColumnSchemaInterface column schema instance.
      */
-    private function createColumnSchema(): ColumnSchema
+    private function createColumnSchema(): ColumnSchemaInterface
     {
         return new ColumnSchema();
     }
