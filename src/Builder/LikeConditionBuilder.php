@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Builder;
 
-use Yiisoft\Db\Query\Conditions\Builder\LikeConditionBuilder as BaseLikeConditionBuilder;
-use Yiisoft\Db\Query\QueryBuilderInterface;
+use Yiisoft\Db\QueryBuilder\Conditions\Builder\LikeConditionBuilder as BaseLikeConditionBuilder;
+use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 
 final class LikeConditionBuilder extends BaseLikeConditionBuilder
 {

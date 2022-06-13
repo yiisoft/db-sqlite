@@ -10,7 +10,7 @@ use Yiisoft\Db\Driver\PDO\CommandPDO;
 use Yiisoft\Db\Exception\ConvertException;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
-use Yiisoft\Db\Query\QueryBuilderInterface;
+use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Sqlite\SqlToken;
 use Yiisoft\Db\Sqlite\SqlTokenizer;
