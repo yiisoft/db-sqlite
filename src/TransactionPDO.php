@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite\PDO;
+namespace Yiisoft\Db\Sqlite;
 
 use Throwable;
-use Yiisoft\Db\Driver\PDO\TransactionPDO;
+use Yiisoft\Db\Driver\PDO\TransactionPDO as AbstractTransactionPDO;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
-final class TransactionPDOSqlite extends TransactionPDO
+final class TransactionPDO extends AbstractTransactionPDO
 {
     /**
      * Sets the isolation level of the current transaction.

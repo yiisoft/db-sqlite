@@ -2,17 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite\PDO;
+namespace Yiisoft\Db\Sqlite;
 
-use Yiisoft\Db\QueryBuilder\QueryBuilder;
+use Yiisoft\Db\QueryBuilder\QueryBuilder as AbstractQueryBuilder;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Schema\SchemaInterface;
-use Yiisoft\Db\Sqlite\DDLQueryBuilder;
-use Yiisoft\Db\Sqlite\DMLQueryBuilder;
-use Yiisoft\Db\Sqlite\DQLQueryBuilder;
 
-final class QueryBuilderPDOSqlite extends QueryBuilder
+final class QueryBuilder extends AbstractQueryBuilder
 {
     /**
      * @var array mapping from abstract column types (keys) to physical column types (values).

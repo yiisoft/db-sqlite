@@ -2,18 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite\PDO;
+namespace Yiisoft\Db\Sqlite;
 
 use PDOException;
 use Throwable;
-use Yiisoft\Db\Driver\PDO\CommandPDO;
+use Yiisoft\Db\Driver\PDO\CommandPDO as AbstractCommandPDO;
 use Yiisoft\Db\Exception\ConvertException;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
-use Yiisoft\Db\Sqlite\SqlToken;
-use Yiisoft\Db\Sqlite\SqlTokenizer;
 use Yiisoft\Strings\StringHelper;
 
 use function array_pop;
@@ -22,7 +20,7 @@ use function ltrim;
 use function preg_match_all;
 use function strpos;
 
-final class CommandPDOSqlite extends CommandPDO
+final class CommandPDO extends AbstractCommandPDO
 {
     /**
      * @inheritDoc

@@ -6,8 +6,8 @@ namespace Yiisoft\Db\Sqlite\Tests;
 
 use Exception;
 use PHPUnit\Framework\TestCase as AbstractTestCase;
-use Yiisoft\Db\Sqlite\PDO\PDODriver;
-use Yiisoft\Db\Sqlite\PDO\ConnectionPDOSqlite;
+use Yiisoft\Db\Sqlite\PDODriver;
+use Yiisoft\Db\Sqlite\ConnectionPDO;
 use Yiisoft\Db\TestSupport\TestTrait;
 
 class TestCase extends AbstractTestCase
@@ -22,21 +22,21 @@ class TestCase extends AbstractTestCase
     protected array $dataProvider;
     protected string $likeEscapeCharSql = '';
     protected array $likeParameterReplacements = [];
-    protected ConnectionPDOSqlite $db;
+    protected ConnectionPDO $db;
 
     /**
      * @param bool $reset whether to clean up the test database.
      *
-     * @return ConnectionPDOSqlite
+     * @return ConnectionPDO
      */
     protected function getConnection(
         $reset = false,
         string $dsn = 'sqlite:' . __DIR__ . '/Runtime/yiitest.sq3',
         string $fixture = __DIR__ . '/Fixture/sqlite.sql'
-    ): ConnectionPDOSqlite {
+    ): ConnectionPDO {
         $this->dsn = $dsn;
         $pdoDriver = new PDODriver($this->dsn, $this->username, $this->password);
-        $this->db = new ConnectionPDOSqlite($pdoDriver, $this->createQueryCache(), $this->createSchemaCache());
+        $this->db = new ConnectionPDO($pdoDriver, $this->createQueryCache(), $this->createSchemaCache());
         $this->db->setLogger($this->createLogger());
         $this->db->setProfiler($this->createProfiler());
 

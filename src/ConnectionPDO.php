@@ -2,18 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite\PDO;
+namespace Yiisoft\Db\Sqlite;
 
 use PDO;
 use Yiisoft\Db\Driver\PDO\CommandPDOInterface;
-use Yiisoft\Db\Driver\PDO\ConnectionPDO;
+use Yiisoft\Db\Driver\PDO\ConnectionPDO as AbstractConnectionPDO;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 use Yiisoft\Db\Schema\Quoter;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
-use Yiisoft\Db\Sqlite\Schema;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 use function strncmp;
@@ -21,7 +20,7 @@ use function strncmp;
 /**
  * Database connection class prefilled for SQLite Server.
  */
-final class ConnectionPDOSqlite extends ConnectionPDO
+final class ConnectionPDO extends AbstractConnectionPDO
 {
     /**
      * Reset the connection after cloning.
@@ -38,7 +37,7 @@ final class ConnectionPDOSqlite extends ConnectionPDO
 
     public function createCommand(?string $sql = null, array $params = []): CommandPDOInterface
     {
-        $command = new CommandPDOSqlite($this, $this->queryCache);
+        $command = new CommandPDO($this, $this->queryCache);
 
         if ($sql !== null) {
             $command->setSql($sql);
@@ -57,7 +56,7 @@ final class ConnectionPDOSqlite extends ConnectionPDO
 
     public function createTransaction(): TransactionInterface
     {
-        return new TransactionPDOSqlite($this);
+        return new TransactionPDO($this);
     }
 
     /**
@@ -66,7 +65,7 @@ final class ConnectionPDOSqlite extends ConnectionPDO
     public function getQueryBuilder(): QueryBuilderInterface
     {
         if ($this->queryBuilder === null) {
-            $this->queryBuilder = new QueryBuilderPDOSqlite(
+            $this->queryBuilder = new QueryBuilder(
                 $this->getQuoter(),
                 $this->getSchema(),
             );
