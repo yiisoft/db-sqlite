@@ -60,7 +60,7 @@ final class ConnectionTest extends TestCase
     public function testGetDriverName(): void
     {
         $db = $this->getConnection();
-        $this->assertEquals('sqlite', $db->getDriverName());
+        $this->assertEquals('sqlite', $db->getDriver()->getDriverName());
     }
 
     /**

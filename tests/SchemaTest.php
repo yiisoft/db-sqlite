@@ -358,7 +358,7 @@ final class SchemaTest extends TestCase
         $schema = $db->getSchema();
         $tables = $schema->getTableNames();
 
-        if ($db->getDriverName() === 'sqlsrv') {
+        if ($db->getDriver()->getDriverName() === 'sqlsrv') {
             $tables = array_map(static function ($item) {
                 return trim($item, '[]');
             }, $tables);
