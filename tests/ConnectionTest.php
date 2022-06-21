@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests;
 
 use PDO;
+use Psr\Log\NullLogger;
 use Yiisoft\Cache\CacheKeyNormalizer;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
@@ -42,7 +43,7 @@ final class ConnectionTest extends TestCase
         $this->runExceptionTest($db);
 
         /* profiling only */
-        $db->setLogger(null);
+        $db->setLogger(new NullLogger());
         $db->setProfiler($this->profiler);
         $this->runExceptionTest($db);
 
@@ -52,7 +53,7 @@ final class ConnectionTest extends TestCase
         $this->runExceptionTest($db);
 
         /* disabled */
-        $db->setLogger(null);
+        $db->setLogger(new NullLogger());
         $db->setProfiler(null);
         $this->runExceptionTest($db);
     }
