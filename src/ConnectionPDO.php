@@ -59,6 +59,11 @@ final class ConnectionPDO extends AbstractConnectionPDO
         return new TransactionPDO($this);
     }
 
+    public function getName(): string
+    {
+        return $this->getDriver()->getName();
+    }
+
     /**
      * @throws Exception|InvalidConfigException
      */
