@@ -9,9 +9,10 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Schema\TableSchema;
-use Yiisoft\Db\TestUtility\AnyValue;
-use Yiisoft\Db\TestUtility\TestSchemaTrait;
+use Yiisoft\Db\QueryBuilder\QueryBuilder;
+use Yiisoft\Db\Schema\TableSchemaInterface;
+use Yiisoft\Db\TestSupport\AnyValue;
+use Yiisoft\Db\TestSupport\TestSchemaTrait;
 
 /**
  * @group sqlite
@@ -211,8 +212,9 @@ final class SchemaTest extends TestCase
         $db = $this->getConnection();
 
         $schema = $db->getSchema();
-
         $table = $schema->getTableSchema('composite_fk');
+
+        $this->assertNotNull($table);
 
         $fk = $table->getForeignKeys();
         $this->assertCount(1, $fk);
@@ -220,6 +222,121 @@ final class SchemaTest extends TestCase
         $this->assertEquals('order_item', $fk[0][0]);
         $this->assertEquals('order_id', $fk[0]['order_id']);
         $this->assertEquals('item_id', $fk[0]['item_id']);
+    }
+
+    public function testFindUniqueIndexes(): void
+    {
+        $db = $this->getConnection();
+
+        try {
+            $db->createCommand()->dropTable('uniqueIndex')->execute();
+        } catch (Exception $e) {
+        }
+
+        $db->createCommand()->createTable('uniqueIndex', ['somecol' => 'string', 'someCol2' => 'string'])->execute();
+        $schema = $db->getSchema();
+
+        $tableSchema = $schema->getTableSchema('uniqueIndex', true);
+        $this->assertNotNull($tableSchema);
+        $uniqueIndexes = $schema->findUniqueIndexes($tableSchema);
+        $this->assertSame([], $uniqueIndexes);
+
+        $db->createCommand()->createIndex('somecolUnique', 'uniqueIndex', 'somecol', QueryBuilder::INDEX_UNIQUE)->execute();
+
+        $tableSchema = $schema->getTableSchema('uniqueIndex', true);
+        $this->assertNotNull($tableSchema);
+        $uniqueIndexes = $schema->findUniqueIndexes($tableSchema);
+        $this->assertEquals(['somecolUnique' => ['somecol']], $uniqueIndexes);
+
+        // create another column with upper case letter that fails postgres
+        // see https://github.com/yiisoft/yii2/issues/10613
+        $db->createCommand()->createIndex('someCol2Unique', 'uniqueIndex', 'someCol2', QueryBuilder::INDEX_UNIQUE)->execute();
+
+        $tableSchema = $schema->getTableSchema('uniqueIndex', true);
+        $this->assertNotNull($tableSchema);
+        $uniqueIndexes = $schema->findUniqueIndexes($tableSchema);
+        $this->assertEquals(['somecolUnique' => ['somecol'], 'someCol2Unique' => ['someCol2']], $uniqueIndexes);
+
+        // see https://github.com/yiisoft/yii2/issues/13814
+        $db->createCommand()->createIndex('another unique index', 'uniqueIndex', 'someCol2', QueryBuilder::INDEX_UNIQUE)->execute();
+
+        $tableSchema = $schema->getTableSchema('uniqueIndex', true);
+        $this->assertNotNull($tableSchema);
+        $uniqueIndexes = $schema->findUniqueIndexes($tableSchema);
+        $this->assertEquals(
+            ['somecolUnique' => ['somecol'], 'someCol2Unique' => ['someCol2'], 'another unique index' => ['someCol2']],
+            $uniqueIndexes,
+        );
+    }
+
+    public function testForeingKey(): void
+    {
+        $db = $this->getConnection();
+
+        $db->createCommand('PRAGMA foreign_keys = ON')->execute();
+
+        $tableMaster = 'departments';
+        $tableRelation = 'students';
+        $tableRelation1 = 'benefits';
+        $schema = $db->getSchema();
+
+        if ($schema->getTableSchema($tableRelation1) !== null) {
+            $db->createCommand()->dropTable($tableRelation1)->execute();
+        }
+
+        if ($schema->getTableSchema($tableRelation) !== null) {
+            $db->createCommand()->dropTable($tableRelation)->execute();
+        }
+
+        if ($schema->getTableSchema($tableMaster) !== null) {
+            $db->createCommand()->dropTable($tableMaster)->execute();
+        }
+
+        $db->createCommand()->createTable($tableMaster, [
+            'id' => 'integer not null primary key autoincrement',
+            'name' => 'nvarchar(50) null',
+        ])->execute();
+
+        $foreingKeys = $schema->getTableForeignKeys($tableMaster);
+        $this->assertCount(0, $foreingKeys);
+        $this->assertSame([], $foreingKeys);
+
+        $db->createCommand()->createTable($tableRelation, [
+            'id' => 'integer primary key autoincrement not null',
+            'name' => 'nvarchar(50) null',
+            'department_id' => 'integer not null',
+            'dateOfBirth' => 'date null',
+            'CONSTRAINT fk_departments FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE CASCADE',
+        ])->execute();
+
+        $foreingKeys = $schema->getTableForeignKeys($tableRelation);
+        $this->assertCount(1, $foreingKeys);
+        $this->assertSame(['department_id'], $foreingKeys[0]->getColumnNames());
+        $this->assertSame($tableMaster, $foreingKeys[0]->getForeignTableName());
+        $this->assertSame(['id'], $foreingKeys[0]->getForeignColumnNames());
+        $this->assertSame('CASCADE', $foreingKeys[0]->getOnDelete());
+        $this->assertSame('NO ACTION', $foreingKeys[0]->getOnUpdate());
+
+        $db->createCommand()->createTable($tableRelation1, [
+            'id' => 'integer primary key autoincrement not null',
+            'benefit' => 'nvarchar(50) null',
+            'student_id' => 'integer not null',
+            'department_id' => 'integer not null',
+            'CONSTRAINT fk_students FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE',
+            'CONSTRAINT fk_departments FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE CASCADE',
+        ])->execute();
+        $foreingKeys = $schema->getTableForeignKeys($tableRelation1);
+        $this->assertCount(2, $foreingKeys);
+        $this->assertSame(['department_id'], $foreingKeys[0]->getColumnNames());
+        $this->assertSame($tableMaster, $foreingKeys[0]->getForeignTableName());
+        $this->assertSame(['id'], $foreingKeys[0]->getForeignColumnNames());
+        $this->assertSame('CASCADE', $foreingKeys[0]->getOnDelete());
+        $this->assertSame('NO ACTION', $foreingKeys[0]->getOnUpdate());
+        $this->assertSame(['student_id'], $foreingKeys[1]->getColumnNames());
+        $this->assertSame($tableRelation, $foreingKeys[1]->getForeignTableName());
+        $this->assertSame(['id'], $foreingKeys[1]->getForeignColumnNames());
+        $this->assertSame('CASCADE', $foreingKeys[1]->getOnDelete());
+        $this->assertSame('NO ACTION', $foreingKeys[1]->getOnUpdate());
     }
 
     /**
@@ -232,17 +349,16 @@ final class SchemaTest extends TestCase
      */
     public function testGetTableNames(array $pdoAttributes): void
     {
-        $connection = $this->getConnection(true);
+        $db = $this->getConnection(true);
 
         foreach ($pdoAttributes as $name => $value) {
-            $connection->getPDO()->setAttribute($name, $value);
+            $db->getPDO()?->setAttribute($name, $value);
         }
 
-        $schema = $connection->getSchema();
-
+        $schema = $db->getSchema();
         $tables = $schema->getTableNames();
 
-        if ($connection->getDriverName() === 'sqlsrv') {
+        if ($db->getDriver()->getDriverName() === 'sqlsrv') {
             $tables = array_map(static function ($item) {
                 return trim($item, '[]');
             }, $tables);
@@ -268,17 +384,15 @@ final class SchemaTest extends TestCase
         $db = $this->getConnection(true);
 
         foreach ($pdoAttributes as $name => $value) {
-            $db->getPDO()->setAttribute($name, $value);
+            $db->getPDO()?->setAttribute($name, $value);
         }
 
         $schema = $db->getSchema();
-
         $tables = $schema->getTableSchemas();
-
         $this->assertCount(count($schema->getTableNames()), $tables);
 
         foreach ($tables as $table) {
-            $this->assertInstanceOf(TableSchema::class, $table);
+            $this->assertInstanceOf(TableSchemaInterface::class, $table);
         }
     }
 
@@ -306,8 +420,8 @@ final class SchemaTest extends TestCase
      */
     public function testQuoteTableName($name, $expectedName): void
     {
-        $schema = $this->getConnection()->getSchema();
-        $quotedName = $schema->quoteTableName($name);
+        $quoter = $this->getConnection()->getQuoter();
+        $quotedName = $quoter->quoteTableName($name);
         $this->assertEquals($expectedName, $quotedName);
     }
 
@@ -348,7 +462,6 @@ final class SchemaTest extends TestCase
         }
 
         $constraints = $this->getConnection()->getSchema()->{'getTable' . ucfirst($type)}($tableName);
-
         $this->assertMetadataEquals($expected, $constraints);
     }
 
@@ -368,12 +481,9 @@ final class SchemaTest extends TestCase
             $this->expectException(NotSupportedException::class);
         }
 
-        $connection = $this->getConnection();
-
-        $connection->getSlavePdo()->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
-
-        $constraints = $connection->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
-
+        $db = $this->getConnection();
+        $db->getActivePDO()->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
+        $constraints = $db->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
         $this->assertMetadataEquals($expected, $constraints);
     }
 
@@ -393,18 +503,13 @@ final class SchemaTest extends TestCase
             $this->expectException(NotSupportedException::class);
         }
 
-        $connection = $this->getConnection();
-
-        $connection->getSlavePdo()->setAttribute(PDO::ATTR_CASE, PDO::CASE_UPPER);
-
-        $constraints = $connection->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
-
+        $db = $this->getConnection();
+        $db->getActivePDO()->setAttribute(PDO::ATTR_CASE, PDO::CASE_UPPER);
+        $constraints = $db->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
         $this->assertMetadataEquals($expected, $constraints);
     }
 
     /**
-     * @depends testSchemaCache
-     *
      * @dataProvider tableSchemaCachePrefixesProviderTrait
      *
      * @param string $tablePrefix
@@ -418,81 +523,39 @@ final class SchemaTest extends TestCase
         string $testTablePrefix,
         string $testTableName
     ): void {
-        $db = $this->getConnection();
-        $schema = $this->getConnection()->getSchema();
+        $db = $this->getConnection(true);
+        $schema = $db->getSchema();
+
+        $this->assertNotNull($this->schemaCache);
 
         $this->schemaCache->setEnable(true);
 
         $db->setTablePrefix($tablePrefix);
-
         $noCacheTable = $schema->getTableSchema($tableName, true);
-
-        $this->assertInstanceOf(TableSchema::class, $noCacheTable);
+        $this->assertInstanceOf(TableSchemaInterface::class, $noCacheTable);
 
         /* Compare */
         $db->setTablePrefix($testTablePrefix);
-
         $testNoCacheTable = $schema->getTableSchema($testTableName);
-
         $this->assertSame($noCacheTable, $testNoCacheTable);
 
         $db->setTablePrefix($tablePrefix);
-
         $schema->refreshTableSchema($tableName);
-
         $refreshedTable = $schema->getTableSchema($tableName, false);
-
-        $this->assertInstanceOf(TableSchema::class, $refreshedTable);
+        $this->assertInstanceOf(TableSchemaInterface::class, $refreshedTable);
         $this->assertNotSame($noCacheTable, $refreshedTable);
 
         /* Compare */
         $db->setTablePrefix($testTablePrefix);
-
         $schema->refreshTableSchema($testTablePrefix);
-
         $testRefreshedTable = $schema->getTableSchema($testTableName, false);
-
-        $this->assertInstanceOf(TableSchema::class, $testRefreshedTable);
+        $this->assertInstanceOf(TableSchemaInterface::class, $testRefreshedTable);
         $this->assertEquals($refreshedTable, $testRefreshedTable);
         $this->assertNotSame($testNoCacheTable, $testRefreshedTable);
     }
 
-    public function testsCountIndexUnique(): void
+    public function testGetSchemaDefaultValues(): void
     {
-        $db = $this->getConnection();
-
-        $tableName = 'test_uq';
-        $name = 'test_uq_constraint';
-
-        $schema = $db->getSchema();
-
-        if ($schema->getTableSchema($tableName) !== null) {
-            $db->createCommand()->dropTable($tableName)->execute();
-        }
-
-        $db->createCommand()->createTable($tableName, [
-            'int1' => 'integer not null',
-            'int2' => 'integer not null',
-        ])->execute();
-
-        $this->assertEmpty($schema->getTableIndexes($tableName, true));
-        $this->assertEmpty($schema->getTableUniques($tableName, true));
-
-        $db->createCommand()->addUnique($name, $tableName, ['int1'])->execute();
-
-        $this->assertCount(1, $schema->getTableIndexes($tableName, true));
-        $this->assertCount(1, $schema->getTableUniques($tableName, true));
-        $this->assertEquals(['int1'], $schema->getTableUniques($tableName, true)[0]->getColumnNames());
-
-        $db->createCommand()->dropUnique($name, $tableName)->execute();
-
-        $this->assertEmpty($schema->getTableIndexes($tableName, true));
-        $this->assertEmpty($schema->getTableUniques($tableName, true));
-
-        $db->createCommand()->addUnique($name, $tableName, ['int1', 'int2'])->execute();
-
-        $this->assertCount(1, $schema->getTableIndexes($tableName, true));
-        $this->assertCount(1, $schema->getTableUniques($tableName, true));
-        $this->assertEquals(['int1', 'int2'], $schema->getTableUniques($tableName, true)[0]->getColumnNames());
+        $this->markTestSkipped('SQLite does not support default value constraints.');
     }
 }

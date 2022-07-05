@@ -4,39 +4,61 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
+use Exception;
 use PHPUnit\Framework\TestCase as AbstractTestCase;
-use Yiisoft\Db\Sqlite\Connection;
-use Yiisoft\Db\TestUtility\TestTrait;
+use Yiisoft\Db\Sqlite\PDODriver;
+use Yiisoft\Db\Sqlite\ConnectionPDO;
+use Yiisoft\Db\TestSupport\TestTrait;
 
 class TestCase extends AbstractTestCase
 {
     use TestTrait;
 
-    protected const DB_CONNECTION_CLASS = \Yiisoft\Db\Sqlite\Connection::class;
-    protected const DB_DRIVERNAME = 'sqlite';
-    protected const DB_DSN = 'sqlite:' . __DIR__ . '/Runtime/yiitest.sq3';
-    protected const DB_FIXTURES_PATH = __DIR__ . '/Fixture/sqlite.sql';
-    protected const DB_USERNAME = '';
-    protected const DB_PASSWORD = '';
-    protected const DB_CHARSET = 'UTF8';
+    protected string $drivername = 'sqlite';
+    protected string $dsn;
+    protected string $username = '';
+    protected string $password = '';
+    protected string $charset = 'UTF8';
     protected array $dataProvider;
     protected string $likeEscapeCharSql = '';
     protected array $likeParameterReplacements = [];
-    protected Connection $connection;
+    protected ConnectionPDO $db;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->connection = $this->createConnection(self::DB_DSN);
+    /**
+     * @param bool $reset whether to clean up the test database.
+     *
+     * @return ConnectionPDO
+     */
+    protected function getConnection(
+        $reset = false,
+        string $dsn = 'sqlite:' . __DIR__ . '/Runtime/yiitest.sq3',
+        string $fixture = __DIR__ . '/Fixture/sqlite.sql'
+    ): ConnectionPDO {
+        $this->dsn = $dsn;
+        $pdoDriver = new PDODriver($this->dsn, $this->username, $this->password);
+        $this->db = new ConnectionPDO($pdoDriver, $this->createQueryCache(), $this->createSchemaCache());
+        $this->db->setLogger($this->createLogger());
+        $this->db->setProfiler($this->createProfiler());
+
+        if ($reset === false) {
+            return $this->db;
+        }
+
+        try {
+            $this->prepareDatabase($this->db, $fixture);
+        } catch (Exception $e) {
+            $this->markTestSkipped('Something wrong when preparing database: ' . $e->getMessage());
+        }
+
+        return $this->db;
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
-        $this->connection->close();
         unset(
             $this->cache,
-            $this->connection,
+            $this->db,
             $this->logger,
             $this->queryCache,
             $this->schemaCache,

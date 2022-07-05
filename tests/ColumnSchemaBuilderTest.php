@@ -6,7 +6,7 @@ namespace Yiisoft\Db\Sqlite\Tests;
 
 use Yiisoft\Db\Sqlite\ColumnSchemaBuilder;
 use Yiisoft\Db\Sqlite\Schema;
-use Yiisoft\Db\TestUtility\TestColumnSchemaBuilderTrait;
+use Yiisoft\Db\TestSupport\TestColumnSchemaBuilderTrait;
 
 /**
  * @group sqlite
@@ -17,7 +17,7 @@ final class ColumnSchemaBuilderTest extends TestCase
 
     public function getColumnSchemaBuilder($type, $length = null): ColumnSchemaBuilder
     {
-        return new ColumnSchemaBuilder($type, $length, $this->getConnection());
+        return new ColumnSchemaBuilder($type, $length);
     }
 
     public function typesProvider(): array

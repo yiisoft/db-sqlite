@@ -7,6 +7,8 @@ namespace Yiisoft\Db\Sqlite;
 use Throwable;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Arrays\ArraySorter;
+use Yiisoft\Db\Cache\SchemaCache;
+use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Constraint\CheckConstraint;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
@@ -17,14 +19,15 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Schema\ColumnSchema;
+use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\Schema as AbstractSchema;
-use Yiisoft\Db\Transaction\Transaction;
+use Yiisoft\Db\Schema\TableSchemaInterface;
+use Yiisoft\Db\Transaction\TransactionInterface;
 
 use function count;
 use function explode;
 use function preg_match;
 use function strncasecmp;
-use function strpos;
 use function strtolower;
 use function trim;
 
@@ -32,12 +35,59 @@ use function trim;
  * Schema is the class for retrieving metadata from a SQLite (2/3) database.
  *
  * @property string $transactionIsolationLevel The transaction isolation level to use for this transaction. This can be
- * either {@see Transaction::READ_UNCOMMITTED} or {@see Transaction::SERIALIZABLE}.
+ * either {@see TransactionInterface::READ_UNCOMMITTED} or {@see TransactionInterface::SERIALIZABLE}.
+ *
+ * @psalm-type Column = array<array-key, array{seqno:string, cid:string, name:string}>
+ *
+ * @psalm-type NormalizePragmaForeignKeyList = array<
+ *   string,
+ *   array<
+ *     array-key,
+ *     array{
+ *       id:string,
+ *       cid:string,
+ *       seq:string,
+ *       table:string,
+ *       from:string,
+ *       to:string,
+ *       on_update:string,
+ *       on_delete:string
+ *     }
+ *   >
+ * >
+ *
+ * @psalm-type PragmaForeignKeyList = array<
+ *   string,
+ *   array{
+ *     id:string,
+ *     cid:string,
+ *     seq:string,
+ *     table:string,
+ *     from:string,
+ *     to:string,
+ *     on_update:string,
+ *     on_delete:string
+ *   }
+ * >
+ *
+ * @psalm-type PragmaIndexInfo = array<array-key, array{seqno:string, cid:string, name:string}>
+ *
+ * @psalm-type PragmaIndexList = array<
+ *   array-key,
+ *   array{seq:string, name:string, unique:string, origin:string, partial:string}
+ * >
+ *
+ * @psalm-type PragmaTableInfo = array<
+ *   array-key,
+ *   array{cid:string, name:string, type:string, notnull:string, dflt_value:string|null, pk:string}
+ * >
  */
 final class Schema extends AbstractSchema
 {
     /**
      * @var array mapping from physical column types (keys) to abstract column types (values)
+     *
+     * @psalm-var array<array-key, string> $typeMap
      */
     private array $typeMap = [
         'tinyint' => self::TYPE_TINYINT,
@@ -70,17 +120,10 @@ final class Schema extends AbstractSchema
         'enum' => self::TYPE_STRING,
     ];
 
-    /**
-     * @var string|string[] character used to quote schema, table, etc. names. An array of 2 characters can be used in
-     * case starting and ending characters are different.
-     */
-    protected $tableQuoteCharacter = '`';
-
-    /**
-     * @var string|string[] character used to quote column names. An array of 2 characters can be used in case starting
-     * and ending characters are different.
-     */
-    protected $columnQuoteCharacter = '`';
+    public function __construct(private ConnectionInterface $db, SchemaCache $schemaCache)
+    {
+        parent::__construct($schemaCache);
+    }
 
     /**
      * Returns all table names in the database.
@@ -96,9 +139,15 @@ final class Schema extends AbstractSchema
      */
     protected function findTableNames(string $schema = ''): array
     {
-        $sql = "SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name<>'sqlite_sequence' ORDER BY tbl_name";
+        $tableNames = $this->db->createCommand(
+            "SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name<>'sqlite_sequence' ORDER BY tbl_name"
+        )->queryColumn();
 
-        return $this->getDb()->createCommand($sql)->queryColumn();
+        if (!$tableNames) {
+            return [];
+        }
+
+        return $tableNames;
     }
 
     /**
@@ -108,9 +157,9 @@ final class Schema extends AbstractSchema
      *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|Throwable
      *
-     * @return TableSchema|null DBMS-dependent table metadata, `null` if the table does not exist.
+     * @return TableSchemaInterface|null DBMS-dependent table metadata, `null` if the table does not exist.
      */
-    protected function loadTableSchema(string $name): ?TableSchema
+    protected function loadTableSchema(string $name): ?TableSchemaInterface
     {
         $table = new TableSchema();
 
@@ -137,7 +186,9 @@ final class Schema extends AbstractSchema
      */
     protected function loadTablePrimaryKey(string $tableName): ?Constraint
     {
-        return $this->loadTableConstraints($tableName, 'primaryKey');
+        $tablePrimaryKey = $this->loadTableConstraints($tableName, self::PRIMARY_KEY);
+
+        return $tablePrimaryKey instanceof Constraint ? $tablePrimaryKey : null;
     }
 
     /**
@@ -151,19 +202,17 @@ final class Schema extends AbstractSchema
      */
     protected function loadTableForeignKeys(string $tableName): array
     {
-        $foreignKeys = $this->getDb()->createCommand(
-            'PRAGMA FOREIGN_KEY_LIST (' . $this->quoteValue($tableName) . ')'
-        )->queryAll();
-
-        $foreignKeys = $this->normalizePdoRowKeyCase($foreignKeys, true);
-
-        $foreignKeys = ArrayHelper::index($foreignKeys, null, 'table');
-
-        ArraySorter::multisort($foreignKeys, 'seq', SORT_ASC, SORT_NUMERIC);
-
         $result = [];
+        /** @psalm-var PragmaForeignKeyList */
+        $foreignKeysList = $this->getPragmaForeignKeyList($tableName);
+        /** @psalm-var NormalizePragmaForeignKeyList */
+        $foreignKeysList = $this->normalizeRowKeyCase($foreignKeysList, true);
+        /** @psalm-var NormalizePragmaForeignKeyList */
+        $foreignKeysList = ArrayHelper::index($foreignKeysList, null, 'table');
+        ArraySorter::multisort($foreignKeysList, 'seq', SORT_ASC, SORT_NUMERIC);
 
-        foreach ($foreignKeys as $table => $foreignKey) {
+        /** @psalm-var NormalizePragmaForeignKeyList $foreignKeysList */
+        foreach ($foreignKeysList as $table => $foreignKey) {
             $fk = (new ForeignKeyConstraint())
                 ->columnNames(ArrayHelper::getColumn($foreignKey, 'from'))
                 ->foreignTableName($table)
@@ -184,11 +233,15 @@ final class Schema extends AbstractSchema
      *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|Throwable
      *
-     * @return IndexConstraint[] indexes for the given table.
+     * @return array indexes for the given table.
+     *
+     * @psalm-return array|IndexConstraint[]
      */
     protected function loadTableIndexes(string $tableName): array
     {
-        return $this->loadTableConstraints($tableName, 'indexes');
+        $tableIndexes = $this->loadTableConstraints($tableName, self::INDEXES);
+
+        return is_array($tableIndexes) ? $tableIndexes : [];
     }
 
     /**
@@ -198,11 +251,15 @@ final class Schema extends AbstractSchema
      *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|Throwable
      *
-     * @return Constraint[] unique constraints for the given table.
+     * @return array unique constraints for the given table.
+     *
+     * @psalm-return array|Constraint[]
      */
     protected function loadTableUniques(string $tableName): array
     {
-        return $this->loadTableConstraints($tableName, 'uniques');
+        $tableUniques = $this->loadTableConstraints($tableName, self::UNIQUES);
+
+        return is_array($tableUniques) ? $tableUniques : [];
     }
 
     /**
@@ -216,46 +273,41 @@ final class Schema extends AbstractSchema
      */
     protected function loadTableChecks(string $tableName): array
     {
-        $sql = $this->getDb()->createCommand('SELECT `sql` FROM `sqlite_master` WHERE name = :tableName', [
-            ':tableName' => $tableName,
-        ])->queryScalar();
+        $sql = $this->db->createCommand(
+            'SELECT `sql` FROM `sqlite_master` WHERE name = :tableName',
+            [':tableName' => $tableName],
+        )->queryScalar();
+
+        $sql = ($sql === false || $sql === null) ? '' : (string) $sql;
 
         /** @var SqlToken[]|SqlToken[][]|SqlToken[][][] $code */
         $code = (new SqlTokenizer($sql))->tokenize();
-
         $pattern = (new SqlTokenizer('any CREATE any TABLE any()'))->tokenize();
-
-        if (!$code[0]->matches($pattern, 0, $firstMatchIndex, $lastMatchIndex)) {
-            return [];
-        }
-
-        $createTableToken = $code[0][$lastMatchIndex - 1];
         $result = [];
-        $offset = 0;
 
-        while (true) {
-            $pattern = (new SqlTokenizer('any CHECK()'))->tokenize();
+        if ($code[0] instanceof SqlToken && $code[0]->matches($pattern, 0, $firstMatchIndex, $lastMatchIndex)) {
+            $offset = 0;
+            $createTableToken = $code[0][(int) $lastMatchIndex - 1];
+            $sqlTokenizerAnyCheck = new SqlTokenizer('any CHECK()');
 
-            if (!$createTableToken->matches($pattern, $offset, $firstMatchIndex, $offset)) {
-                break;
-            }
-
-            $checkSql = $createTableToken[$offset - 1]->getSql();
-            $name = null;
-            $pattern = (new SqlTokenizer('CONSTRAINT any'))->tokenize();
-
-            if (
-                isset($createTableToken[$firstMatchIndex - 2])
-                && $createTableToken->matches($pattern, $firstMatchIndex - 2)
+            while (
+                $createTableToken instanceof SqlToken &&
+                $createTableToken->matches($sqlTokenizerAnyCheck->tokenize(), (int) $offset, $firstMatchIndex, $offset)
             ) {
-                $name = $createTableToken[$firstMatchIndex - 1]->getContent();
+                $name = null;
+                $checkSql = (string) $createTableToken[(int) $offset - 1];
+                $pattern = (new SqlTokenizer('CONSTRAINT any'))->tokenize();
+
+                if (
+                    isset($createTableToken[(int) $firstMatchIndex - 2])
+                    && $createTableToken->matches($pattern, (int) $firstMatchIndex - 2)
+                ) {
+                    $sqlToken = $createTableToken[(int) $firstMatchIndex - 1];
+                    $name = $sqlToken?->getContent();
+                }
+
+                $result[] = (new CheckConstraint())->name($name)->expression($checkSql);
             }
-
-            $ck = (new CheckConstraint())
-                ->name($name)
-                ->expression($checkSql);
-
-            $result[] = $ck;
         }
 
         return $result;
@@ -276,18 +328,6 @@ final class Schema extends AbstractSchema
     }
 
     /**
-     * Creates a query builder for the MySQL database.
-     *
-     * This method may be overridden by child classes to create a DBMS-specific query builder.
-     *
-     * @return QueryBuilder query builder instance.
-     */
-    public function createQueryBuilder(): QueryBuilder
-    {
-        return new QueryBuilder($this->getDb());
-    }
-
-    /**
      * Create a column schema builder instance giving the type and value precision.
      *
      * This method may be overridden by child classes to create a DBMS-specific column schema builder.
@@ -296,8 +336,10 @@ final class Schema extends AbstractSchema
      * @param array|int|string|null $length length or precision of the column. See {@see ColumnSchemaBuilder::$length}.
      *
      * @return ColumnSchemaBuilder column schema builder instance.
+     *
+     * @psalm-param array<array-key, string>|int|null|string $length
      */
-    public function createColumnSchemaBuilder(string $type, $length = null): ColumnSchemaBuilder
+    public function createColumnSchemaBuilder(string $type, array|int|string $length = null): ColumnSchemaBuilder
     {
         return new ColumnSchemaBuilder($type, $length);
     }
@@ -305,58 +347,57 @@ final class Schema extends AbstractSchema
     /**
      * Collects the table column metadata.
      *
-     * @param TableSchema $table the table metadata.
+     * @param TableSchemaInterface $table the table metadata.
      *
      * @throws Exception|InvalidConfigException|Throwable
      *
      * @return bool whether the table exists in the database.
      */
-    protected function findColumns(TableSchema $table): bool
+    protected function findColumns(TableSchemaInterface $table): bool
     {
-        $sql = 'PRAGMA table_info(' . $this->quoteSimpleTableName($table->getName()) . ')';
-        $columns = $this->getDb()->createCommand($sql)->queryAll();
-
-        if (empty($columns)) {
-            return false;
-        }
+        /** @psalm-var PragmaTableInfo */
+        $columns = $this->getPragmaTableInfo($table->getName());
 
         foreach ($columns as $info) {
             $column = $this->loadColumnSchema($info);
             $table->columns($column->getName(), $column);
+
             if ($column->isPrimaryKey()) {
                 $table->primaryKey($column->getName());
             }
         }
 
-        $pk = $table->getPrimaryKey();
-        if (count($pk) === 1 && !strncasecmp($table->getColumn($pk[0])->getDbType(), 'int', 3)) {
+        $column = count($table->getPrimaryKey()) === 1 ? $table->getColumn($table->getPrimaryKey()[0]) : null;
+
+        if ($column !== null && !strncasecmp($column->getDbType(), 'int', 3)) {
             $table->sequenceName('');
-            $table->getColumn($pk[0])->autoIncrement(true);
+            $column->autoIncrement(true);
         }
 
-        return true;
+        return !empty($columns);
     }
 
     /**
      * Collects the foreign key column details for the given table.
      *
-     * @param TableSchema $table the table metadata.
+     * @param TableSchemaInterface $table the table metadata.
      *
      * @throws Exception|InvalidConfigException|Throwable
      */
-    protected function findConstraints(TableSchema $table): void
+    protected function findConstraints(TableSchemaInterface $table): void
     {
-        $sql = 'PRAGMA foreign_key_list(' . $this->quoteSimpleTableName($table->getName()) . ')';
-        $keys = $this->getDb()->createCommand($sql)->queryAll();
+        /** @psalm-var PragmaForeignKeyList */
+        $foreignKeysList = $this->getPragmaForeignKeyList($table->getName());
 
-        foreach ($keys as $key) {
-            $id = (int) $key['id'];
+        foreach ($foreignKeysList as $foreignKey) {
+            $id = (int) $foreignKey['id'];
             $fk = $table->getForeignKeys();
+
             if (!isset($fk[$id])) {
-                $table->foreignKey($id, ([$key['table'], $key['from'] => $key['to']]));
+                $table->foreignKey($id, ([$foreignKey['table'], $foreignKey['from'] => $foreignKey['to']]));
             } else {
                 /** composite FK */
-                $table->compositeFK($id, $key['from'], $key['to']);
+                $table->compositeFK($id, $foreignKey['from'], $foreignKey['to']);
             }
         }
     }
@@ -373,23 +414,22 @@ final class Schema extends AbstractSchema
      * ]
      * ```
      *
-     * @param TableSchema $table the table metadata.
+     * @param TableSchemaInterface $table the table metadata.
      *
      * @throws Exception|InvalidConfigException|Throwable
      *
      * @return array all unique indexes for the given table.
      */
-    public function findUniqueIndexes(TableSchema $table): array
+    public function findUniqueIndexes(TableSchemaInterface $table): array
     {
-        $sql = 'PRAGMA index_list(' . $this->quoteSimpleTableName($table->getName()) . ')';
-        $indexes = $this->getDb()->createCommand($sql)->queryAll();
+        /** @psalm-var PragmaIndexList */
+        $indexList = $this->getPragmaIndexList($table->getName());
         $uniqueIndexes = [];
 
-        foreach ($indexes as $index) {
+        foreach ($indexList as $index) {
             $indexName = $index['name'];
-            $indexInfo = $this->getDb()->createCommand(
-                'PRAGMA index_info(' . $this->quoteValue($index['name']) . ')'
-            )->queryAll();
+            /** @psalm-var PragmaIndexInfo */
+            $indexInfo = $this->getPragmaIndexInfo($index['name']);
 
             if ($index['unique']) {
                 $uniqueIndexes[$indexName] = [];
@@ -403,20 +443,22 @@ final class Schema extends AbstractSchema
     }
 
     /**
-     * Loads the column information into a {@see ColumnSchema} object.
+     * Loads the column information into a {@see ColumnSchemaInterface} object.
      *
      * @param array $info column information.
      *
-     * @return ColumnSchema the column schema object.
+     * @return ColumnSchemaInterface the column schema object.
+     *
+     * @psalm-param array{cid:string, name:string, type:string, notnull:string, dflt_value:string|null, pk:string} $info
      */
-    protected function loadColumnSchema(array $info): ColumnSchema
+    protected function loadColumnSchema(array $info): ColumnSchemaInterface
     {
         $column = $this->createColumnSchema();
         $column->name($info['name']);
         $column->allowNull(!$info['notnull']);
-        $column->primaryKey($info['pk'] != 0);
+        $column->primaryKey($info['pk'] != '0');
         $column->dbType(strtolower($info['type']));
-        $column->unsigned(strpos($column->getDbType(), 'unsigned') !== false);
+        $column->unsigned(str_contains($column->getDbType(), 'unsigned'));
         $column->type(self::TYPE_STRING);
 
         if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->getDbType(), $matches)) {
@@ -430,16 +472,18 @@ final class Schema extends AbstractSchema
                 $values = explode(',', $matches[2]);
                 $column->precision((int) $values[0]);
                 $column->size((int) $values[0]);
+
                 if (isset($values[1])) {
                     $column->scale((int) $values[1]);
                 }
+
                 if ($column->getSize() === 1 && ($type === 'tinyint' || $type === 'bit')) {
-                    $column->type('boolean');
+                    $column->type(self::TYPE_BOOLEAN);
                 } elseif ($type === 'bit') {
                     if ($column->getSize() > 32) {
-                        $column->type('bigint');
+                        $column->type(self::TYPE_BIGINT);
                     } elseif ($column->getSize() === 32) {
-                        $column->type('integer');
+                        $column->type(self::TYPE_INTEGER);
                     }
                 }
             }
@@ -462,33 +506,6 @@ final class Schema extends AbstractSchema
     }
 
     /**
-     * Sets the isolation level of the current transaction.
-     *
-     * @param string $level The transaction isolation level to use for this transaction. This can be either
-     * {@see Transaction::READ_UNCOMMITTED} or {@see Transaction::SERIALIZABLE}.
-     *
-     * @throws Exception|InvalidConfigException|NotSupportedException|Throwable when unsupported isolation levels are
-     * used. SQLite only supports SERIALIZABLE and READ UNCOMMITTED.
-     *
-     * {@see http://www.sqlite.org/pragma.html#pragma_read_uncommitted}
-     */
-    public function setTransactionIsolationLevel(string $level): void
-    {
-        switch ($level) {
-            case Transaction::SERIALIZABLE:
-                $this->getDb()->createCommand('PRAGMA read_uncommitted = False;')->execute();
-                break;
-            case Transaction::READ_UNCOMMITTED:
-                $this->getDb()->createCommand('PRAGMA read_uncommitted = True;')->execute();
-                break;
-            default:
-                throw new NotSupportedException(
-                    self::class . ' only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.'
-                );
-        }
-    }
-
-    /**
      * Returns table columns info.
      *
      * @param string $tableName table name.
@@ -499,11 +516,9 @@ final class Schema extends AbstractSchema
      */
     private function loadTableColumnsInfo(string $tableName): array
     {
-        $tableColumns = $this->getDb()->createCommand(
-            'PRAGMA TABLE_INFO (' . $this->quoteValue($tableName) . ')'
-        )->queryAll();
-
-        $tableColumns = $this->normalizePdoRowKeyCase($tableColumns, true);
+        $tableColumns = $this->getPragmaTableInfo($tableName);
+        /** @psalm-var PragmaTableInfo */
+        $tableColumns = $this->normalizeRowKeyCase($tableColumns, true);
 
         return ArrayHelper::index($tableColumns, 'cid');
     }
@@ -516,82 +531,56 @@ final class Schema extends AbstractSchema
      *
      * @throws Exception|InvalidConfigException|Throwable
      *
-     * @return mixed constraints.
+     * @return array|Constraint|null
+     *
+     * @psalm-return (Constraint|IndexConstraint)[]|Constraint|null
      */
-    private function loadTableConstraints(string $tableName, string $returnType)
+    private function loadTableConstraints(string $tableName, string $returnType): Constraint|array|null
     {
-        $tableColumns = null;
-        $indexList = $this->getDb()->createCommand(
-            'PRAGMA INDEX_LIST (' . $this->quoteValue($tableName) . ')'
-        )->queryAll();
-        $indexes = $this->normalizePdoRowKeyCase($indexList, true);
-
-        if (!empty($indexes) && !isset($indexes[0]['origin'])) {
-            /**
-             * SQLite may not have an "origin" column in INDEX_LIST.
-             *
-             * {See https://www.sqlite.org/src/info/2743846cdba572f6}
-             */
-            $tableColumns = $this->loadTableColumnsInfo($tableName);
-        }
-
+        $indexList = $this->getPragmaIndexList($tableName);
+        /** @psalm-var PragmaIndexList $indexes */
+        $indexes = $this->normalizeRowKeyCase($indexList, true);
         $result = [
-            'primaryKey' => null,
-            'indexes' => [],
-            'uniques' => [],
+            self::PRIMARY_KEY => null,
+            self::INDEXES => [],
+            self::UNIQUES => [],
         ];
 
         foreach ($indexes as $index) {
+            /** @psalm-var Column $columns */
             $columns = $this->getPragmaIndexInfo($index['name']);
 
-            if ($tableColumns !== null) {
-                /** SQLite may not have an "origin" column in INDEX_LIST */
-                $index['origin'] = 'c';
-
-                if (!empty($columns) && $tableColumns[$columns[0]['cid']]['pk'] > 0) {
-                    $index['origin'] = 'pk';
-                }
+            if ($index['origin'] === 'pk') {
+                $result[self::PRIMARY_KEY] = (new Constraint())
+                    ->columnNames(ArrayHelper::getColumn($columns, 'name'));
             }
 
-            $ic = (new IndexConstraint())
+            if ($index['origin'] === 'u') {
+                $result[self::UNIQUES][] = (new Constraint())
+                    ->name($index['name'])
+                    ->columnNames(ArrayHelper::getColumn($columns, 'name'));
+            }
+
+            $result[self::INDEXES][] = (new IndexConstraint())
                 ->primary($index['origin'] === 'pk')
                 ->unique((bool) $index['unique'])
                 ->name($index['name'])
                 ->columnNames(ArrayHelper::getColumn($columns, 'name'));
-
-            $result['indexes'][] = $ic;
-
-            if ($index['origin'] === 'pk') {
-                $ct = (new Constraint())
-                    ->columnNames(ArrayHelper::getColumn($columns, 'name'));
-
-                $result['primaryKey'] = $ct;
-            } elseif ($index['unique']) {
-                $ct = (new Constraint())
-                    ->name($index['name'])
-                    ->columnNames(ArrayHelper::getColumn($columns, 'name'));
-
-                $result['uniques'][] = $ct;
-            }
         }
 
-        if ($result['primaryKey'] === null) {
+        if (!isset($result[self::PRIMARY_KEY])) {
             /**
              * Additional check for PK in case of INTEGER PRIMARY KEY with ROWID.
              *
              * {@See https://www.sqlite.org/lang_createtable.html#primkeyconst}
+             *
+             * @psalm-var PragmaTableInfo
              */
-
-            if ($tableColumns === null) {
-                $tableColumns = $this->loadTableColumnsInfo($tableName);
-            }
+            $tableColumns = $this->loadTableColumnsInfo($tableName);
 
             foreach ($tableColumns as $tableColumn) {
                 if ($tableColumn['pk'] > 0) {
-                    $ct = (new Constraint())
-                        ->columnNames([$tableColumn['name']]);
-
-                    $result['primaryKey'] = $ct;
+                    $result[self::PRIMARY_KEY] = (new Constraint())->columnNames([$tableColumn['name']]);
                     break;
                 }
             }
@@ -609,9 +598,9 @@ final class Schema extends AbstractSchema
      *
      * This method may be overridden by child classes to create a DBMS-specific column schema.
      *
-     * @return ColumnSchema column schema instance.
+     * @return ColumnSchemaInterface column schema instance.
      */
-    private function createColumnSchema(): ColumnSchema
+    private function createColumnSchema(): ColumnSchemaInterface
     {
         return new ColumnSchema();
     }
@@ -619,12 +608,125 @@ final class Schema extends AbstractSchema
     /**
      * @throws Exception|InvalidConfigException|Throwable
      */
+    private function getPragmaForeignKeyList(string $tableName): array
+    {
+        return $this->db->createCommand(
+            'PRAGMA FOREIGN_KEY_LIST(' . $this->db->getQuoter()->quoteSimpleTableName(($tableName)) . ')'
+        )->queryAll();
+    }
+
+    /**
+     * @throws Exception|InvalidConfigException|Throwable
+     */
     private function getPragmaIndexInfo(string $name): array
     {
-        $column = $this->getDb()->createCommand('PRAGMA INDEX_INFO (' . $this->quoteValue($name) . ')')->queryAll();
-        $columns = $this->normalizePdoRowKeyCase($column, true);
-        ArraySorter::multisort($columns, 'seqno', SORT_ASC, SORT_NUMERIC);
+        $column = $this->db
+            ->createCommand('PRAGMA INDEX_INFO(' . (string) $this->db->getQuoter()->quoteValue($name) . ')')
+            ->queryAll();
+        /** @psalm-var Column */
+        $column = $this->normalizeRowKeyCase($column, true);
+        ArraySorter::multisort($column, 'seqno', SORT_ASC, SORT_NUMERIC);
 
-        return $columns;
+        return $column;
+    }
+
+    /**
+     * @throws Exception|InvalidConfigException|Throwable
+     */
+    private function getPragmaIndexList(string $tableName): array
+    {
+        return $this->db
+            ->createCommand('PRAGMA INDEX_LIST(' . (string) $this->db->getQuoter()->quoteValue($tableName) . ')')
+            ->queryAll();
+    }
+
+    /**
+     * @throws Exception|InvalidConfigException|Throwable
+     */
+    private function getPragmaTableInfo(string $tableName): array
+    {
+        return $this->db->createCommand(
+            'PRAGMA TABLE_INFO(' . $this->db->getQuoter()->quoteSimpleTableName($tableName) . ')'
+        )->queryAll();
+    }
+
+    /**
+     * Returns the actual name of a given table name.
+     *
+     * This method will strip off curly brackets from the given table name and replace the percentage character '%' with
+     * {@see ConnectionInterface::tablePrefix}.
+     *
+     * @param string $name the table name to be converted.
+     *
+     * @return string the real name of the given table name.
+     */
+    public function getRawTableName(string $name): string
+    {
+        if (str_contains($name, '{{')) {
+            $name = preg_replace('/{{(.*?)}}/', '\1', $name);
+
+            return str_replace('%', $this->db->getTablePrefix(), $name);
+        }
+
+        return $name;
+    }
+
+    /**
+     * Returns the cache key for the specified table name.
+     *
+     * @param string $name the table name.
+     *
+     * @return array the cache key.
+     */
+    protected function getCacheKey(string $name): array
+    {
+        return array_merge([__CLASS__], $this->db->getCacheKey(), [$this->getRawTableName($name)]);
+    }
+
+    /**
+     * Returns the cache tag name.
+     *
+     * This allows {@see refresh()} to invalidate all cached table schemas.
+     *
+     * @return string the cache tag name.
+     */
+    protected function getCacheTag(): string
+    {
+        return md5(serialize(array_merge([__CLASS__], $this->db->getCacheKey())));
+    }
+
+    /**
+     * Changes row's array key case to lower.
+     *
+     * @param array $row row's array or an array of row's arrays.
+     * @param bool $multiple whether multiple rows or a single row passed.
+     *
+     * @return array normalized row or rows.
+     */
+    protected function normalizeRowKeyCase(array $row, bool $multiple): array
+    {
+        if ($multiple) {
+            return array_map(static function (array $row) {
+                return array_change_key_case($row, CASE_LOWER);
+            }, $row);
+        }
+
+        return array_change_key_case($row, CASE_LOWER);
+    }
+
+    /**
+     * @return bool whether this DBMS supports [savepoint](http://en.wikipedia.org/wiki/Savepoint).
+     */
+    public function supportsSavepoint(): bool
+    {
+        return $this->db->isSavepointEnabled();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLastInsertID(?string $sequenceName = null): string
+    {
+        return $this->db->getLastInsertID($sequenceName);
     }
 }

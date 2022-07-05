@@ -18,15 +18,14 @@ It is used in [Yii Framework] but is supposed to be usable separately.
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/db-sqlite/v/stable.png)](https://packagist.org/packages/yiisoft/db-sqlite)
 [![Total Downloads](https://poser.pugx.org/yiisoft/db-sqlite/downloads.png)](https://packagist.org/packages/yiisoft/db-sqlite)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/yiisoft/db-sqlite/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/db-sqlite/?branch=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/yiisoft/db-sqlite/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/db-sqlite/?branch=master)
+[![codecov](https://codecov.io/gh/yiisoft/db-sqlite/branch/dev/graph/badge.svg?token=YXUHCPPITH)](https://codecov.io/gh/yiisoft/db-sqlite)
 
 
 ## Support version
 
 |  PHP | Sqlite Version            |  CI-Actions
 |:----:|:------------------------:|:---:|
-|**7.4 - 8.0**| **3:latest**|[![Build status](https://github.com/yiisoft/db-sqlite/workflows/build/badge.svg)](https://github.com/yiisoft/db-sqlite/actions?query=workflow%3Abuild) [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-sqlite%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-sqlite/master) [![static analysis](https://github.com/yiisoft/db-sqlite/workflows/static%20analysis/badge.svg)](https://github.com/yiisoft/db-sqlite/actions?query=workflow%3A%22static+analysis%22) [![type-coverage](https://shepherd.dev/github/yiisoft/db-sqlite/coverage.svg)](https://shepherd.dev/github/yiisoft/db-sqlite)
+|**7.4 - 8.0**| **3:latest**|[![build](https://github.com/yiisoft/db-sqlite/actions/workflows/build.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-sqlite/actions/workflows/build.yml) [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-sqlite%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-sqlite/master) [![static analysis](https://github.com/yiisoft/db-sqlite/actions/workflows/static.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-sqlite/actions/workflows/static.yml) [![type-coverage](https://shepherd.dev/github/yiisoft/db-sqlite/coverage.svg)](https://shepherd.dev/github/yiisoft/db-sqlite)
 
 
 ## Installation
