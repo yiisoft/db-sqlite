@@ -135,19 +135,15 @@ final class Schema extends AbstractSchema
      *
      * @throws Exception|InvalidConfigException|Throwable
      *
-     * @return array all table names in the database. The names have NO schema name prefix.
+     * @return array All table names in the database. The names have NO schema name prefix.
      */
     protected function findTableNames(string $schema = ''): array
     {
-        $tableNames = $this->db->createCommand(
-            "SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name<>'sqlite_sequence' ORDER BY tbl_name"
-        )->queryColumn();
-
-        if (!$tableNames) {
-            return [];
-        }
-
-        return $tableNames;
+       return $this->db
+           ->createCommand(
+               "SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name<>'sqlite_sequence' ORDER BY tbl_name"
+           )
+           ->queryColumn();
     }
 
     /**
