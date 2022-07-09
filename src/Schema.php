@@ -139,7 +139,7 @@ final class Schema extends AbstractSchema
      */
     protected function findTableNames(string $schema = ''): array
     {
-       return $this->db
+        return $this->db
            ->createCommand(
                "SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name<>'sqlite_sequence' ORDER BY tbl_name"
            )
