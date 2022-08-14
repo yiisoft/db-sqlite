@@ -21,6 +21,7 @@ use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Schema\ColumnSchema;
 use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\Schema as AbstractSchema;
+use Yiisoft\Db\Schema\TableNameInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
@@ -120,11 +121,6 @@ final class Schema extends AbstractSchema
         'enum' => self::TYPE_STRING,
     ];
 
-    public function __construct(private ConnectionInterface $db, SchemaCache $schemaCache)
-    {
-        parent::__construct($schemaCache);
-    }
-
     /**
      * Returns all table names in the database.
      *
@@ -149,18 +145,15 @@ final class Schema extends AbstractSchema
     /**
      * Loads the metadata for the specified table.
      *
-     * @param string $name table name.
+     * @param TableNameInterface $name table name.
      *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|Throwable
      *
      * @return TableSchemaInterface|null DBMS-dependent table metadata, `null` if the table does not exist.
      */
-    protected function loadTableSchema(string $name): ?TableSchemaInterface
+    protected function loadTableSchema(TableNameInterface $name): ?TableSchemaInterface
     {
-        $table = new TableSchema();
-
-        $table->name($name);
-        $table->fullName($name);
+        $table = $this->resolveTableName($name);
 
         if ($this->findColumns($table)) {
             $this->findConstraints($table);
@@ -174,13 +167,13 @@ final class Schema extends AbstractSchema
     /**
      * Loads a primary key for the given table.
      *
-     * @param string $tableName table name.
+     * @param TableNameInterface $tableName table name.
      *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|Throwable
      *
      * @return Constraint|null primary key for the given table, `null` if the table has no primary key.
      */
-    protected function loadTablePrimaryKey(string $tableName): ?Constraint
+    protected function loadTablePrimaryKey(TableNameInterface $tableName): ?Constraint
     {
         $tablePrimaryKey = $this->loadTableConstraints($tableName, self::PRIMARY_KEY);
 
@@ -190,17 +183,17 @@ final class Schema extends AbstractSchema
     /**
      * Loads all foreign keys for the given table.
      *
-     * @param string $tableName table name.
+     * @param TableNameInterface $tableName table name.
      *
      * @throws Exception|InvalidConfigException|Throwable
      *
      * @return ForeignKeyConstraint[] foreign keys for the given table.
      */
-    protected function loadTableForeignKeys(string $tableName): array
+    protected function loadTableForeignKeys(TableNameInterface $tableName): array
     {
         $result = [];
         /** @psalm-var PragmaForeignKeyList */
-        $foreignKeysList = $this->getPragmaForeignKeyList($tableName);
+        $foreignKeysList = $this->getPragmaForeignKeyList((string) $tableName);
         /** @psalm-var NormalizePragmaForeignKeyList */
         $foreignKeysList = $this->normalizeRowKeyCase($foreignKeysList, true);
         /** @psalm-var NormalizePragmaForeignKeyList */
@@ -225,7 +218,7 @@ final class Schema extends AbstractSchema
     /**
      * Loads all indexes for the given table.
      *
-     * @param string $tableName table name.
+     * @param TableNameInterface $tableName table name.
      *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|Throwable
      *
@@ -233,7 +226,7 @@ final class Schema extends AbstractSchema
      *
      * @psalm-return array|IndexConstraint[]
      */
-    protected function loadTableIndexes(string $tableName): array
+    protected function loadTableIndexes(TableNameInterface $tableName): array
     {
         $tableIndexes = $this->loadTableConstraints($tableName, self::INDEXES);
 
@@ -243,7 +236,7 @@ final class Schema extends AbstractSchema
     /**
      * Loads all unique constraints for the given table.
      *
-     * @param string $tableName table name.
+     * @param TableNameInterface $tableName table name.
      *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|Throwable
      *
@@ -251,7 +244,7 @@ final class Schema extends AbstractSchema
      *
      * @psalm-return array|Constraint[]
      */
-    protected function loadTableUniques(string $tableName): array
+    protected function loadTableUniques(TableNameInterface $tableName): array
     {
         $tableUniques = $this->loadTableConstraints($tableName, self::UNIQUES);
 
@@ -261,13 +254,13 @@ final class Schema extends AbstractSchema
     /**
      * Loads all check constraints for the given table.
      *
-     * @param string $tableName table name.
+     * @param TableNameInterface $tableName table name.
      *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|Throwable
      *
      * @return CheckConstraint[] check constraints for the given table.
      */
-    protected function loadTableChecks(string $tableName): array
+    protected function loadTableChecks(TableNameInterface $tableName): array
     {
         $sql = $this->db->createCommand(
             'SELECT `sql` FROM `sqlite_master` WHERE name = :tableName',
@@ -312,13 +305,13 @@ final class Schema extends AbstractSchema
     /**
      * Loads all default value constraints for the given table.
      *
-     * @param string $tableName table name.
+     * @param TableNameInterface $tableName table name.
      *
      * @throws NotSupportedException
      *
      * @return array default value constraints for the given table.
      */
-    protected function loadTableDefaultValues(string $tableName): array
+    protected function loadTableDefaultValues(TableNameInterface $tableName): array
     {
         throw new NotSupportedException('SQLite does not support default value constraints.');
     }
@@ -522,7 +515,7 @@ final class Schema extends AbstractSchema
     /**
      * Loads multiple types of constraints and returns the specified ones.
      *
-     * @param string $tableName table name.
+     * @param TableNameInterface $tableName table name.
      * @param string $returnType return type: (primaryKey, indexes, uniques).
      *
      * @throws Exception|InvalidConfigException|Throwable
@@ -531,9 +524,9 @@ final class Schema extends AbstractSchema
      *
      * @psalm-return (Constraint|IndexConstraint)[]|Constraint|null
      */
-    private function loadTableConstraints(string $tableName, string $returnType): Constraint|array|null
+    private function loadTableConstraints(TableNameInterface $tableName, string $returnType): Constraint|array|null
     {
-        $indexList = $this->getPragmaIndexList($tableName);
+        $indexList = $this->getPragmaIndexList((string) $tableName);
         /** @psalm-var PragmaIndexList $indexes */
         $indexes = $this->normalizeRowKeyCase($indexList, true);
         $result = [
@@ -572,7 +565,7 @@ final class Schema extends AbstractSchema
              *
              * @psalm-var PragmaTableInfo
              */
-            $tableColumns = $this->loadTableColumnsInfo($tableName);
+            $tableColumns = $this->loadTableColumnsInfo((string) $tableName);
 
             foreach ($tableColumns as $tableColumn) {
                 if ($tableColumn['pk'] > 0) {
@@ -652,19 +645,22 @@ final class Schema extends AbstractSchema
      * This method will strip off curly brackets from the given table name and replace the percentage character '%' with
      * {@see ConnectionInterface::tablePrefix}.
      *
-     * @param string $name the table name to be converted.
+     * @param string|TableNameInterface $name the table name to be converted.
      *
      * @return string the real name of the given table name.
      */
-    public function getRawTableName(string $name): string
+    public function getRawTableName(string|TableNameInterface $name): string
     {
-        if (str_contains($name, '{{')) {
-            $name = preg_replace('/{{(.*?)}}/', '\1', $name);
-
-            return str_replace('%', $this->db->getTablePrefix(), $name);
+        if ($name instanceof TableNameInterface) {
+            return (string)$name;
         }
 
-        return $name;
+        if (!str_contains($name, '{{')) {
+            return $name;
+        }
+
+        $name = preg_replace('/{{(.*?)}}/', '\1', $name);
+        return str_replace('%', $this->db->getTablePrefix(), $name);
     }
 
     /**
@@ -676,7 +672,7 @@ final class Schema extends AbstractSchema
      */
     protected function getCacheKey(string $name): array
     {
-        return array_merge([__CLASS__], $this->db->getCacheKey(), [$this->getRawTableName($name)]);
+        return array_merge([__CLASS__], $this->db->getCacheKey(), [$name]);
     }
 
     /**
@@ -708,6 +704,25 @@ final class Schema extends AbstractSchema
         }
 
         return array_change_key_case($row, CASE_LOWER);
+    }
+
+    /**
+     * Resolves the table name and schema name (if any).
+     *
+     * @param TableNameInterface $name the table name.
+     *
+     * {@see TableSchemaInterface}
+     *
+     * @return TableSchemaInterface
+     */
+    protected function resolveTableName(TableNameInterface $name): TableSchemaInterface
+    {
+        $resolvedName = new TableSchema();
+
+        $resolvedName->name($name->getTableName());
+        $resolvedName->fullName((string) $name);
+
+        return $resolvedName;
     }
 
     /**
