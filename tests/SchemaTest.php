@@ -5,13 +5,10 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests;
 
 use PDO;
-use Yiisoft\Db\Command\CommandInterface;
-use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Sqlite\Schema;
 use Yiisoft\Db\QueryBuilder\QueryBuilder;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 use Yiisoft\Db\TestSupport\AnyValue;
