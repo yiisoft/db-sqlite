@@ -401,10 +401,10 @@ final class SchemaTest extends TestCase
         return [
             ['test', '`test`'],
             ['test.test', '`test`.`test`'],
-            ['test.test.test', '`test`.`test`.`test`'],
+            ['test.test.test', '`test`.`test`'],
             ['`test`', '`test`'],
             ['`test`.`test`', '`test`.`test`'],
-            ['test.`test`.test', '`test`.`test`.`test`'],
+            ['test.`test`.test', '`test`.`test`'],
         ];
     }
 
@@ -557,5 +557,30 @@ final class SchemaTest extends TestCase
     public function testGetSchemaDefaultValues(): void
     {
         $this->markTestSkipped('SQLite does not support default value constraints.');
+    }
+
+    /**
+     * @dataProvider quoterTablePartsDataProvider
+     */
+    public function testQuoterTableParts(string $tableName, ...$expectedParts): void
+    {
+        $quoter = $this->getConnection()->getQuoter();
+
+        $parts = $quoter->getTableNameParts($tableName);
+
+        $this->assertEquals($expectedParts, array_reverse($parts));
+    }
+
+    public function quoterTablePartsDataProvider(): array
+    {
+        return [
+            ['animal', 'animal',],
+            ['dbo.animal', 'animal', 'dbo'],
+            ['`dbo`.`animal`', 'animal', 'dbo'],
+            ['`other`.`animal2`', 'animal2', 'other'],
+            ['other.`animal2`', 'animal2', 'other'],
+            ['other.animal2', 'animal2', 'other'],
+            ['catalog.other.animal2', 'animal2', 'other'],
+        ];
     }
 }
