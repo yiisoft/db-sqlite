@@ -7,8 +7,6 @@ namespace Yiisoft\Db\Sqlite;
 use Throwable;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Arrays\ArraySorter;
-use Yiisoft\Db\Cache\SchemaCache;
-use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Constraint\CheckConstraint;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
@@ -119,11 +117,6 @@ final class Schema extends AbstractSchema
         'timestamp' => self::TYPE_TIMESTAMP,
         'enum' => self::TYPE_STRING,
     ];
-
-    public function __construct(private ConnectionInterface $db, SchemaCache $schemaCache)
-    {
-        parent::__construct($schemaCache);
-    }
 
     /**
      * Returns all table names in the database.
@@ -644,27 +637,6 @@ final class Schema extends AbstractSchema
         return $this->db->createCommand(
             'PRAGMA TABLE_INFO(' . $this->db->getQuoter()->quoteSimpleTableName($tableName) . ')'
         )->queryAll();
-    }
-
-    /**
-     * Returns the actual name of a given table name.
-     *
-     * This method will strip off curly brackets from the given table name and replace the percentage character '%' with
-     * {@see ConnectionInterface::tablePrefix}.
-     *
-     * @param string $name the table name to be converted.
-     *
-     * @return string the real name of the given table name.
-     */
-    public function getRawTableName(string $name): string
-    {
-        if (str_contains($name, '{{')) {
-            $name = preg_replace('/{{(.*?)}}/', '\1', $name);
-
-            return str_replace('%', $this->db->getTablePrefix(), $name);
-        }
-
-        return $name;
     }
 
     /**
