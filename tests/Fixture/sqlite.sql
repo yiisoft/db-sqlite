@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS "order_with_null_fk";
 DROP TABLE IF EXISTS "category";
 DROP TABLE IF EXISTS "customer";
 DROP TABLE IF EXISTS "profile";
+DROP TABLE IF EXISTS "quoter";
 DROP TABLE IF EXISTS "type";
 DROP TABLE IF EXISTS "null_values";
 DROP TABLE IF EXISTS "negative_default_values";
@@ -33,6 +34,13 @@ DROP TABLE IF EXISTS "T_upsert_1";
 
 CREATE TABLE "profile" (
   id INTEGER NOT NULL,
+  description varchar(128) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE "quoter" (
+  id INTEGER NOT NULL,
+  name varchar(16) NOT NULL,
   description varchar(128) NOT NULL,
   PRIMARY KEY (id)
 );
