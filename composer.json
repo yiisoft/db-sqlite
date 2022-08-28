@@ -23,7 +23,7 @@
         "ext-mbstring": "*",
         "ext-pdo": "*",
         "yiisoft/arrays": "^2.0",
-        "yiisoft/db": "dev-master",
+        "yiisoft/db": "dev-adopt-last-change-profiler",
         "yiisoft/strings": "^2.0"
     },
     "require-dev": {
