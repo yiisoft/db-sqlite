@@ -49,12 +49,12 @@ final class ConnectionTest extends TestCase
 
         /* logging only */
         $db->setLogger($this->logger);
-        $db->setProfiler(null);
+        $db->notProfiler();
         $this->runExceptionTest($db);
 
         /* disabled */
         $db->setLogger(new NullLogger());
-        $db->setProfiler(null);
+        $db->notProfiler();
         $this->runExceptionTest($db);
     }
 
