@@ -143,6 +143,7 @@ final class CommandTest extends TestCase
      * @param array $values
      * @param string $expected
      * @param array $expectedParams
+     * @param int $insertedRow
      *
      * @throws Exception
      * @throws InvalidConfigException
@@ -155,14 +156,22 @@ final class CommandTest extends TestCase
         array $columns,
         array $values,
         string $expected,
-        array $expectedParams = []
+        array $expectedParams = [],
+        int $insertedRow = 1
     ): void {
         $db = $this->getConnection(true);
+
         $command = $db->createCommand();
+
         $command->batchInsert($table, $columns, $values);
+
         $command->prepare(false);
+
         $this->assertSame($expected, $command->getSql());
         $this->assertSame($expectedParams, $command->getParams());
+
+        $command->execute();
+        $this->assertEquals($insertedRow, (new Query($db))->from($table)->count());
     }
 
     /**
