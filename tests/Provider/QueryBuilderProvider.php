@@ -17,10 +17,7 @@ final class QueryBuilderProvider extends TestCase
 
     public function batchInsertProvider(): array
     {
-        $data = (new BaseQueryBuilderProvider($this->getConnection()))->batchInsertProvider();
-        $data['escape-danger-chars']['expected'] = 'INSERT INTO `customer` (`address`)'
-            . " VALUES ('SQL-danger chars are escaped: ''); --')";
-        return $data;
+        return (new BaseQueryBuilderProvider($this->getConnection()))->batchInsertProvider();
     }
 
     public function buildConditionsProvider(): array
