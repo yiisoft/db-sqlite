@@ -230,7 +230,7 @@ final class SchemaTest extends TestCase
 
         try {
             $db->createCommand()->dropTable('uniqueIndex')->execute();
-        } catch (Exception $e) {
+        } catch (Exception) {
         }
 
         $db->createCommand()->createTable('uniqueIndex', ['somecol' => 'string', 'someCol2' => 'string'])->execute();
@@ -342,8 +342,6 @@ final class SchemaTest extends TestCase
     /**
      * @dataProvider pdoAttributesProviderTrait
      *
-     * @param array $pdoAttributes
-     *
      * @throws Exception
      * @throws InvalidConfigException
      */
@@ -359,9 +357,7 @@ final class SchemaTest extends TestCase
         $tables = $schema->getTableNames();
 
         if ($db->getDriver()->getDriverName() === 'sqlsrv') {
-            $tables = array_map(static function ($item) {
-                return trim($item, '[]');
-            }, $tables);
+            $tables = array_map(static fn ($item) => trim($item, '[]'), $tables);
         }
 
         $this->assertContains('customer', $tables);
@@ -376,8 +372,6 @@ final class SchemaTest extends TestCase
 
     /**
      * @dataProvider pdoAttributesProviderTrait
-     *
-     * @param array $pdoAttributes
      */
     public function testGetTableSchemas(array $pdoAttributes): void
     {
@@ -450,12 +444,8 @@ final class SchemaTest extends TestCase
 
     /**
      * @dataProvider constraintsProvider
-     *
-     * @param string $tableName
-     * @param string $type
-     * @param mixed $expected
      */
-    public function testTableSchemaConstraints(string $tableName, string $type, $expected): void
+    public function testTableSchemaConstraints(string $tableName, string $type, mixed $expected): void
     {
         if ($expected === false) {
             $this->expectException(NotSupportedException::class);
@@ -468,14 +458,10 @@ final class SchemaTest extends TestCase
     /**
      * @dataProvider lowercaseConstraintsProviderTrait
      *
-     * @param string $tableName
-     * @param string $type
-     * @param mixed $expected
-     *
      * @throws Exception
      * @throws InvalidConfigException
      */
-    public function testTableSchemaConstraintsWithPdoLowercase(string $tableName, string $type, $expected): void
+    public function testTableSchemaConstraintsWithPdoLowercase(string $tableName, string $type, mixed $expected): void
     {
         if ($expected === false) {
             $this->expectException(NotSupportedException::class);
@@ -490,14 +476,10 @@ final class SchemaTest extends TestCase
     /**
      * @dataProvider uppercaseConstraintsProviderTrait
      *
-     * @param string $tableName
-     * @param string $type
-     * @param mixed $expected
-     *
      * @throws Exception
      * @throws InvalidConfigException
      */
-    public function testTableSchemaConstraintsWithPdoUppercase(string $tableName, string $type, $expected): void
+    public function testTableSchemaConstraintsWithPdoUppercase(string $tableName, string $type, mixed $expected): void
     {
         if ($expected === false) {
             $this->expectException(NotSupportedException::class);
@@ -511,11 +493,6 @@ final class SchemaTest extends TestCase
 
     /**
      * @dataProvider tableSchemaCachePrefixesProviderTrait
-     *
-     * @param string $tablePrefix
-     * @param string $tableName
-     * @param string $testTablePrefix
-     * @param string $testTableName
      */
     public function testTableSchemaCacheWithTablePrefixes(
         string $tablePrefix,

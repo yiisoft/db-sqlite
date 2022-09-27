@@ -22,7 +22,7 @@ use function reset;
  * read-only.
  * @property string $sql SQL code. This property is read-only.
  */
-final class SqlToken implements ArrayAccess
+final class SqlToken implements ArrayAccess, \Stringable
 {
     public const TYPE_CODE = 0;
     public const TYPE_STATEMENT = 1;
@@ -234,14 +234,6 @@ final class SqlToken implements ArrayAccess
 
     /**
      * Tests the given token to match the specified pattern token.
-     *
-     * @param SqlToken $patternToken
-     * @param SqlToken $token
-     * @param int $offset
-     * @param int|null $firstMatchIndex
-     * @param int|null $lastMatchIndex
-     *
-     * @return bool
      */
     private function tokensMatch(
         self $patternToken,
@@ -308,10 +300,6 @@ final class SqlToken implements ArrayAccess
 
     /**
      * Returns an absolute offset in the children array.
-     *
-     * @param int $offset
-     *
-     * @return int
      */
     private function calculateOffset(int $offset): int
     {
@@ -348,8 +336,6 @@ final class SqlToken implements ArrayAccess
      * - {@see TYPE_STRING_LITERAL}
      *
      * @param int $value token type. It has to be one of the following constants:
-     *
-     * @return self
      */
     public function type(int $value): self
     {
@@ -360,10 +346,6 @@ final class SqlToken implements ArrayAccess
 
     /**
      * Set token content.
-     *
-     * @param string|null $value
-     *
-     * @return self
      */
     public function content(?string $value): self
     {
@@ -376,8 +358,6 @@ final class SqlToken implements ArrayAccess
      * Set original SQL token start position.
      *
      * @param int $value original SQL token start position.
-     *
-     * @return self
      */
     public function startOffset(int $value): self
     {
@@ -390,8 +370,6 @@ final class SqlToken implements ArrayAccess
      * Set original SQL token end position.
      *
      * @param int $value original SQL token end position.
-     *
-     * @return self
      */
     public function endOffset(int $value): self
     {
@@ -404,8 +382,6 @@ final class SqlToken implements ArrayAccess
      * Set parent token.
      *
      * @param SqlToken $value parent token.
-     *
-     * @return self
      */
     public function parent(self $value): self
     {

@@ -15,8 +15,6 @@ use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
-use function strncmp;
-
 /**
  * Database connection class prefilled for SQLite Server.
  */
@@ -29,7 +27,7 @@ final class ConnectionPDO extends AbstractConnectionPDO
     {
         $this->transaction = null;
 
-        if (strncmp($this->driver->getDsn(), 'sqlite::memory:', 15) !== 0) {
+        if (!str_starts_with($this->driver->getDsn(), 'sqlite::memory:')) {
             /** reset PDO connection, unless its sqlite in-memory, which can only have one connection */
             $this->pdo = null;
         }
