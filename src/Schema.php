@@ -518,7 +518,6 @@ final class Schema extends AbstractSchema
      *
      * @throws Exception|InvalidConfigException|Throwable
      *
-     *
      * @psalm-return (Constraint|IndexConstraint)[]|Constraint|null
      */
     private function loadTableConstraints(string $tableName, string $returnType): Constraint|array|null
@@ -671,7 +670,7 @@ final class Schema extends AbstractSchema
     protected function normalizeRowKeyCase(array $row, bool $multiple): array
     {
         if ($multiple) {
-            return array_map(static fn(array $row) => array_change_key_case($row, CASE_LOWER), $row);
+            return array_map(static fn (array $row) => array_change_key_case($row, CASE_LOWER), $row);
         }
 
         return array_change_key_case($row, CASE_LOWER);
