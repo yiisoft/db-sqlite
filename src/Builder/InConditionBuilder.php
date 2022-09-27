@@ -48,10 +48,7 @@ final class InConditionBuilder extends BaseInConditionBuilder
     /**
      * Builds SQL for IN condition.
      *
-     * @param string|null $operator
-     * @param array|Traversable $columns
      * @param iterable|Iterator $values
-     * @param array $params
      *
      * @return string SQL.
      */

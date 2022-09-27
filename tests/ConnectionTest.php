@@ -127,15 +127,17 @@ final class ConnectionTest extends TestCase
                 $db->createCommand('SELECT description FROM profile WHERE id=1')->queryScalar()
             );
 
-            $result = $db->useMaster(static function (ConnectionInterface $db) {
-                return $db->createCommand('SELECT description FROM profile WHERE id=1')->queryScalar();
-            });
+            $result = $db->useMaster(static fn(ConnectionInterface $db) => $db->createCommand('SELECT description FROM profile WHERE id=1')->queryScalar());
             $this->assertEquals('test', $result);
         }
     }
 
     public function testMastersShuffled(): void
     {
+        $mastersCount = null;
+        $slavesCount = null;
+        $hit_slaves = [];
+        $hit_masters = [];
         $this->markTestSkipped('Only for master/slave');
 
         $mastersCount = 2;
@@ -164,6 +166,10 @@ final class ConnectionTest extends TestCase
 
     public function testMastersSequential(): void
     {
+        $mastersCount = null;
+        $slavesCount = null;
+        $hit_slaves = [];
+        $hit_masters = [];
         $this->markTestSkipped('Only for master/slave');
 
         $mastersCount = 2;
@@ -203,6 +209,7 @@ final class ConnectionTest extends TestCase
 
     public function testRestoreMasterAfterException(): void
     {
+        $db = null;
         $this->markTestSkipped('Only for master/slave');
 
         $db = $this->prepareMasterSlave(1, 1);
@@ -213,7 +220,7 @@ final class ConnectionTest extends TestCase
                 throw new Exception('fail');
             });
             $this->fail('Exceptions was caught somewhere');
-        } catch (Exception $e) {
+        } catch (Exception) {
             /* ok */
         }
 
@@ -222,6 +229,7 @@ final class ConnectionTest extends TestCase
 
     public function testServerStatusCacheWorks(): void
     {
+        $db = null;
         $this->markTestSkipped('Only for master/slave');
 
         $cacheKeyNormalizer = new CacheKeyNormalizer();
@@ -255,7 +263,7 @@ final class ConnectionTest extends TestCase
 
         try {
             $db->open();
-        } catch (InvalidConfigException $e) {
+        } catch (InvalidConfigException) {
         }
 
         $this->assertTrue(
@@ -266,6 +274,7 @@ final class ConnectionTest extends TestCase
 
     public function testServerStatusCacheCanBeDisabled(): void
     {
+        $db = null;
         $this->markTestSkipped('Only for master/slave');
 
         $cacheKeyNormalizer = new CacheKeyNormalizer();
@@ -297,7 +306,7 @@ final class ConnectionTest extends TestCase
 
         try {
             $db->open();
-        } catch (InvalidConfigException $e) {
+        } catch (InvalidConfigException) {
         }
 
         $this->assertFalse($this->cache->psr()->has($cacheKey), 'Caching is disabled');
@@ -335,6 +344,7 @@ final class ConnectionTest extends TestCase
 
     protected function prepareMasterSlave($masterCount, $slaveCount): ConnectionInterface
     {
+        $db = null;
         $this->markTestSkipped('Only for master/slave');
 
         $db = $this->getConnection(true);
@@ -362,9 +372,6 @@ final class ConnectionTest extends TestCase
         return $db;
     }
 
-    /**
-     * @param ConnectionInterface $db
-     */
     private function runExceptionTest(ConnectionInterface $db): void
     {
         $thrown = false;

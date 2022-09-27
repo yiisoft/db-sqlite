@@ -179,7 +179,6 @@ final class CommandTest extends TestCase
      *
      * @dataProvider bindParamsNonWhereProviderTrait
      *
-     * @param string $sql
      *
      * @throws Exception
      * @throws InvalidArgumentException
@@ -229,13 +228,12 @@ final class CommandTest extends TestCase
      *
      * @dataProvider invalidSelectColumnsProviderTrait
      *
-     * @param mixed $invalidSelectColumns
      *
      * @throws Exception
      * @throws InvalidConfigException
      * @throws NotSupportedException
      */
-    public function testInsertSelectFailed($invalidSelectColumns): void
+    public function testInsertSelectFailed(mixed $invalidSelectColumns): void
     {
         $db = $this->getConnection();
         $query = new Query($db);
@@ -249,8 +247,6 @@ final class CommandTest extends TestCase
     /**
      * @dataProvider upsertProviderTrait
      *
-     * @param array $firstData
-     * @param array $secondData
      *
      * @throws Exception
      * @throws InvalidConfigException
