@@ -133,7 +133,6 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
      * Contains array of default expression builders. Extend this method and override it, if you want to change default
      * expression builders for this query builder.
      *
-     * @return array
      *
      * See {@see ExpressionBuilder} docs for details.
      *

@@ -179,8 +179,6 @@ final class CommandPDO extends AbstractCommandPDO
      * Splits the specified SQL codes into individual SQL statements and returns them or `false` if there's a single
      * statement.
      *
-     * @param string $sql
-     * @param array $params
      *
      * @throws InvalidArgumentException
      *
@@ -217,10 +215,7 @@ final class CommandPDO extends AbstractCommandPDO
     /**
      * Returns named bindings used in the specified statement token.
      *
-     * @param SqlToken $statement
-     * @param array $params
      *
-     * @return array
      *
      * @psalm-param array<string, string> $params
      */
