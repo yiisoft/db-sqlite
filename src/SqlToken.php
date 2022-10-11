@@ -234,8 +234,6 @@ final class SqlToken implements ArrayAccess, \Stringable
 
     /**
      * Tests the given token to match the specified pattern token.
-     *
-     *
      */
     private function tokensMatch(
         self $patternToken,
@@ -302,8 +300,6 @@ final class SqlToken implements ArrayAccess, \Stringable
 
     /**
      * Returns an absolute offset in the children array.
-     *
-     *
      */
     private function calculateOffset(int $offset): int
     {
@@ -340,7 +336,6 @@ final class SqlToken implements ArrayAccess, \Stringable
      * - {@see TYPE_STRING_LITERAL}
      *
      * @param int $value token type. It has to be one of the following constants:
-     *
      */
     public function type(int $value): self
     {
@@ -351,8 +346,6 @@ final class SqlToken implements ArrayAccess, \Stringable
 
     /**
      * Set token content.
-     *
-     *
      */
     public function content(?string $value): self
     {
@@ -365,7 +358,6 @@ final class SqlToken implements ArrayAccess, \Stringable
      * Set original SQL token start position.
      *
      * @param int $value original SQL token start position.
-     *
      */
     public function startOffset(int $value): self
     {
@@ -378,7 +370,6 @@ final class SqlToken implements ArrayAccess, \Stringable
      * Set original SQL token end position.
      *
      * @param int $value original SQL token end position.
-     *
      */
     public function endOffset(int $value): self
     {
@@ -391,7 +382,6 @@ final class SqlToken implements ArrayAccess, \Stringable
      * Set parent token.
      *
      * @param SqlToken $value parent token.
-     *
      */
     public function parent(self $value): self
     {

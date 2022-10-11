@@ -500,7 +500,6 @@ final class Schema extends AbstractSchema
      * @param string $tableName table name.
      *
      * @throws Exception|InvalidConfigException|Throwable
-     *
      */
     private function loadTableColumnsInfo(string $tableName): array
     {
@@ -518,7 +517,6 @@ final class Schema extends AbstractSchema
      * @param string $returnType return type: (primaryKey, indexes, uniques).
      *
      * @throws Exception|InvalidConfigException|Throwable
-     *
      *
      * @psalm-return (Constraint|IndexConstraint)[]|Constraint|null
      */
@@ -672,7 +670,7 @@ final class Schema extends AbstractSchema
     protected function normalizeRowKeyCase(array $row, bool $multiple): array
     {
         if ($multiple) {
-            return array_map(static fn(array $row) => array_change_key_case($row, CASE_LOWER), $row);
+            return array_map(static fn (array $row) => array_change_key_case($row, CASE_LOWER), $row);
         }
 
         return array_change_key_case($row, CASE_LOWER);

@@ -15,8 +15,6 @@ use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
-use function strncmp;
-
 /**
  * Database connection class prefilled for SQLite Server.
  */

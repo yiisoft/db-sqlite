@@ -52,10 +52,9 @@ final class QueryBuilderTest extends TestCase
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::buildConditionsProvider
      *
-     *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
      */
-    public function testBuildCondition(array|\Yiisoft\Db\Expression\ExpressionInterface $condition, string $expected, array $expectedParams): void
+    public function testBuildCondition(array|ExpressionInterface $condition, string $expected, array $expectedParams): void
     {
         $db = $this->getConnection();
         $query = (new Query($db))->where($condition);
@@ -69,7 +68,6 @@ final class QueryBuilderTest extends TestCase
 
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::buildFilterConditionProvider
-     *
      *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
      */
@@ -88,7 +86,6 @@ final class QueryBuilderTest extends TestCase
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::buildFromDataProvider
      *
-     *
      * @throws Exception
      */
     public function testBuildFrom(string $table, string $expected): void
@@ -105,10 +102,9 @@ final class QueryBuilderTest extends TestCase
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::buildLikeConditionsProvider
      *
-     *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
      */
-    public function testBuildLikeCondition(array|\Yiisoft\Db\Expression\ExpressionInterface $condition, string $expected, array $expectedParams): void
+    public function testBuildLikeCondition(array|ExpressionInterface $condition, string $expected, array $expectedParams): void
     {
         $db = $this->getConnection();
         $query = (new Query($db))->where($condition);
@@ -147,7 +143,6 @@ final class QueryBuilderTest extends TestCase
 
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::buildExistsParamsProvider
-     *
      *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
      */
@@ -188,7 +183,6 @@ final class QueryBuilderTest extends TestCase
 
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::createDropIndexesProvider
-     *
      */
     public function testCreateDropIndex(string $sql, Closure $builder): void
     {
@@ -198,7 +192,6 @@ final class QueryBuilderTest extends TestCase
 
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::deleteProvider
-     *
      *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
      */
@@ -259,10 +252,9 @@ final class QueryBuilderTest extends TestCase
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::insertProvider
      *
-     *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
      */
-    public function testInsert(string $table, array|\Yiisoft\Db\Query\QueryInterface $columns, array $params, string $expectedSQL, array $expectedParams): void
+    public function testInsert(string $table, array|QueryInterface $columns, array $params, string $expectedSQL, array $expectedParams): void
     {
         $db = $this->getConnection();
         $this->assertSame($expectedSQL, $db->getQueryBuilder()->insert($table, $columns, $params));
@@ -307,7 +299,6 @@ final class QueryBuilderTest extends TestCase
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::updateProvider
      *
-     *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
      */
     public function testUpdate(
@@ -331,7 +322,7 @@ final class QueryBuilderTest extends TestCase
      *
      * @throws Exception|NotSupportedException
      */
-    public function testUpsert(string $table, array|\Yiisoft\Db\Query\QueryInterface $insertColumns, array|bool $updateColumns, string|array $expectedSQL, array $expectedParams): void
+    public function testUpsert(string $table, array|QueryInterface $insertColumns, array|bool $updateColumns, string|array $expectedSQL, array $expectedParams): void
     {
         $actualParams = [];
         $db = $this->getConnection();

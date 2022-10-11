@@ -72,7 +72,7 @@ final class QueryBuilderProvider extends TestCase
         $tableName = 'mytable';
         $result['with schema'] = [
             "CREATE INDEX {{{$schemaName}}}.[[$indexName]] ON {{{$tableName}}} ([[C_index_1]])",
-            static fn(QueryBuilderInterface $qb) => $qb->createIndex($indexName, $schemaName . '.' . $tableName, 'C_index_1'),
+            static fn (QueryBuilderInterface $qb) => $qb->createIndex($indexName, $schemaName . '.' . $tableName, 'C_index_1'),
         ];
         return $result;
     }

@@ -127,7 +127,7 @@ final class ConnectionTest extends TestCase
                 $db->createCommand('SELECT description FROM profile WHERE id=1')->queryScalar()
             );
 
-            $result = $db->useMaster(static fn(ConnectionInterface $db) => $db->createCommand('SELECT description FROM profile WHERE id=1')->queryScalar());
+            $result = $db->useMaster(static fn (ConnectionInterface $db) => $db->createCommand('SELECT description FROM profile WHERE id=1')->queryScalar());
             $this->assertEquals('test', $result);
         }
     }

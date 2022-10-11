@@ -78,8 +78,7 @@ abstract class BaseTokenizer
          * @var string SQL code.
          */
         private string $sql
-    )
-    {
+    ) {
     }
 
     /**
@@ -240,7 +239,7 @@ abstract class BaseTokenizer
         }
 
         if (!is_array(reset($with))) {
-            usort($with, static fn(string $string1, string $string2) => mb_strlen($string2, 'UTF-8') - mb_strlen($string1, 'UTF-8'));
+            usort($with, static fn (string $string1, string $string2) => mb_strlen($string2, 'UTF-8') - mb_strlen($string1, 'UTF-8'));
 
             $map = [];
 
@@ -327,8 +326,6 @@ abstract class BaseTokenizer
 
     /**
      * Determines whether there is a delimited string at the current offset and adds it to the token children.
-     *
-     *
      */
     private function tokenizeDelimitedString(int &$length): bool
     {
@@ -352,8 +349,6 @@ abstract class BaseTokenizer
 
     /**
      * Determines whether there is an operator at the current offset and adds it to the token children.
-     *
-     *
      */
     private function tokenizeOperator(int &$length): bool
     {
@@ -447,7 +442,6 @@ abstract class BaseTokenizer
     /**
      * Adds the specified length to the current offset.
      *
-     *
      * @throws InvalidArgumentException
      */
     private function advance(int $length): void
@@ -462,7 +456,6 @@ abstract class BaseTokenizer
 
     /**
      * Returns whether the SQL code is completely traversed.
-     *
      */
     private function isEof(): bool
     {
