@@ -71,7 +71,7 @@ abstract class BaseTokenizer
     /**
      * @var SqlToken|null resulting token of a last {@see tokenize()} call.
      */
-    private ?SqlToken $token = null;
+    private SqlToken|null $token = null;
 
     public function __construct(
         /**
@@ -171,7 +171,7 @@ abstract class BaseTokenizer
      *
      * @return bool whether there's an operator at the current offset.
      */
-    abstract protected function isOperator(int &$length, ?string &$content): bool;
+    abstract protected function isOperator(int &$length, string|null &$content): bool;
 
     /**
      * Returns whether there's an identifier at the current offset.
@@ -184,7 +184,7 @@ abstract class BaseTokenizer
      *
      * @return bool whether there's an identifier at the current offset.
      */
-    abstract protected function isIdentifier(int &$length, ?string &$content): bool;
+    abstract protected function isIdentifier(int &$length, string|null &$content): bool;
 
     /**
      * Returns whether there's a string literal at the current offset.
@@ -197,7 +197,7 @@ abstract class BaseTokenizer
      *
      * @return bool whether there's a string literal at the current offset.
      */
-    abstract protected function isStringLiteral(int &$length, ?string &$content): bool;
+    abstract protected function isStringLiteral(int &$length, string|null &$content): bool;
 
     /**
      * Returns whether the given string is a keyword.
@@ -209,7 +209,7 @@ abstract class BaseTokenizer
      *
      * @return bool whether the given string is a keyword.
      */
-    abstract protected function isKeyword(string $string, ?string &$content): bool;
+    abstract protected function isKeyword(string $string, string|null &$content): bool;
 
     public function setSql(string $sql): void
     {
@@ -232,7 +232,7 @@ abstract class BaseTokenizer
         array $with,
         bool $caseSensitive,
         int &$length,
-        ?string &$content = null
+        string &$content = null
     ): bool {
         if (empty($with)) {
             return false;
@@ -272,7 +272,7 @@ abstract class BaseTokenizer
      *
      * @return string result string, it may be empty if there's nothing to return.
      */
-    protected function substring(int $length, bool $caseSensitive = true, ?int $offset = null): string
+    protected function substring(int $length, bool $caseSensitive = true, int $offset = null): string
     {
         if ($offset === null) {
             $offset = $this->offset;
@@ -303,7 +303,7 @@ abstract class BaseTokenizer
      *
      * @return int index after the given string or end of string index.
      */
-    protected function indexAfter(string $string, ?int $offset = null): int
+    protected function indexAfter(string $string, int $offset = null): int
     {
         if ($offset === null) {
             $offset = $this->offset;

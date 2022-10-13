@@ -53,7 +53,7 @@ final class InConditionBuilder extends BaseInConditionBuilder
      * @return string SQL.
      */
     protected function buildCompositeInCondition(
-        ?string $operator,
+        string|null $operator,
         Traversable|array $columns,
         iterable|Iterator $values,
         array &$params = []
