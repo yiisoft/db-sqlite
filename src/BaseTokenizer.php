@@ -34,11 +34,6 @@ use function usort;
 abstract class BaseTokenizer
 {
     /**
-     * @var string SQL code.
-     */
-    private string $sql;
-
-    /**
      * @var int SQL code string length.
      */
     protected int $length = 0;
@@ -76,11 +71,14 @@ abstract class BaseTokenizer
     /**
      * @var SqlToken|null resulting token of a last {@see tokenize()} call.
      */
-    private ?SqlToken $token = null;
+    private SqlToken|null $token = null;
 
-    public function __construct(string $sql)
-    {
-        $this->sql = $sql;
+    public function __construct(
+        /**
+         * @var string SQL code.
+         */
+        private string $sql
+    ) {
     }
 
     /**
@@ -173,7 +171,7 @@ abstract class BaseTokenizer
      *
      * @return bool whether there's an operator at the current offset.
      */
-    abstract protected function isOperator(int &$length, ?string &$content): bool;
+    abstract protected function isOperator(int &$length, string|null &$content): bool;
 
     /**
      * Returns whether there's an identifier at the current offset.
@@ -186,7 +184,7 @@ abstract class BaseTokenizer
      *
      * @return bool whether there's an identifier at the current offset.
      */
-    abstract protected function isIdentifier(int &$length, ?string &$content): bool;
+    abstract protected function isIdentifier(int &$length, string|null &$content): bool;
 
     /**
      * Returns whether there's a string literal at the current offset.
@@ -199,7 +197,7 @@ abstract class BaseTokenizer
      *
      * @return bool whether there's a string literal at the current offset.
      */
-    abstract protected function isStringLiteral(int &$length, ?string &$content): bool;
+    abstract protected function isStringLiteral(int &$length, string|null &$content): bool;
 
     /**
      * Returns whether the given string is a keyword.
@@ -211,11 +209,8 @@ abstract class BaseTokenizer
      *
      * @return bool whether the given string is a keyword.
      */
-    abstract protected function isKeyword(string $string, ?string &$content): bool;
+    abstract protected function isKeyword(string $string, string|null &$content): bool;
 
-    /**
-     * @param string $sql
-     */
     public function setSql(string $sql): void
     {
         $this->sql = $sql;
@@ -237,16 +232,14 @@ abstract class BaseTokenizer
         array $with,
         bool $caseSensitive,
         int &$length,
-        ?string &$content = null
+        string &$content = null
     ): bool {
         if (empty($with)) {
             return false;
         }
 
         if (!is_array(reset($with))) {
-            usort($with, static function (string $string1, string $string2) {
-                return mb_strlen($string2, 'UTF-8') - mb_strlen($string1, 'UTF-8');
-            });
+            usort($with, static fn (string $string1, string $string2) => mb_strlen($string2, 'UTF-8') - mb_strlen($string1, 'UTF-8'));
 
             $map = [];
 
@@ -279,7 +272,7 @@ abstract class BaseTokenizer
      *
      * @return string result string, it may be empty if there's nothing to return.
      */
-    protected function substring(int $length, bool $caseSensitive = true, ?int $offset = null): string
+    protected function substring(int $length, bool $caseSensitive = true, int $offset = null): string
     {
         if ($offset === null) {
             $offset = $this->offset;
@@ -310,7 +303,7 @@ abstract class BaseTokenizer
      *
      * @return int index after the given string or end of string index.
      */
-    protected function indexAfter(string $string, ?int $offset = null): int
+    protected function indexAfter(string $string, int $offset = null): int
     {
         if ($offset === null) {
             $offset = $this->offset;
@@ -333,10 +326,6 @@ abstract class BaseTokenizer
 
     /**
      * Determines whether there is a delimited string at the current offset and adds it to the token children.
-     *
-     * @param int $length
-     *
-     * @return bool
      */
     private function tokenizeDelimitedString(int &$length): bool
     {
@@ -360,10 +349,6 @@ abstract class BaseTokenizer
 
     /**
      * Determines whether there is an operator at the current offset and adds it to the token children.
-     *
-     * @param int $length
-     *
-     * @return bool
      */
     private function tokenizeOperator(int &$length): bool
     {
@@ -457,8 +442,6 @@ abstract class BaseTokenizer
     /**
      * Adds the specified length to the current offset.
      *
-     * @param int $length
-     *
      * @throws InvalidArgumentException
      */
     private function advance(int $length): void
@@ -473,8 +456,6 @@ abstract class BaseTokenizer
 
     /**
      * Returns whether the SQL code is completely traversed.
-     *
-     * @return bool
      */
     private function isEof(): bool
     {

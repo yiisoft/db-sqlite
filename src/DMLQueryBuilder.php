@@ -35,6 +35,8 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 
     /**
      * @throws Exception|Throwable
+     *
+     * @psalm-suppress RiskyCast
      */
     public function resetSequence(string $tableName, mixed $value = null): string
     {

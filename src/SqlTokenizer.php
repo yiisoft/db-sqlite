@@ -69,7 +69,7 @@ final class SqlTokenizer extends BaseTokenizer
      *
      * @return bool whether there's an operator at the current offset.
      */
-    protected function isOperator(int &$length, ?string &$content): bool
+    protected function isOperator(int &$length, string|null &$content): bool
     {
         $operators = [
             '!=',
@@ -112,7 +112,7 @@ final class SqlTokenizer extends BaseTokenizer
      *
      * @return bool whether there's an identifier at the current offset.
      */
-    protected function isIdentifier(int &$length, ?string &$content): bool
+    protected function isIdentifier(int &$length, string|null &$content): bool
     {
         $identifierDelimiters = ['"' => '"', '[' => ']', '`' => '`'];
 
@@ -151,7 +151,7 @@ final class SqlTokenizer extends BaseTokenizer
      *
      * @return bool whether there's a string literal at the current offset.
      */
-    protected function isStringLiteral(int &$length, ?string &$content): bool
+    protected function isStringLiteral(int &$length, string|null &$content): bool
     {
         if ($this->substring(1) !== "'") {
             return false;
@@ -182,7 +182,7 @@ final class SqlTokenizer extends BaseTokenizer
      *
      * @return bool whether the given string is a keyword.
      */
-    protected function isKeyword(string $string, ?string &$content): bool
+    protected function isKeyword(string $string, string|null &$content): bool
     {
         $keywords = [
             'ABORT' => true,

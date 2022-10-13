@@ -58,8 +58,8 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         array|string $columns,
         string $refTable,
         array|string $refColumns,
-        ?string $delete = null,
-        ?string $update = null
+        string $delete = null,
+        string $update = null
     ): string {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
@@ -96,8 +96,13 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     /**
      * @throws Exception|InvalidArgumentException
      */
-    public function createIndex(string $name, string $table, array|string $columns, ?string $indexType = null, ?string $indexMethod = null): string
-    {
+    public function createIndex(
+        string $name,
+        string $table,
+        array|string $columns,
+        string $indexType = null,
+        string $indexMethod = null
+    ): string {
         $tableParts = explode('.', $table);
 
         $schema = null;

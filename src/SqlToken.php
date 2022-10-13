@@ -22,7 +22,7 @@ use function reset;
  * read-only.
  * @property string $sql SQL code. This property is read-only.
  */
-final class SqlToken implements ArrayAccess
+final class SqlToken implements ArrayAccess, \Stringable
 {
     public const TYPE_CODE = 0;
     public const TYPE_STATEMENT = 1;
@@ -33,10 +33,10 @@ final class SqlToken implements ArrayAccess
     public const TYPE_IDENTIFIER = 6;
     public const TYPE_STRING_LITERAL = 7;
     private int $type = self::TYPE_TOKEN;
-    private ?string $content = null;
-    private ?int $startOffset = null;
-    private ?int $endOffset = null;
-    private ?SqlToken $parent = null;
+    private string|null $content = null;
+    private int|null $startOffset = null;
+    private int|null $endOffset = null;
+    private SqlToken|null $parent = null;
     private array $children = [];
 
     /**
@@ -74,7 +74,7 @@ final class SqlToken implements ArrayAccess
      *
      * @return SqlToken|null the child token at the specified offset, `null` if there's no token.
      */
-    public function offsetGet($offset): ?self
+    public function offsetGet($offset): self|null
     {
         $offset = $this->calculateOffset($offset);
 
@@ -220,8 +220,8 @@ final class SqlToken implements ArrayAccess
     public function matches(
         self $patternToken,
         int $offset = 0,
-        ?int &$firstMatchIndex = null,
-        ?int &$lastMatchIndex = null
+        int &$firstMatchIndex = null,
+        int &$lastMatchIndex = null
     ): bool {
         $result = false;
 
@@ -234,21 +234,13 @@ final class SqlToken implements ArrayAccess
 
     /**
      * Tests the given token to match the specified pattern token.
-     *
-     * @param SqlToken $patternToken
-     * @param SqlToken $token
-     * @param int $offset
-     * @param int|null $firstMatchIndex
-     * @param int|null $lastMatchIndex
-     *
-     * @return bool
      */
     private function tokensMatch(
         self $patternToken,
         self $token,
         int $offset = 0,
-        ?int &$firstMatchIndex = null,
-        ?int &$lastMatchIndex = null
+        int &$firstMatchIndex = null,
+        int &$lastMatchIndex = null
     ): bool {
         if (
             $patternToken->getIsCollection() !== $token->getIsCollection() ||
@@ -308,10 +300,6 @@ final class SqlToken implements ArrayAccess
 
     /**
      * Returns an absolute offset in the children array.
-     *
-     * @param int $offset
-     *
-     * @return int
      */
     private function calculateOffset(int $offset): int
     {
@@ -348,8 +336,6 @@ final class SqlToken implements ArrayAccess
      * - {@see TYPE_STRING_LITERAL}
      *
      * @param int $value token type. It has to be one of the following constants:
-     *
-     * @return self
      */
     public function type(int $value): self
     {
@@ -360,12 +346,8 @@ final class SqlToken implements ArrayAccess
 
     /**
      * Set token content.
-     *
-     * @param string|null $value
-     *
-     * @return self
      */
-    public function content(?string $value): self
+    public function content(string|null $value): self
     {
         $this->content = $value;
 
@@ -376,8 +358,6 @@ final class SqlToken implements ArrayAccess
      * Set original SQL token start position.
      *
      * @param int $value original SQL token start position.
-     *
-     * @return self
      */
     public function startOffset(int $value): self
     {
@@ -390,8 +370,6 @@ final class SqlToken implements ArrayAccess
      * Set original SQL token end position.
      *
      * @param int $value original SQL token end position.
-     *
-     * @return self
      */
     public function endOffset(int $value): self
     {
@@ -404,8 +382,6 @@ final class SqlToken implements ArrayAccess
      * Set parent token.
      *
      * @param SqlToken $value parent token.
-     *
-     * @return self
      */
     public function parent(self $value): self
     {
@@ -414,7 +390,7 @@ final class SqlToken implements ArrayAccess
         return $this;
     }
 
-    public function getContent(): ?string
+    public function getContent(): string|null
     {
         return $this->content;
     }

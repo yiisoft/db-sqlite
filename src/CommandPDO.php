@@ -101,7 +101,7 @@ final class CommandPDO extends AbstractCommandPDO
         return $result;
     }
 
-    protected function internalExecute(?string $rawSql): void
+    protected function internalExecute(string|null $rawSql): void
     {
         $attempt = 0;
 
@@ -112,7 +112,10 @@ final class CommandPDO extends AbstractCommandPDO
                     && $this->isolationLevel !== null
                     && $this->db->getTransaction() === null
                 ) {
-                    $this->db->transaction(fn (?string $rawSql) => $this->internalExecute($rawSql), $this->isolationLevel);
+                    $this->db->transaction(
+                        fn (string|null $rawSql) => $this->internalExecute($rawSql),
+                        $this->isolationLevel,
+                    );
                 } else {
                     $this->pdoStatement?->execute();
                 }
@@ -179,9 +182,6 @@ final class CommandPDO extends AbstractCommandPDO
      * Splits the specified SQL codes into individual SQL statements and returns them or `false` if there's a single
      * statement.
      *
-     * @param string $sql
-     * @param array $params
-     *
      * @throws InvalidArgumentException
      *
      * @return array|bool (array|string)[][]|bool
@@ -216,11 +216,6 @@ final class CommandPDO extends AbstractCommandPDO
 
     /**
      * Returns named bindings used in the specified statement token.
-     *
-     * @param SqlToken $statement
-     * @param array $params
-     *
-     * @return array
      *
      * @psalm-param array<string, string> $params
      */
