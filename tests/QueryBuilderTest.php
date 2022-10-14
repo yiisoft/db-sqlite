@@ -278,6 +278,10 @@ final class QueryBuilderTest extends TestCase
         $this->assertEquals(1, $result);
 
         // change up
+        $expected = "UPDATE sqlite_sequence SET seq='0' WHERE name='testCreateTable'";
+        $sql = $qb->resetSequence('testCreateTable', '1');
+        $this->assertEquals($expected, $sql);
+
         $expected = "UPDATE sqlite_sequence SET seq='3' WHERE name='testCreateTable'";
         $sql = $qb->resetSequence('testCreateTable', 4);
         $this->assertEquals($expected, $sql);

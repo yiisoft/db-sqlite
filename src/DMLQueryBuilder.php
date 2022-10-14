@@ -35,10 +35,8 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 
     /**
      * @throws Exception|Throwable
-     *
-     * @psalm-suppress RiskyCast
      */
-    public function resetSequence(string $tableName, mixed $value = null): string
+    public function resetSequence(string $tableName, int|string $value = null): string
     {
         $table = $this->schema->getTableSchema($tableName);
 
@@ -47,11 +45,13 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         }
 
         $sequenceName = $table->getSequenceName();
+
         if ($sequenceName === null) {
             throw new InvalidArgumentException("There is not sequence associated with table '$tableName'.'");
         }
 
         $tableName = $this->quoter->quoteTableName($tableName);
+
         if ($value !== null) {
             $value = "'" . ((int) $value - 1) . "'";
         } else {
