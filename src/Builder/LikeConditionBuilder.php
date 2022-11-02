@@ -13,6 +13,19 @@ final class LikeConditionBuilder extends BaseLikeConditionBuilder
 
     public function __construct(QueryBuilderInterface $queryBuilder)
     {
-        parent::__construct($queryBuilder);
+        parent::__construct($queryBuilder, $this->getEscapeSql());
+    }
+
+    /**
+     * @return string character used to escape special characters in LIKE conditions. By default,
+     * it's assumed to be `\`.
+     */
+    private function getEscapeSql(): string
+    {
+        if ($this->escapeCharacter !== null) {
+            return " ESCAPE '{$this->escapeCharacter}'";
+        }
+
+        return '';
     }
 }
