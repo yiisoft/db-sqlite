@@ -533,7 +533,12 @@ final class SchemaTest extends TestCase
 
     public function testGetSchemaDefaultValues(): void
     {
-        $this->markTestSkipped('SQLite does not support default value constraints.');
+        $db = $this->getConnection();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Sqlite\Schema::getSchemaDefaultValues is not supported by SQLite.');
+
+        $db->getSchema()->getSchemaDefaultValues();
     }
 
     /**
@@ -559,5 +564,14 @@ final class SchemaTest extends TestCase
             ['other.animal2', 'animal2', 'other'],
             ['catalog.other.animal2', 'animal2', 'other'],
         ];
+    }
+
+    public function testGetLastInsertID(): void
+    {
+        $db = $this->getConnection(true);
+
+        $schema = $db->getSchema();
+
+        $this->assertEquals(2, $schema->getLastInsertID('customer_id_seq'));
     }
 }

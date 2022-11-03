@@ -36,6 +36,11 @@ final class QueryBuilderProvider extends TestCase
                 '(([[id]] = :qp0 AND [[name]] = :qp1))',
                 [':qp0' => 1, ':qp1' => 'oy'],
             ],
+            'composite in array values no exist' => [
+                ['in', ['id', 'name', 'email'], [['id' => 1, 'name' => 'oy']]],
+                '(([[id]] = :qp0 AND [[name]] = :qp1 AND [[email]] IS NULL))',
+                [':qp0' => 1, ':qp1' => 'oy'],
+            ],
         ]);
     }
 

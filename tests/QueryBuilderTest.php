@@ -23,12 +23,72 @@ final class QueryBuilderTest extends TestCase
 {
     use TestQueryBuilderTrait;
 
+    public function testAddCheck(): string
+    {
+        $qb = $this->getConnection()->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::addCheck is not supported by SQLite.');
+
+        $qb->addCheck('name', 'table', 'expresion');
+    }
+
+    public function testAddCommentOnColumn(): string
+    {
+        $qb = $this->getConnection()->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCommentOnColumn is not supported by SQLite.'
+        );
+
+        $qb->addCommentOnColumn('table', 'column', 'comment');
+    }
+
+    public function testAddCommentOnTable(): string
+    {
+        $qb = $this->getConnection()->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCommentOnTable is not supported by SQLite.'
+        );
+
+        $qb->addCommentOnTable('table', 'comment');
+    }
+
     public function testAddForeignKey(): void
     {
         $qb = $this->getConnection()->getQueryBuilder();
+
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::addForeignKey is not supported by SQLite.');
+
         $qb->addForeignKey('test_fk', 'test_table', ['id'], 'test_table', ['id']);
+    }
+
+    public function testAddPrimaryKey(): string
+    {
+        $qb = $this->getConnection()->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addPrimaryKey is not supported by SQLite.'
+        );
+
+        $qb->addPrimaryKey('name', 'table', 'columns');
+    }
+
+    public function testAlterColumn(): string
+    {
+        $qb = $this->getConnection()->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::alterColumn is not supported by SQLite.'
+        );
+
+        $qb->alterColumn('table', 'column', 'type');
     }
 
     /**
@@ -41,8 +101,8 @@ final class QueryBuilderTest extends TestCase
     public function testBatchInsert(string $table, array $columns, array $value, ?string $expected, array $expectedParams = []): void
     {
         $params = [];
-        $db = $this->getConnection();
 
+        $db = $this->getConnection();
         $sql = $db->getQueryBuilder()->batchInsert($table, $columns, $value, $params);
 
         $this->assertEquals($expected, $sql);
@@ -58,7 +118,9 @@ final class QueryBuilderTest extends TestCase
     {
         $db = $this->getConnection();
         $query = (new Query($db))->where($condition);
+
         [$sql, $params] = $db->getQueryBuilder()->build($query);
+
         $replacedQuotes = $this->replaceQuotes($expected);
 
         $this->assertIsString($replacedQuotes);
@@ -75,7 +137,9 @@ final class QueryBuilderTest extends TestCase
     {
         $db = $this->getConnection();
         $query = (new Query($db))->filterWhere($condition);
+
         [$sql, $params] = $db->getQueryBuilder()->build($query);
+
         $replacedQuotes = $this->replaceQuotes($expected);
 
         $this->assertIsString($replacedQuotes);
@@ -91,6 +155,7 @@ final class QueryBuilderTest extends TestCase
     public function testBuildFrom(string $table, string $expected): void
     {
         $db = $this->getConnection();
+
         $params = [];
         $sql = $db->getQueryBuilder()->buildFrom([$table], $params);
         $replacedQuotes = $this->replaceQuotes($expected);
@@ -108,12 +173,23 @@ final class QueryBuilderTest extends TestCase
     {
         $db = $this->getConnection();
         $query = (new Query($db))->where($condition);
+
         [$sql, $params] = $db->getQueryBuilder()->build($query);
+
         $replacedQuotes = $this->replaceQuotes($expected);
 
         $this->assertIsString($replacedQuotes);
         $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $replacedQuotes), $sql);
         $this->assertEquals($expectedParams, $params);
+    }
+
+    public function testBuildLimitWithNull(): void
+    {
+        $qb = $this->getConnection()->getQueryBuilder();
+
+        $sql = $qb->buildLimit(null, 5);
+
+        $this->assertSame('LIMIT 9223372036854775807 OFFSET 5', $sql);
     }
 
     public function testBuildUnion(): void
@@ -136,7 +212,9 @@ final class QueryBuilderTest extends TestCase
             ->where(['and', 'w > 0', 'x < 2'])
             ->union($secondQuery)
             ->union($thirdQuery, true);
+
         [$actualQuerySql, $queryParams] = $db->getQueryBuilder()->build($query);
+
         $this->assertEquals($expectedQuerySql, $actualQuerySql);
         $this->assertEquals([], $queryParams);
     }
@@ -149,12 +227,15 @@ final class QueryBuilderTest extends TestCase
     public function testBuildWhereExists(string $cond, string $expectedQuerySql): void
     {
         $db = $this->getConnection();
+
         $expectedQueryParams = [];
         $subQuery = new Query($db);
         $subQuery->select('1')->from('Website w');
         $query = new Query($db);
         $query->select('id')->from('TotalExample t')->where([$cond, $subQuery]);
+
         [$actualQuerySql, $actualQueryParams] = $db->getQueryBuilder()->build($query);
+
         $this->assertEquals($expectedQuerySql, $actualQuerySql);
         $this->assertEquals($expectedQueryParams, $actualQueryParams);
     }
@@ -168,6 +249,7 @@ final class QueryBuilderTest extends TestCase
             . ' INNER JOIN [[a1]] ON t2.id = a1.id WHERE expr = 2 UNION  SELECT [[id]] FROM [[t3]] WHERE expr = 3)'
             . ' SELECT * FROM [[a2]]'
         );
+
         $with1Query = (new Query($db))->select('id')->from('t1')->where('expr = 1');
         $with2Query = (new Query($db))->select('id')->from('t2')->innerJoin('a1', 't2.id = a1.id')->where('expr = 2');
         $with3Query = (new Query($db))->select('id')->from('t3')->where('expr = 3');
@@ -177,8 +259,17 @@ final class QueryBuilderTest extends TestCase
             ->from('a2');
 
         [$actualQuerySql, $queryParams] = $db->getQueryBuilder()->build($query);
+
         $this->assertEquals($expectedQuerySql, $actualQuerySql);
         $this->assertEquals([], $queryParams);
+    }
+
+    public function testCheckIntegrity(): void
+    {
+        $db = $this->getConnection();
+
+        $this->assertEquals('PRAGMA foreign_keys=1', $db->getQueryBuilder()->checkIntegrity('', '', true));
+        $this->assertEquals('PRAGMA foreign_keys=0', $db->getQueryBuilder()->checkIntegrity('', '', false));
     }
 
     /**
@@ -187,6 +278,7 @@ final class QueryBuilderTest extends TestCase
     public function testCreateDropIndex(string $sql, Closure $builder): void
     {
         $db = $this->getConnection();
+
         $this->assertSame($db->getQuoter()->quoteSql($sql), $builder($db->getQueryBuilder()));
     }
 
@@ -198,8 +290,10 @@ final class QueryBuilderTest extends TestCase
     public function testDelete(string $table, array|string $condition, string $expectedSQL, array $expectedParams): void
     {
         $db = $this->getConnection();
+
         $actualParams = [];
         $actualSQL = $db->getQueryBuilder()->delete($table, $condition, $actualParams);
+
         $this->assertSame($expectedSQL, $actualSQL);
         $this->assertSame($expectedParams, $actualParams);
     }
@@ -231,22 +325,80 @@ final class QueryBuilderTest extends TestCase
         }
 
         $db->createCommand($qb->createTable('column_type_table', $columns))->execute();
+
         $this->assertNotEmpty($db->getTableSchema('column_type_table', true));
+    }
+
+    public function testDropCheck(): string
+    {
+        $qb = $this->getConnection()->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCheck is not supported by SQLite.'
+        );
+
+        $qb->dropCheck('name', 'table');
+    }
+
+    public function testDropColumn(): string
+    {
+        $qb = $this->getConnection()->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropColumn is not supported by SQLite.'
+        );
+
+        $qb->dropColumn('table', 'column');
+    }
+
+    public function testDropCommentFromColumn(): void
+    {
+        $qb = $this->getConnection()->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCommentFromColumn is not supported by SQLite.'
+        );
+
+        $qb->dropCommentFromColumn('table', 'column');
+    }
+
+    public function testDropCommentFromTable(): void
+    {
+        $qb = $this->getConnection()->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCommentFromTable is not supported by SQLite.'
+        );
+
+        $qb->dropCommentFromTable('table');
     }
 
     public function testDropForeignKey(): void
     {
         $qb = $this->getConnection()->getQueryBuilder();
+
         $this->expectException(NotSupportedException::class);
-        $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::dropForeignKey is not supported by SQLite.');
-        $qb->dropForeignKey('test_fk', 'test_table');
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropForeignKey is not supported by SQLite.'
+        );
+
+        $qb->dropForeignKey('name', 'table');
     }
 
-    public function testRenameTable()
+    public function testDropPrimaryKey(): void
     {
-        $db = $this->getConnection();
-        $sql = $db->getQueryBuilder()->renameTable('table_from', 'table_to');
-        $this->assertEquals('ALTER TABLE `table_from` RENAME TO `table_to`', $sql);
+        $qb = $this->getConnection()->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropPrimaryKey is not supported by SQLite.'
+        );
+
+        $qb->dropPrimaryKey('name', 'table');
     }
 
     /**
@@ -257,8 +409,29 @@ final class QueryBuilderTest extends TestCase
     public function testInsert(string $table, array|QueryInterface $columns, array $params, string $expectedSQL, array $expectedParams): void
     {
         $db = $this->getConnection();
+
         $this->assertSame($expectedSQL, $db->getQueryBuilder()->insert($table, $columns, $params));
         $this->assertSame($expectedParams, $params);
+    }
+
+    public function testRenameColumn(): void
+    {
+        $qb = $this->getConnection()->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::renameColumn is not supported by SQLite.'
+        );
+
+        $qb->renameColumn('table', 'old_name', 'new_name');
+    }
+
+    public function testRenameTable()
+    {
+        $db = $this->getConnection();
+        $sql = $db->getQueryBuilder()->renameTable('table_from', 'table_to');
+
+        $this->assertEquals('ALTER TABLE `table_from` RENAME TO `table_to`', $sql);
     }
 
     public function testResetSequence(): void
@@ -271,33 +444,60 @@ final class QueryBuilderTest extends TestCase
         // change to max row
         $expected = "UPDATE sqlite_sequence SET seq=(SELECT MAX(`id`) FROM `testCreateTable`) WHERE name='testCreateTable'";
         $sql = $qb->resetSequence('testCreateTable');
+
         $this->assertEquals($expected, $sql);
 
         $db->createCommand($sql)->execute();
         $result = $db->createCommand($checkSql)->queryScalar();
+
         $this->assertEquals(1, $result);
 
         // change up
         $expected = "UPDATE sqlite_sequence SET seq='0' WHERE name='testCreateTable'";
         $sql = $qb->resetSequence('testCreateTable', '1');
+
         $this->assertEquals($expected, $sql);
 
         $expected = "UPDATE sqlite_sequence SET seq='3' WHERE name='testCreateTable'";
         $sql = $qb->resetSequence('testCreateTable', 4);
+
         $this->assertEquals($expected, $sql);
 
         $db->createCommand($sql)->execute();
         $result = $db->createCommand($checkSql)->queryScalar();
+
         $this->assertEquals(3, $result);
 
         // and again change to max rows
         $expected = "UPDATE sqlite_sequence SET seq=(SELECT MAX(`id`) FROM `testCreateTable`) WHERE name='testCreateTable'";
         $sql = $qb->resetSequence('testCreateTable');
+
         $this->assertEquals($expected, $sql);
 
         $db->createCommand($sql)->execute();
         $result = $db->createCommand($checkSql)->queryScalar();
+
         $this->assertEquals(1, $result);
+    }
+
+    public function testResetSequenceExceptionTableNoExist(): void
+    {
+        $qb = $this->getConnection()->getQueryBuilder();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Table not found: no_table');
+
+        $qb->resetSequence('no_table');
+    }
+
+    public function testResetSequenceExceptionInvalidSequenceName(): void
+    {
+        $qb = $this->getConnection()->getQueryBuilder();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("There is not sequence associated with table 'order_item_with_null_fk'.");
+
+        $qb->resetSequence('order_item_with_null_fk');
     }
 
     /**
@@ -315,6 +515,7 @@ final class QueryBuilderTest extends TestCase
         $actualParams = [];
         $db = $this->getConnection();
         $actualSQL = $db->getQueryBuilder()->update($table, $columns, $condition, $actualParams);
+
         $this->assertSame($expectedSQL, $actualSQL);
         $this->assertSame($expectedParams, $actualParams);
     }

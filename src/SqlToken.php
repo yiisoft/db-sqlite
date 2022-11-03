@@ -34,8 +34,8 @@ final class SqlToken implements ArrayAccess, \Stringable
     public const TYPE_STRING_LITERAL = 7;
     private int $type = self::TYPE_TOKEN;
     private string|null $content = null;
-    private int|null $startOffset = null;
-    private int|null $endOffset = null;
+    private int $startOffset = 0;
+    private int $endOffset = 0;
     private SqlToken|null $parent = null;
     private array $children = [];
 
@@ -178,23 +178,15 @@ final class SqlToken implements ArrayAccess, \Stringable
      */
     public function getSql(): string
     {
-        $sql = '';
         $code = $this;
 
         while ($code->parent !== null) {
             $code = $code->parent;
         }
 
-        if ($code->content !== null) {
-            $sql = mb_substr(
-                $code->content,
-                (int) $this->startOffset,
-                (int) $this->endOffset - (int) $this->startOffset,
-                'UTF-8',
-            );
-        }
-
-        return $sql;
+        return $code->content !== null
+            ? mb_substr($code->content, $this->startOffset, $this->endOffset - $this->startOffset, 'UTF-8')
+            : '';
     }
 
     /**
@@ -378,25 +370,8 @@ final class SqlToken implements ArrayAccess, \Stringable
         return $this;
     }
 
-    /**
-     * Set parent token.
-     *
-     * @param SqlToken $value parent token.
-     */
-    public function parent(self $value): self
-    {
-        $this->parent = $value;
-
-        return $this;
-    }
-
     public function getContent(): string|null
     {
         return $this->content;
-    }
-
-    public function getType(): int
-    {
-        return $this->type;
     }
 }

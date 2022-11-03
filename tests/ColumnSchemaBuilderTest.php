@@ -23,15 +23,11 @@ final class ColumnSchemaBuilderTest extends TestCase
     public function typesProvider(): array
     {
         return [
-            ['integer UNSIGNED', Schema::TYPE_INTEGER, null, [
-                ['unsigned'],
-            ]],
-            ['integer(10) UNSIGNED', Schema::TYPE_INTEGER, 10, [
-                ['unsigned'],
-            ]],
-            ['integer(10)', Schema::TYPE_INTEGER, 10, [
-                ['comment', 'test'],
-            ]],
+            ['integer UNSIGNED', Schema::TYPE_INTEGER, null, [['unsigned']]],
+            ['integer(10) UNSIGNED', Schema::TYPE_INTEGER, 10, [['unsigned']]],
+            ['integer(10)', Schema::TYPE_INTEGER, 10, [['comment', 'test']]],
+            ['smallint UNSIGNED', Schema::TYPE_SMALLINT, null, [['unsigned']]],
+            ['bigint UNSIGNED', Schema::TYPE_BIGINT, null, [['unsigned']]],
         ];
     }
 

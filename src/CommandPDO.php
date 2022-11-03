@@ -11,7 +11,6 @@ use Yiisoft\Db\Exception\ConvertException;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
-use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Strings\StringHelper;
 
 use function array_pop;
@@ -55,11 +54,6 @@ final class CommandPDO extends AbstractCommandPDO
     public function queryBuilder(): QueryBuilderInterface
     {
         return $this->db->getQueryBuilder();
-    }
-
-    public function schema(): SchemaInterface
-    {
-        return $this->db->getSchema();
     }
 
     /**

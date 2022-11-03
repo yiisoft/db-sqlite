@@ -10,6 +10,7 @@ use Yiisoft\Cache\CacheKeyNormalizer;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
+use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\TestSupport\TestConnectionTrait;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
@@ -62,6 +63,20 @@ final class ConnectionTest extends TestCase
     {
         $db = $this->getConnection();
         $this->assertEquals('sqlite', $db->getDriver()->getDriverName());
+    }
+
+    public function testGetEmulatePrepare(): void
+    {
+        $db = $this->getConnection();
+
+        $this->assertNull($db->getEmulatePrepare());
+
+        $db->setEmulatePrepare(true);
+        $db->open();
+
+        $this->assertTrue($db->getEmulatePrepare());
+
+        $db->close();
     }
 
     /**
@@ -322,6 +337,18 @@ final class ConnectionTest extends TestCase
 
         /* No exceptions means test is passed. */
         $this->assertTrue(true);
+    }
+
+    public function testTransactionIsolationException(): void
+    {
+        $db = $this->getConnection();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\TransactionPDO only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.'
+        );
+
+        $db->beginTransaction(TransactionInterface::READ_COMMITTED);
     }
 
     public function testTransactionShortcutCustom(): void

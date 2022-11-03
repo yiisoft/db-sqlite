@@ -687,8 +687,16 @@ final class Schema extends AbstractSchema
     /**
      * @inheritDoc
      */
-    public function getLastInsertID(?string $sequenceName = null): string
+    public function getLastInsertID(string $sequenceName = null): string
     {
         return $this->db->getLastInsertID($sequenceName);
+    }
+
+    /**
+     * @throws NotSupportedException
+     */
+    public function getSchemaDefaultValues(string $schema = '', bool $refresh = false): array
+    {
+        throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
 }
