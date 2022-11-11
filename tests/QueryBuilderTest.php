@@ -370,7 +370,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     {
         $db = $this->getConnection();
 
-         $expectedQuerySql = DbHelper::replaceQuotes(
+        $expectedQuerySql = DbHelper::replaceQuotes(
             <<<SQL
             SELECT `id` FROM `TotalExample` `t1` WHERE (w > 0) AND (x < 2) UNION  SELECT `id` FROM `TotalTotalExample` `t2` WHERE w > 5 UNION ALL  SELECT `id` FROM `TotalTotalExample` `t3` WHERE w = 3
             SQL,

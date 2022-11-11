@@ -91,7 +91,6 @@ final class CommandTest extends CommonCommandTest
         parent::testAddPrimaryKey();
     }
 
-
     public function testAddUnique(): void
     {
         $this->expectException(NotSupportedException::class);

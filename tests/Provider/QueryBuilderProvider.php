@@ -71,7 +71,7 @@ final class QueryBuilderProvider
                 '(([[id]] IS NULL AND [[name]] = :qp0))',
                 [':qp0' => 'oy'],
             ],
-            'inCondition-custom-5' =>[
+            'inCondition-custom-5' => [
                 new InCondition(['id', 'name'], 'in', [['id' => 1, 'name' => 'oy']]),
                 '(([[id]] = :qp0 AND [[name]] = :qp1))',
                 [':qp0' => 1, ':qp1' => 'oy'],
