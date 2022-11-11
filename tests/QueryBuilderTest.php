@@ -721,7 +721,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->createCommand($sql)->execute();
         $result = $db->createCommand($checkSql)->queryScalar();
 
-        $this->assertSame(1, $result);
+        $this->assertEquals(1, $result);
 
         // change up
         $expected = <<<SQL
@@ -754,7 +754,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->createCommand($sql)->execute();
         $result = $db->createCommand($checkSql)->queryScalar();
 
-        $this->assertSame(1, $result);
+        $this->assertEquals(1, $result);
     }
 
     /**

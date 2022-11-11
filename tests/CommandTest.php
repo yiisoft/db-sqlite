@@ -422,7 +422,7 @@ final class CommandTest extends CommonCommandTest
         $db->createCommand()->insert('testCreateTable', ['bar' => 3])->execute();
         $db->createCommand()->insert('testCreateTable', ['bar' => 4])->execute();
 
-        $this->assertSame(
+        $this->assertEquals(
             4,
             $db->createCommand(
                 "SELECT seq FROM sqlite_sequence where name='testCreateTable'"
@@ -442,7 +442,7 @@ final class CommandTest extends CommonCommandTest
 
         $db->createCommand()->resetSequence('testCreateTable')->execute();
 
-        $this->assertSame(
+        $this->assertEquals(
             4,
             $db->createCommand(
                 <<<SQL
@@ -479,7 +479,7 @@ final class CommandTest extends CommonCommandTest
             SQL
         )->queryAll();
 
-        $this->assertSame(
+        $this->assertEquals(
             [['intcol' => 41, 'textcol' => 'foo'], [ 'intcol' => 42, 'textcol' => 'bar']],
             $queryAll,
         );
@@ -492,7 +492,7 @@ final class CommandTest extends CommonCommandTest
 
         $queryAll = $db->createCommand($sql, ['newInt' => 410, 'val1' => 'foo', 'val2' => 'bar'])->queryAll();
 
-        $this->assertSame([['intcol' => 410, 'textcol' => 'foo']], $queryAll);
+        $this->assertEquals([['intcol' => 410, 'textcol' => 'foo']], $queryAll);
     }
 
     /**

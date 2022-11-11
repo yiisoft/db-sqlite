@@ -49,6 +49,6 @@ final class QueryTest extends CommonQueryTest
         $query->limit(new Expression('1 + 1'))->offset(new Expression('1 + 0'));
         $result = $query->column();
 
-        $this->assertSame([2, 3], $result);
+        $this->assertEquals([2, 3], $result);
     }
 }
