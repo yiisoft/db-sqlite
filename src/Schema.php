@@ -677,14 +677,6 @@ final class Schema extends AbstractSchema
     }
 
     /**
-     * @return bool whether this DBMS supports [savepoint](http://en.wikipedia.org/wiki/Savepoint).
-     */
-    public function supportsSavepoint(): bool
-    {
-        return $this->db->isSavepointEnabled();
-    }
-
-    /**
      * @inheritDoc
      */
     public function getLastInsertID(string $sequenceName = null): string

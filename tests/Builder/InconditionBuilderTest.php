@@ -4,17 +4,28 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests\Builder;
 
+use PHPUnit\Framework\TestCase;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidArgumentException;
+use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\QueryBuilder\Conditions\InCondition;
 use Yiisoft\Db\Sqlite\Builder\InConditionBuilder;
-use Yiisoft\Db\Sqlite\Tests\TestCase;
+use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 
 /**
  * @group sqlite
  */
 final class InconditionBuilderTest extends TestCase
 {
+    use TestTrait;
+
+    /**
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     */
     public function testBuildSubqueryInCondition(): void
     {
         $db = $this->getConnection();

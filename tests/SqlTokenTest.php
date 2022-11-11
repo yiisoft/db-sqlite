@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Yiisoft\Db\Sqlite\SqlToken;
 
 /**
@@ -24,10 +25,7 @@ final class SqlTokenTest extends TestCase
         $token = new SqlToken();
         $token->content('foo');
         $token->setChildren(
-            [
-                (new SqlToken())->content('bar'),
-                (new SqlToken())->content('baz'),
-            ],
+            [(new SqlToken())->content('bar'), (new SqlToken())->content('baz')],
         );
 
         $this->assertSame('foo', $token->getContent());

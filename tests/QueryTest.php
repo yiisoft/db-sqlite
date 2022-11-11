@@ -4,38 +4,51 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
+use Throwable;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\TestSupport\TestQueryTrait;
+use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
+use Yiisoft\Db\Tests\Common\CommonQueryTest;
 
 /**
  * @group sqlite
  */
-final class QueryTest extends TestCase
+final class QueryTest extends CommonQueryTest
 {
-    use TestQueryTrait;
+    use TestTrait;
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
     public function testUnion(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getConnectionwithData();
 
-        $query = new Query($db);
-        $query->select(['id', 'name'])
-            ->from('item')
-            ->union((new Query($db))->select(['id', 'name'])->from(['category']));
+        $query = $this->getQuery($db);
+        $subQuery = $this->getQuery($db)->select(['id', 'name'])->from(['category']);
+        $query->select(['id', 'name'])->from('item')->union($subQuery);
         $result = $query->all();
+
         $this->assertNotEmpty($result);
         $this->assertCount(7, $result);
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
     public function testLimitOffsetWithExpression(): void
     {
-        $query = (new Query($this->getConnection()))->from('customer')->select('id')->orderBy('id');
+        $db = $this->getConnectionWithData();
+
+        $query = $this->getQuery($db)->from('customer')->select('id')->orderBy('id');
         $query->limit(new Expression('1 + 1'))->offset(new Expression('1 + 0'));
         $result = $query->column();
 
-        $this->assertContains('2', $result);
-        $this->assertContains('3', $result);
-        $this->assertNotContains('1', $result);
+        $this->assertSame([2, 3], $result);
     }
 }
