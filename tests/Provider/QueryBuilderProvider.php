@@ -113,9 +113,9 @@ final class QueryBuilderProvider
 
     public function buildLikeConditions(): array
     {
-        $baseQueryBuilderProvider = new BaseQueryBuilderProvider(" ESCAPE '\\'");
+        $baseQueryBuilderProvider = new BaseQueryBuilderProvider();
 
-        return  $baseQueryBuilderProvider->buildLikeConditions($this->getConnection());
+        return $baseQueryBuilderProvider->buildLikeConditions($this->getConnection(), " ESCAPE '\\'");
     }
 
     public function createDropIndex(): array

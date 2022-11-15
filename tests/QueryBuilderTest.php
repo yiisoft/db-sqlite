@@ -7,7 +7,6 @@ namespace Yiisoft\Db\Sqlite\Tests;
 use Closure;
 use JsonException;
 use Throwable;
-use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -310,17 +309,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string $expected,
         array $expectedParams
     ): void {
-        $db = $this->getConnection();
-
-        $query = $this->getQuery($db)->where($condition);
-
-        [$sql, $params] = $db->getQueryBuilder()->build($query);
-
-        $replacedQuotes = DbHelper::replaceQuotes($expected, $db->getName());
-
-        $this->assertIsString($replacedQuotes);
-        $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $replacedQuotes), $sql);
-        $this->assertEquals($expectedParams, $params);
+        parent::testBuildLikeCondition($condition, $expected, $expectedParams);
     }
 
     /**
@@ -586,7 +575,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     /**
      * @throws Exception
      */
-    public function testsDropCommentFromTable(): void
+    public function testDropCommentFromTable(): void
     {
         $db = $this->getConnection();
 
@@ -847,21 +836,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string|array $expectedSQL,
         array $expectedParams
     ): void {
-        $db = $this->getConnectionWithData();
-
-        $actualParams = [];
-        $actualSQL = $db->getQueryBuilder()->upsert($table, $insertColumns, $updateColumns, $actualParams);
-
-        if (is_string($expectedSQL)) {
-            $this->assertSame($expectedSQL, $actualSQL);
-        } else {
-            $this->assertContains($actualSQL, $expectedSQL);
-        }
-
-        if (ArrayHelper::isAssociative($expectedParams)) {
-            $this->assertSame($expectedParams, $actualParams);
-        } else {
-            Assert::isOneOf($actualParams, $expectedParams);
-        }
+        parent::testUpsert($table, $insertColumns, $updateColumns, $expectedSQL, $expectedParams);
     }
 }

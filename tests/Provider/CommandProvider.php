@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests\Provider;
 
 use Exception;
-use Yiisoft\Db\Sqlite\Tests\Support\SqliteConnection;
+use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Provider\BaseCommandProvider;
 
 final class CommandProvider
 {
+    use TestTrait;
+
     /**
      * @throws Exception
      */
@@ -17,7 +19,7 @@ final class CommandProvider
     {
         $baseCommandProvider = new BaseCommandProvider();
 
-        $batchInsertSql = $baseCommandProvider->batchInsertSql(SqliteConnection::getConnection());
+        $batchInsertSql = $baseCommandProvider->batchInsertSql($this->getConnection());
         unset($batchInsertSql['wrongBehavior']);
 
         return $batchInsertSql;
@@ -30,6 +32,6 @@ final class CommandProvider
     {
         $baseCommandProvider = new BaseCommandProvider();
 
-        return $baseCommandProvider->upsert(SqliteConnection::getConnection());
+        return $baseCommandProvider->upsert($this->getConnection());
     }
 }

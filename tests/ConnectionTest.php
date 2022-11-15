@@ -53,20 +53,6 @@ final class ConnectionTest extends CommonConnectionTest
 
     /**
      * @throws Exception
-     */
-    public function testQuoteValue(): void
-    {
-        $db = $this->getConnection();
-
-        $quoter = $db->getQuoter();
-
-        $this->assertEquals(123, $quoter->quoteValue(123));
-        $this->assertEquals("'string'", $quoter->quoteValue('string'));
-        $this->assertEquals("'It''s interesting'", $quoter->quoteValue("It's interesting"));
-    }
-
-    /**
-     * @throws Exception
      * @throws InvalidConfigException
      * @throws NotSupportedException
      * @throws Throwable

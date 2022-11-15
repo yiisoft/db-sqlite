@@ -6,11 +6,8 @@ namespace Yiisoft\Db\Sqlite\Tests;
 
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Expression\ExpressionInterface;
-use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\QueryBuilder\QueryBuilder;
 use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
@@ -20,6 +17,8 @@ use function version_compare;
 
 /**
  * @group sqlite
+ *
+ * @psalm-suppress PropertyNotSetInConstructor
  */
 final class CommandTest extends CommonCommandTest
 {
@@ -194,18 +193,53 @@ final class CommandTest extends CommonCommandTest
         array $expectedParams = [],
         int $insertedRow = 1
     ): void {
+        parent::testBatchInsertSQL($table, $columns, $values, $expected, $expectedParams, $insertedRow);
+    }
+
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
+    public function testBindParamValue(): void
+    {
+        parent::testBindParamValue();
+
         $db = $this->getConnectionWithData();
 
         $command = $db->createCommand();
-        $command->batchInsert($table, $columns, $values);
-        $command->prepare(false);
+        $command = $command->setSql(
+            <<<SQL
+            INSERT INTO type (int_col, char_col, float_col, blob_col, numeric_col, bool_col) VALUES (:int_col, :char_col, :float_col, :blob_col, :numeric_col, :bool_col)
+            SQL
+        );
+        $intCol = 123;
+        $charCol = 'abc';
+        $floatCol = 1.23;
+        $blobCol = "\x10\x11\x12";
+        $numericCol = '1.23';
+        $boolCol = false;
+        $command->bindParam(':int_col', $intCol);
+        $command->bindParam(':char_col', $charCol);
+        $command->bindParam(':float_col', $floatCol);
+        $command->bindParam(':blob_col', $blobCol);
+        $command->bindParam(':numeric_col', $numericCol);
+        $command->bindParam(':bool_col', $boolCol);
 
-        $this->assertSame($expected, $command->getSql());
-        $this->assertSame($expectedParams, $command->getParams());
+        $this->assertEquals(1, $command->execute());
 
-        $command->execute();
+        $row = $command->setSql(
+            <<<SQL
+            SELECT int_col, char_col, float_col, blob_col AS blob_col, numeric_col FROM type
+            SQL
+        )->queryOne();
 
-        $this->assertEquals($insertedRow, (new Query($db))->from($table)->count());
+        $this->assertIsArray($row);
+        $this->assertEquals($intCol, $row['int_col']);
+        $this->assertSame($charCol, trim($row['char_col']));
+        $this->assertEquals($floatCol, (float) $row['float_col']);
+        $this->assertSame($blobCol, $row['blob_col']);
+        $this->assertEquals($numericCol, $row['numeric_col']);
     }
 
     /**
@@ -295,24 +329,40 @@ final class CommandTest extends CommonCommandTest
         parent::testDropColumn();
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
     public function testDropCommentFromColumn(): void
     {
+        $db = $this->getConnection();
+
+        $command = $db->createCommand();
+
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
             'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCommentFromColumn is not supported by SQLite.'
         );
 
-        parent::testDropCommentFromColumn();
+        $command->dropCommentFromColumn('table', 'column');
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
     public function testDropCommentFromTable(): void
     {
+        $db = $this->getConnection();
+
+        $command = $db->createCommand();
+
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
             'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCommentFromTable is not supported by SQLite.'
         );
 
-        parent::testDropCommentFromTable();
+        $command->dropCommentFromTable('table');
     }
 
     /**
@@ -496,28 +546,6 @@ final class CommandTest extends CommonCommandTest
     }
 
     /**
-     * Test INSERT INTO ... SELECT SQL statement with wrong query object.
-     *
-     * @dataProvider \Yiisoft\Db\Tests\Provider\CommandProvider::invalidSelectColumns()
-     *
-     * @throws Exception
-     * @throws Throwable
-     */
-    public function testInsertSelectFailed(array|ExpressionInterface|string $invalidSelectColumns): void
-    {
-        $db = $this->getConnection();
-
-        $query = new Query($db);
-        $query->select($invalidSelectColumns)->from('{{customer}}');
-        $command = $db->createCommand();
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected select query object with enumerated (named) parameters');
-
-        $command->insert('{{customer}}', $query)->execute();
-    }
-
-    /**
      * @throws Exception
      * @throws InvalidConfigException
      * @throws Throwable
@@ -604,11 +632,6 @@ final class CommandTest extends CommonCommandTest
             $this->markTestSkipped('SQLite < 3.8.3 does not support "WITH" keyword.');
         }
 
-        $db = $this->getConnectionWithData();
-
-        $this->assertEquals(0, $db->createCommand('SELECT COUNT(*) FROM {{T_upsert}}')->queryScalar());
-        $this->performAndCompareUpsertResult($db, $firstData);
-        $this->assertEquals(1, $db->createCommand('SELECT COUNT(*) FROM {{T_upsert}}')->queryScalar());
-        $this->performAndCompareUpsertResult($db, $secondData);
+        parent::testUpsert($firstData, $secondData);
     }
 }

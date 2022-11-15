@@ -9,6 +9,8 @@ use Yiisoft\Db\Tests\Common\CommonColumnSchemaBuilderTest;
 
 /**
  * @group sqlite
+ *
+ * @psalm-suppress PropertyNotSetInConstructor
  */
 final class ColumnSchemaBuilderTest extends CommonColumnSchemaBuilderTest
 {
@@ -17,7 +19,7 @@ final class ColumnSchemaBuilderTest extends CommonColumnSchemaBuilderTest
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\ColumnSchemaBuilderProvider::types()
      */
-    public function testCustomTypes(string $expected, string $type, ?int $length, array $calls): void
+    public function testCustomTypes(string $expected, string $type, int|null $length, array $calls): void
     {
         $this->checkBuildString($expected, $type, $length, $calls);
     }
