@@ -201,18 +201,6 @@ final class SchemaTest extends CommonSchemaTest
     /**
      * @throws Exception
      */
-    public function testGetLastInsertID(): void
-    {
-        $db = $this->getConnectionWithData();
-
-        $schema = $db->getSchema();
-
-        $this->assertSame('2', $schema->getLastInsertID('customer_id_seq'));
-    }
-
-    /**
-     * @throws Exception
-     */
     public function testGetSchemaDefaultValues(): void
     {
         $db = $this->getConnection();
