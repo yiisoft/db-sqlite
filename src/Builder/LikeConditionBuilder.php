@@ -9,7 +9,7 @@ use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 
 final class LikeConditionBuilder extends BaseLikeConditionBuilder
 {
-    private string|null $escapeCharacter = '\\';
+    private string $escapeCharacter = '\\';
 
     public function __construct(QueryBuilderInterface $queryBuilder)
     {
@@ -18,14 +18,11 @@ final class LikeConditionBuilder extends BaseLikeConditionBuilder
 
     /**
      * @return string character used to escape special characters in LIKE conditions.
+     *
      * By default, it's assumed to be `\`.
      */
     private function getEscapeSql(): string
     {
-        if ($this->escapeCharacter !== null) {
-            return " ESCAPE '{$this->escapeCharacter}'";
-        }
-
-        return '';
+        return $this->escapeCharacter !== '' ? " ESCAPE '{$this->escapeCharacter}'" : '';
     }
 }
