@@ -10,7 +10,7 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\QueryBuilder\Conditions\InCondition;
+use Yiisoft\Db\QueryBuilder\Condition\InCondition;
 use Yiisoft\Db\Sqlite\Builder\InConditionBuilder;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 
