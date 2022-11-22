@@ -193,4 +193,9 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
             . ' RENAME TO '
             . $this->quoter->quoteTableName($newName);
     }
+
+    public function truncateTable(string $table): string
+    {
+        return 'DELETE FROM ' . $this->quoter->quoteTableName($table);
+    }
 }
