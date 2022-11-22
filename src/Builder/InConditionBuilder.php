@@ -11,7 +11,7 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionInterface;
-use Yiisoft\Db\QueryBuilder\Conditions\Builder\InConditionBuilder as BaseInConditionBuilder;
+use Yiisoft\Db\QueryBuilder\Condition\Builder\InConditionBuilder as BaseInConditionBuilder;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 
 use function implode;
