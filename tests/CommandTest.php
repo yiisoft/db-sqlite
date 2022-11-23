@@ -4,97 +4,214 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
-use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidArgumentException;
-use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\TestSupport\TestCommandTrait;
+use Yiisoft\Db\Schema\Schema;
+use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
+use Yiisoft\Db\Tests\AbstractCommandTest;
 
 use function version_compare;
 
 /**
  * @group sqlite
  */
-final class CommandTest extends TestCase
+final class CommandTest extends AbstractCommandTest
 {
-    use TestCommandTrait;
+    use TestTrait;
 
     protected string $upsertTestCharCast = 'CAST([[address]] AS VARCHAR(255))';
 
-    public function testAddDropForeignKey(): void
+    public function testAddCheck(): void
     {
-        $db = $this->getConnection();
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addForeignKey is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCheck() is not supported by SQLite.'
         );
-        $db->createCommand()->addForeignKey(
-            'test_fk_constraint',
-            'students',
-            ['Department_id'],
-            'departments',
-            ['Department_id']
-        )->execute();
+
+        parent::testAddCheck();
     }
 
-    public function testAddDropUnique(): void
+    public function testAddCommentOnColumn(): void
     {
-        $db = $this->getConnection();
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addUnique is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCommentOnColumn() is not supported by SQLite.'
         );
-        $db->createCommand()->addUnique('test_fk_constraint', 'students', ['Department_id'])->execute();
+
+        parent::testAddCommentOnColumn();
     }
 
-    public function testAutoQuoting(): void
+    public function testAddCommentOnTable(): void
     {
-        $db = $this->getConnection();
-        $sql = 'SELECT [[id]], [[t.name]] FROM {{customer}} t';
-        $command = $db->createCommand($sql);
-        $this->assertEquals('SELECT `id`, `t`.`name` FROM `customer` t', $command->getSql());
-    }
-
-    public function testDropForeignKey(): void
-    {
-        $db = $this->getConnection();
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropForeignKey is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCommentOnTable() is not supported by SQLite.'
         );
-        $db->createCommand()->dropForeignKey('departments', 'test_fk_constraint')->execute();
+
+        parent::testAddCommentOnTable();
+    }
+
+    public function testAddForeignKey(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::addForeignKey() is not supported by SQLite.');
+
+        parent::testAddForeignKey();
+    }
+
+    public function testAddPrimaryKey(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::addPrimaryKey() is not supported by SQLite.');
+
+        parent::testAddPrimaryKey();
+    }
+
+    public function testAddUnique(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::addUnique() is not supported by SQLite.');
+
+        parent::testAddUnique();
+    }
+
+    public function testAlterColumn(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::alterColumn() is not supported by SQLite.');
+
+        parent::testAlterColumn();
+    }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::createIndex()
+     */
+    public function testCreateIndex(
+        string $name,
+        string $table,
+        array|string $column,
+        string $indexType = '',
+        string $indexMethod = '',
+        string $expected = '',
+    ): void {
+        $db = $this->getConnection();
+
+        $command = $db->createCommand();
+        $schema = $db->getSchema();
+
+        if ($schema->getTableSchema($table) !== null) {
+            $command->dropTable($table)->execute();
+        }
+
+        $command->createTable($table, ['int1' => 'integer not null', 'int2' => 'integer not null'])->execute();
+
+        $this->assertEmpty($schema->getTableIndexes($table, true));
+
+        $command->createIndex($name, $table, $column, $indexType, $indexMethod)->execute();
+
+        $this->assertSame($column, $schema->getTableIndexes($table, true)[0]->getColumnNames());
+
+        if ($indexType === 'UNIQUE') {
+            $this->assertTrue($schema->getTableIndexes($table, true)[0]->isUnique());
+        } else {
+            $this->assertFalse($schema->getTableIndexes($table, true)[0]->isUnique());
+        }
+    }
+
+    public function testDropCheck(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCheck() is not supported by SQLite.');
+
+        parent::testDropCheck();
+    }
+
+    public function testDropColumn(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::dropColumn() is not supported by SQLite.');
+
+        parent::testDropColumn();
+    }
+
+    public function testDropCommentFromColumn(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCommentFromColumn() is not supported by SQLite.'
+        );
+
+        parent::testDropCommentFromColumn();
+    }
+
+    public function testDropCommentFromTable(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCommentFromTable() is not supported by SQLite.'
+        );
+
+        parent::testDropCommentFromTable();
+    }
+
+    public function testDropForeingKey(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropForeignKey() is not supported by SQLite.'
+        );
+
+        parent::testDropForeingKey();
+    }
+
+    public function testDropIndex(): void
+    {
+        $db = $this->getConnection();
+
+        $command = $db->createCommand();
+        $schema = $db->getSchema();
+
+        if ($schema->getTableSchema('test_idx') !== null) {
+            $command->dropTable('test_idx')->execute();
+        }
+
+        $command->createTable('test_idx', ['int1' => 'integer not null', 'int2' => 'integer not null'])->execute();
+
+        $this->assertEmpty($schema->getTableIndexes('test_idx', true));
+
+        $command->createIndex('test_idx_constraint', 'test_idx', ['int1', 'int2'], 'UNIQUE')->execute();
+
+        $this->assertSame(['int1', 'int2'], $schema->getTableIndexes('test_idx', true)[0]->getColumnNames());
+        $this->assertTrue($schema->getTableIndexes('test_idx', true)[0]->isUnique());
+
+        $command->dropIndex('test_idx_constraint', 'test_idx')->execute();
+
+        $this->assertEmpty($schema->getTableIndexes('test_idx', true));
+    }
+
+    public function testDropPrimaryKey(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropPrimaryKey() is not supported by SQLite.'
+        );
+
+        parent::testDropPrimaryKey();
     }
 
     public function testDropUnique(): void
     {
-        $db = $this->getConnection();
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropUnique is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropUnique() is not supported by SQLite.'
         );
-        $db->createCommand()->dropUnique('departments', 'test_fk_constraint')->execute();
-    }
 
-    public function testForeingKeyException(): void
-    {
-        $db = $this->getConnection();
-        $this->expectException(NotSupportedException::class);
-        $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addForeignKey is not supported by SQLite.'
-        );
-        $db->createCommand()->addForeignKey(
-            'test_fk_constraint',
-            'students',
-            ['Department_id'],
-            'departments',
-            ['Department_id']
-        )->execute();
+        parent::testDropUnique();
     }
 
     public function testMultiStatementSupport(): void
     {
-        $db = $this->getConnection(false);
+        $db = $this->getConnection();
+
         $sql = <<<SQL
         DROP TABLE IF EXISTS {{T_multistatement}};
         CREATE TABLE {{T_multistatement}} (
@@ -107,10 +224,14 @@ final class CommandTest extends TestCase
 
         // check
         $db->createCommand($sql, ['val1' => 'foo', 'val2' => 'bar'])->execute();
-        $queryAll = $db->createCommand('SELECT * FROM {{T_multistatement}}')->queryAll();
+        $queryAll = $db->createCommand(
+            <<<SQL
+            SELECT * FROM {{T_multistatement}}
+            SQL
+        )->queryAll();
 
-        $this->assertSame(
-            [['intcol' => '41', 'textcol' => 'foo'], [ 'intcol' => '42', 'textcol' => 'bar']],
+        $this->assertEquals(
+            [['intcol' => 41, 'textcol' => 'foo'], [ 'intcol' => 42, 'textcol' => 'bar']],
             $queryAll,
         );
 
@@ -122,144 +243,113 @@ final class CommandTest extends TestCase
 
         $queryAll = $db->createCommand($sql, ['newInt' => 410, 'val1' => 'foo', 'val2' => 'bar'])->queryAll();
 
-        $this->assertSame([['intcol' => '410', 'textcol' => 'foo']], $queryAll);
+        $this->assertEquals([['intcol' => 410, 'textcol' => 'foo']], $queryAll);
     }
 
-    public function batchInsertSqlProvider(): array
+    public function testRenameColumn(): void
     {
-        $parent = $this->batchInsertSqlProviderTrait();
-        /* Produces SQL syntax error: General error: 1 near ".": syntax error */
-        unset($parent['wrongBehavior']);
-        return $parent;
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::renameColumn() is not supported by SQLite.'
+        );
+
+        parent::testRenameColumn();
     }
 
-    /**
-     * Make sure that `{{something}}` in values will not be encoded.
-     *
-     * @dataProvider batchInsertSqlProvider
-     *
-     * @param string $table
-     * @param array $columns
-     * @param array $values
-     * @param string $expected
-     * @param array $expectedParams
-     * @param int $insertedRow
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     *
-     * {@see https://github.com/yiisoft/yii2/issues/11242}
-     */
-    public function testBatchInsertSQL(
-        string $table,
-        array $columns,
-        array $values,
-        string $expected,
-        array $expectedParams = [],
-        int $insertedRow = 1
-    ): void {
-        $db = $this->getConnection(true);
+    public function testRenameTable(): void
+    {
+        $db = $this->getConnection('customer');
+
+        $command = $db->createCommand();
+        $command->renameTable('customer', 'customer_new')->execute();
+
+        $this->assertSame('customer_new', $db->getSchema()->getTableSchema('customer_new')?->getName());
+    }
+
+    public function testResetSequence(): void
+    {
+        $db = $this->getConnection();
 
         $command = $db->createCommand();
 
-        $command->batchInsert($table, $columns, $values);
-
-        $command->prepare(false);
-
-        $this->assertSame($expected, $command->getSql());
-        $this->assertSame($expectedParams, $command->getParams());
-
-        $command->execute();
-        $this->assertEquals($insertedRow, (new Query($db))->from($table)->count());
-    }
-
-    /**
-     * Test whether param binding works in other places than WHERE.
-     *
-     * @dataProvider bindParamsNonWhereProviderTrait
-     *
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     */
-    public function testBindParamsNonWhere(string $sql): void
-    {
-        $db = $this->getConnection();
-        $db->createCommand()->insert(
-            'customer',
-            [
-                'name' => 'testParams',
-                'email' => 'testParams@example.com',
-                'address' => '1',
-            ]
-        )->execute();
-        $params = [':email' => 'testParams@example.com', ':len' => 5];
-        $command = $db->createCommand($sql, $params);
-        $this->assertEquals('Params', $command->queryScalar());
-    }
-
-    /**
-     * Test command getRawSql.
-     *
-     * @dataProvider getRawSqlProviderTrait
-     *
-     * @param string $sql
-     * @param array $params
-     * @param string $expectedRawSql
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     *
-     * {@see https://github.com/yiisoft/yii2/issues/8592}
-     */
-    public function testGetRawSql(string $sql, array $params, string $expectedRawSql): void
-    {
-        $db = $this->getConnection();
-        $command = $db->createCommand($sql, $params);
-        $this->assertEquals($expectedRawSql, $command->getRawSql());
-    }
-
-    /**
-     * Test INSERT INTO ... SELECT SQL statement with wrong query object.
-     *
-     * @dataProvider invalidSelectColumnsProviderTrait
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     */
-    public function testInsertSelectFailed(mixed $invalidSelectColumns): void
-    {
-        $db = $this->getConnection();
-        $query = new Query($db);
-        $query->select($invalidSelectColumns)->from('{{customer}}');
-        $command = $db->createCommand();
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected select query object with enumerated (named) parameters');
-        $command->insert('{{customer}}', $query)->execute();
-    }
-
-    /**
-     * @dataProvider upsertProviderTrait
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     */
-    public function testUpsert(array $firstData, array $secondData)
-    {
-        if (version_compare($this->getConnection()->getServerVersion(), '3.8.3', '<')) {
-            $this->markTestSkipped('SQLite < 3.8.3 does not support "WITH" keyword.');
-            return;
+        if ($db->getSchema()->getTableSchema('testCreateTable', true) !== null) {
+            $command->dropTable('testCreateTable')->execute();
         }
 
-        $db = $this->getConnection(true);
+        $command->createTable('testCreateTable', ['id' => Schema::TYPE_PK, 'bar' => Schema::TYPE_INTEGER])->execute();
+
+        $command->insert('testCreateTable', ['bar' => 1])->execute();
+        $command->insert('testCreateTable', ['bar' => 2])->execute();
+        $command->insert('testCreateTable', ['bar' => 3])->execute();
+        $command->insert('testCreateTable', ['bar' => 4])->execute();
+
+        $this->assertEquals(
+            4,
+            $command->setSql(
+                <<<SQL
+                SELECT seq FROM sqlite_sequence where name='testCreateTable'
+                SQL
+            )->queryScalar()
+        );
+
+        $command->resetSequence('testCreateTable', 2)->execute();
+
+        $this->assertSame(
+            '1',
+            $command->setSql(
+                <<<SQL
+                SELECT seq FROM sqlite_sequence where name='testCreateTable'
+                SQL
+            )->queryScalar()
+        );
+
+        $command->resetSequence('testCreateTable')->execute();
+
+        $this->assertEquals(
+            4,
+            $command->setSql(
+                <<<SQL
+                SELECT seq FROM sqlite_sequence where name='testCreateTable'
+                SQL
+            )->queryScalar()
+        );
+    }
+
+    public function testTruncateTable(): void
+    {
+        $db = $this->getConnection('customer');
+
+        $command = $db->createCommand();
+        $command->setSql(
+            <<<SQL
+            SELECT COUNT(*) FROM customer
+            SQL
+        );
+
+        $this->assertEquals(3, $command->queryScalar());
+
+        $command->truncateTable('customer')->execute();
+
+        $this->assertEquals(0, $command->queryScalar());
+    }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::upsert()
+     */
+    public function testUpsert(array $firstData, array $secondData): void
+    {
+        $db = $this->getConnection('customer', 't_upsert');
+
+        if (version_compare($db->getServerVersion(), '3.8.3', '<')) {
+            $this->markTestSkipped('SQLite < 3.8.3 does not support "WITH" keyword.');
+        }
+
         $this->assertEquals(0, $db->createCommand('SELECT COUNT(*) FROM {{T_upsert}}')->queryScalar());
+
         $this->performAndCompareUpsertResult($db, $firstData);
+
         $this->assertEquals(1, $db->createCommand('SELECT COUNT(*) FROM {{T_upsert}}')->queryScalar());
+
         $this->performAndCompareUpsertResult($db, $secondData);
     }
 }

@@ -31,8 +31,8 @@ class TestCase extends AbstractTestCase
      */
     protected function getConnection(
         $reset = false,
-        string $dsn = 'sqlite:' . __DIR__ . '/Runtime/yiitest.sq3',
-        string $fixture = __DIR__ . '/Fixture/sqlite.sql'
+        string $dsn = 'sqlite:' . __DIR__ . '/Support/Runtime/yiitest.sq3',
+        string $fixture = __DIR__ . '/Support/Fixture/sqlite.sql'
     ): ConnectionPDO {
         $this->dsn = $dsn;
         $pdoDriver = new PDODriver($this->dsn, $this->username, $this->password);

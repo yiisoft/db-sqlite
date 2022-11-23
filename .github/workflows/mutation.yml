@@ -21,8 +21,9 @@ name: mutation test
 
 jobs:
   mutation:
-    uses: yiisoft/actions/.github/workflows/roave-infection.yml@master
+    uses: yiisoft/actions/.github/workflows/roave-infection.yml@add-support-composer-flag-
     with:
+      composer-options: --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader
       os: >-
         ['ubuntu-latest']
       php: >-
