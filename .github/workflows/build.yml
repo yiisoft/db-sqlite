@@ -25,7 +25,7 @@ jobs:
   phpunit:
     uses: yiisoft/actions/.github/workflows/phpunit.yml@add-support-composer-flag-
     with:
-      composer-options: --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader
+      composer-options: config preferred-install.yiisoft/db source --no-interaction --no-progress --optimize-autoloader --ansi
       extensions: pdo, pdo_sqlite
       os: >-
         ['ubuntu-latest', 'windows-latest']
