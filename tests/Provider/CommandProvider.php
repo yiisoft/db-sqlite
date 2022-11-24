@@ -32,6 +32,13 @@ final class CommandProvider
         ];
     }
 
+    public function update(): array
+    {
+        $baseCommandProvider = new BaseCommandProvider();
+
+        return $baseCommandProvider->update($this->getConnection());
+    }
+
     public function upsert(): array
     {
         $baseCommandProvider = new BaseCommandProvider();

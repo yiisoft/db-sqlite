@@ -4,17 +4,23 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
+use Throwable;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
-use Yiisoft\Db\Tests\AbstractCommandTest;
+use Yiisoft\Db\Tests\Common\CommonCommandTest;
 
 use function version_compare;
 
 /**
  * @group sqlite
+ *
+ * @psalm-suppress MixedMethodCall
+ * @psalm-suppress PropertyNotSetInConstructor
  */
-final class CommandTest extends AbstractCommandTest
+final class CommandTest extends CommonCommandTest
 {
     use TestTrait;
 
@@ -50,6 +56,24 @@ final class CommandTest extends AbstractCommandTest
         parent::testAddCommentOnTable();
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
+    public function testAddDefaultValue(): void
+    {
+        $db = $this->getConnection();
+
+        $command = $db->createCommand();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\QueryBuilder\DDLQueryBuilder::addDefaultValue() does not support adding default value constraints.'
+        );
+
+        $command->addDefaultValue('name', 'table', 'column', 'value');
+    }
+
     public function testAddForeignKey(): void
     {
         $this->expectException(NotSupportedException::class);
@@ -82,8 +106,59 @@ final class CommandTest extends AbstractCommandTest
         parent::testAlterColumn();
     }
 
+    public function testAlterTable(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::alterColumn() is not supported by SQLite.');
+
+        parent::testAlterTable();
+    }
+
+    /**
+     * Make sure that `{{something}}` in values will not be encoded.
+     *
+     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::batchInsertSql()
+     *
+     * {@see https://github.com/yiisoft/yii2/issues/11242}
+     */
+    public function testBatchInsertSQL(
+        string $table,
+        array $columns,
+        array $values,
+        string $expected,
+        array $expectedParams = [],
+        int $insertedRow = 1,
+        string $fixture = 'type'
+    ): void {
+        parent::testBatchInsertSQL($table, $columns, $values, $expected, $expectedParams, $insertedRow, $fixture);
+    }
+
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
+    public function testCheckIntegrity(): void
+    {
+        $db = $this->getConnection('customer');
+
+        $command = $db->createCommand();
+        $command->checkIntegrity('', 'customer');
+
+        $this->assertSame(
+            <<<SQL
+            PRAGMA foreign_keys=1
+            SQL,
+            $command->getSql()
+        );
+        $this->assertSame(1, $command->execute());
+    }
+
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::createIndex()
+     *
+     * @throws Exception
+     * @throws Throwable
      */
     public function testCreateIndex(
         string $name,
@@ -163,6 +238,11 @@ final class CommandTest extends AbstractCommandTest
         parent::testDropForeingKey();
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
     public function testDropIndex(): void
     {
         $db = $this->getConnection();
@@ -208,6 +288,11 @@ final class CommandTest extends AbstractCommandTest
         parent::testDropUnique();
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
     public function testMultiStatementSupport(): void
     {
         $db = $this->getConnection();
@@ -256,6 +341,11 @@ final class CommandTest extends AbstractCommandTest
         parent::testRenameColumn();
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
     public function testRenameTable(): void
     {
         $db = $this->getConnection('customer');
@@ -266,6 +356,11 @@ final class CommandTest extends AbstractCommandTest
         $this->assertSame('customer_new', $db->getSchema()->getTableSchema('customer_new')?->getName());
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
     public function testResetSequence(): void
     {
         $db = $this->getConnection();
@@ -315,6 +410,11 @@ final class CommandTest extends AbstractCommandTest
         );
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
     public function testTruncateTable(): void
     {
         $db = $this->getConnection('customer');
@@ -334,6 +434,19 @@ final class CommandTest extends AbstractCommandTest
     }
 
     /**
+     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::update()
+     */
+    public function testUpdate(
+        string $table,
+        array $columns,
+        array|string $conditions,
+        array $params,
+        string $expected
+    ): void {
+        parent::testUpdate($table, $columns, $conditions, $params, $expected);
+    }
+
+    /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::upsert()
      */
     public function testUpsert(array $firstData, array $secondData): void
@@ -344,12 +457,6 @@ final class CommandTest extends AbstractCommandTest
             $this->markTestSkipped('SQLite < 3.8.3 does not support "WITH" keyword.');
         }
 
-        $this->assertEquals(0, $db->createCommand('SELECT COUNT(*) FROM {{T_upsert}}')->queryScalar());
-
-        $this->performAndCompareUpsertResult($db, $firstData);
-
-        $this->assertEquals(1, $db->createCommand('SELECT COUNT(*) FROM {{T_upsert}}')->queryScalar());
-
-        $this->performAndCompareUpsertResult($db, $secondData);
+        parent::testUpsert($firstData, $secondData);
     }
 }
