@@ -12,11 +12,11 @@ final class CommandProvider
 {
     use TestTrait;
 
-    public function batchInsertSql(): array
+    public function batchInsert(): array
     {
         $baseCommandProvider = new BaseCommandProvider();
 
-        $batchInsertSql = $baseCommandProvider->batchInsertSql($this->getConnection());
+        $batchInsertSql = $baseCommandProvider->batchInsert($this->getConnection());
         unset($batchInsertSql['wrongBehavior']);
 
         return $batchInsertSql;

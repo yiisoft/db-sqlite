@@ -52,6 +52,14 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     /**
      * @throws NotSupportedException
      */
+    public function addDefaultValue(string $name, string $table, string $column, mixed $value): string
+    {
+        throw new NotSupportedException(__METHOD__ . '()' . ' is not supported by SQLite.');
+    }
+
+    /**
+     * @throws NotSupportedException
+     */
     public function addForeignKey(
         string $name,
         string $table,
@@ -145,6 +153,14 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
      * @throws NotSupportedException
      */
     public function dropCommentFromTable(string $table): string
+    {
+        throw new NotSupportedException(__METHOD__ . '()' . ' is not supported by SQLite.');
+    }
+
+    /**
+     * @throws NotSupportedException
+     */
+    public function dropDefaultValue(string $name, string $table): string
     {
         throw new NotSupportedException(__METHOD__ . '()' . ' is not supported by SQLite.');
     }
