@@ -185,8 +185,8 @@ final class CommandTest extends CommonCommandTest
         string $name,
         string $tableName,
         array|string $column,
-        string $indexType,
-        string $indexMethod,
+        string|null $indexType,
+        string|null $indexMethod,
     ): void {
         parent::testCreateIndex($name, $tableName, $column, $indexType, $indexMethod);
     }
@@ -318,7 +318,7 @@ final class CommandTest extends CommonCommandTest
     /**
      * Test command getRawSql.
      *
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::rawSql()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::rawSql()
      *
      * @throws Exception
      * @throws InvalidConfigException
