@@ -89,12 +89,13 @@ final class CommandTest extends CommonCommandTest
         string $name,
         string $tableName,
         array|string $column1,
-        array|string $column2
+        array|string $column2,
+        string $expectedName,
     ): void {
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::addForeignKey() is not supported by SQLite.');
 
-        parent::testAddForeignKey($name, $tableName, $column1, $column2);
+        parent::testAddForeignKey($name, $tableName, $column1, $column2, $expectedName);
     }
 
     /**
