@@ -17,7 +17,7 @@ trait TestTrait
      * @throws Exception
      * @throws InvalidConfigException
      */
-    protected function getConnection(string ...$fixtures): ConnectionPDOInterface
+    protected function getConnection(bool $fixture = false): ConnectionPDOInterface
     {
         $db = new ConnectionPDO(
             new PDODriver('sqlite::memory:'),
@@ -25,8 +25,8 @@ trait TestTrait
             DbHelper::getSchemaCache(),
         );
 
-        foreach ($fixtures as $fixture) {
-            DbHelper::loadFixture($db, __DIR__ . "/Fixture/$fixture.sql");
+        if ($fixture) {
+            DbHelper::loadFixture($db, __DIR__ . "/Fixture/sqlite.sql");
         }
 
         return $db;

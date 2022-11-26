@@ -36,6 +36,10 @@ final class CommandTest extends CommonCommandTest
         parent::testAddCheck();
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
     public function testAddCommentOnColumn(): void
     {
         $db = $this->getConnection();
@@ -47,7 +51,7 @@ final class CommandTest extends CommonCommandTest
             'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCommentOnColumn() is not supported by SQLite.'
         );
 
-        $command->addCommentOnColumn('customer', 'name', 'some comment');
+        $command->addCommentOnColumn('{{customer}}', '{{name}}', 'some comment');
     }
 
     public function testAddCommentOnTable(): void
@@ -75,7 +79,7 @@ final class CommandTest extends CommonCommandTest
             'Yiisoft\Db\Sqlite\DDLQueryBuilder::addDefaultValue() is not supported by SQLite.'
         );
 
-        $command->addDefaultValue('name', 'table', 'column', 'value');
+        $command->addDefaultValue('{{name}}', '{{table}}', 'column', 'value');
     }
 
     /**
@@ -115,12 +119,21 @@ final class CommandTest extends CommonCommandTest
         parent::testAddUnique($name, $tableName, $column);
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
     public function testAlterColumn(): void
     {
+        $db = $this->getConnection();
+
+        $command = $db->createCommand();
+
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::alterColumn() is not supported by SQLite.');
 
-        parent::testAlterColumn();
+        $command->alterColumn('{{customer}}', 'email', 'ntext')->execute();
     }
 
     /**
@@ -136,10 +149,9 @@ final class CommandTest extends CommonCommandTest
         array $values,
         string $expected,
         array $expectedParams = [],
-        int $insertedRow = 1,
-        string $fixture = 'type'
+        int $insertedRow = 1
     ): void {
-        parent::testBatchInsert($table, $columns, $values, $expected, $expectedParams, $insertedRow, $fixture);
+        parent::testBatchInsert($table, $columns, $values, $expected, $expectedParams, $insertedRow);
     }
 
     /**
@@ -149,10 +161,10 @@ final class CommandTest extends CommonCommandTest
      */
     public function testCheckIntegrity(): void
     {
-        $db = $this->getConnection('customer');
+        $db = $this->getConnection(true);
 
         $command = $db->createCommand();
-        $command->checkIntegrity('', 'customer');
+        $command->checkIntegrity('', '{{customer}}');
 
         $this->assertSame(
             <<<SQL
@@ -166,39 +178,16 @@ final class CommandTest extends CommonCommandTest
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::createIndex()
      *
-     * @throws Exception
      * @throws Throwable
      */
     public function testCreateIndex(
         string $name,
-        string $table,
+        string $tableName,
         array|string $column,
-        string $indexType = '',
-        string $indexMethod = '',
-        string $expected = '',
+        string $indexType,
+        string $indexMethod,
     ): void {
-        $db = $this->getConnection();
-
-        $command = $db->createCommand();
-        $schema = $db->getSchema();
-
-        if ($schema->getTableSchema($table) !== null) {
-            $command->dropTable($table)->execute();
-        }
-
-        $command->createTable($table, ['int1' => 'integer not null', 'int2' => 'integer not null'])->execute();
-
-        $this->assertEmpty($schema->getTableIndexes($table, true));
-
-        $command->createIndex($name, $table, $column, $indexType, $indexMethod)->execute();
-
-        $this->assertSame($column, $schema->getTableIndexes($table, true)[0]->getColumnNames());
-
-        if ($indexType === 'UNIQUE') {
-            $this->assertTrue($schema->getTableIndexes($table, true)[0]->isUnique());
-        } else {
-            $this->assertFalse($schema->getTableIndexes($table, true)[0]->isUnique());
-        }
+        parent::testCreateIndex($name, $tableName, $column, $indexType, $indexMethod);
     }
 
     public function testDropCheck(): void
@@ -217,6 +206,10 @@ final class CommandTest extends CommonCommandTest
         parent::testDropColumn();
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
     public function testDropCommentFromColumn(): void
     {
         $db = $this->getConnection();
@@ -228,9 +221,13 @@ final class CommandTest extends CommonCommandTest
             'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCommentFromColumn() is not supported by SQLite.'
         );
 
-        $command->dropCommentFromColumn('name', 'table', 'column');
+        $command->dropCommentFromColumn('{{table}}', 'column');
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
     public function testDropCommentFromTable(): void
     {
         $db = $this->getConnection();
@@ -242,9 +239,13 @@ final class CommandTest extends CommonCommandTest
             'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCommentFromTable() is not supported by SQLite.'
         );
 
-        $command->dropCommentFromTable('name', 'table');
+        $command->dropCommentFromTable( '{{table}}');
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
     public function testDropDefaultValue(): void
     {
         $db = $this->getConnection();
@@ -256,9 +257,13 @@ final class CommandTest extends CommonCommandTest
             'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropDefaultValue() is not supported by SQLite.'
         );
 
-        $command->dropDefaultValue('name', 'table');
+        $command->dropDefaultValue('{{name}}', '{{table}}');
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
     public function testDropForeignKey(): void
     {
         $db = $this->getConnection();
@@ -270,9 +275,13 @@ final class CommandTest extends CommonCommandTest
             'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropForeignKey() is not supported by SQLite.'
         );
 
-        $command->dropForeignKey('name', 'table');
+        $command->dropForeignKey('{{name}}', '{{table}}');
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
     public function testDropPrimaryKey(): void
     {
         $db = $this->getConnection();
@@ -284,9 +293,13 @@ final class CommandTest extends CommonCommandTest
             'iisoft\Db\Sqlite\DDLQueryBuilder::dropPrimaryKey() is not supported by SQLite.'
         );
 
-        $command->dropPrimaryKey('name', 'table');
+        $command->dropPrimaryKey('{{name}}', '{{table}}');
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
     public function testDropUnique(): void
     {
         $db = $this->getConnection();
@@ -298,28 +311,49 @@ final class CommandTest extends CommonCommandTest
             'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropUnique() is not supported by SQLite.'
         );
 
-        $command->dropUnique('name', 'table');
+        $command->dropUnique('{{name}}', '{{table}}');
     }
 
+    /**
+     * Test command getRawSql.
+     *
+     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::rawSql()
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     *
+     * {@see https://github.com/yiisoft/yii2/issues/8592}
+     */
+    public function testGetRawSql(string $sql, array $params, string $expectedRawSql): void
+    {
+        parent::testGetRawSql($sql, $params, $expectedRawSql);
+    }
+
+    /**
+     * @throws Throwable
+     * @throws InvalidConfigException
+     * @throws Exception
+     */
     public function testMultiStatementSupport(): void
     {
         $db = $this->getConnection();
 
         $sql = <<<SQL
-        DROP TABLE IF EXISTS {{T_multistatement}};
-        CREATE TABLE {{T_multistatement}} (
+        DROP TABLE IF EXISTS [[T_multistatement]];
+        CREATE TABLE [[T_multistatement]] (
             [[intcol]] INTEGER,
             [[textcol]] TEXT
         );
-        INSERT INTO {{T_multistatement}} VALUES(41, :val1);
-        INSERT INTO {{T_multistatement}} VALUES(42, :val2);
+        INSERT INTO [[T_multistatement]] VALUES(41, :val1);
+        INSERT INTO [[T_multistatement]] VALUES(42, :val2);
         SQL;
 
         // check
         $db->createCommand($sql, ['val1' => 'foo', 'val2' => 'bar'])->execute();
         $queryAll = $db->createCommand(
             <<<SQL
-            SELECT * FROM {{T_multistatement}}
+            SELECT * FROM [[T_multistatement]]
             SQL
         )->queryAll();
 
@@ -329,9 +363,9 @@ final class CommandTest extends CommonCommandTest
         );
 
         $sql = <<<SQL
-        UPDATE {{T_multistatement}} SET [[intcol]] = :newInt WHERE [[textcol]] = :val1;
-        DELETE FROM {{T_multistatement}} WHERE [[textcol]] = :val2;
-        SELECT * FROM {{T_multistatement}}
+        UPDATE [[T_multistatement]] SET [[intcol]] = :newInt WHERE [[textcol]] = :val1;
+        DELETE FROM [[T_multistatement]] WHERE [[textcol]] = :val2;
+        SELECT * FROM [[T_multistatement]]
         SQL;
 
         $queryAll = $db->createCommand($sql, ['newInt' => 410, 'val1' => 'foo', 'val2' => 'bar'])->queryAll();
@@ -349,69 +383,82 @@ final class CommandTest extends CommonCommandTest
         parent::testRenameColumn();
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
     public function testResetSequence(): void
     {
         $db = $this->getConnection();
 
         $command = $db->createCommand();
 
-        if ($db->getSchema()->getTableSchema('testCreateTable', true) !== null) {
-            $command->dropTable('testCreateTable')->execute();
+        if ($db->getSchema()->getTableSchema('{{testCreateTable}}', true) !== null) {
+            $command->dropTable('{{testCreateTable}}')->execute();
         }
 
-        $command->createTable('testCreateTable', ['id' => Schema::TYPE_PK, 'bar' => Schema::TYPE_INTEGER])->execute();
+        $command->createTable(
+            '{{testCreateTable}}',
+            ['id' => Schema::TYPE_PK, 'bar' => Schema::TYPE_INTEGER],
+        )->execute();
 
-        $command->insert('testCreateTable', ['bar' => 1])->execute();
-        $command->insert('testCreateTable', ['bar' => 2])->execute();
-        $command->insert('testCreateTable', ['bar' => 3])->execute();
-        $command->insert('testCreateTable', ['bar' => 4])->execute();
+        $command->insert('{{testCreateTable}}', ['bar' => 1])->execute();
+        $command->insert('{{testCreateTable}}', ['bar' => 2])->execute();
+        $command->insert('{{testCreateTable}}', ['bar' => 3])->execute();
+        $command->insert('{{testCreateTable}}', ['bar' => 4])->execute();
 
         $this->assertEquals(
             4,
             $command->setSql(
                 <<<SQL
-                SELECT seq FROM sqlite_sequence where name='testCreateTable'
+                SELECT [[seq]] FROM [[sqlite_sequence]] where [[name]] = 'testCreateTable'
                 SQL
             )->queryScalar()
         );
 
-        $command->resetSequence('testCreateTable', 2)->execute();
+        $command->resetSequence('{{testCreateTable}}', 2)->execute();
 
         $this->assertSame(
             '1',
             $command->setSql(
                 <<<SQL
-                SELECT seq FROM sqlite_sequence where name='testCreateTable'
+                SELECT [[seq]] FROM [[sqlite_sequence]] where [[name]] = 'testCreateTable'
                 SQL
             )->queryScalar()
         );
 
-        $command->resetSequence('testCreateTable')->execute();
+        $command->resetSequence('{{testCreateTable}}')->execute();
 
         $this->assertEquals(
             4,
             $command->setSql(
                 <<<SQL
-                SELECT seq FROM sqlite_sequence where name='testCreateTable'
+                SELECT [[seq]] FROM [[sqlite_sequence]] where [[name]] = 'testCreateTable'
                 SQL
             )->queryScalar()
         );
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
     public function testTruncateTable(): void
     {
-        $db = $this->getConnection('customer');
+        $db = $this->getConnection(true);
 
         $command = $db->createCommand();
         $command->setSql(
             <<<SQL
-            SELECT COUNT(*) FROM customer
+            SELECT COUNT(*) FROM [[customer]]
             SQL
         );
 
         $this->assertEquals(3, $command->queryScalar());
 
-        $command->truncateTable('customer')->execute();
+        $command->truncateTable('{{customer}}')->execute();
 
         $this->assertEquals(0, $command->queryScalar());
     }
@@ -431,6 +478,9 @@ final class CommandTest extends CommonCommandTest
 
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::upsert()
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
      */
     public function testUpsert(array $firstData, array $secondData): void
     {
