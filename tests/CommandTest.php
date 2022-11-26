@@ -239,7 +239,7 @@ final class CommandTest extends CommonCommandTest
             'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCommentFromTable() is not supported by SQLite.'
         );
 
-        $command->dropCommentFromTable( '{{table}}');
+        $command->dropCommentFromTable('{{table}}');
     }
 
     /**

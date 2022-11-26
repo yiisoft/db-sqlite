@@ -26,7 +26,7 @@ trait TestTrait
         );
 
         if ($fixture) {
-            DbHelper::loadFixture($db, __DIR__ . "/Fixture/sqlite.sql");
+            DbHelper::loadFixture($db, __DIR__ . '/Fixture/sqlite.sql');
         }
 
         return $db;
