@@ -318,7 +318,7 @@ final class CommandTest extends CommonCommandTest
     /**
      * Test command getRawSql.
      *
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::rawSql()
+     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::rawSql()
      *
      * @throws Exception
      * @throws InvalidConfigException
