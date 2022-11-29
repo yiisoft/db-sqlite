@@ -26,8 +26,10 @@ final class QueryBuilderTest extends TestCase
     public function testAddForeignKey(): void
     {
         $qb = $this->getConnection()->getQueryBuilder();
+
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::addForeignKey is not supported by SQLite.');
+
         $qb->addForeignKey('test_fk', 'test_table', ['id'], 'test_table', ['id']);
     }
 
@@ -237,8 +239,10 @@ final class QueryBuilderTest extends TestCase
     public function testDropForeignKey(): void
     {
         $qb = $this->getConnection()->getQueryBuilder();
+
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::dropForeignKey is not supported by SQLite.');
+
         $qb->dropForeignKey('test_fk', 'test_table');
     }
 
@@ -263,41 +267,68 @@ final class QueryBuilderTest extends TestCase
 
     public function testResetSequence(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getConnection();
+
+        $command = $db->createCommand();
         $qb = $db->getQueryBuilder();
 
-        $checkSql = "SELECT seq FROM sqlite_sequence where name='testCreateTable'";
+        if ($db->getSchema()->getTableSchema('testCreateTable', true) !== null) {
+            $command->dropTable('testCreateTable')->execute();
+        }
+
+        $checkSql = <<<SQL
+        SELECT seq FROM sqlite_sequence where name='testCreateTable'
+        SQL;
+        $command->createTable('testCreateTable', ['id' => Schema::TYPE_PK, 'bar' => Schema::TYPE_INTEGER])->execute();
+        $command->insert('testCreateTable', ['bar' => 1])->execute();
+        $command->insert('testCreateTable', ['bar' => 2])->execute();
+        $command->insert('testCreateTable', ['bar' => 3])->execute();
 
         // change to max row
-        $expected = "UPDATE sqlite_sequence SET seq=(SELECT MAX(`id`) FROM `testCreateTable`) WHERE name='testCreateTable'";
+        $expected = <<<SQL
+        UPDATE sqlite_sequence SET seq=(SELECT MAX(`id`) FROM `testCreateTable`) WHERE name='testCreateTable'
+        SQL;
         $sql = $qb->resetSequence('testCreateTable');
-        $this->assertEquals($expected, $sql);
 
-        $db->createCommand($sql)->execute();
-        $result = $db->createCommand($checkSql)->queryScalar();
-        $this->assertEquals(1, $result);
+        $this->assertSame($expected, $sql);
+
+        $command->setSql($sql)->execute();
+        $result = $command->setSql($checkSql)->queryScalar();
+
+        $this->assertEquals(3, $result);
 
         // change up
-        $expected = "UPDATE sqlite_sequence SET seq='0' WHERE name='testCreateTable'";
+        $expected = <<<SQL
+        UPDATE sqlite_sequence SET seq='0' WHERE name='testCreateTable'
+        SQL;
         $sql = $qb->resetSequence('testCreateTable', '1');
-        $this->assertEquals($expected, $sql);
 
-        $expected = "UPDATE sqlite_sequence SET seq='3' WHERE name='testCreateTable'";
+        $this->assertSame($expected, $sql);
+
+        $expected = <<<SQL
+        UPDATE sqlite_sequence SET seq='3' WHERE name='testCreateTable'
+        SQL;
         $sql = $qb->resetSequence('testCreateTable', 4);
-        $this->assertEquals($expected, $sql);
 
-        $db->createCommand($sql)->execute();
-        $result = $db->createCommand($checkSql)->queryScalar();
+        $this->assertSame($expected, $sql);
+
+        $command->setSql($sql)->execute();
+        $result = $command->setSql($checkSql)->queryScalar();
+
         $this->assertEquals(3, $result);
 
         // and again change to max rows
-        $expected = "UPDATE sqlite_sequence SET seq=(SELECT MAX(`id`) FROM `testCreateTable`) WHERE name='testCreateTable'";
+        $expected = <<<SQL
+        UPDATE sqlite_sequence SET seq=(SELECT MAX(`id`) FROM `testCreateTable`) WHERE name='testCreateTable'
+        SQL;
         $sql = $qb->resetSequence('testCreateTable');
-        $this->assertEquals($expected, $sql);
 
-        $db->createCommand($sql)->execute();
-        $result = $db->createCommand($checkSql)->queryScalar();
-        $this->assertEquals(1, $result);
+        $this->assertSame($expected, $sql);
+
+        $command->setSql($sql)->execute();
+        $result = $command->setSql($checkSql)->queryScalar();
+
+        $this->assertSame('3', $result);
     }
 
     /**

@@ -10,6 +10,9 @@ use Yiisoft\Db\Sqlite\PDODriver;
 use Yiisoft\Db\Sqlite\ConnectionPDO;
 use Yiisoft\Db\TestSupport\TestTrait;
 
+/**
+ * @psalm-suppress PropertyNotSetInConstructor
+ */
 class TestCase extends AbstractTestCase
 {
     use TestTrait;
@@ -24,15 +27,10 @@ class TestCase extends AbstractTestCase
     protected array $likeParameterReplacements = [];
     protected ConnectionPDO $db;
 
-    /**
-     * @param bool $reset whether to clean up the test database.
-     *
-     * @return ConnectionPDO
-     */
     protected function getConnection(
-        $reset = false,
-        string $dsn = 'sqlite:' . __DIR__ . '/Runtime/yiitest.sq3',
-        string $fixture = __DIR__ . '/Fixture/sqlite.sql'
+        bool $reset = false,
+        string $dsn = 'sqlite:' . __DIR__ . '/Support/Runtime/yiitest.sq3',
+        string $fixture = __DIR__ . '/Support/Fixture/sqlite.sql'
     ): ConnectionPDO {
         $this->dsn = $dsn;
         $pdoDriver = new PDODriver($this->dsn, $this->username, $this->password);
