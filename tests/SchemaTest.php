@@ -560,4 +560,14 @@ final class SchemaTest extends TestCase
             ['catalog.other.animal2', 'animal2', 'other'],
         ];
     }
+
+    public function testTableComment(): void
+    {
+        $this->markTestSkipped('SQLite does not support comments for tables.');
+    }
+
+    public function testColumnComment(): void
+    {
+        $this->markTestSkipped('SQLite does not support comments for columns.');
+    }
 }
