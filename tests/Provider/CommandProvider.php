@@ -27,13 +27,6 @@ final class CommandProvider
         return $batchInsertSql;
     }
 
-    public function createIndex(): array
-    {
-        $baseCommandProvider = new BaseCommandProvider();
-
-        return $baseCommandProvider->createIndex();
-    }
-
     /**
      * @throws Exception
      * @throws InvalidConfigException

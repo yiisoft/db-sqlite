@@ -176,21 +176,6 @@ final class CommandTest extends CommonCommandTest
         $this->assertSame(1, $command->execute());
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::createIndex()
-     *
-     * @throws Throwable
-     */
-    public function testCreateIndex(
-        string $name,
-        string $tableName,
-        array|string $column,
-        string|null $indexType,
-        string|null $indexMethod,
-    ): void {
-        parent::testCreateIndex($name, $tableName, $column, $indexType, $indexMethod);
-    }
-
     public function testDropCheck(): void
     {
         $this->expectException(NotSupportedException::class);
@@ -329,18 +314,6 @@ final class CommandTest extends CommonCommandTest
     public function testGetRawSql(string $sql, array $params, string $expectedRawSql): void
     {
         parent::testGetRawSql($sql, $params, $expectedRawSql);
-    }
-
-    public function testInsertEx(): void
-    {
-        $db = $this->getConnection(true);
-
-        $command = $db->createCommand();
-
-        $this->assertSame(
-            ['id' => '4'],
-            $command->insertEx('{{customer}}', ['name' => 'test_1', 'email' => 'test_1@example.com']),
-        );
     }
 
     /**
