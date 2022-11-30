@@ -19,7 +19,7 @@ It is used in [Yii Framework] but is supposed to be usable separately.
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/db-sqlite/v/stable.png)](https://packagist.org/packages/yiisoft/db-sqlite)
 [![Total Downloads](https://poser.pugx.org/yiisoft/db-sqlite/downloads.png)](https://packagist.org/packages/yiisoft/db-sqlite)
 [![rector](https://github.com/yiisoft/db-sqlite/actions/workflows/rector.yml/badge.svg)](https://github.com/yiisoft/db-sqlite/actions/workflows/rector.yml)
-[![codecov](https://codecov.io/gh/yiisoft/db-sqlite/branch/dev/graph/badge.svg?token=YXUHCPPITH)](https://codecov.io/gh/yiisoft/db-sqlite)
+[![codecov](https://codecov.io/gh/yiisoft/db-sqlite/branch/master/graph/badge.svg?token=YXUHCPPITH)](https://codecov.io/gh/yiisoft/db-sqlite)
 [![StyleCI](https://github.styleci.io/repos/145220194/shield?branch=master)](https://github.styleci.io/repos/145220194?branch=master)
 
 
@@ -46,11 +46,11 @@ Di-Container:
 
 ```php
 use Yiisoft\Db\Connection\ConnectionInterface;
-use Yiisoft\Db\Sqlite\Connection as SqliteConnection;
+use Yiisoft\Db\Sqlite\ConnectionPDO;
 
 return [
     ConnectionInterface::class => [
-        'class' => SqliteConnection::class,
+        'class' => ConnectionPDO::class,
         '__construct()' => [
             'dsn' => $params['yiisoft/db-sqlite']['dsn'],
         ]
@@ -99,6 +99,16 @@ use either newest or any specific version of PHP:
 
 ```shell
 ./vendor/bin/rector
+```
+
+### Composer require checker
+
+This package uses [composer-require-checker](https://github.com/maglnet/ComposerRequireChecker) to check if all dependencies are correctly defined in `composer.json`.
+
+To run the checker, execute the following command:
+
+```shell
+./vendor/bin/composer-require-checker
 ```
 
 ### Support the project

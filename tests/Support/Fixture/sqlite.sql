@@ -1,8 +1,3 @@
-/**
- * This is the database schema for testing Sqlite support of Yii DAO and Active Record.
- * The database setup in config.php is required to perform then relevant tests:
- */
-
 DROP TABLE IF EXISTS "composite_fk";
 DROP TABLE IF EXISTS "order_item";
 DROP TABLE IF EXISTS "order_item_with_null_fk";
@@ -18,12 +13,6 @@ DROP TABLE IF EXISTS "null_values";
 DROP TABLE IF EXISTS "negative_default_values";
 DROP TABLE IF EXISTS "animal";
 DROP TABLE IF EXISTS "default_pk";
-DROP TABLE IF EXISTS "document";
-DROP TABLE IF EXISTS "dossier";
-DROP TABLE IF EXISTS "employee";
-DROP TABLE IF EXISTS "department";
-DROP TABLE IF EXISTS "alpha";
-DROP TABLE IF EXISTS "beta";
 DROP VIEW IF EXISTS "animal_view";
 DROP TABLE IF EXISTS "T_constraints_4";
 DROP TABLE IF EXISTS "T_constraints_3";
@@ -154,48 +143,6 @@ CREATE TABLE "default_pk" (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE "document" (
-  id INTEGER NOT NULL,
-  title VARCHAR(255) NOT NULL,
-  content text,
-  version INTEGER NOT NULL DEFAULT '0',
-  PRIMARY KEY (id)
-);
-
-CREATE TABLE "department" (
-  id INTEGER NOT NULL,
-  title VARCHAR(255) NOT NULL,
-  PRIMARY KEY (id)
-);
-
-CREATE TABLE "employee" (
-  id INTEGER NOT NULL,
-  department_id INTEGER NOT NULL,
-  first_name VARCHAR(255) NOT NULL,
-  last_name VARCHAR(255) NOT NULL,
-  PRIMARY KEY (id, department_id)
-);
-
-CREATE TABLE "dossier" (
-  id INTEGER NOT NULL,
-  department_id INTEGER NOT NULL,
-  employee_id INTEGER NOT NULL,
-  summary VARCHAR(255) NOT NULL,
-  PRIMARY KEY (id)
-);
-
-CREATE TABLE "alpha" (
-  id INTEGER NOT NULL,
-  string_identifier VARCHAR(255) NOT NULL,
-  PRIMARY KEY (id)
-);
-
-CREATE TABLE "beta" (
-  id INTEGER NOT NULL,
-  alpha_string_identifier VARCHAR(255) NOT NULL,
-  PRIMARY KEY (id)
-);
-
 CREATE VIEW "animal_view" AS SELECT * FROM "animal";
 
 INSERT INTO "animal" ("type") VALUES ('yiiunit\data\ar\Cat');
@@ -238,66 +185,6 @@ INSERT INTO "order_item_with_null_fk" (order_id, item_id, quantity, subtotal) VA
 INSERT INTO "order_item_with_null_fk" (order_id, item_id, quantity, subtotal) VALUES (2, 5, 1, 15.0);
 INSERT INTO "order_item_with_null_fk" (order_id, item_id, quantity, subtotal) VALUES (2, 3, 1, 8.0);
 INSERT INTO "order_item_with_null_fk" (order_id, item_id, quantity, subtotal) VALUES (3, 2, 1, 40.0);
-
-INSERT INTO "document" (title, content, version) VALUES ('Yii 2.0 guide', 'This is Yii 2.0 guide', 0);
-
-INSERT INTO "department" (id, title) VALUES (1, 'IT');
-INSERT INTO "department" (id, title) VALUES (2, 'accounting');
-
-INSERT INTO "employee" (id, department_id, first_name, last_name) VALUES (1, 1, 'John', 'Doe');
-INSERT INTO "employee" (id, department_id, first_name, last_name) VALUES (1, 2, 'Ann', 'Smith');
-INSERT INTO "employee" (id, department_id, first_name, last_name) VALUES (2, 2, 'Will', 'Smith');
-
-INSERT INTO "dossier" (id, department_id, employee_id, summary) VALUES (1, 1, 1, 'Excellent employee.');
-INSERT INTO "dossier" (id, department_id, employee_id, summary) VALUES (2, 2, 1, 'Brilliant employee.');
-INSERT INTO "dossier" (id, department_id, employee_id, summary) VALUES (3, 2, 2, 'Good employee.');
-
-INSERT INTO "alpha" (id, string_identifier) VALUES (1, '1');
-INSERT INTO "alpha" (id, string_identifier) VALUES (2, '1a');
-INSERT INTO "alpha" (id, string_identifier) VALUES (3, '01');
-INSERT INTO "alpha" (id, string_identifier) VALUES (4, '001');
-INSERT INTO "alpha" (id, string_identifier) VALUES (5, '2');
-INSERT INTO "alpha" (id, string_identifier) VALUES (6, '2b');
-INSERT INTO "alpha" (id, string_identifier) VALUES (7, '02');
-INSERT INTO "alpha" (id, string_identifier) VALUES (8, '002');
-
-INSERT INTO "beta" (id, alpha_string_identifier) VALUES (1, '1');
-INSERT INTO "beta" (id, alpha_string_identifier) VALUES (2, '01');
-INSERT INTO "beta" (id, alpha_string_identifier) VALUES (3, '001');
-INSERT INTO "beta" (id, alpha_string_identifier) VALUES (4, '001');
-INSERT INTO "beta" (id, alpha_string_identifier) VALUES (5, '2');
-INSERT INTO "beta" (id, alpha_string_identifier) VALUES (6, '2b');
-INSERT INTO "beta" (id, alpha_string_identifier) VALUES (7, '2b');
-INSERT INTO "beta" (id, alpha_string_identifier) VALUES (8, '02');
-
-/**
- * (SqLite-)Database Schema for validator tests
- */
-
-DROP TABLE IF EXISTS "validator_main";
-DROP TABLE IF EXISTS "validator_ref";
-
-CREATE TABLE "validator_main" (
-  id     INTEGER PRIMARY KEY ,
-  field1 VARCHAR(255)
-);
-
-CREATE TABLE "validator_ref" (
-  id      INTEGER PRIMARY KEY ,
-  a_field VARCHAR(255),
-  ref     INT(11)
-);
-
-INSERT INTO "validator_main" (id, field1) VALUES (1, 'just a string1');
-INSERT INTO "validator_main" (id, field1) VALUES (2, 'just a string2');
-INSERT INTO "validator_main" (id, field1) VALUES (3, 'just a string3');
-INSERT INTO "validator_main" (id, field1) VALUES (4, 'just a string4');
-INSERT INTO "validator_ref" (id, a_field, ref) VALUES (1, 'ref_to_2', 2);
-INSERT INTO "validator_ref" (id, a_field, ref) VALUES (2, 'ref_to_2', 2);
-INSERT INTO "validator_ref" (id, a_field, ref) VALUES (3, 'ref_to_3', 3);
-INSERT INTO "validator_ref" (id, a_field, ref) VALUES (4, 'ref_to_4', 4);
-INSERT INTO "validator_ref" (id, a_field, ref) VALUES (5, 'ref_to_4', 4);
-INSERT INTO "validator_ref" (id, a_field, ref) VALUES (6, 'ref_to_5', 5);
 
 /* bit test, see https://github.com/yiisoft/yii2/issues/9006 */
 
