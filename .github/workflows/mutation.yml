@@ -23,7 +23,7 @@ jobs:
   mutation:
     uses: yiisoft/actions/.github/workflows/roave-infection.yml@master
     with:
-      composer-command: composer config preferred-install.yiisoft/db source && composer update --no-interaction --no-progress --optimize-autoloader --ansi
+      composer-command: composer update --no-interaction --no-progress --optimize-autoloader --ansi
       os: >-
         ['ubuntu-latest']
       php: >-
