@@ -13,6 +13,7 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
+use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 use Yiisoft\Db\Tests\Support\Assert;
@@ -39,7 +40,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::addCheck is not supported by SQLite.');
 
-        $qb->addCheck('table', 'check', 'check > 0');
+        $qb->addCheck('customer', 'id', 'id > 0');
     }
 
     /**
@@ -57,7 +58,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCommentOnColumn is not supported by SQLite.'
         );
 
-        $qb->addCommentOnColumn('table', 'column', 'comment');
+        $qb->addCommentOnColumn('customer', 'id', 'Primary key.');
     }
 
     /**
@@ -75,7 +76,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCommentOnTable is not supported by SQLite.'
         );
 
-        $qb->addCommentOnTable('table', 'comment');
+        $qb->addCommentOnTable('customer', 'Customer table.');
     }
 
     /**
@@ -91,7 +92,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::addDefaultValue is not supported by SQLite.');
 
-        $qb->addDefaultValue('name', 'table', 'column', 'value');
+        $qb->addDefaultValue('CN_pk', 'T_constraints_1', 'C_default', 1);
     }
 
     /**
@@ -169,7 +170,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::alterColumn is not supported by SQLite.');
 
-        $qb->alterColumn('table', 'column', 'type');
+        $qb->alterColumn('customer', 'email', (string) Schema::TYPE_STRING);
     }
 
     /**
@@ -324,6 +325,30 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testBuildWithWhereExists(string $cond, string $expectedQuerySql): void
     {
         parent::testBuildWithWhereExists($cond, $expectedQuerySql);
+    }
+
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
+    public function testCheckIntegrity(): void
+    {
+        $qb = $this->getConnection();
+
+        $qb = $qb->getQueryBuilder();
+
+        $this->assertSame(
+            <<<SQL
+            PRAGMA foreign_keys=1
+            SQL,
+            $qb->checkIntegrity('', 'customer'),
+        );
+        $this->assertSame(
+            <<<SQL
+            PRAGMA foreign_keys=0
+            SQL,
+            $qb->checkIntegrity('', 'customer', false),
+        );
     }
 
     /**
@@ -516,9 +541,9 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb = $db->getQueryBuilder();
 
         $this->expectException(NotSupportedException::class);
-        $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::addUnique is not supported by SQLite.');
+        $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::dropUnique is not supported by SQLite.');
 
-        $qb->addUnique('test_uq_constraint', 'test_uq', ['int1']);
+        $qb->dropUnique('test_uq_constraint', 'test_uq');
     }
 
     /**
@@ -574,13 +599,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db = $this->getConnection();
 
         $qb = $db->getQueryBuilder();
-        $sql = $qb->renameTable('alpha', 'alpha-test');
 
         $this->assertSame(
             <<<SQL
             ALTER TABLE `alpha` RENAME TO `alpha-test`
             SQL,
-            $sql,
+            $qb->renameTable('alpha', 'alpha-test'),
         );
     }
 
