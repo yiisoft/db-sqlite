@@ -41,7 +41,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         $table = $this->schema->getTableSchema($tableName);
 
         if ($table === null) {
-            throw new InvalidArgumentException("Table not found: $tableName");
+            throw new InvalidArgumentException("Table not found: '$tableName'.");
         }
 
         $sequenceName = $table->getSequenceName();
