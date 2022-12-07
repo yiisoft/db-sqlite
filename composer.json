@@ -23,7 +23,7 @@
         "ext-mbstring": "*",
         "ext-pdo": "*",
         "yiisoft/arrays": "^2.0",
-        "yiisoft/db": "dev-remove-test-column-schema-builder-trait as 3.0@dev",
+        "yiisoft/db": "^3.0@dev",
         "yiisoft/strings": "^2.0"
     },
     "require-dev": {
