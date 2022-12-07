@@ -4,41 +4,22 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
-use Yiisoft\Db\Sqlite\ColumnSchemaBuilder;
-use Yiisoft\Db\Sqlite\Schema;
-use Yiisoft\Db\TestSupport\TestColumnSchemaBuilderTrait;
+use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
+use Yiisoft\Db\Tests\Common\CommonColumnSchemaBuilderTest;
 
 /**
  * @group sqlite
+ *
+ * @psalm-suppress PropertyNotSetInConstructor
  */
-final class ColumnSchemaBuilderTest extends TestCase
+final class ColumnSchemaBuilderTest extends CommonColumnSchemaBuilderTest
 {
-    use TestColumnSchemaBuilderTrait;
-
-    public function getColumnSchemaBuilder($type, $length = null): ColumnSchemaBuilder
-    {
-        return new ColumnSchemaBuilder($type, $length);
-    }
-
-    public function typesProvider(): array
-    {
-        return [
-            ['integer UNSIGNED', Schema::TYPE_INTEGER, null, [
-                ['unsigned'],
-            ]],
-            ['integer(10) UNSIGNED', Schema::TYPE_INTEGER, 10, [
-                ['unsigned'],
-            ]],
-            ['integer(10)', Schema::TYPE_INTEGER, 10, [
-                ['comment', 'test'],
-            ]],
-        ];
-    }
+    use TestTrait;
 
     /**
-     * @dataProvider typesProvider
+     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\ColumnSchemaBuilderProvider::types();
      */
-    public function testCustomTypes(string $expected, string $type, ?int $length, mixed $calls): void
+    public function testCustomTypes(string $expected, string $type, int|null $length, array $calls): void
     {
         $this->checkBuildString($expected, $type, $length, $calls);
     }
