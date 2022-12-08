@@ -63,11 +63,5 @@
     "scripts": {
         "test": "phpunit --testdox --no-interaction",
         "test-watch": "phpunit-watcher watch"
-    },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../db"
-        }
-    ]
+    }
 }
