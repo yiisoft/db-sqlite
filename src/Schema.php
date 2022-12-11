@@ -645,6 +645,7 @@ final class Schema extends AbstractSchema
 
     protected function findViewNames(string $schema = ''): array
     {
+        /** @psalm-var string[][] $views */
         $views = $this->db->createCommand(
             <<<SQL
             SELECT name as view FROM sqlite_master WHERE type = 'view' AND name NOT LIKE 'sqlite_%'
