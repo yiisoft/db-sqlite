@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS "customer";
 DROP TABLE IF EXISTS "profile";
 DROP TABLE IF EXISTS "quoter";
 DROP TABLE IF EXISTS "type";
+DROP TABLE IF EXISTS "type_bit";
 DROP TABLE IF EXISTS "null_values";
 DROP TABLE IF EXISTS "negative_default_values";
 DROP TABLE IF EXISTS "animal";
@@ -20,6 +21,7 @@ DROP TABLE IF EXISTS "T_constraints_2";
 DROP TABLE IF EXISTS "T_constraints_1";
 DROP TABLE IF EXISTS "T_upsert";
 DROP TABLE IF EXISTS "T_upsert_1";
+DROP TABLE IF EXISTS "T_constraints_check";
 
 CREATE TABLE "profile" (
   id INTEGER NOT NULL,
@@ -129,6 +131,15 @@ CREATE TABLE "type" (
   bool_col tinyint(1) NOT NULL,
   bool_col2 tinyint(1) DEFAULT '1',
   ts_default TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE "type_bit" (
+  bit_col_1 bit(1) NOT NULL,
+  bit_col_2 bit(1) DEFAULT '1',
+  bit_col_3 bit(32) NOT NULL,
+  bit_col_4 bit(32) DEFAULT '1',
+  bit_col_5 bit(64) NOT NULL,
+  bit_col_6 bit(64) DEFAULT '1'
 );
 
 CREATE TABLE "animal" (
@@ -254,4 +265,12 @@ CREATE TABLE "T_upsert"
 CREATE TABLE "T_upsert_1"
 (
     "a" INTEGER NOT NULL PRIMARY KEY
+);
+
+CREATE TABLE "T_constraints_check"
+(
+    "C_id" INT NOT NULL PRIMARY KEY,
+    "C_check_1" INT NOT NULL CHECK ("C_check_1" > 0),
+    "C_check_2" INT NOT NULL CHECK ("C_check_2" > 0),
+    CONSTRAINT "CN_constraints_check" CHECK ("C_check_1" > "C_check_2")
 );

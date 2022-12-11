@@ -432,6 +432,14 @@ final class Schema extends AbstractSchema
     }
 
     /**
+     * @throws NotSupportedException
+     */
+    public function getSchemaDefaultValues(string $schema = '', bool $refresh = false): array
+    {
+        throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
+    }
+
+    /**
      * Loads the column information into a {@see ColumnSchemaInterface} object.
      *
      * @param array $info column information.
@@ -557,7 +565,7 @@ final class Schema extends AbstractSchema
             /**
              * Additional check for PK in case of INTEGER PRIMARY KEY with ROWID.
              *
-             * {@See https://www.sqlite.org/lang_createtable.html#primkeyconst}
+             * {@link https://www.sqlite.org/lang_createtable.html#primkeyconst}
              *
              * @psalm-var PragmaTableInfo
              */
@@ -633,6 +641,21 @@ final class Schema extends AbstractSchema
         return $this->db->createCommand(
             'PRAGMA TABLE_INFO(' . $this->db->getQuoter()->quoteSimpleTableName($tableName) . ')'
         )->queryAll();
+    }
+
+    protected function findViewNames(string $schema = ''): array
+    {
+        $views = $this->db->createCommand(
+            <<<SQL
+            SELECT name as view FROM sqlite_master WHERE type = 'view' AND name NOT LIKE 'sqlite_%'
+            SQL,
+        )->queryAll();
+
+        foreach ($views as $key => $view) {
+            $views[$key] = $view['view'];
+        }
+
+        return $views;
     }
 
     /**
