@@ -192,11 +192,11 @@ final class Schema extends AbstractSchema
     protected function loadTableForeignKeys(string $tableName): array
     {
         $result = [];
-        /** @psalm-var PragmaForeignKeyList */
+        /** @psalm-var PragmaForeignKeyList $foreignKeysList */
         $foreignKeysList = $this->getPragmaForeignKeyList($tableName);
-        /** @psalm-var NormalizePragmaForeignKeyList */
+        /** @psalm-var NormalizePragmaForeignKeyList $foreignKeysList */
         $foreignKeysList = $this->normalizeRowKeyCase($foreignKeysList, true);
-        /** @psalm-var NormalizePragmaForeignKeyList */
+        /** @psalm-var NormalizePragmaForeignKeyList $foreignKeysList */
         $foreignKeysList = ArrayHelper::index($foreignKeysList, null, 'table');
         ArraySorter::multisort($foreignKeysList, 'seq', SORT_ASC, SORT_NUMERIC);
 
@@ -344,7 +344,7 @@ final class Schema extends AbstractSchema
      */
     protected function findColumns(TableSchemaInterface $table): bool
     {
-        /** @psalm-var PragmaTableInfo */
+        /** @psalm-var PragmaTableInfo $columns */
         $columns = $this->getPragmaTableInfo($table->getName());
 
         foreach ($columns as $info) {
@@ -375,7 +375,7 @@ final class Schema extends AbstractSchema
      */
     protected function findConstraints(TableSchemaInterface $table): void
     {
-        /** @psalm-var PragmaForeignKeyList */
+        /** @psalm-var PragmaForeignKeyList $foreignKeysList */
         $foreignKeysList = $this->getPragmaForeignKeyList($table->getName());
 
         foreach ($foreignKeysList as $foreignKey) {
@@ -411,13 +411,13 @@ final class Schema extends AbstractSchema
      */
     public function findUniqueIndexes(TableSchemaInterface $table): array
     {
-        /** @psalm-var PragmaIndexList */
+        /** @psalm-var PragmaIndexList $indexList */
         $indexList = $this->getPragmaIndexList($table->getName());
         $uniqueIndexes = [];
 
         foreach ($indexList as $index) {
             $indexName = $index['name'];
-            /** @psalm-var PragmaIndexInfo */
+            /** @psalm-var PragmaIndexInfo $indexInfo */
             $indexInfo = $this->getPragmaIndexInfo($index['name']);
 
             if ($index['unique']) {
@@ -429,6 +429,14 @@ final class Schema extends AbstractSchema
         }
 
         return $uniqueIndexes;
+    }
+
+    /**
+     * @throws NotSupportedException
+     */
+    public function getSchemaDefaultValues(string $schema = '', bool $refresh = false): array
+    {
+        throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
 
     /**
@@ -504,7 +512,7 @@ final class Schema extends AbstractSchema
     private function loadTableColumnsInfo(string $tableName): array
     {
         $tableColumns = $this->getPragmaTableInfo($tableName);
-        /** @psalm-var PragmaTableInfo */
+        /** @psalm-var PragmaTableInfo $tableColumns */
         $tableColumns = $this->normalizeRowKeyCase($tableColumns, true);
 
         return ArrayHelper::index($tableColumns, 'cid');
@@ -557,9 +565,9 @@ final class Schema extends AbstractSchema
             /**
              * Additional check for PK in case of INTEGER PRIMARY KEY with ROWID.
              *
-             * {@See https://www.sqlite.org/lang_createtable.html#primkeyconst}
+             * {@link https://www.sqlite.org/lang_createtable.html#primkeyconst}
              *
-             * @psalm-var PragmaTableInfo
+             * @psalm-var PragmaTableInfo $tableColumns
              */
             $tableColumns = $this->loadTableColumnsInfo($tableName);
 
@@ -608,7 +616,7 @@ final class Schema extends AbstractSchema
         $column = $this->db
             ->createCommand('PRAGMA INDEX_INFO(' . (string) $this->db->getQuoter()->quoteValue($name) . ')')
             ->queryAll();
-        /** @psalm-var Column */
+        /** @psalm-var Column $column */
         $column = $this->normalizeRowKeyCase($column, true);
         ArraySorter::multisort($column, 'seqno', SORT_ASC, SORT_NUMERIC);
 
@@ -616,7 +624,9 @@ final class Schema extends AbstractSchema
     }
 
     /**
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      */
     private function getPragmaIndexList(string $tableName): array
     {
@@ -633,6 +643,27 @@ final class Schema extends AbstractSchema
         return $this->db->createCommand(
             'PRAGMA TABLE_INFO(' . $this->db->getQuoter()->quoteSimpleTableName($tableName) . ')'
         )->queryAll();
+    }
+
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
+    protected function findViewNames(string $schema = ''): array
+    {
+        /** @psalm-var string[][] $views */
+        $views = $this->db->createCommand(
+            <<<SQL
+            SELECT name as view FROM sqlite_master WHERE type = 'view' AND name NOT LIKE 'sqlite_%'
+            SQL,
+        )->queryAll();
+
+        foreach ($views as $key => $view) {
+            $views[$key] = $view['view'];
+        }
+
+        return $views;
     }
 
     /**
