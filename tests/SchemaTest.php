@@ -41,9 +41,6 @@ final class SchemaTest extends CommonSchemaTest
 
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::columnsTypeBit()
-     *
-     * @throws Exception
-     * @throws NotSupportedException
      */
     public function testColumnSchemaWithTypeBit(array $columns): void
     {
