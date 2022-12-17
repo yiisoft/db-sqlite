@@ -4,23 +4,54 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
-use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
-use Yiisoft\Db\Tests\AbstractQuoterTest;
+use Yiisoft\Db\TestSupport\TestQuoterTrait;
 
 /**
  * @group sqlite
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
-final class QuoterTest extends AbstractQuoterTest
+final class QuoterTest extends TestCase
 {
-    use TestTrait;
+    use TestQuoterTrait;
 
     /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QuoterProvider::tableNameParts()
+     * @return string[][]
      */
-    public function testGetTableNameParts(string $tableName, string ...$expected): void
+    public function simpleTableNamesProvider(): array
     {
-        parent::testGetTableNameParts($tableName, ...$expected);
+        return [
+            ['test', 'test', ],
+            ['te\'st', 'te\'st', ],
+            ['te"st', 'te"st', ],
+            ['current-table-name', 'current-table-name', ],
+            ['`current-table-name`', 'current-table-name', ],
+        ];
+    }
+
+    /**
+     * @return string[][]
+     */
+    public function simpleColumnNamesProvider(): array
+    {
+        return [
+            ['test', '`test`', 'test'],
+            ['`test`', '`test`', 'test'],
+            ['*', '*', '*'],
+        ];
+    }
+
+    /**
+     * @return string[][]
+     */
+    public function columnNamesProvider(): array
+    {
+        return [
+            ['*', '*'],
+            ['table.*', '`table`.*'],
+            ['`table`.*', '`table`.*'],
+            ['table.column', '`table`.`column`'],
+            ['`table`.column', '`table`.`column`'],
+            ['table.`column`', '`table`.`column`'],
+            ['`table`.`column`', '`table`.`column`'],
+        ];
     }
 }
