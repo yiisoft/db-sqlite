@@ -271,4 +271,44 @@ final class SchemaTest extends CommonSchemaTest
     {
         parent::testTableSchemaConstraintsWithPdoUppercase($tableName, $type, $expected);
     }
+
+    public function testWorkWithUniqueConstraint(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addUnique is not supported by SQLite.'
+        );
+
+        parent::testWorkWithUniqueConstraint();
+    }
+
+    public function testWorkWithCheckConstraint(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCheck is not supported by SQLite.'
+        );
+
+        parent::testWorkWithCheckConstraint();
+    }
+
+    public function testWorkWithDefaultValueConstraint(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addDefaultValue is not supported by SQLite.'
+        );
+
+        parent::testWorkWithDefaultValueConstraint();
+    }
+
+    public function testWorkWithPrimaryKeyConstraint(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addPrimaryKey is not supported by SQLite.'
+        );
+
+        parent::testWorkWithPrimaryKeyConstraint();
+    }
 }
