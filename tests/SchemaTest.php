@@ -9,6 +9,7 @@ use Yiisoft\Db\Constraint\CheckConstraint;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Sqlite\QueryBuilder;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonSchemaTest;
 
@@ -270,5 +271,45 @@ final class SchemaTest extends CommonSchemaTest
     public function testTableSchemaConstraintsWithPdoUppercase(string $tableName, string $type, mixed $expected): void
     {
         parent::testTableSchemaConstraintsWithPdoUppercase($tableName, $type, $expected);
+    }
+
+    public function testWorkWithUniqueConstraint(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addUnique is not supported by SQLite.'
+        );
+
+        parent::testWorkWithUniqueConstraint();
+    }
+
+    public function testWorkWithCheckConstraint(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCheck is not supported by SQLite.'
+        );
+
+        parent::testWorkWithCheckConstraint();
+    }
+
+    public function testWorkWithDefaultValueConstraint(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addDefaultValue is not supported by SQLite.'
+        );
+
+        parent::testWorkWithDefaultValueConstraint();
+    }
+
+    public function testWorkWithPrimaryKeyConstraint(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addPrimaryKey is not supported by SQLite.'
+        );
+
+        parent::testWorkWithPrimaryKeyConstraint();
     }
 }
