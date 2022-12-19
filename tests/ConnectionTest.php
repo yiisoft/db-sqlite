@@ -81,7 +81,6 @@ final class ConnectionTest extends CommonConnectionTest
         $db->close();
     }
 
-
     /**
      * @throws Exception
      * @throws InvalidConfigException
