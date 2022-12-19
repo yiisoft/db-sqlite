@@ -9,8 +9,6 @@ use Yiisoft\Db\Tests\Common\CommonCommandPDOTest;
 
 /**
  * @group sqlite
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class CommandPDOTest extends CommonCommandPDOTest
 {

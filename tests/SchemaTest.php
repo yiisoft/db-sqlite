@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
-use JsonException;
 use Throwable;
 use Yiisoft\Db\Constraint\CheckConstraint;
 use Yiisoft\Db\Exception\Exception;
@@ -245,7 +244,6 @@ final class SchemaTest extends CommonSchemaTest
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::constraints()
      *
      * @throws Exception
-     * @throws JsonException
      */
     public function testTableSchemaConstraints(string $tableName, string $type, mixed $expected): void
     {
@@ -257,7 +255,6 @@ final class SchemaTest extends CommonSchemaTest
      *
      * @throws Exception
      * @throws InvalidConfigException
-     * @throws JsonException
      * @throws NotSupportedException
      */
     public function testTableSchemaConstraintsWithPdoLowercase(string $tableName, string $type, mixed $expected): void
@@ -269,7 +266,6 @@ final class SchemaTest extends CommonSchemaTest
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::constraints()
      *
      * @throws Exception
-     * @throws JsonException
      */
     public function testTableSchemaConstraintsWithPdoUppercase(string $tableName, string $type, mixed $expected): void
     {

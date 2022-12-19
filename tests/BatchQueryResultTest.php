@@ -9,8 +9,6 @@ use Yiisoft\Db\Tests\Common\CommonBatchQueryResultTest;
 
 /**
  * @group sqlite
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class BatchQueryResultTest extends CommonBatchQueryResultTest
 {
