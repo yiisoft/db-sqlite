@@ -351,6 +351,21 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         );
     }
 
+    public function testCreateIndexWithSchema(): void
+    {
+        $db = $this->getConnection();
+
+        $command = $db->createCommand();
+        $qb = $db->getQueryBuilder();
+
+        $this->assertSame(
+            <<<SQL
+            CREATE INDEX `myschema`.`myindex` ON `myindex` (`C_index_1`)
+            SQL,
+            $qb->createIndex('myindex', 'myschema' . '.' . 'myindex', 'C_index_1'),
+        );
+    }
+
     /**
      * @throws Exception
      * @throws InvalidConfigException
