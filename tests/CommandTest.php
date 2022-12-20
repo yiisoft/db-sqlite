@@ -17,7 +17,6 @@ use function version_compare;
 /**
  * @group sqlite
  *
- * @psalm-suppress MixedMethodCall
  * @psalm-suppress PropertyNotSetInConstructor
  */
 final class CommandTest extends CommonCommandTest
@@ -84,6 +83,9 @@ final class CommandTest extends CommonCommandTest
 
     /**
      * @dataProvider \Yiisoft\Db\Tests\Provider\CommandProvider::addForeignKey()
+     *
+     * @throws Exception
+     * @throws Throwable
      */
     public function testAddForeignKey(
         string $name,
@@ -100,6 +102,9 @@ final class CommandTest extends CommonCommandTest
 
     /**
      * @dataProvider \Yiisoft\Db\Tests\Provider\CommandProvider::addPrimaryKey()
+     *
+     * @throws Exception
+     * @throws Throwable
      */
     public function testAddPrimaryKey(string $name, string $tableName, array|string $column): void
     {
@@ -111,6 +116,9 @@ final class CommandTest extends CommonCommandTest
 
     /**
      * @dataProvider \Yiisoft\Db\Tests\Provider\CommandProvider::addUnique()
+     *
+     * @throws Exception
+     * @throws Throwable
      */
     public function testAddUnique(string $name, string $tableName, array|string $column): void
     {
@@ -139,6 +147,9 @@ final class CommandTest extends CommonCommandTest
 
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::batchInsert()
+     *
+     * @throws Exception
+     * @throws Throwable
      */
     public function testBatchInsert(
         string $table,
@@ -443,6 +454,9 @@ final class CommandTest extends CommonCommandTest
 
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::update()
+     *
+     * @throws Exception
+     * @throws Throwable
      */
     public function testUpdate(
         string $table,
@@ -458,7 +472,7 @@ final class CommandTest extends CommonCommandTest
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::upsert()
      *
      * @throws Exception
-     * @throws InvalidConfigException
+     * @throws Throwable
      */
     public function testUpsert(array $firstData, array $secondData): void
     {

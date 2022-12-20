@@ -13,17 +13,17 @@ use Yiisoft\Db\Tests\Support\DbHelper;
 
 trait TestTrait
 {
+    private string $dsn = 'sqlite::memory:';
+
     /**
      * @throws Exception
      * @throws InvalidConfigException
      */
     protected function getConnection(bool $fixture = false): ConnectionPDOInterface
     {
-        $db = new ConnectionPDO(
-            new PDODriver('sqlite::memory:'),
-            DbHelper::getQueryCache(),
-            DbHelper::getSchemaCache(),
-        );
+        $pdoDriver = new PDODriver($this->dsn);
+
+        $db = new ConnectionPDO($pdoDriver, DbHelper::getQueryCache(), DbHelper::getSchemaCache());
 
         if ($fixture) {
             DbHelper::loadFixture($db, __DIR__ . '/Fixture/sqlite.sql');
@@ -35,5 +35,10 @@ trait TestTrait
     protected function getDriverName(): string
     {
         return 'sqlite';
+    }
+
+    protected function setDsn(string $dsn): void
+    {
+        $this->dsn = $dsn;
     }
 }

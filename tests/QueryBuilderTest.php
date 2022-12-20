@@ -170,7 +170,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::alterColumn is not supported by SQLite.');
 
-        $qb->alterColumn('customer', 'email', (string) Schema::TYPE_STRING);
+        $qb->alterColumn('customer', 'email', Schema::TYPE_STRING);
     }
 
     /**
@@ -348,6 +348,21 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             PRAGMA foreign_keys=0
             SQL,
             $qb->checkIntegrity('', 'customer', false),
+        );
+    }
+
+    public function testCreateIndexWithSchema(): void
+    {
+        $db = $this->getConnection();
+
+        $command = $db->createCommand();
+        $qb = $db->getQueryBuilder();
+
+        $this->assertSame(
+            <<<SQL
+            CREATE INDEX `myschema`.`myindex` ON `myindex` (`C_index_1`)
+            SQL,
+            $qb->createIndex('myindex', 'myschema' . '.' . 'myindex', 'C_index_1'),
         );
     }
 
@@ -561,6 +576,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::insertEx()
+     *
+     * @throws Exception
      */
     public function testInsertEx(
         string $table,
