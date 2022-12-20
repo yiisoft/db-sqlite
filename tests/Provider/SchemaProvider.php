@@ -242,7 +242,7 @@ final class SchemaProvider extends AbstractSchemaProvider
                         'defaultValue' => null,
                     ],
                 ],
-                'animal'
+                'animal',
             ],
         ];
     }
