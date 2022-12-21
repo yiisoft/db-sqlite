@@ -326,7 +326,7 @@ final class Schema extends AbstractSchema
      *
      * @return ColumnSchemaBuilder column schema builder instance.
      *
-     * @psalm-param array<array-key, string>|int|null|string $length
+     * @psalm-param string[]|int[]|int|null|string $length
      */
     public function createColumnSchemaBuilder(string $type, array|int|string $length = null): ColumnSchemaBuilder
     {
