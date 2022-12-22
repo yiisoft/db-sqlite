@@ -158,6 +158,12 @@ final class QueryBuilderProvider extends AbstractQueryBuilderProvider
                 INSERT OR IGNORE INTO `T_upsert_1` (`a`) VALUES (:qp0)
                 SQL,
             ],
+            // @todo - SQL code have a bug. Need fix in next PR
+            'no columns to update with unique' => [
+                3 => <<<SQL
+                WITH "EXCLUDED" (`email`) AS (VALUES (:qp0)) UPDATE {{%T_upsert}} SET  WHERE {{%T_upsert}}.`email`=(SELECT `email` FROM `EXCLUDED`); INSERT OR IGNORE INTO {{%T_upsert}} (`email`) VALUES (:qp0);
+                SQL,
+            ],
         ];
 
         $upsert = parent::upsert();
