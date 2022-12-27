@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests;
 
 use JsonException;
-use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -16,7 +15,6 @@ use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
-use Yiisoft\Db\Tests\Support\Assert;
 
 /**
  * @group sqlite
