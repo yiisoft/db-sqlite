@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests;
 
 use JsonException;
-use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -16,7 +15,6 @@ use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
-use Yiisoft\Db\Tests\Support\Assert;
 
 /**
  * @group sqlite
@@ -708,7 +706,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string $table,
         array|QueryInterface $insertColumns,
         array|bool $updateColumns,
-        string|array $expectedSQL,
+        string $expectedSQL,
         array $expectedParams
     ): void {
         $db = $this->getConnection(true);
@@ -716,16 +714,19 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $actualParams = [];
         $actualSQL = $db->getQueryBuilder()->upsert($table, $insertColumns, $updateColumns, $actualParams);
 
-        if (is_string($expectedSQL)) {
-            $this->assertSame($expectedSQL, $actualSQL);
-        } else {
-            $this->assertContains($actualSQL, $expectedSQL);
-        }
+        $this->assertSame($expectedSQL, $actualSQL);
 
-        if (ArrayHelper::isAssociative($expectedParams)) {
-            $this->assertSame($expectedParams, $actualParams);
-        } else {
-            Assert::isOneOf($actualParams, $expectedParams);
-        }
+        $this->assertSame($expectedParams, $actualParams);
+    }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::upsert()
+     */
+    public function testUpsertExecute(
+        string $table,
+        array|QueryInterface $insertColumns,
+        array|bool $updateColumns
+    ): void {
+        parent::testUpsertExecute($table, $insertColumns, $updateColumns);
     }
 }

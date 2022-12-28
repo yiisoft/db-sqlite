@@ -131,6 +131,10 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
             }
         }
 
+        if ($updateColumns === []) {
+            return $insertSql;
+        }
+
         /** @var array $params */
         $updateSql = 'WITH "EXCLUDED" ('
             . implode(', ', $insertNames)
