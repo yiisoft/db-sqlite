@@ -72,6 +72,14 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         bool|array $updateColumns,
         array &$params
     ): string {
+        if (!$insertColumns instanceof QueryInterface) {
+            $insertColumns = $this->normalizeColumnNames($table, $insertColumns);
+        }
+
+        if (!is_bool($updateColumns)) {
+            $updateColumns = $this->normalizeColumnNames($table, $updateColumns);
+        }
+
         /** @var Constraint[] $constraints */
         $constraints = [];
 
