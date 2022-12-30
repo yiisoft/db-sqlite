@@ -42,12 +42,10 @@ final class Dsn extends AbstractDsn
      */
     public function asString(): string
     {
-        $dsn = match ($this->databaseName) {
+        return match ($this->databaseName) {
             'memory' => $this->driver . '::memory:',
             '' => $this->driver . ':',
             default => $this->driver . ':' . $this->databaseName,
         };
-
-        return $dsn;
     }
 }
