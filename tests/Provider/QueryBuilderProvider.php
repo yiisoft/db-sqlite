@@ -130,22 +130,22 @@ final class QueryBuilderProvider extends AbstractQueryBuilderProvider
             ],
             'values and expressions' => [
                 3 => <<<SQL
-                WITH "EXCLUDED" (`email`, [[ts]]) AS (VALUES (:qp0, CURRENT_TIMESTAMP)) UPDATE {{%T_upsert}} SET [[ts]]=(SELECT [[ts]] FROM `EXCLUDED`) WHERE {{%T_upsert}}.`email`=(SELECT `email` FROM `EXCLUDED`); INSERT OR IGNORE INTO {{%T_upsert}} (`email`, [[ts]]) VALUES (:qp0, CURRENT_TIMESTAMP);
+                WITH "EXCLUDED" (`email`, `ts`) AS (VALUES (:qp0, CURRENT_TIMESTAMP)) UPDATE {{%T_upsert}} SET `ts`=(SELECT `ts` FROM `EXCLUDED`) WHERE {{%T_upsert}}.`email`=(SELECT `email` FROM `EXCLUDED`); INSERT OR IGNORE INTO {{%T_upsert}} (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP);
                 SQL,
             ],
             'values and expressions with update part' => [
                 3 => <<<SQL
-                WITH "EXCLUDED" (`email`, [[ts]]) AS (VALUES (:qp0, CURRENT_TIMESTAMP)) UPDATE {{%T_upsert}} SET [[orders]]=T_upsert.orders + 1 WHERE {{%T_upsert}}.`email`=(SELECT `email` FROM `EXCLUDED`); INSERT OR IGNORE INTO {{%T_upsert}} (`email`, [[ts]]) VALUES (:qp0, CURRENT_TIMESTAMP);
+                WITH "EXCLUDED" (`email`, `ts`) AS (VALUES (:qp0, CURRENT_TIMESTAMP)) UPDATE {{%T_upsert}} SET `orders`=T_upsert.orders + 1 WHERE {{%T_upsert}}.`email`=(SELECT `email` FROM `EXCLUDED`); INSERT OR IGNORE INTO {{%T_upsert}} (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP);
                 SQL,
             ],
             'values and expressions without update part' => [
                 3 => <<<SQL
-                INSERT OR IGNORE INTO {{%T_upsert}} (`email`, [[ts]]) VALUES (:qp0, CURRENT_TIMESTAMP)
+                INSERT OR IGNORE INTO {{%T_upsert}} (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP)
                 SQL,
             ],
             'query, values and expressions with update part' => [
                 3 => <<<SQL
-                WITH "EXCLUDED" (`email`, [[ts]]) AS (SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]) UPDATE {{%T_upsert}} SET `ts`=:qp1, [[orders]]=T_upsert.orders + 1 WHERE {{%T_upsert}}.`email`=(SELECT `email` FROM `EXCLUDED`); INSERT OR IGNORE INTO {{%T_upsert}} (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]];
+                WITH "EXCLUDED" (`email`, [[ts]]) AS (SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]) UPDATE {{%T_upsert}} SET `ts`=:qp1, `orders`=T_upsert.orders + 1 WHERE {{%T_upsert}}.`email`=(SELECT `email` FROM `EXCLUDED`); INSERT OR IGNORE INTO {{%T_upsert}} (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]];
                 SQL,
             ],
             'query, values and expressions without update part' => [
