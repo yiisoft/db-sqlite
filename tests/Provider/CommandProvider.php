@@ -13,9 +13,6 @@ final class CommandProvider extends AbstractCommandProvider
 
     public function batchInsert(): array
     {
-        $batchInsertSql = parent::batchInsert();
-        unset($batchInsertSql['wrongBehavior']);
-
-        return $batchInsertSql;
+        return parent::batchInsert();
     }
 }
