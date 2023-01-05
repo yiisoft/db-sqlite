@@ -14,6 +14,7 @@ DROP TABLE IF EXISTS "null_values";
 DROP TABLE IF EXISTS "negative_default_values";
 DROP TABLE IF EXISTS "animal";
 DROP TABLE IF EXISTS "default_pk";
+DROP TABLE IF EXISTS "notauto_pk";
 DROP VIEW IF EXISTS "animal_view";
 DROP TABLE IF EXISTS "T_constraints_4";
 DROP TABLE IF EXISTS "T_constraints_3";
@@ -152,6 +153,13 @@ CREATE TABLE "default_pk" (
   id INTEGER NOT NULL DEFAULT 5,
   type VARCHAR(255) NOT NULL,
   PRIMARY KEY (id)
+);
+
+CREATE TABLE "notauto_pk" (
+  id_1 INTEGER,
+  id_2 INTEGER,
+  type VARCHAR(255) NOT NULL,
+  PRIMARY KEY (id_1, id_2)
 );
 
 CREATE VIEW "animal_view" AS SELECT * FROM "animal";
