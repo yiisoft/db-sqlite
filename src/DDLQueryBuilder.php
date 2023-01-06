@@ -102,7 +102,8 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws Exception|InvalidArgumentException
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public function createIndex(
         string $name,
