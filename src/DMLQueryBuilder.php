@@ -34,7 +34,8 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
     }
 
     /**
-     * @throws ExceptionInvalidArgumentException
+     * @throws Exception
+     * @throws InvalidArgumentException
      * @throws InvalidConfigException
      * @throws NotSupportedException
      */
@@ -123,7 +124,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 
         foreach ($constraints as $constraint) {
             $constraintCondition = ['and'];
-            /** @psalm-var string[] $columnNames */
+            /** @psalm-var string[] $columnsNames */
             $columnsNames = $constraint->getColumnNames();
             foreach ($columnsNames as $name) {
                 $quotedName = $this->quoter->quoteColumnName($name);
