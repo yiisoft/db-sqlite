@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite;
 
 use ArrayAccess;
+use Stringable;
 
 use function array_splice;
 use function count;
@@ -22,7 +23,7 @@ use function reset;
  * read-only.
  * @property string $sql SQL code. This property is read-only.
  */
-final class SqlToken implements ArrayAccess, \Stringable
+final class SqlToken implements ArrayAccess, Stringable
 {
     public const TYPE_CODE = 0;
     public const TYPE_STATEMENT = 1;

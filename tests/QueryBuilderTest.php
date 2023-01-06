@@ -586,7 +586,9 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         array $expectedParams
     ): void {
         $this->expectException(NotSupportedException::class);
-        $this->expectExceptionMessage('Yiisoft\Db\QueryBuilder\DMLQueryBuilder::insertWithReturningPks() is not supported by this DBMS.');
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\DMLQueryBuilder::insertWithReturningPks() is not supported by SQLite.'
+        );
 
         $db = $this->getConnection(true);
         $qb = $db->getQueryBuilder();
