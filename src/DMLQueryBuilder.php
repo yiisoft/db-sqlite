@@ -13,9 +13,9 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
-use Yiisoft\Db\QueryBuilder\DMLQueryBuilder as AbstractDMLQueryBuilder;
-use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 use Yiisoft\Db\Query\QueryInterface;
+use Yiisoft\Db\QueryBuilder\AbstractDMLQueryBuilder;
+use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 
@@ -34,7 +34,19 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
     }
 
     /**
-     * @throws Exception|Throwable
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     */
+    public function insertWithReturningPks(string $table, QueryInterface|array $columns, array &$params = []): string
+    {
+        throw new NotSupportedException(__METHOD__ . '() is not supported by SQLite.');
+    }
+
+    /**
+     * @throws Exception
+     * @throws Throwable
      */
     public function resetSequence(string $tableName, int|string $value = null): string
     {
@@ -64,7 +76,11 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
     }
 
     /**
-     * @throws Exception|InvalidArgumentException|InvalidConfigException|JsonException|NotSupportedException
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws JsonException
+     * @throws NotSupportedException
      */
     public function upsert(
         string $table,
@@ -72,7 +88,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         bool|array $updateColumns,
         array &$params
     ): string {
-        /** @var Constraint[] $constraints */
+        /** @psalm-var Constraint[] $constraints */
         $constraints = [];
 
         /**
@@ -91,9 +107,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
             return $this->insert($table, $insertColumns, $params);
         }
 
-        /**
-         * @psalm-var string[] $placeholders
-         */
+        /** @psalm-var string[] $placeholders */
         [, $placeholders, $values, $params] = $this->prepareInsertValues($table, $insertColumns, $params);
 
         $insertSql = 'INSERT OR IGNORE INTO '
@@ -110,7 +124,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 
         foreach ($constraints as $constraint) {
             $constraintCondition = ['and'];
-            /** @psalm-var string[] */
+            /** @psalm-var string[] $columnsNames */
             $columnsNames = $constraint->getColumnNames();
             foreach ($columnsNames as $name) {
                 $quotedName = $this->quoter->quoteColumnName($name);
@@ -135,7 +149,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
             return $insertSql;
         }
 
-        /** @var array $params */
+        /** @psalm-var array $params */
         $updateSql = 'WITH "EXCLUDED" ('
             . implode(', ', $insertNames)
             . ') AS (' . (!empty($placeholders)
