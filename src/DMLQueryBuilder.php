@@ -41,7 +41,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
      */
     public function insertWithReturningPks(string $table, QueryInterface|array $columns, array &$params = []): string
     {
-        throw new NotSupportedException(__METHOD__ . '() is not supported by this DBMS.');
+        throw new NotSupportedException(__METHOD__ . '() is not supported by SQLite.');
     }
 
     /**
