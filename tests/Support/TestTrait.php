@@ -24,8 +24,7 @@ trait TestTrait
     {
         $db = new ConnectionPDO(
             new PDODriver($this->getDsn()),
-            DbHelper::getQueryCache(),
-            DbHelper::getSchemaCache(),
+            DbHelper::getSchemaCache()
         );
 
         if ($fixture) {
