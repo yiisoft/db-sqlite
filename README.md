@@ -44,7 +44,7 @@ The package could be installed via composer:
 composer require yiisoft/db-sqlite
 ```
 
-### Installation with [YiiFramework]
+### Config with [YiiFramework]
 
 The configuration with [container di](https://github.com/yiisoft/di) of [YiiFramework].
 
@@ -86,7 +86,7 @@ return [
 ];
 ```
 
-### Installation without [YiiFramework]
+### Config without [YiiFramework]
 
 ```php
 <?php
