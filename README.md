@@ -11,11 +11,11 @@
 
 **Yii DataBase SQLite Extension** is a package for working with [SQLite] databases in PHP. It is a part of the [YiiFramework], which is a high-performance, component-based framework for developing modern web applications.
 
-The `yiisoft/db-sqlite` package provides a set of classes for interacting with [SQLite] databases in PHP. It includes a database connection class, a command builder class, and a set of classes for representing database tables and rows as PHP objects.
+**Yii DataBase SQLite Extension** package provides a set of classes for interacting with [SQLite] databases in PHP. It includes a database connection class, a command builder class, and a set of classes for representing database tables and rows as PHP objects.
 
-Using the `yiisoft/db-sqlite` package, you can perform a variety of tasks with [SQLite] databases in PHP, such as connecting to a database, executing SQL queries, and working with database transactions. You can also use it to create and manipulate database tables and rows, and to perform advanced database operations such as joins and aggregates.
+Using the **Yii DataBase SQLite Extension** package, you can perform a variety of tasks with [SQLite] databases in PHP, such as connecting to a database, executing SQL queries, and working with database transactions. You can also use it to create and manipulate database tables and rows, and to perform advanced database operations such as joins and aggregates.
 
-Overall, `yiisoft/db-sqlite` is a powerful tool for working with [SQLite] databases in PHP, and is well-suited for use in web applications built with the [YiiFramework].
+Overall, **Yii DataBase SQLite Extension** is a powerful tool for working with [SQLite] databases in PHP, and is well-suited for use in web applications built with the [YiiFramework].
 
 It is used in [Yii Framework] but can be used separately.
 
