@@ -17,7 +17,7 @@ Using the **Yii DataBase SQLite Extension** package, you can perform a variety o
 
 Overall, **Yii DataBase SQLite Extension** is a powerful tool for working with [SQLite] databases in PHP, and is well-suited for use in web applications built with the [YiiFramework].
 
-It is used in [Yii Framework] but can be used separately.
+It is used in [YiiFramework] but can be used separately.
 
 [SQLite]: https://www.sqlite.org/
 [YiiFramework]: https://github.com/yiisoft/core
