@@ -60,6 +60,8 @@ declare(strict_types=1);
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Sqlite\ConnectionPDO;
 
+/** @var array $params */
+
 return [
     ConnectionInterface::class => [
         'class' => ConnectionPDO::class,
