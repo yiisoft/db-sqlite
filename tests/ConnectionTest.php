@@ -11,6 +11,7 @@ use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Profiler\ProfilerInterface;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonConnectionTest;
 use Yiisoft\Db\Tests\Support\DbHelper;
@@ -45,25 +46,25 @@ final class ConnectionTest extends CommonConnectionTest
 
         /* profiling and logging */
         $db->setLogger(DbHelper::getLogger());
-        $db->setProfiler(DbHelper::getProfiler());
+        $db->setProfiler($this->createProfiler());
 
         $this->runExceptionTest($db);
 
         /* profiling only */
         $db->setLogger(new NullLogger());
-        $db->setProfiler(DbHelper::getProfiler());
+        $db->setProfiler($this->createProfiler());
 
         $this->runExceptionTest($db);
 
         /* logging only */
         $db->setLogger(DbHelper::getLogger());
-        $db->notProfiler();
+        $db->setProfiler(null);
 
         $this->runExceptionTest($db);
 
         /* disabled */
         $db->setLogger(new NullLogger());
-        $db->notProfiler();
+        $db->setProfiler(null);
 
         $this->runExceptionTest($db);
     }
@@ -172,5 +173,10 @@ final class ConnectionTest extends CommonConnectionTest
         }
 
         $this->assertTrue($thrown, 'An exception should have been thrown by the command.');
+    }
+
+    private function createProfiler(): ProfilerInterface
+    {
+        return $this->createMock(ProfilerInterface::class);
     }
 }
