@@ -101,6 +101,7 @@ use Yiisoft\Cache\Cache;
 use Yiisoft\Db\Cache\SchemaCache;
 use Yiisoft\Db\Sqlite\ConnectionPDO;
 use Yiisoft\Db\Sqlite\Dsn;
+use Yiisoft\Db\Sqlite\PDODriver;
 
 // Or any other PSR-16 cache implementation.
 $arrayCache = new ArrayCache();
