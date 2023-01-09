@@ -6,7 +6,6 @@ namespace Yiisoft\Db\Sqlite;
 
 use Yiisoft\Db\QueryBuilder\AbstractQueryBuilder;
 use Yiisoft\Db\Schema\QuoterInterface;
-use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Schema\SchemaInterface;
 
 final class QueryBuilder extends AbstractQueryBuilder

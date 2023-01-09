@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use Stringable;
-use Yiisoft\Db\Schema\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
+use Yiisoft\Db\Schema\AbstractColumnSchemaBuilder;
 
-final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder implements Stringable
+final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
 {
     /**
      * Builds the unsigned string for column. Defaults to unsupported.

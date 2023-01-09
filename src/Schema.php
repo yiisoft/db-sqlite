@@ -16,9 +16,8 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Schema\ColumnSchema;
+use Yiisoft\Db\Schema\AbstractSchema;
 use Yiisoft\Db\Schema\ColumnSchemaInterface;
-use Yiisoft\Db\Schema\Schema as AbstractSchema;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
