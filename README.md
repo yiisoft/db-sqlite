@@ -36,7 +36,7 @@ It is used in [YiiFramework] but can be used separately.
 |**8.0 - 8.2**| **3:latest**|[![build](https://github.com/yiisoft/db-sqlite/actions/workflows/build.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-sqlite/actions/workflows/build.yml) [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-sqlite%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-sqlite/master) [![static analysis](https://github.com/yiisoft/db-sqlite/actions/workflows/static.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-sqlite/actions/workflows/static.yml) [![type-coverage](https://shepherd.dev/github/yiisoft/db-sqlite/coverage.svg)](https://shepherd.dev/github/yiisoft/db-sqlite)
 
 
-### Installation
+### Installation with [YiiFramework]
 
 The package could be installed via composer:
 
@@ -80,6 +80,31 @@ return [
         'dsn' => (new PDODriver('sqlite', 'memory'))->asString(),
     ]
 ];
+```
+
+### Installation without [YiiFramework]
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Yiisoft\Cache\ArrayCache;
+use Yiisoft\Cache\Cache;
+use Yiisoft\Db\Cache\SchemaCache;
+use Yiisoft\Db\Sqlite\ConnectionPDO;
+use Yiisoft\Db\Sqlite\PDODriver;
+
+// Or any other PSR-16 cache implementation.
+$arrayCache = new ArrayCache();
+
+// Or any other PSR-6 cache implementation.
+$cache = new Cache($arrayCache); 
+
+// Or any other PDO driver.
+$pdoDriver = new PDODriver('sqlite', 'memory'); 
+$schemaCache = new SchemaCache($cache);
+$db = new ConnectionPDO($pdoDriver, $schemaCache);
 ```
 
 ### Unit testing
