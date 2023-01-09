@@ -36,7 +36,7 @@ It is used in [YiiFramework] but can be used separately.
 |**8.0 - 8.2**| **3:latest**|[![build](https://github.com/yiisoft/db-sqlite/actions/workflows/build.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-sqlite/actions/workflows/build.yml) [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-sqlite%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-sqlite/master) [![static analysis](https://github.com/yiisoft/db-sqlite/actions/workflows/static.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-sqlite/actions/workflows/static.yml) [![type-coverage](https://shepherd.dev/github/yiisoft/db-sqlite/coverage.svg)](https://shepherd.dev/github/yiisoft/db-sqlite)
 
 
-### Installation with [YiiFramework]
+### Installation
 
 The package could be installed via composer:
 
@@ -44,7 +44,11 @@ The package could be installed via composer:
 composer require yiisoft/db-sqlite
 ```
 
-## Configuration
+### Installation with [YiiFramework]
+
+The configuration with [container di](https://github.com/yiisoft/di) of [YiiFramework].
+
+Also you can use any container di which implements [PSR-11](https://www.php-fig.org/psr/psr-11/).
 
 db.php
 
