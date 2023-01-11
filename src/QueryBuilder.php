@@ -6,7 +6,6 @@ namespace Yiisoft\Db\Sqlite;
 
 use Yiisoft\Db\QueryBuilder\AbstractQueryBuilder;
 use Yiisoft\Db\Schema\QuoterInterface;
-use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Schema\SchemaInterface;
 
 final class QueryBuilder extends AbstractQueryBuilder
@@ -17,27 +16,27 @@ final class QueryBuilder extends AbstractQueryBuilder
      * @psalm-var string[] $typeMap
      */
     protected array $typeMap = [
-        Schema::TYPE_PK => 'integer PRIMARY KEY AUTOINCREMENT NOT NULL',
-        Schema::TYPE_UPK => 'integer PRIMARY KEY AUTOINCREMENT NOT NULL',
-        Schema::TYPE_BIGPK => 'integer PRIMARY KEY AUTOINCREMENT NOT NULL',
-        Schema::TYPE_UBIGPK => 'integer PRIMARY KEY AUTOINCREMENT NOT NULL',
-        Schema::TYPE_CHAR => 'char(1)',
-        Schema::TYPE_STRING => 'varchar(255)',
-        Schema::TYPE_TEXT => 'text',
-        Schema::TYPE_TINYINT => 'tinyint',
-        Schema::TYPE_SMALLINT => 'smallint',
-        Schema::TYPE_INTEGER => 'integer',
-        Schema::TYPE_BIGINT => 'bigint',
-        Schema::TYPE_FLOAT => 'float',
-        Schema::TYPE_DOUBLE => 'double',
-        Schema::TYPE_DECIMAL => 'decimal(10,0)',
-        Schema::TYPE_DATETIME => 'datetime',
-        Schema::TYPE_TIMESTAMP => 'timestamp',
-        Schema::TYPE_TIME => 'time',
-        Schema::TYPE_DATE => 'date',
-        Schema::TYPE_BINARY => 'blob',
-        Schema::TYPE_BOOLEAN => 'boolean',
-        Schema::TYPE_MONEY => 'decimal(19,4)',
+        SchemaInterface::TYPE_PK => 'integer PRIMARY KEY AUTOINCREMENT NOT NULL',
+        SchemaInterface::TYPE_UPK => 'integer PRIMARY KEY AUTOINCREMENT NOT NULL',
+        SchemaInterface::TYPE_BIGPK => 'integer PRIMARY KEY AUTOINCREMENT NOT NULL',
+        SchemaInterface::TYPE_UBIGPK => 'integer PRIMARY KEY AUTOINCREMENT NOT NULL',
+        SchemaInterface::TYPE_CHAR => 'char(1)',
+        SchemaInterface::TYPE_STRING => 'varchar(255)',
+        SchemaInterface::TYPE_TEXT => 'text',
+        SchemaInterface::TYPE_TINYINT => 'tinyint',
+        SchemaInterface::TYPE_SMALLINT => 'smallint',
+        SchemaInterface::TYPE_INTEGER => 'integer',
+        SchemaInterface::TYPE_BIGINT => 'bigint',
+        SchemaInterface::TYPE_FLOAT => 'float',
+        SchemaInterface::TYPE_DOUBLE => 'double',
+        SchemaInterface::TYPE_DECIMAL => 'decimal(10,0)',
+        SchemaInterface::TYPE_DATETIME => 'datetime',
+        SchemaInterface::TYPE_TIMESTAMP => 'timestamp',
+        SchemaInterface::TYPE_TIME => 'time',
+        SchemaInterface::TYPE_DATE => 'date',
+        SchemaInterface::TYPE_BINARY => 'blob',
+        SchemaInterface::TYPE_BOOLEAN => 'boolean',
+        SchemaInterface::TYPE_MONEY => 'decimal(19,4)',
     ];
     private DDLQueryBuilder $ddlBuilder;
     private DMLQueryBuilder $dmlBuilder;
