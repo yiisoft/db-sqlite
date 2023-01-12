@@ -8,7 +8,7 @@ use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Schema\Schema;
+use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonCommandTest;
 
@@ -389,7 +389,7 @@ final class CommandTest extends CommonCommandTest
 
         $command->createTable(
             '{{testCreateTable}}',
-            ['id' => Schema::TYPE_PK, 'bar' => Schema::TYPE_INTEGER],
+            ['id' => SchemaInterface::TYPE_PK, 'bar' => SchemaInterface::TYPE_INTEGER],
         )->execute();
 
         $command->insert('{{testCreateTable}}', ['bar' => 1])->execute();
