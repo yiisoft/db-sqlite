@@ -17,6 +17,7 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Schema\AbstractSchema;
+use Yiisoft\Db\Schema\ColumnSchemaBuilderInterface;
 use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 use Yiisoft\Db\Transaction\TransactionInterface;
@@ -125,7 +126,9 @@ final class Schema extends AbstractSchema
      *
      * @param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema.
      *
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      *
      * @return array All table names in the database. The names have NO schema name prefix.
      */
@@ -143,7 +146,10 @@ final class Schema extends AbstractSchema
      *
      * @param string $name table name.
      *
-     * @throws Exception|InvalidArgumentException|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws Throwable
      *
      * @return TableSchemaInterface|null DBMS-dependent table metadata, `null` if the table does not exist.
      */
@@ -168,7 +174,10 @@ final class Schema extends AbstractSchema
      *
      * @param string $tableName table name.
      *
-     * @throws Exception|InvalidArgumentException|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws Throwable
      *
      * @return Constraint|null primary key for the given table, `null` if the table has no primary key.
      */
@@ -184,7 +193,9 @@ final class Schema extends AbstractSchema
      *
      * @param string $tableName table name.
      *
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      *
      * @return ForeignKeyConstraint[] foreign keys for the given table.
      */
@@ -219,7 +230,10 @@ final class Schema extends AbstractSchema
      *
      * @param string $tableName table name.
      *
-     * @throws Exception|InvalidArgumentException|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws Throwable
      *
      * @return array indexes for the given table.
      *
@@ -237,7 +251,10 @@ final class Schema extends AbstractSchema
      *
      * @param string $tableName table name.
      *
-     * @throws Exception|InvalidArgumentException|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws Throwable
      *
      * @return array unique constraints for the given table.
      *
@@ -255,7 +272,10 @@ final class Schema extends AbstractSchema
      *
      * @param string $tableName table name.
      *
-     * @throws Exception|InvalidArgumentException|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws Throwable
      *
      * @return CheckConstraint[] check constraints for the given table.
      */
@@ -315,20 +335,10 @@ final class Schema extends AbstractSchema
         throw new NotSupportedException('SQLite does not support default value constraints.');
     }
 
-    /**
-     * Create a column schema builder instance giving the type and value precision.
-     *
-     * This method may be overridden by child classes to create a DBMS-specific column schema builder.
-     *
-     * @param string $type type of the column. See {@see ColumnSchemaBuilder::$type}.
-     * @param array|int|string|null $length length or precision of the column. See {@see ColumnSchemaBuilder::$length}.
-     *
-     * @return ColumnSchemaBuilder column schema builder instance.
-     *
-     * @psalm-param string[]|int[]|int|null|string $length
-     */
-    public function createColumnSchemaBuilder(string $type, array|int|string $length = null): ColumnSchemaBuilder
-    {
+    public function createColumnSchemaBuilder(
+        string $type,
+        array|int|string $length = null
+    ): ColumnSchemaBuilderInterface {
         return new ColumnSchemaBuilder($type, $length);
     }
 
@@ -337,7 +347,9 @@ final class Schema extends AbstractSchema
      *
      * @param TableSchemaInterface $table the table metadata.
      *
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      *
      * @return bool whether the table exists in the database.
      */
@@ -370,7 +382,9 @@ final class Schema extends AbstractSchema
      *
      * @param TableSchemaInterface $table the table metadata.
      *
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      */
     protected function findConstraints(TableSchemaInterface $table): void
     {
@@ -404,7 +418,9 @@ final class Schema extends AbstractSchema
      *
      * @param TableSchemaInterface $table the table metadata.
      *
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      *
      * @return array all unique indexes for the given table.
      */
@@ -506,7 +522,9 @@ final class Schema extends AbstractSchema
      *
      * @param string $tableName table name.
      *
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      */
     private function loadTableColumnsInfo(string $tableName): array
     {
@@ -523,7 +541,9 @@ final class Schema extends AbstractSchema
      * @param string $tableName table name.
      * @param string $returnType return type: (primaryKey, indexes, uniques).
      *
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      *
      * @psalm-return (Constraint|IndexConstraint)[]|Constraint|null
      */
@@ -598,7 +618,9 @@ final class Schema extends AbstractSchema
     }
 
     /**
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      */
     private function getPragmaForeignKeyList(string $tableName): array
     {
@@ -608,7 +630,9 @@ final class Schema extends AbstractSchema
     }
 
     /**
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      */
     private function getPragmaIndexInfo(string $name): array
     {
@@ -635,7 +659,9 @@ final class Schema extends AbstractSchema
     }
 
     /**
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      */
     private function getPragmaTableInfo(string $tableName): array
     {
