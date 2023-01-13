@@ -18,7 +18,7 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
         return $this->isUnsigned() ? ' UNSIGNED' : '';
     }
 
-    public function __toString(): string
+    public function asString(): string
     {
         $format = match ($this->getTypeCategory()) {
             self::CATEGORY_PK => '{type}{check}{append}',
