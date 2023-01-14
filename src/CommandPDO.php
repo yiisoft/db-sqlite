@@ -12,7 +12,6 @@ use Yiisoft\Db\Exception\ConvertException;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
-use Yiisoft\Strings\StringHelper;
 
 use function array_pop;
 use function count;
@@ -190,7 +189,7 @@ final class CommandPDO extends AbstractCommandPDO
     {
         $semicolonIndex = strpos($sql, ';');
 
-        if ($semicolonIndex === false || $semicolonIndex === StringHelper::byteLength($sql) - 1) {
+        if ($semicolonIndex === false || $semicolonIndex === mb_strlen($sql, '8bit') - 1) {
             return false;
         }
 

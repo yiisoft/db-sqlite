@@ -23,8 +23,7 @@
         "ext-mbstring": "*",
         "ext-pdo": "*",
         "yiisoft/arrays": "^2.0",
-        "yiisoft/db": "^3.0@dev",
-        "yiisoft/strings": "^2.0"
+        "yiisoft/db": "^3.0@dev"
     },
     "require-dev": {
         "ext-json": "*",
