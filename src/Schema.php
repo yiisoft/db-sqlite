@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite;
 
 use Throwable;
-use Yiisoft\Arrays\ArrayHelper;
-use Yiisoft\Arrays\ArraySorter;
 use Yiisoft\Db\Constraint\CheckConstraint;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
@@ -16,6 +14,7 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Helper\ArrayHelper;
 use Yiisoft\Db\Schema\AbstractSchema;
 use Yiisoft\Db\Schema\ColumnSchemaBuilderInterface;
 use Yiisoft\Db\Schema\ColumnSchemaInterface;
@@ -207,8 +206,8 @@ final class Schema extends AbstractSchema
         /** @psalm-var NormalizePragmaForeignKeyList $foreignKeysList */
         $foreignKeysList = $this->normalizeRowKeyCase($foreignKeysList, true);
         /** @psalm-var NormalizePragmaForeignKeyList $foreignKeysList */
-        $foreignKeysList = ArrayHelper::index($foreignKeysList, null, 'table');
-        ArraySorter::multisort($foreignKeysList, 'seq', SORT_ASC, SORT_NUMERIC);
+        $foreignKeysList = ArrayHelper::index($foreignKeysList, null, ['table']);
+        ArrayHelper::multisort($foreignKeysList, 'seq');
 
         /** @psalm-var NormalizePragmaForeignKeyList $foreignKeysList */
         foreach ($foreignKeysList as $table => $foreignKey) {
@@ -641,7 +640,7 @@ final class Schema extends AbstractSchema
             ->queryAll();
         /** @psalm-var Column $column */
         $column = $this->normalizeRowKeyCase($column, true);
-        ArraySorter::multisort($column, 'seqno', SORT_ASC, SORT_NUMERIC);
+        ArrayHelper::multisort($column, 'seqno');
 
         return $column;
     }
