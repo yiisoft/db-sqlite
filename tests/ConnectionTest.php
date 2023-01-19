@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests;
 
 use PDO;
+use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Throwable;
 use Yiisoft\Db\Connection\ConnectionInterface;
@@ -14,7 +16,6 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Profiler\ProfilerInterface;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonConnectionTest;
-use Yiisoft\Db\Tests\Support\DbHelper;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 /**
@@ -45,7 +46,7 @@ final class ConnectionTest extends CommonConnectionTest
         $db->setEmulatePrepare(true);
 
         /* profiling and logging */
-        $db->setLogger(DbHelper::getLogger());
+        $db->setLogger($this->getLogger());
         $db->setProfiler($this->createProfiler());
 
         $this->runExceptionTest($db);
@@ -57,7 +58,7 @@ final class ConnectionTest extends CommonConnectionTest
         $this->runExceptionTest($db);
 
         /* logging only */
-        $db->setLogger(DbHelper::getLogger());
+        $db->setLogger($this->getLogger());
         $db->setProfiler(null);
 
         $this->runExceptionTest($db);
@@ -132,6 +133,11 @@ final class ConnectionTest extends CommonConnectionTest
             )->queryScalar(),
             'profile should be inserted in transaction shortcut',
         );
+    }
+
+    protected function getLogger(): LoggerInterface|MockObject
+    {
+        return $this->createMock(LoggerInterface::class);
     }
 
     /**
