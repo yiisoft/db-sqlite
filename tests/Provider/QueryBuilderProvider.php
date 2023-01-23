@@ -23,7 +23,11 @@ final class QueryBuilderProvider extends AbstractQueryBuilderProvider
     {
         $buildCondition = parent::buildCondition();
 
-        unset($buildCondition['inCondition-custom-1'], $buildCondition['inCondition-custom-2']);
+        unset(
+            $buildCondition['inCondition-custom-1'],
+            $buildCondition['inCondition-custom-2'],
+            $buildCondition['inCondition-custom-6'],
+        );
 
         return array_merge($buildCondition, [
             'composite in using array objects' => [
@@ -38,6 +42,14 @@ final class QueryBuilderProvider extends AbstractQueryBuilderProvider
             'composite in' => [
                 ['in', ['id', 'name'], [['id' => 1, 'name' => 'oy']]],
                 '(([[id]] = :qp0 AND [[name]] = :qp1))',
+                [':qp0' => 1, ':qp1' => 'oy'],
+            ],
+            'composite in with Expression' => [
+                ['in',
+                    [new Expression('id'), new Expression('name')],
+                    [['id' => 1, 'name' => 'oy']],
+                ],
+                '((id = :qp0 AND name = :qp1))',
                 [':qp0' => 1, ':qp1' => 'oy'],
             ],
             'composite in array values no exist' => [
