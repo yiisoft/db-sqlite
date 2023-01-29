@@ -21,13 +21,71 @@ on:
 
 name: build
 
+#jobs:
+#  phpunit:
+#    uses: yiisoft/actions/.github/workflows/phpunit.yml@master
+#    with:
+#      composer-command: composer update --no-interaction --no-progress --optimize-autoloader --ansi
+#      extensions: pdo, pdo_sqlite
+#      os: >-
+#        ['ubuntu-latest', 'windows-latest']
+#      php: >-
+#        ['8.0', '8.1', '8.2']
+
 jobs:
-  phpunit:
-    uses: yiisoft/actions/.github/workflows/phpunit.yml@master
-    with:
-      composer-command: composer update --no-interaction --no-progress --optimize-autoloader --ansi
+  tests:
+    name: PHP ${{ matrix.php }}-sqlite-${{ matrix.os }}
+
+    env:
       extensions: pdo, pdo_sqlite
-      os: >-
-        ['ubuntu-latest', 'windows-latest']
-      php: >-
-        ['8.0', '8.1', '8.2']
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+
+        php:
+          - 8.0
+          - 8.1
+          - 8.2
+
+    steps:
+      - name: Checkout.
+        uses: actions/checkout@v3
+
+      - name: Install PHP with extensions.
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: ${{ env.extensions }}
+          ini-values: date.timezone='UTC'
+          coverage: pcov
+          tools: composer:v2
+
+      - name: Update composer.
+        run: composer self-update
+
+      - name: Install db.
+        uses: ./.github/actions/subpackage_install
+        with:
+          CURRENT_PACKAGE: db
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
+          FULL_BRANCH_NAME: ${{ env.FULL_BRANCH_NAME }}
+          COMPOSER_ROOT_VERSION: ${{ env.COMPOSER_ROOT_VERSION }}
+          WORK_PACKAGE_URL: ${{ env.WORK_PACKAGE_URL }}
+
+      - name: Install dependencies with composer.
+        run: composer update --no-interaction --no-progress --optimize-autoloader --ansi
+
+      - name: Run tests with phpunit with code coverage.
+        run: vendor/bin/phpunit --coverage-clover=coverage.xml --colors=always
+
+      - name: Upload coverage to Codecov.
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+
