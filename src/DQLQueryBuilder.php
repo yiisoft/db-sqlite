@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionBuilderInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\Query;
@@ -87,14 +86,15 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
         return [$sql, $params];
     }
 
-    public function buildLimit(Expression|int|null $limit, Expression|int|null $offset): string
+    public function buildLimit(ExpressionInterface|int|null $limit, ExpressionInterface|int|null $offset): string
     {
         $sql = '';
 
         if ($this->hasLimit($limit)) {
-            $sql = "LIMIT $limit";
+            $sql = 'LIMIT ' . ($limit instanceof ExpressionInterface ? $this->buildExpression($limit) : (string)$limit);
             if ($this->hasOffset($offset)) {
-                $sql .= " OFFSET $offset";
+                $sql .= ' OFFSET ' .
+                    ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string)$offset);
             }
         } elseif ($this->hasOffset($offset)) {
             /**
@@ -102,7 +102,8 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
              *
              * {@see http://www.sqlite.org/syntaxdiagrams.html#select-stmt}
              */
-            $sql = "LIMIT 9223372036854775807 OFFSET $offset"; // 2^63-1
+            $sql = 'LIMIT 9223372036854775807 OFFSET ' . // 2^63-1
+                ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string)$offset);
         }
 
         return $sql;

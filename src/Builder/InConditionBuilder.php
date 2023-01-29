@@ -63,8 +63,7 @@ final class InConditionBuilder extends BaseInConditionBuilder
         /** @psalm-var string[]|Traversable $columns */
         foreach ($columns as $i => $column) {
             if ($column instanceof ExpressionInterface) {
-                /** @psalm-suppress InvalidCast */
-                $quotedColumns[$i] = (string) $column;
+                $quotedColumns[$i] = $this->queryBuilder->buildExpression($column);
                 continue;
             }
             $quotedColumns[$i] = !str_contains($column, '(')
@@ -78,8 +77,7 @@ final class InConditionBuilder extends BaseInConditionBuilder
             $vs = [];
             foreach ($columns as $i => $column) {
                 if ($column instanceof ExpressionInterface) {
-                    /** @psalm-suppress InvalidCast */
-                    $column = (string)$column;
+                    $column = $this->queryBuilder->buildExpression($column);
                 }
                 if (isset($value[$column])) {
                     $phName = $this->queryBuilder->bindParam($value[$column], $params);
