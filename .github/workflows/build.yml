@@ -39,6 +39,9 @@ jobs:
           - 8.2
 
     steps:
+      - name: Update composer.
+        run: composer self-update
+
       - name: Phpunit
         uses: yiisoft/actions/.github/workflows/phpunit.yml@master
         with:
