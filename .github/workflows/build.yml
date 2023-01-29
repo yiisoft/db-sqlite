@@ -23,7 +23,7 @@ name: build
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php }}-${{ matrix.os }}-db
+    name: PHP ${{ matrix.php }}-mysql-${{ matrix.mysql }}
 
     runs-on: ${{ matrix.os }}
 
