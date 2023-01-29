@@ -23,10 +23,10 @@ name: build
 
 jobs:
   phpunit:
-        uses: yiisoft/actions/.github/workflows/phpunit.yml@master
-        with:
-          composer-command: composer update --no-interaction --no-progress --optimize-autoloader --ansi
-          extensions: pdo, pdo_sqlite
+    uses: yiisoft/actions/.github/workflows/phpunit.yml@master
+    with:
+      composer-command: composer update --no-interaction --no-progress --optimize-autoloader --ansi
+      extensions: pdo, pdo_sqlite
       os: >-
         ['ubuntu-latest', 'windows-latest']
       php: >-
