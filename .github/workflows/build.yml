@@ -42,8 +42,7 @@ jobs:
       - name: Update composer.
         run: composer self-update
 
-      - name: Phpunit
-        uses: yiisoft/actions/.github/workflows/phpunit.yml@master
+      - uses: yiisoft/actions/.github/workflows/phpunit.yml@master
         with:
           composer-command: composer update --no-interaction --no-progress --optimize-autoloader --ansi
           extensions: pdo, pdo_sqlite
