@@ -22,7 +22,8 @@ on:
 name: build
 
 jobs:
-  phpunit:
+  tests:
+    name: PHP ${{ matrix.php }}-${{ matrix.os }}-db
 
     runs-on: ${{ matrix.os }}
 
