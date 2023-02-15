@@ -48,8 +48,6 @@ final class InConditionBuilder extends BaseInConditionBuilder
     /**
      * Builds SQL for IN condition.
      *
-     * @param iterable|Iterator $values
-     *
      * @return string SQL.
      */
     protected function buildCompositeInCondition(
@@ -60,7 +58,7 @@ final class InConditionBuilder extends BaseInConditionBuilder
     ): string {
         $quotedColumns = [];
 
-        /** @psalm-var string[]|Traversable $columns */
+        /** @psalm-var string[] $columns */
         foreach ($columns as $i => $column) {
             if ($column instanceof ExpressionInterface) {
                 $quotedColumns[$i] = $this->queryBuilder->buildExpression($column);
