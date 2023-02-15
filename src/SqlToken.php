@@ -22,6 +22,8 @@ use function reset;
  * @property bool $isCollection Whether the token represents a collection of tokens. This property is
  * read-only.
  * @property string $sql SQL code. This property is read-only.
+ *
+ * @template-implements ArrayAccess<int, SqlToken>
  */
 final class SqlToken implements ArrayAccess, Stringable
 {
@@ -90,6 +92,8 @@ final class SqlToken implements ArrayAccess, Stringable
      *
      * @param mixed $offset child token offset.
      * @param mixed $value token to be added.
+     *
+     * @psalm-suppress MixedPropertyTypeCoercion
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
