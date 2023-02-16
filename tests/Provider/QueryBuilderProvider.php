@@ -7,12 +7,11 @@ namespace Yiisoft\Db\Sqlite\Tests\Provider;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\QueryBuilder\Condition\InCondition;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
-use Yiisoft\Db\Tests\Provider\AbstractQueryBuilderProvider;
 use Yiisoft\Db\Tests\Support\TraversableObject;
 
 use function array_replace;
 
-final class QueryBuilderProvider extends AbstractQueryBuilderProvider
+final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilderProvider
 {
     use TestTrait;
 
