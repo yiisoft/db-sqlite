@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
+use Closure;
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -82,7 +83,7 @@ final class CommandTest extends CommonCommandTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Tests\Provider\CommandProvider::addForeignKey()
+     * @dataProvider \Yiisoft\Db\Tests\Provider\CommandProvider::addForeignKey
      *
      * @throws Exception
      * @throws Throwable
@@ -101,7 +102,7 @@ final class CommandTest extends CommonCommandTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Tests\Provider\CommandProvider::addPrimaryKey()
+     * @dataProvider \Yiisoft\Db\Tests\Provider\CommandProvider::addPrimaryKey
      *
      * @throws Exception
      * @throws Throwable
@@ -115,7 +116,7 @@ final class CommandTest extends CommonCommandTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Tests\Provider\CommandProvider::addUnique()
+     * @dataProvider \Yiisoft\Db\Tests\Provider\CommandProvider::addUnique
      *
      * @throws Exception
      * @throws Throwable
@@ -146,7 +147,7 @@ final class CommandTest extends CommonCommandTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::batchInsert()
+     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::batchInsert
      *
      * @throws Exception
      * @throws Throwable
@@ -155,7 +156,7 @@ final class CommandTest extends CommonCommandTest
         string $table,
         array $columns,
         array $values,
-        string $expected,
+        Closure $expected,
         array $expectedParams = [],
         int $insertedRow = 1
     ): void {
@@ -308,13 +309,13 @@ final class CommandTest extends CommonCommandTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::rawSql()
+     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::rawSql
      *
      * @throws Exception
      * @throws InvalidConfigException
      * @throws NotSupportedException
      */
-    public function testGetRawSql(string $sql, array $params, string $expectedRawSql): void
+    public function testGetRawSql(string $sql, array $params, Closure $expectedRawSql): void
     {
         parent::testGetRawSql($sql, $params, $expectedRawSql);
     }
@@ -453,7 +454,7 @@ final class CommandTest extends CommonCommandTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::update()
+     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::update
      *
      * @throws Exception
      * @throws Throwable
@@ -463,13 +464,13 @@ final class CommandTest extends CommonCommandTest
         array $columns,
         array|string $conditions,
         array $params,
-        string $expected
+        Closure $expected
     ): void {
         parent::testUpdate($table, $columns, $conditions, $params, $expected);
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::upsert()
+     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::upsert
      *
      * @throws Exception
      * @throws Throwable
