@@ -15,10 +15,10 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
 {
     use TestTrait;
 
-    protected string $likeEscapeCharSql = " ESCAPE '\\'";
-    protected array $likeParameterReplacements = [];
+    protected static string $driverName = 'sqlite';
+    protected static string $likeEscapeCharSql = " ESCAPE '\\'";
 
-    public function buildCondition(): array
+    public static function buildCondition(): array
     {
         $buildCondition = parent::buildCondition();
 
@@ -95,7 +95,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         ]);
     }
 
-    public function insert(): array
+    public static function insert(): array
     {
         $insert = parent::insert();
 
@@ -106,7 +106,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         return $insert;
     }
 
-    public function upsert(): array
+    public static function upsert(): array
     {
         $concreteData = [
             'regular values' => [
