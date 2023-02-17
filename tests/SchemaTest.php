@@ -33,7 +33,7 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::columns()
+     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::columns
      */
     public function testColumnSchema(array $columns, string $tableName): void
     {
@@ -41,7 +41,7 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::columnsTypeBit()
+     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::columnsTypeBit
      */
     public function testColumnSchemaWithTypeBit(array $columns): void
     {
@@ -242,7 +242,7 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::constraints()
+     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::constraints
      *
      * @throws Exception
      * @throws JsonException
@@ -253,7 +253,7 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::constraints()
+     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::constraints
      *
      * @throws Exception
      * @throws InvalidConfigException
@@ -266,7 +266,7 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::constraints()
+     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::constraints
      *
      * @throws Exception
      * @throws JsonException

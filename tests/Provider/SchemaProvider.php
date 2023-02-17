@@ -9,7 +9,7 @@ use Yiisoft\Db\Tests\Support\AnyValue;
 
 final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
 {
-    public function columns(): array
+    public static function columns(): array
     {
         return [
             [
@@ -246,7 +246,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
         ];
     }
 
-    public function columnsTypeBit(): array
+    public static function columnsTypeBit(): array
     {
         return [
             [
@@ -334,7 +334,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
         ];
     }
 
-    public function constraints(): array
+    public static function constraints(): array
     {
         $constraints = parent::constraints();
 
