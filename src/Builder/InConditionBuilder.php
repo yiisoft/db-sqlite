@@ -45,11 +45,14 @@ final class InConditionBuilder extends BaseInConditionBuilder
     /**
      * Builds SQL for IN condition.
      *
-     * @return string SQL.
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
     protected function buildCompositeInCondition(
         string|null $operator,
-        Iterator $columns,
+        iterable $columns,
         iterable|Iterator $values,
         array &$params = []
     ): string {
