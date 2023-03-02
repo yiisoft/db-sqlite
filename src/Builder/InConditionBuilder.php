@@ -5,26 +5,23 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Builder;
 
 use Iterator;
-use Traversable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\QueryBuilder\Condition\Builder\InConditionBuilder as BaseInConditionBuilder;
-use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 
 use function implode;
 use function is_array;
 use function str_contains;
 
+/**
+ * InConditionBuilder builds conditions for {@see `\Yiisoft\Db\QueryBuilder\Condition\InCondition`} IN operator for
+ * SQLite.
+ */
 final class InConditionBuilder extends BaseInConditionBuilder
 {
-    public function __construct(private QueryBuilderInterface $queryBuilder)
-    {
-        parent::__construct($queryBuilder);
-    }
-
     /**
      * Builds SQL for IN condition.
      *
@@ -52,7 +49,7 @@ final class InConditionBuilder extends BaseInConditionBuilder
      */
     protected function buildCompositeInCondition(
         string|null $operator,
-        Traversable|array $columns,
+        Iterator $columns,
         iterable|Iterator $values,
         array &$params = []
     ): string {
