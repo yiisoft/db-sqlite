@@ -10,7 +10,6 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionInterface;
-use Yiisoft\Db\QueryBuilder\Condition\Builder\InConditionBuilder as BaseInConditionBuilder;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 
 use function implode;
@@ -21,7 +20,7 @@ use function str_contains;
  * InConditionBuilder builds conditions for {@see `\Yiisoft\Db\QueryBuilder\Condition\InCondition`} IN operator for
  * SQLite Server.
  */
-final class InConditionBuilder extends BaseInConditionBuilder
+final class InConditionBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Builder\InConditionBuilder
 {
     public function __construct(private QueryBuilderInterface $queryBuilder)
     {
