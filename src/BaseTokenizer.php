@@ -17,14 +17,14 @@ use function reset;
 use function usort;
 
 /**
- * BaseTokenizer splits an SQL query into individual SQL tokens.
+ * Splits an SQL query into individual SQL tokens.
  *
  * It can be used to obtain an addition information from an SQL code.
  *
  * Usage example:
  *
  * ```php
- * $tokenizer = new SqlTokenizer("SELECT * FROM user WHERE id = 1");
+ * $tokenizer = new SqlTokenizer("SELECT * FROM {{%user}} WHERE [[id]] = 1");
  * $root = $tokenizer->tokenize();
  * $sqlTokens = $root->getChildren();
  * ```
@@ -44,7 +44,7 @@ abstract class BaseTokenizer
     protected int $offset = 0;
 
     /**
-     * @var SplStack of active tokens.
+     * @var SplStack Of active tokens.
      *
      * @psalm-var SplStack<SqlToken>
      * @psalm-suppress PropertyNotSetInConstructor
@@ -52,41 +52,35 @@ abstract class BaseTokenizer
     private SplStack $tokenStack;
 
     /**
-     * @psalm-var SqlToken|SqlToken[] active token. It's usually a top of the token stack.
+     * @var array|SqlToken active token. It's usually a top of the token stack.
      *
+     * @psalm-var SqlToken|SqlToken[]
      * @psalm-suppress PropertyNotSetInConstructor
      */
     private array|SqlToken $currentToken;
 
     /**
-     * @var string[] cached substrings.
+     * @var array Cached substrings.
+     *
+     * @psalm-var string[]
      */
     private array $substrings = [];
 
     /**
-     * @var string string current buffer value.
+     * @var string Buffer for the current token.
      */
     private string $buffer = '';
 
-    /**
-     * @var SqlToken|null resulting token of a last {@see tokenize()} call.
-     */
-    private SqlToken|null $token = null;
-
-    public function __construct(
-        /**
-         * @var string SQL code.
-         */
-        private string $sql
-    ) {
+    public function __construct(private string $sql)
+    {
     }
 
     /**
      * Tokenizes and returns a code type token.
      *
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException If the SQL code is invalid.
      *
-     * @return SqlToken code type token.
+     * @return SqlToken Code type token.
      *
      * @psalm-suppress MixedPropertyTypeCoercion
      */
@@ -96,14 +90,17 @@ abstract class BaseTokenizer
         $this->offset = 0;
         $this->substrings = [];
         $this->buffer = '';
-        $this->token = (new SqlToken())->type(SqlToken::TYPE_CODE)->content($this->sql);
-        $this->tokenStack = new SplStack();
-        $this->tokenStack->push($this->token);
-        $this->token[] = (new SqlToken())->type(SqlToken::TYPE_STATEMENT);
-        $this->tokenStack->push($this->token[0]);
-        /** @var SqlToken */
-        $this->currentToken = $this->tokenStack->top();
 
+        $token = (new SqlToken())->type(SqlToken::TYPE_CODE)->content($this->sql);
+
+        $this->tokenStack = new SplStack();
+        $this->tokenStack->push($token);
+
+        $token[] = (new SqlToken())->type(SqlToken::TYPE_STATEMENT);
+
+        $this->tokenStack->push($token[0]);
+        /** @psalm-var SqlToken */
+        $this->currentToken = $this->tokenStack->top();
         $length = 0;
 
         while (!$this->isEof()) {
@@ -128,14 +125,14 @@ abstract class BaseTokenizer
         $this->addTokenFromBuffer();
 
         if (
-            $this->token->getHasChildren() &&
-            $this->token[-1] instanceof SqlToken &&
-            !$this->token[-1]->getHasChildren()
+            $token->getHasChildren() &&
+            $token[-1] instanceof SqlToken &&
+            !$token[-1]->getHasChildren()
         ) {
-            unset($this->token[-1]);
+            unset($token[-1]);
         }
 
-        return $this->token;
+        return $token;
     }
 
     /**
@@ -143,9 +140,9 @@ abstract class BaseTokenizer
      *
      * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string.
      *
-     * @param int $length length of the matched string.
+     * @param int $length Length of the matched string.
      *
-     * @return bool whether there's a whitespace at the current offset.
+     * @return bool Whether there's a whitespace at the current offset.
      */
     abstract protected function isWhitespace(int &$length): bool;
 
@@ -154,9 +151,9 @@ abstract class BaseTokenizer
      *
      * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string.
      *
-     * @param int $length length of the matched string.
+     * @param int $length Length of the matched string.
      *
-     * @return bool whether there's a commentary at the current offset.
+     * @return bool Whether there's a commentary at the current offset.
      */
     abstract protected function isComment(int &$length): bool;
 
@@ -166,10 +163,10 @@ abstract class BaseTokenizer
      * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string. It may
      * also set `$content` to a string that will be used as a token content.
      *
-     * @param int $length  length of the matched string.
-     * @param string|null $content optional content instead of the matched string.
+     * @param int $length  Length of the matched string.
+     * @param string|null $content Optional content instead of the matched string.
      *
-     * @return bool whether there's an operator at the current offset.
+     * @return bool Whether there's an operator at the current offset.
      */
     abstract protected function isOperator(int &$length, string|null &$content): bool;
 
@@ -179,10 +176,10 @@ abstract class BaseTokenizer
      * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string. It may
      * also set `$content` to a string that will be used as a token content.
      *
-     * @param int $length length of the matched string.
-     * @param string|null $content optional content instead of the matched string.
+     * @param int $length Length of the matched string.
+     * @param string|null $content Optional content instead of the matched string.
      *
-     * @return bool whether there's an identifier at the current offset.
+     * @return bool Whether there's an identifier at the current offset.
      */
     abstract protected function isIdentifier(int &$length, string|null &$content): bool;
 
@@ -192,10 +189,10 @@ abstract class BaseTokenizer
      * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string. It may
      * also set `$content` to a string that will be used as a token content.
      *
-     * @param int $length  length of the matched string.
-     * @param string|null $content optional content instead of the matched string.
+     * @param int $length Length of the matched string.
+     * @param string|null $content Optional content instead of the matched string.
      *
-     * @return bool whether there's a string literal at the current offset.
+     * @return bool Whether there's a string literal at the current offset.
      */
     abstract protected function isStringLiteral(int &$length, string|null &$content): bool;
 
@@ -204,10 +201,10 @@ abstract class BaseTokenizer
      *
      * The method may set `$content` to a string that will be used as a token content.
      *
-     * @param string $string  string to be matched.
-     * @param string|null $content optional content instead of the matched string.
+     * @param string $string String to be matched.
+     * @param string|null $content Optional content instead of the matched string.
      *
-     * @return bool whether the given string is a keyword.
+     * @return bool Whether the given string is a keyword.
      */
     abstract protected function isKeyword(string $string, string|null &$content): bool;
 
@@ -219,12 +216,12 @@ abstract class BaseTokenizer
     /**
      * Returns whether the longest common prefix equals to the SQL code of the same length at the current offset.
      *
-     * @param array $with strings to be tested. The method `will` modify this parameter to speed up lookups.
-     * @param bool $caseSensitive whether to perform a case-sensitive comparison.
-     * @param int $length length of the matched string.
-     * @param string|null $content matched string.
+     * @param array $with Strings to be tested. The method `will` modify this parameter to speed up lookups.
+     * @param bool $caseSensitive Whether to perform a case-sensitive comparison.
+     * @param int $length Length of the matched string.
+     * @param string|null $content Matched string.
      *
-     * @return bool whether a match is found.
+     * @return bool Whether a match is found.
      *
      * @psalm-param array<array-key, string> $with
      */
@@ -266,11 +263,11 @@ abstract class BaseTokenizer
     /**
      * Returns a string of the given length starting with the specified offset.
      *
-     * @param int $length string length to be returned.
-     * @param bool $caseSensitive if it's `false`, the string will be uppercase.
+     * @param int $length String length to be returned.
+     * @param bool $caseSensitive If it's `false`, the string will be uppercase.
      * @param int|null $offset SQL code offset, defaults to current if `null` is passed.
      *
-     * @return string result string, it may be empty if there's nothing to return.
+     * @return string Result string, it may be empty if there's nothing to return.
      */
     protected function substring(int $length, bool $caseSensitive = true, int $offset = null): string
     {
@@ -298,10 +295,10 @@ abstract class BaseTokenizer
     /**
      * Returns an index after the given string in the SQL code starting with the specified offset.
      *
-     * @param string $string string to be found.
+     * @param string $string String to be found.
      * @param int|null $offset SQL code offset, defaults to current if `null` is passed.
      *
-     * @return int index after the given string or end of string index.
+     * @return int Index after the given string or end of string index.
      */
     protected function indexAfter(string $string, int $offset = null): int
     {
@@ -442,7 +439,7 @@ abstract class BaseTokenizer
     /**
      * Adds the specified length to the current offset.
      *
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException If the length is less than or equal to 0.
      */
     private function advance(int $length): void
     {
