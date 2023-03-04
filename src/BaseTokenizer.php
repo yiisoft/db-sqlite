@@ -208,11 +208,6 @@ abstract class BaseTokenizer
      */
     abstract protected function isKeyword(string $string, string|null &$content): bool;
 
-    public function setSql(string $sql): void
-    {
-        $this->sql = $sql;
-    }
-
     /**
      * Returns whether the longest common prefix equals to the SQL code of the same length at the current offset.
      *
