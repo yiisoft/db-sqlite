@@ -13,7 +13,7 @@ use Yiisoft\Db\Schema\AbstractColumnSchema;
  * Is used to store and retrieve metadata about a column in a database table. It is typically used in conjunction with
  * the {@see TableSchema}, which represents the metadata of a database table as a whole.
  *
- * The following code shows how to use ColumnSchema:
+ * The following code shows how to use:
  *
  * ```php
  * use Yiisoft\Db\Sqlite\ColumnSchema;
