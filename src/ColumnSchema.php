@@ -10,7 +10,7 @@ use Yiisoft\Db\Schema\AbstractColumnSchema;
  * Represents the metadata of a column in a database table for SQLite Server. It provides information about the column's
  * name, type, size, precision, and other details.
  *
- * Is used to store and retrieve metadata about a column in a database table. It is typically used in conjunction with
+ * Is used to store and retrieve metadata about a column in a database table. It's typically used in conjunction with
  * the {@see TableSchema}, which represents the metadata of a database table as a whole.
  *
  * The following code shows how to use:

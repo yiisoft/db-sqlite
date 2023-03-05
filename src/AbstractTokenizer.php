@@ -211,7 +211,7 @@ abstract class AbstractTokenizer
     /**
      * Returns whether the longest common prefix equals to the SQL code of the same length at the current offset.
      *
-     * @param array $with Strings to be tested. The method `will` modify this parameter to speed up lookups.
+     * @param array $with Strings to be tested. The method `will` change this parameter to speed up lookups.
      * @param bool $caseSensitive Whether to perform a case-sensitive comparison.
      * @param int $length Length of the matched string.
      * @param string|null $content Matched string.
