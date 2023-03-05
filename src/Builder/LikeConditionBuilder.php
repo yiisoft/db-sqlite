@@ -20,7 +20,7 @@ final class LikeConditionBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Buil
     }
 
     /**
-     * @return string character used to escape special characters in LIKE conditions. By default, it's assumed to be
+     * @return string Character used to escape special characters in LIKE conditions. By default, it's assumed to be
      * `\`.
      */
     private function getEscapeSql(): string
