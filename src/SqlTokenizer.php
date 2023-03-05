@@ -15,7 +15,7 @@ use function strtr;
  * {@see http://www.sqlite.org/draft/tokenreq.html}
  * {@see https://sqlite.org/lang.html}
  */
-final class SqlTokenizer extends BaseTokenizer
+final class SqlTokenizer extends AbstractTokenizer
 {
     /**
      * Returns whether there's a whitespace at the current offset.

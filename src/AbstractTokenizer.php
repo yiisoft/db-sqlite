@@ -19,7 +19,7 @@ use function usort;
 /**
  * Splits an SQL query into individual SQL tokens.
  *
- * It can be used to obtain an addition information from an SQL code.
+ * It can be used to obtain addition information from an SQL code.
  *
  * Usage example:
  *
@@ -31,7 +31,7 @@ use function usort;
  *
  * Tokens are instances of {@see SqlToken}.
  */
-abstract class BaseTokenizer
+abstract class AbstractTokenizer
 {
     /**
      * @var int SQL code string length.
@@ -52,7 +52,7 @@ abstract class BaseTokenizer
     private SplStack $tokenStack;
 
     /**
-     * @var array|SqlToken active token. It's usually a top of the token stack.
+     * @var array|SqlToken Active token. It's usually a top of the token stack.
      *
      * @psalm-var SqlToken|SqlToken[]
      * @psalm-suppress PropertyNotSetInConstructor
@@ -136,13 +136,13 @@ abstract class BaseTokenizer
     }
 
     /**
-     * Returns whether there's a whitespace at the current offset.
+     * Returns whether there's a space or blank at the current offset.
      *
      * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string.
      *
      * @param int $length Length of the matched string.
      *
-     * @return bool Whether there's a whitespace at the current offset.
+     * @return bool Whether there's a space or blank at the current offset.
      */
     abstract protected function isWhitespace(int &$length): bool;
 
