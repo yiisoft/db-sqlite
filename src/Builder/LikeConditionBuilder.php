@@ -7,8 +7,7 @@ namespace Yiisoft\Db\Sqlite\Builder;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 
 /**
- * Builds conditions for {@see `\Yiisoft\Db\QueryBuilder\Condition\LikeCondition`} LIKE operator
- * for SQLite Server.
+ * Builds conditions for {@see `\Yiisoft\Db\QueryBuilder\Condition\LikeCondition`} LIKE operator for SQLite Server.
  */
 final class LikeConditionBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Builder\LikeConditionBuilder
 {
