@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\QueryBuilder\AbstractDDLQueryBuilder;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
@@ -15,6 +13,9 @@ use Yiisoft\Db\Schema\SchemaInterface;
 
 use function count;
 
+/**
+ * Implements a (Data Definition Language) SQL statements for SQLite Server.
+ */
 final class DDLQueryBuilder extends AbstractDDLQueryBuilder
 {
     public function __construct(
@@ -26,7 +27,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws NotSupportedException
+     * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function addCheck(string $name, string $table, string $expression): string
     {
@@ -34,7 +35,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws NotSupportedException
+     * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function addCommentOnColumn(string $table, string $column, string $comment): string
     {
@@ -42,7 +43,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws NotSupportedException
+     * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function addCommentOnTable(string $table, string $comment): string
     {
@@ -50,7 +51,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws NotSupportedException
+     * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function addDefaultValue(string $name, string $table, string $column, mixed $value): string
     {
@@ -58,7 +59,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws NotSupportedException
+     * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function addForeignKey(
         string $name,
@@ -73,7 +74,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws NotSupportedException
+     * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function addPrimaryKey(string $name, string $table, array|string $columns): string
     {
@@ -81,7 +82,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws NotSupportedException
+     * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function addUnique(string $name, string $table, array|string $columns): string
     {
@@ -89,7 +90,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws NotSupportedException
+     * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function alterColumn(string $table, string $column, ColumnSchemaBuilderInterface|string $type): string
     {
@@ -101,10 +102,6 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         return 'PRAGMA foreign_keys=' . (int) $check;
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidArgumentException
-     */
     public function createIndex(
         string $name,
         string $table,
@@ -127,7 +124,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws NotSupportedException
+     * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function dropCheck(string $name, string $table): string
     {
@@ -135,7 +132,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws NotSupportedException
+     * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function dropColumn(string $table, string $column): string
     {
@@ -143,7 +140,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws NotSupportedException
+     * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function dropCommentFromColumn(string $table, string $column): string
     {
@@ -151,7 +148,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws NotSupportedException
+     * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function dropCommentFromTable(string $table): string
     {
@@ -159,7 +156,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws NotSupportedException
+     * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function dropDefaultValue(string $name, string $table): string
     {
@@ -167,7 +164,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws NotSupportedException
+     * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function dropForeignKey(string $name, string $table): string
     {
@@ -180,7 +177,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws NotSupportedException
+     * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function dropPrimaryKey(string $name, string $table): string
     {
@@ -188,7 +185,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws NotSupportedException
+     * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function dropUnique(string $name, string $table): string
     {
@@ -196,7 +193,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws NotSupportedException
+     * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function renameColumn(string $table, string $oldName, string $newName): string
     {

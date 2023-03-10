@@ -17,7 +17,7 @@ use function is_array;
 use function str_contains;
 
 /**
- * Builds conditions for {@see `\Yiisoft\Db\QueryBuilder\Condition\InCondition`} IN operator for SQLite Server.
+ * Build an object of {@see `\Yiisoft\Db\QueryBuilder\Condition\InCondition`} into SQL expressions for SQLite Server.
  */
 final class InConditionBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Builder\InConditionBuilder
 {

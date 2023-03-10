@@ -22,6 +22,9 @@ use function array_merge;
 use function implode;
 use function trim;
 
+/**
+ * Implements a DQL (Data Query Language) SQL statements for SQLite Server.
+ */
 final class DQLQueryBuilder extends AbstractDQLQueryBuilder
 {
     public function __construct(
@@ -98,7 +101,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             }
         } elseif ($this->hasOffset($offset)) {
             /**
-             * limit is not optional in SQLite.
+             * Limit isn't optional in SQLite.
              *
              * {@see http://www.sqlite.org/syntaxdiagrams.html#select-stmt}
              */
@@ -131,10 +134,11 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
     }
 
     /**
-     * Contains array of default expression builders. Extend this method and override it, if you want to change default
-     * expression builders for this query builder.
+     * Has an array of default expression builders.
      *
-     * See {@see ExpressionBuilder} docs for details.
+     * Extend this method and override it if you want to change default expression builders for this query builder.
+     *
+     * {@see ExpressionBuilder} docs for details.
      *
      * @psalm-return array<string, class-string<ExpressionBuilderInterface>>
      */

@@ -19,6 +19,10 @@ use function ltrim;
 use function preg_match_all;
 use function strpos;
 
+/**
+ * Implements a database command that can be executed against a PDO (PHP Data Object) database connection for SQLite
+ * Server.
+ */
 final class CommandPDO extends AbstractCommandPDO
 {
     public function insertWithReturningPks(string $table, array $columns): bool|array
@@ -56,12 +60,13 @@ final class CommandPDO extends AbstractCommandPDO
     /**
      * Executes the SQL statement.
      *
-     * This method should only be used for executing non-query SQL statement, such as `INSERT`, `DELETE`, `UPDATE` SQLs.
+     * This method should only be used for executing a non-query SQL statement, such as `INSERT`, `DELETE`, `UPDATE` SQLs.
      * No result set will be returned.
      *
-     * @throws Exception|Throwable execution failed.
+     * @throws Exception
+     * @throws Throwable The execution failed.
      *
-     * @return int number of rows affected by the execution.
+     * @return int Number of rows affected by the execution.
      */
     public function execute(): int
     {
@@ -128,13 +133,14 @@ final class CommandPDO extends AbstractCommandPDO
     }
 
     /**
-     * Performs the actual DB query of a SQL statement.
+     * Performs the actual DB query of an SQL statement.
      *
-     * @param int $queryMode - return results as DataReader
+     * @param int $queryMode Return results as DataReader
      *
-     * @throws Exception|Throwable if the query causes any problem.
+     * @throws Exception
+     * @throws Throwable If the query causes any problem.
      *
-     * @return mixed the method execution result.
+     * @return mixed The method execution result.
      */
     protected function queryInternal(int $queryMode): mixed
     {
@@ -156,8 +162,8 @@ final class CommandPDO extends AbstractCommandPDO
          */
         foreach ($statements as $statement) {
             /**
-             * @var string $statementSql
-             * @var array $statementParams
+             * @psalm-var string $statementSql
+             * @psalm-var array $statementParams
              */
             [$statementSql, $statementParams] = $statement;
             $this->setSql($statementSql)->bindValues($statementParams);
@@ -178,9 +184,11 @@ final class CommandPDO extends AbstractCommandPDO
      * Splits the specified SQL codes into individual SQL statements and returns them or `false` if there's a single
      * statement.
      *
+     * @param string $sql SQL codes to be split.
+     *
      * @throws InvalidArgumentException
      *
-     * @return array|bool (array|string)[][]|bool
+     * @return array|bool List of SQL statements or `false` if there's a single statement.
      *
      * @psalm-param array<string, string> $params
      * @psalm-return false|list<array{0: string, 1: array}>

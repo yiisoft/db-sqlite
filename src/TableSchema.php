@@ -6,6 +6,9 @@ namespace Yiisoft\Db\Sqlite;
 
 use Yiisoft\Db\Schema\AbstractTableSchema;
 
+/**
+ * Implements the SQLite Server specific table schema.
+ */
 final class TableSchema extends AbstractTableSchema
 {
     public function compositeFK(int $id, string $from, string $to): void

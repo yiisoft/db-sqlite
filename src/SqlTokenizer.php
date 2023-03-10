@@ -8,40 +8,39 @@ use function mb_strtoupper;
 use function strtr;
 
 /**
- * SqlTokenizer splits SQLite queries into individual SQL tokens.
+ * Splits SQLite queries into individual SQL tokens.
  *
- * It's used to obtain a `CHECK` constraint information from a `CREATE TABLE` SQL code.
+ * It's used to obtain `CHECK` constraint information from a `CREATE TABLE` SQL code.
  *
- * {@see http://www.sqlite.org/draft/tokenreq.html}
- * {@see https://sqlite.org/lang.html}
+ * @link http://www.sqlite.org/draft/tokenreq.html
+ * @link https://sqlite.org/lang.html
  */
 final class SqlTokenizer extends AbstractTokenizer
 {
     /**
-     * Returns whether there's a whitespace at the current offset.
+     * Returns whether there's a space at the current offset.
      *
      * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string.
      *
-     * @param int $length length of the matched string.
+     * @param int $length The length of the matched string.
      *
-     * @return bool whether there's a whitespace at the current offset.
+     * @return bool Whether there's a space at the current offset.
      */
     protected function isWhitespace(int &$length): bool
     {
         $whitespaces = ["\f" => true, "\n" => true, "\r" => true, "\t" => true, ' ' => true];
         $length = 1;
-
         return isset($whitespaces[$this->substring($length)]);
     }
 
     /**
      * Returns whether there's a commentary at the current offset.
      *
-     * If these methods returns `true`, it has to set the `$length` parameter to the length of the matched string.
+     * If these methods return `true`, it has to set the `$length` parameter to the length of the matched string.
      *
-     * @param int $length length of the matched string.
+     * @param int $length The length of the matched string.
      *
-     * @return bool whether there's a commentary at the current offset.
+     * @return bool Whether there's a commentary at the current offset.
      */
     protected function isComment(int &$length): bool
     {
@@ -61,13 +60,14 @@ final class SqlTokenizer extends AbstractTokenizer
     /**
      * Returns whether there's an operator at the current offset.
      *
-     * If these methods returns `true`, it has to set the `$length` parameter to the length of the matched string. It may
-     * also set `$content` to a string that will be used as a token content.
+     * If these methods return `true`, it has to set the `$length` parameter to the length of the matched string.
      *
-     * @param int $length  length of the matched string.
-     * @param string|null $content optional content instead of the matched string.
+     * It may also set `$content` to a string that will be used as a token content.
      *
-     * @return bool whether there's an operator at the current offset.
+     * @param int $length The length of the matched string.
+     * @param string|null $content Optional content instead of the matched string.
+     *
+     * @return bool Whether there's an operator at the current offset.
      */
     protected function isOperator(int &$length, string|null &$content): bool
     {
@@ -104,13 +104,14 @@ final class SqlTokenizer extends AbstractTokenizer
     /**
      * Returns whether there's an identifier at the current offset.
      *
-     * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string. It may
-     * also set `$content` to a string that will be used as a token content.
+     * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string.
      *
-     * @param int $length length of the matched string.
-     * @param string|null $content optional content instead of the matched string.
+     * It may also set `$content` to a string that will be used as a token content.
      *
-     * @return bool whether there's an identifier at the current offset.
+     * @param int $length The length of the matched string.
+     * @param string|null $content Optional content instead of the matched string.
+     *
+     * @return bool Whether there's an identifier at the current offset.
      */
     protected function isIdentifier(int &$length, string|null &$content): bool
     {
@@ -143,13 +144,14 @@ final class SqlTokenizer extends AbstractTokenizer
     /**
      * Returns whether there's a string literal at the current offset.
      *
-     * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string. It may
-     * also set `$content` to a string that will be used as a token content.
+     * If this method returns `true`, it has to set the `$length` parameter to the length of the matched string.
      *
-     * @param int $length  length of the matched string.
-     * @param string|null $content optional content instead of the matched string.
+     * It may also set `$content` to a string that will be used as a token content.
      *
-     * @return bool whether there's a string literal at the current offset.
+     * @param int $length The length of the matched string.
+     * @param string|null $content Optional content instead of the matched string.
+     *
+     * @return bool Whether there's a string literal at the current offset.
      */
     protected function isStringLiteral(int &$length, string|null &$content): bool
     {
@@ -177,10 +179,10 @@ final class SqlTokenizer extends AbstractTokenizer
      *
      * The method may set `$content` to a string that will be used as a token content.
      *
-     * @param string $string  string to be matched.
-     * @param string|null $content optional content instead of the matched string.
+     * @param string $string The string to be matched.
+     * @param string|null $content Optional content instead of the matched string.
      *
-     * @return bool whether the given string is a keyword.
+     * @return bool Whether the given string is a keyword.
      */
     protected function isKeyword(string $string, string|null &$content): bool
     {
