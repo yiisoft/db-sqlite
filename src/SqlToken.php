@@ -15,13 +15,7 @@ use function mb_substr;
 use function reset;
 
 /**
- * SqlToken represents SQL tokens produced by {@see SqlTokenizer} or its child classes.
- *
- * @property SqlToken[] $children Child tokens.
- * @property bool $hasChildren Whether the token has children. This property is read-only.
- * @property bool $isCollection Whether the token represents a collection of tokens. This property is
- * read-only.
- * @property string $sql SQL code. This property is read-only.
+ * Represents SQL tokens produced by {@see SqlTokenizer} or its child classes.
  *
  * @template-implements ArrayAccess<int, SqlToken>
  */
@@ -40,6 +34,11 @@ final class SqlToken implements ArrayAccess, Stringable
     private int|null $startOffset = null;
     private int|null $endOffset = null;
     private SqlToken|null $parent = null;
+    /**
+     * @var array list of child tokens.
+     *
+     * @psalm-var array<int, SqlToken>
+     */
     private array $children = [];
 
     /**
@@ -55,12 +54,13 @@ final class SqlToken implements ArrayAccess, Stringable
     /**
      * Returns whether there is a child token at the specified offset.
      *
-     * This method is required by the SPL {@see ArrayAccess} interface. It is implicitly called when you use something
-     * like `isset($token[$offset])`.
+     * This method is required by the SPL {@see ArrayAccess} interface.
      *
-     * @param int $offset child token offset.
+     * It's implicitly called when you use something like `isset($token[$offset])`.
      *
-     * @return bool whether the token exists.
+     * @param int $offset The child token offset.
+     *
+     * @return bool Whether the token exists.
      */
     public function offsetExists($offset): bool
     {
@@ -70,12 +70,13 @@ final class SqlToken implements ArrayAccess, Stringable
     /**
      * Returns a child token at the specified offset.
      *
-     * This method is required by the SPL {@see ArrayAccess} interface. It is implicitly called when you use something
-     * like `$child = $token[$offset];`.
+     * This method is required by the SPL {@see ArrayAccess} interface.
      *
-     * @param int $offset child token offset.
+     * It's implicitly called when you use something like `$child = $token[$offset];`.
      *
-     * @return SqlToken|null the child token at the specified offset, `null` if there's no token.
+     * @param int $offset The child token offset.
+     *
+     * @return SqlToken|null The child token at the specified offset, `null` if there's no token.
      */
     public function offsetGet($offset): self|null
     {
@@ -87,11 +88,12 @@ final class SqlToken implements ArrayAccess, Stringable
     /**
      * Adds a child token to the token.
      *
-     * This method is required by the SPL {@see ArrayAccess} interface. It is implicitly called when you use something
-     * like `$token[$offset] = $child;`.
+     * This method is required by the SPL {@see ArrayAccess} interface.
      *
-     * @param mixed $offset child token offset.
-     * @param mixed $value token to be added.
+     * It's implicitly called when you use something like `$token[$offset] = $child;`.
+     *
+     * @param mixed $offset The child token offset.
+     * @param mixed $value Token to be added.
      *
      * @psalm-suppress MixedPropertyTypeCoercion
      */
@@ -113,10 +115,11 @@ final class SqlToken implements ArrayAccess, Stringable
     /**
      * Removes a child token at the specified offset.
      *
-     * This method is required by the SPL {@see ArrayAccess} interface. It is implicitly called when you use something
-     * like `unset($token[$offset])`.
+     * This method is required by the SPL {@see ArrayAccess} interface.
      *
-     * @param int $offset child token offset.
+     * It's implicitly called when you use something like `unset($token[$offset])`.
+     *
+     * @param int $offset Child token offset.
      */
     public function offsetUnset($offset): void
     {
@@ -132,7 +135,7 @@ final class SqlToken implements ArrayAccess, Stringable
     /**
      * Returns child tokens.
      *
-     * @return SqlToken[] child tokens.
+     * @return SqlToken[] Child tokens.
      */
     public function getChildren(): array
     {
@@ -142,7 +145,7 @@ final class SqlToken implements ArrayAccess, Stringable
     /**
      * Sets a list of child tokens.
      *
-     * @param SqlToken[] $children child tokens.
+     * @param SqlToken[] $children Child tokens.
      */
     public function setChildren(array $children): void
     {
@@ -159,7 +162,7 @@ final class SqlToken implements ArrayAccess, Stringable
     /**
      * Returns whether the token represents a collection of tokens.
      *
-     * @return bool whether the token represents a collection of tokens.
+     * @return bool Whether the token represents a collection of tokens.
      */
     public function getIsCollection(): bool
     {
@@ -167,9 +170,9 @@ final class SqlToken implements ArrayAccess, Stringable
     }
 
     /**
-     * Returns whether the token represents a collection of tokens and has non-zero number of children.
+     * Returns whether the token represents a collection of tokens and has a non-zero number of children.
      *
-     * @return bool whether the token has children.
+     * @return bool Whether the token has children.
      */
     public function getHasChildren(): bool
     {
@@ -214,13 +217,14 @@ final class SqlToken implements ArrayAccess, Stringable
      * }
      * ```
      *
-     * @param SqlToken $patternToken tokenized SQL codes to match against. In addition to normal SQL, the `any` keyword
-     * is supported which will match any number of keywords, identifiers, whitespaces.
-     * @param int $offset token children offset to start lookup with.
-     * @param int|null $firstMatchIndex token children offset where a successful match begins.
-     * @param int|null $lastMatchIndex  token children offset where a successful match ends.
+     * @param SqlToken $patternToken Tokenized SQL codes to match against.
+     * In addition to normal SQL, the `any` keyword is supported which will match any number of keywords, identifiers,
+     * whitespaces.
+     * @param int $offset Token children offset to start lookup with.
+     * @param int|null $firstMatchIndex Token children offset where a successful match begins.
+     * @param int|null $lastMatchIndex Token children offset where a successful match ends.
      *
-     * @return bool whether this token matches the pattern SQL code.
+     * @return bool Whether this token matches the pattern SQL code.
      */
     public function matches(
         self $patternToken,
@@ -329,7 +333,10 @@ final class SqlToken implements ArrayAccess, Stringable
     }
 
     /**
-     * Set token type. It has to be one of the following constants:
+     * Set token type.
+     *
+     * @param int $value Token type.
+     * It has to be one of the following constants:
      *
      * - {@see TYPE_CODE}
      * - {@see TYPE_STATEMENT}
@@ -339,8 +346,6 @@ final class SqlToken implements ArrayAccess, Stringable
      * - {@see TYPE_OPERATOR}
      * - {@see TYPE_IDENTIFIER}
      * - {@see TYPE_STRING_LITERAL}
-     *
-     * @param int $value token type. It has to be one of the following constants:
      */
     public function type(int $value): self
     {
@@ -362,7 +367,7 @@ final class SqlToken implements ArrayAccess, Stringable
     /**
      * Set original SQL token start position.
      *
-     * @param int $value original SQL token start position.
+     * @param int $value Original SQL token start position.
      */
     public function startOffset(int $value): self
     {
@@ -374,7 +379,7 @@ final class SqlToken implements ArrayAccess, Stringable
     /**
      * Set original SQL token end position.
      *
-     * @param int $value original SQL token end position.
+     * @param int $value Original SQL token end position.
      */
     public function endOffset(int $value): self
     {
@@ -386,7 +391,7 @@ final class SqlToken implements ArrayAccess, Stringable
     /**
      * Set parent token.
      *
-     * @param SqlToken $value parent token.
+     * @param SqlToken $value The parent token.
      */
     public function parent(self $value): self
     {
@@ -395,11 +400,17 @@ final class SqlToken implements ArrayAccess, Stringable
         return $this;
     }
 
+    /**
+     * @return string|null The token content.
+     */
     public function getContent(): string|null
     {
         return $this->content;
     }
 
+    /**
+     * @return int The type of the token.
+     */
     public function getType(): int
     {
         return $this->type;

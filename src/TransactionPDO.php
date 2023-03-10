@@ -9,20 +9,26 @@ use Yiisoft\Db\Driver\PDO\AbstractTransactionPDO;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Transaction\TransactionInterface;
 
+/**
+ * Implements the SQLite Server specific transaction.
+ */
 final class TransactionPDO extends AbstractTransactionPDO
 {
     /**
      * Sets the isolation level of the current transaction.
      *
-     * @param string $level The transaction isolation level to use for this transaction. This can be either
-     * {@see TransactionInterface::READ_UNCOMMITTED} or {@see TransactionInterface::SERIALIZABLE}.
+     * @param string $level The transaction isolation level to use for this transaction.
+     * @see \Yiisoft\Db\Transaction\TransactionInterface::READ_UNCOMMITTED
+     * @see \Yiisoft\Db\Transaction\TransactionInterface::SERIALIZABLE
      *
-     * @throws Exception|InvalidConfigException|NotSupportedException|Throwable when unsupported isolation levels are
-     * used. SQLite only supports SERIALIZABLE and READ UNCOMMITTED.
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     * @throws Throwable When unsupported isolation levels are used. SQLite only supports SERIALIZABLE and READ
+     * UNCOMMITTED.
      *
-     * {@see http://www.sqlite.org/pragma.html#pragma_read_uncommitted}
+     * @link http://www.sqlite.org/pragma.html#pragma_read_uncommitted
      */
     protected function setTransactionIsolationLevel(string $level): void
     {

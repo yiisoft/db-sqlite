@@ -8,10 +8,13 @@ use Yiisoft\Db\QueryBuilder\AbstractQueryBuilder;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 
+/**
+ * Implements the SQLite Server specific query builder.
+ */
 final class QueryBuilder extends AbstractQueryBuilder
 {
     /**
-     * @var array mapping from abstract column types (keys) to physical column types (values).
+     * @var array Mapping from abstract column types (keys) to physical column types (values).
      *
      * @psalm-var string[] $typeMap
      */
@@ -38,15 +41,12 @@ final class QueryBuilder extends AbstractQueryBuilder
         SchemaInterface::TYPE_BOOLEAN => 'boolean',
         SchemaInterface::TYPE_MONEY => 'decimal(19,4)',
     ];
-    private DDLQueryBuilder $ddlBuilder;
-    private DMLQueryBuilder $dmlBuilder;
-    private DQLQueryBuilder $dqlBuilder;
 
     public function __construct(QuoterInterface $quoter, SchemaInterface $schema)
     {
-        $this->ddlBuilder = new DDLQueryBuilder($this, $quoter, $schema);
-        $this->dmlBuilder = new DMLQueryBuilder($this, $quoter, $schema);
-        $this->dqlBuilder = new DQLQueryBuilder($this, $quoter, $schema);
-        parent::__construct($quoter, $schema, $this->ddlBuilder, $this->dmlBuilder, $this->dqlBuilder);
+        $ddlBuilder = new DDLQueryBuilder($this, $quoter, $schema);
+        $dmlBuilder = new DMLQueryBuilder($this, $quoter, $schema);
+        $dqlBuilder = new DQLQueryBuilder($this, $quoter, $schema);
+        parent::__construct($quoter, $schema, $ddlBuilder, $dmlBuilder, $dqlBuilder);
     }
 }
