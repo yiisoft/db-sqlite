@@ -117,6 +117,12 @@ final class Schema extends AbstractSchema
         'enum' => self::TYPE_STRING,
     ];
 
+    public function createColumn(string $type, array|int|string $length = null): ColumnInterface
+    {
+        return (new Column($type, $length));
+    }
+
+
     /**
      * Returns all table names in the database.
      *
