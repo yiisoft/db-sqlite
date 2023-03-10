@@ -121,7 +121,6 @@ final class Schema extends AbstractSchema
         return new Column($type, $length);
     }
 
-
     /**
      * Returns all table names in the database.
      *
