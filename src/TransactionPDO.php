@@ -19,6 +19,7 @@ final class TransactionPDO extends AbstractTransactionPDO
      * Sets the isolation level of the current transaction.
      *
      * @param string $level The transaction isolation level to use for this transaction.
+     *
      * @see \Yiisoft\Db\Transaction\TransactionInterface::READ_UNCOMMITTED
      * @see \Yiisoft\Db\Transaction\TransactionInterface::SERIALIZABLE
      *
