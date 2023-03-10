@@ -7,10 +7,7 @@ namespace Yiisoft\Db\Sqlite;
 use Yiisoft\Db\Connection\AbstractDsn;
 
 /**
- * The Dsn class is typically used to parse a DSN string, which is a string that contains all the necessary information
- * to connect to a database SQL Server, such as the database driver, database name.
- *
- * It also allows you to access individual components of the DSN, such as the driver, database name.
+ * Implement a Data Source Name (DSN) for an SQLite Server.
  *
  * @link https://www.php.net/manual/en/ref.pdo-sqlite.connection.php
  */
@@ -25,7 +22,7 @@ final class Dsn extends AbstractDsn
     }
 
     /**
-     * @return string The Data Source Name, or DSN, contains the information required to connect to the database.
+     * @return string The Data Source Name, or DSN, has the information required to connect to the database.
      *
      * Please refer to the [PHP manual](http://php.net/manual/en/pdo.construct.php) on the format of the DSN string.
      *
@@ -35,7 +32,7 @@ final class Dsn extends AbstractDsn
      * ```php
      * $dsn = new Dsn('sqlite', __DIR__ . '/data/test.sq3');
      * $pdoDriver = new PDODriver($dsn->asString());
-     * $db = new ConnectionPDO($pdoDriver, $queryCache, $schemaCache);
+     * $db = new ConnectionPDO($pdoDriver, $schemaCache);
      * ```
      *
      * Will result in the DSN string `sqlite:/path/to/data/test.sq3`.

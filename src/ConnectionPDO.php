@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use PDO;
 use Yiisoft\Db\Driver\PDO\AbstractConnectionPDO;
 use Yiisoft\Db\Driver\PDO\CommandPDOInterface;
-use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 use Yiisoft\Db\Schema\Quoter;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
+use function str_starts_with;
+
 /**
- * Database connection class prefilled for SQLite Server.
+ * Implements a connection to a database via PDO (PHP Data Objects) for SQLite Server.
+ *
+ * @link https://www.php.net/manual/en/ref.pdo-sqlite.php
  */
 final class ConnectionPDO extends AbstractConnectionPDO
 {
@@ -57,9 +58,6 @@ final class ConnectionPDO extends AbstractConnectionPDO
         return new TransactionPDO($this);
     }
 
-    /**
-     * @throws Exception|InvalidConfigException
-     */
     public function getQueryBuilder(): QueryBuilderInterface
     {
         if ($this->queryBuilder === null) {

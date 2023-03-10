@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use JsonException;
-use Throwable;
 use Yiisoft\Db\Constraint\Constraint;
-use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
-use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
@@ -23,6 +19,9 @@ use function implode;
 use function ltrim;
 use function reset;
 
+/**
+ * Implements a DML (Data Manipulation Language) SQL statements for SQLite Server.
+ */
 final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 {
     public function __construct(
@@ -33,21 +32,11 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         parent::__construct($queryBuilder, $quoter, $schema);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     */
     public function insertWithReturningPks(string $table, QueryInterface|array $columns, array &$params = []): string
     {
         throw new NotSupportedException(__METHOD__ . '() is not supported by SQLite.');
     }
 
-    /**
-     * @throws Exception
-     * @throws Throwable
-     */
     public function resetSequence(string $tableName, int|string $value = null): string
     {
         $table = $this->schema->getTableSchema($tableName);
@@ -75,13 +64,6 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         return 'UPDATE sqlite_sequence SET seq=' . $value . " WHERE name='" . $table->getName() . "'";
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigException
-     * @throws JsonException
-     * @throws NotSupportedException
-     */
     public function upsert(
         string $table,
         QueryInterface|array $insertColumns,
