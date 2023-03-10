@@ -16,7 +16,7 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Helper\ArrayHelper;
 use Yiisoft\Db\Schema\AbstractSchema;
-use Yiisoft\Db\Schema\ColumnSchemaBuilderInterface;
+use Yiisoft\Db\Schema\Builder\ColumnInterface;
 use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 use Yiisoft\Db\Transaction\TransactionInterface;
@@ -332,13 +332,6 @@ final class Schema extends AbstractSchema
     protected function loadTableDefaultValues(string $tableName): array
     {
         throw new NotSupportedException('SQLite does not support default value constraints.');
-    }
-
-    public function createColumnSchemaBuilder(
-        string $type,
-        array|int|string $length = null
-    ): ColumnSchemaBuilderInterface {
-        return new ColumnSchemaBuilder($type, $length);
     }
 
     /**
