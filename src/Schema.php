@@ -16,7 +16,7 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Helper\ArrayHelper;
 use Yiisoft\Db\Schema\AbstractSchema;
-use Yiisoft\Db\Schema\ColumnSchemaBuilderInterface;
+use Yiisoft\Db\Schema\Builder\ColumnInterface;
 use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 
@@ -115,6 +115,11 @@ final class Schema extends AbstractSchema
         'timestamp' => self::TYPE_TIMESTAMP,
         'enum' => self::TYPE_STRING,
     ];
+
+    public function createColumn(string $type, array|int|string $length = null): ColumnInterface
+    {
+        return new Column($type, $length);
+    }
 
     /**
      * Returns all table names in the database.
@@ -332,13 +337,6 @@ final class Schema extends AbstractSchema
     protected function loadTableDefaultValues(string $tableName): array
     {
         throw new NotSupportedException('SQLite does not support default value constraints.');
-    }
-
-    public function createColumnSchemaBuilder(
-        string $type,
-        array|int|string $length = null
-    ): ColumnSchemaBuilderInterface {
-        return new ColumnSchemaBuilder($type, $length);
     }
 
     /**
