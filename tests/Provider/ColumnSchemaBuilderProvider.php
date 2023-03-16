@@ -41,8 +41,6 @@ final class ColumnSchemaBuilderProvider extends \Yiisoft\Db\Tests\Provider\Colum
         $types['uuid pk not null with default'][0] = '`column` blob(16) PRIMARY KEY NOT NULL DEFAULT (RANDOMBLOB(16))';
         $types['uuid pk not null with default'][3] = [['notNull'],['defaultExpression', '(RANDOMBLOB(16))']];
 
-        $types['uuid pk sequence'][0] = '`column` blob(16) PRIMARY KEY NOT NULL DEFAULT (RANDOMBLOB(16))';
-
         return $types;
     }
 }

@@ -39,6 +39,8 @@ final class Column extends AbstractColumn
         $format = match ($this->getTypeCategory()) {
             self::CATEGORY_PK => '{type}{check}{append}',
             self::CATEGORY_NUMERIC => '{type}{length}{unsigned}{notnull}{unique}{check}{default}{append}',
+            self::CATEGORY_UUID => '{type}{notnull}{unique}{default}{check}{comment}{append}',
+            self::CATEGORY_UUID_PK => '{type}{notnull}{default}{check}{comment}{append}',
             default => '{type}{length}{notnull}{unique}{check}{default}{append}',
         };
 
