@@ -191,6 +191,7 @@ final class CommandPDO extends AbstractCommandPDO
      * @return array|bool List of SQL statements or `false` if there's a single statement.
      *
      * @psalm-param array<string, string> $params
+     *
      * @psalm-return false|list<array{0: string, 1: array}>
      */
     private function splitStatements(string $sql, array $params): bool|array

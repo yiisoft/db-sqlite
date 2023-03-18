@@ -47,6 +47,7 @@ abstract class AbstractTokenizer
      * @var SplStack Of active tokens.
      *
      * @psalm-var SplStack<SqlToken>
+     *
      * @psalm-suppress PropertyNotSetInConstructor
      */
     private SplStack $tokenStack;
@@ -55,6 +56,7 @@ abstract class AbstractTokenizer
      * @var array|SqlToken Active token. It's usually a top of the token stack.
      *
      * @psalm-var SqlToken|SqlToken[]
+     *
      * @psalm-suppress PropertyNotSetInConstructor
      */
     private array|SqlToken $currentToken;

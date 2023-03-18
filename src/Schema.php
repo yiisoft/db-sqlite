@@ -34,7 +34,6 @@ use function trim;
  * Implements the SQLite Server specific schema, supporting SQLite 3.3.0 or higher.
  *
  * @psalm-type Column = array<array-key, array{seqno:string, cid:string, name:string}>
- *
  * @psalm-type NormalizePragmaForeignKeyList = array<
  *   string,
  *   array<
@@ -51,7 +50,6 @@ use function trim;
  *     }
  *   >
  * >
- *
  * @psalm-type PragmaForeignKeyList = array<
  *   string,
  *   array{
@@ -65,14 +63,11 @@ use function trim;
  *     on_delete:string
  *   }
  * >
- *
  * @psalm-type PragmaIndexInfo = array<array-key, array{seqno:string, cid:string, name:string}>
- *
  * @psalm-type PragmaIndexList = array<
  *   array-key,
  *   array{seq:string, name:string, unique:string, origin:string, partial:string}
  * >
- *
  * @psalm-type PragmaTableInfo = array<
  *   array-key,
  *   array{cid:string, name:string, type:string, notnull:string, dflt_value:string|null, pk:string}
@@ -393,7 +388,7 @@ final class Schema extends AbstractSchema
             $fk = $table->getForeignKeys();
 
             if (!isset($fk[$id])) {
-                $table->foreignKey($id, ([$foreignKey['table'], $foreignKey['from'] => $foreignKey['to']]));
+                $table->foreignKey($id, [$foreignKey['table'], $foreignKey['from'] => $foreignKey['to']]);
             } else {
                 /** composite FK */
                 $table->compositeFK($id, $foreignKey['from'], $foreignKey['to']);
@@ -622,7 +617,7 @@ final class Schema extends AbstractSchema
     private function getPragmaForeignKeyList(string $tableName): array
     {
         return $this->db->createCommand(
-            'PRAGMA FOREIGN_KEY_LIST(' . $this->db->getQuoter()->quoteSimpleTableName(($tableName)) . ')'
+            'PRAGMA FOREIGN_KEY_LIST(' . $this->db->getQuoter()->quoteSimpleTableName($tableName) . ')'
         )->queryAll();
     }
 
