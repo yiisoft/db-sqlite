@@ -40,6 +40,8 @@ final class QueryBuilder extends AbstractQueryBuilder
         SchemaInterface::TYPE_BINARY => 'blob',
         SchemaInterface::TYPE_BOOLEAN => 'boolean',
         SchemaInterface::TYPE_MONEY => 'decimal(19,4)',
+        SchemaInterface::TYPE_UUID => 'blob(16)',
+        SchemaInterface::TYPE_UUID_PK => 'blob(16) PRIMARY KEY',
     ];
 
     public function __construct(QuoterInterface $quoter, SchemaInterface $schema)
