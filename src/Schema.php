@@ -361,7 +361,7 @@ final class Schema extends AbstractSchema
 
         $column = count($table->getPrimaryKey()) === 1 ? $table->getColumn($table->getPrimaryKey()[0]) : null;
 
-        if ($column !== null && !strncasecmp($column->getDbType(), 'int', 3)) {
+        if ($column !== null && !strncasecmp($column->getDbType() ?? '', 'int', 3)) {
             $table->sequenceName('');
             $column->autoIncrement(true);
         }
@@ -461,10 +461,10 @@ final class Schema extends AbstractSchema
         $column->allowNull(!$info['notnull']);
         $column->primaryKey($info['pk'] != '0');
         $column->dbType(strtolower($info['type']));
-        $column->unsigned(str_contains($column->getDbType(), 'unsigned'));
+        $column->unsigned(str_contains($column->getDbType() ?? '', 'unsigned'));
         $column->type(self::TYPE_STRING);
 
-        if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->getDbType(), $matches)) {
+        if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->getDbType() ?? '', $matches)) {
             $type = strtolower($matches[1]);
 
             if (isset($this->typeMap[$type])) {
