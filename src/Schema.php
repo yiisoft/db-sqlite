@@ -457,8 +457,7 @@ final class Schema extends AbstractSchema
      */
     protected function loadColumnSchema(array $info): ColumnSchemaInterface
     {
-        $column = $this->createColumnSchema();
-        $column->name($info['name']);
+        $column = $this->createColumnSchema($info['name']);
         $column->allowNull(!$info['notnull']);
         $column->primaryKey($info['pk'] != '0');
         $column->dbType(strtolower($info['type']));
@@ -603,10 +602,14 @@ final class Schema extends AbstractSchema
      * Creates a column schema for the database.
      *
      * This method may be overridden by child classes to create a DBMS-specific column schema.
+     *
+     * @param string $name Name of the column.
+     *
+     * @return ColumnSchemaInterface
      */
-    private function createColumnSchema(): ColumnSchemaInterface
+    private function createColumnSchema(string $name): ColumnSchemaInterface
     {
-        return new ColumnSchema();
+        return new ColumnSchema($name);
     }
 
     /**
