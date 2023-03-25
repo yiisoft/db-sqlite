@@ -29,7 +29,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     /**
      * @throws NotSupportedException SQLite doesn't support this method.
      */
-    public function addCheck(string $name, string $table, string $expression): string
+    public function addCheck(string $table, string $name, string $expression): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
@@ -53,7 +53,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     /**
      * @throws NotSupportedException SQLite doesn't support this method.
      */
-    public function addDefaultValue(string $name, string $table, string $column, mixed $value): string
+    public function addDefaultValue(string $table, string $name, string $column, mixed $value): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
@@ -62,8 +62,8 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
      * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function addForeignKey(
-        string $name,
         string $table,
+        string $name,
         array|string $columns,
         string $refTable,
         array|string $refColumns,
@@ -76,7 +76,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     /**
      * @throws NotSupportedException SQLite doesn't support this method.
      */
-    public function addPrimaryKey(string $name, string $table, array|string $columns): string
+    public function addPrimaryKey(string $table, string $name, array|string $columns): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
@@ -84,7 +84,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     /**
      * @throws NotSupportedException SQLite doesn't support this method.
      */
-    public function addUnique(string $name, string $table, array|string $columns): string
+    public function addUnique(string $table, string $name, array|string $columns): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
@@ -103,8 +103,8 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     public function createIndex(
-        string $name,
         string $table,
+        string $name,
         array|string $columns,
         string $indexType = null,
         string $indexMethod = null
@@ -126,7 +126,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     /**
      * @throws NotSupportedException SQLite doesn't support this method.
      */
-    public function dropCheck(string $name, string $table): string
+    public function dropCheck(string $table, string $name): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
@@ -158,7 +158,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     /**
      * @throws NotSupportedException SQLite doesn't support this method.
      */
-    public function dropDefaultValue(string $name, string $table): string
+    public function dropDefaultValue(string $table, string $name): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
@@ -166,12 +166,12 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     /**
      * @throws NotSupportedException SQLite doesn't support this method.
      */
-    public function dropForeignKey(string $name, string $table): string
+    public function dropForeignKey(string $table, string $name): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
 
-    public function dropIndex(string $name, string $table): string
+    public function dropIndex(string $table, string $name): string
     {
         return 'DROP INDEX ' . $this->quoter->quoteTableName($name);
     }
@@ -179,7 +179,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     /**
      * @throws NotSupportedException SQLite doesn't support this method.
      */
-    public function dropPrimaryKey(string $name, string $table): string
+    public function dropPrimaryKey(string $table, string $name): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
@@ -187,7 +187,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     /**
      * @throws NotSupportedException SQLite doesn't support this method.
      */
-    public function dropUnique(string $name, string $table): string
+    public function dropUnique(string $table, string $name): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
