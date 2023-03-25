@@ -39,7 +39,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::addCheck is not supported by SQLite.');
 
-        $qb->addCheck('customer', 'id', 'id > 0');
+        $qb->addCheck('id', 'customer', 'id > 0');
     }
 
     /**
@@ -91,7 +91,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::addDefaultValue is not supported by SQLite.');
 
-        $qb->addDefaultValue('CN_pk', 'T_constraints_1', 'C_default', 1);
+        $qb->addDefaultValue('T_constraints_1', 'CN_pk', 'C_default', 1);
     }
 
     /**
@@ -117,7 +117,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::addForeignKey is not supported by SQLite.');
 
-        $qb->addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete, $update);
+        $qb->addForeignKey($table, $name, $columns, $refTable, $refColumns, $delete, $update);
     }
 
     /**
@@ -135,7 +135,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::addPrimaryKey is not supported by SQLite.');
 
-        $qb->addPrimaryKey($name, $table, $columns);
+        $qb->addPrimaryKey($table, $name, $columns);
     }
 
     /**
@@ -153,7 +153,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::addUnique is not supported by SQLite.');
 
-        $qb->addUnique($name, $table, $columns);
+        $qb->addUnique($table, $name, $columns);
     }
 
     /**
@@ -366,7 +366,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             <<<SQL
             CREATE INDEX `myschema`.`myindex` ON `myindex` (`C_index_1`)
             SQL,
-            $qb->createIndex('myindex', 'myschema' . '.' . 'myindex', 'C_index_1'),
+            $qb->createIndex('myschema' . '.' . 'myindex', 'myindex', 'C_index_1'),
         );
     }
 
@@ -424,7 +424,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCheck is not supported by SQLite.');
 
-        $qb->dropCheck('CN_check', 'T_constraints_1');
+        $qb->dropCheck('T_constraints_1', 'CN_check');
     }
 
     /**
@@ -496,7 +496,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropDefaultValue is not supported by SQLite.'
         );
 
-        $qb->dropDefaultValue('CN_pk', 'T_constraints_1');
+        $qb->dropDefaultValue('T_constraints_1', 'CN_pk');
     }
 
     /**
@@ -512,7 +512,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::dropForeignKey is not supported by SQLite.');
 
-        $qb->dropForeignKey('CN_constraints_3', 'T_constraints_3');
+        $qb->dropForeignKey('T_constraints_3', 'CN_constraints_3');
     }
 
     /**
@@ -529,7 +529,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             <<<SQL
             DROP INDEX `CN_constraints_2_single`
             SQL,
-            $qb->dropIndex('CN_constraints_2_single', 'T_constraints_2'),
+            $qb->dropIndex('T_constraints_2', 'CN_constraints_2_single'),
         );
     }
 
@@ -546,7 +546,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::dropPrimaryKey is not supported by SQLite.');
 
-        $qb->dropPrimaryKey('CN_pk', 'T_constraints_1');
+        $qb->dropPrimaryKey('T_constraints_1', 'CN_pk');
     }
 
     /**
@@ -562,7 +562,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::dropUnique is not supported by SQLite.');
 
-        $qb->dropUnique('test_uq_constraint', 'test_uq');
+        $qb->dropUnique('test_uq', 'test_uq_constraint');
     }
 
     /**

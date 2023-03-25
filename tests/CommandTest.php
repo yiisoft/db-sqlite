@@ -79,7 +79,7 @@ final class CommandTest extends CommonCommandTest
             'Yiisoft\Db\Sqlite\DDLQueryBuilder::addDefaultValue is not supported by SQLite.'
         );
 
-        $command->addDefaultValue('{{name}}', '{{table}}', 'column', 'value');
+        $command->addDefaultValue('{{table}}', '{{name}}', 'column', 'value');
     }
 
     /**
@@ -251,7 +251,7 @@ final class CommandTest extends CommonCommandTest
             'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropDefaultValue is not supported by SQLite.'
         );
 
-        $command->dropDefaultValue('{{name}}', '{{table}}');
+        $command->dropDefaultValue('{{table}}', '{{name}}');
     }
 
     /**
@@ -269,7 +269,7 @@ final class CommandTest extends CommonCommandTest
             'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropForeignKey is not supported by SQLite.'
         );
 
-        $command->dropForeignKey('{{name}}', '{{table}}');
+        $command->dropForeignKey('{{table}}', '{{name}}');
     }
 
     /**
@@ -287,7 +287,7 @@ final class CommandTest extends CommonCommandTest
             'iisoft\Db\Sqlite\DDLQueryBuilder::dropPrimaryKey is not supported by SQLite.'
         );
 
-        $command->dropPrimaryKey('{{name}}', '{{table}}');
+        $command->dropPrimaryKey('{{table}}', '{{name}}');
     }
 
     /**
@@ -305,7 +305,7 @@ final class CommandTest extends CommonCommandTest
             'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropUnique is not supported by SQLite.'
         );
 
-        $command->dropUnique('{{name}}', '{{table}}');
+        $command->dropUnique('{{table}}', '{{name}}');
     }
 
     /**
