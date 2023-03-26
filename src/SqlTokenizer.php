@@ -179,7 +179,7 @@ final class SqlTokenizer extends AbstractTokenizer
      *
      * The method may set `$content` to a string that will be used as a token content.
      *
-     * @param string $string The string to be matched.
+     * @param string $string The string to match.
      * @param string|null $content Optional content instead of the matched string.
      *
      * @return bool Whether the given string is a keyword.

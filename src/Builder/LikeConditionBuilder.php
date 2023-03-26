@@ -7,7 +7,7 @@ namespace Yiisoft\Db\Sqlite\Builder;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 
 /**
- * Build an object of {@see `\Yiisoft\Db\QueryBuilder\Condition\LikeCondition`} into SQL expressions for SQLite Server.
+ * Build an object of {@see \Yiisoft\Db\QueryBuilder\Condition\LikeCondition} into SQL expressions for SQLite Server.
  */
 final class LikeConditionBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Builder\LikeConditionBuilder
 {
@@ -19,8 +19,8 @@ final class LikeConditionBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Buil
     }
 
     /**
-     * @return string Character used to escape special characters in LIKE conditions. By default, it's assumed to be
-     * `\`.
+     * @return string Character used to escape special characters in `LIKE` conditions.
+     * By default, it's assumed to be `\`.
      */
     private function getEscapeSql(): string
     {
