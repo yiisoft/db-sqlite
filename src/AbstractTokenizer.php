@@ -19,7 +19,7 @@ use function usort;
 /**
  * Splits an SQL query into individual SQL tokens.
  *
- * It can be used to obtain addition information from an SQL code.
+ * You can use it to obtain addition information from an SQL code.
  *
  * Usage example:
  *
@@ -203,7 +203,7 @@ abstract class AbstractTokenizer
      *
      * The method may set `$content` to a string that will be used as a token content.
      *
-     * @param string $string String to be matched.
+     * @param string $string String to match.
      * @param string|null $content Optional content instead of the matched string.
      *
      * @return bool Whether the given string is a keyword.
@@ -213,12 +213,12 @@ abstract class AbstractTokenizer
     /**
      * Returns whether the longest common prefix equals to the SQL code of the same length at the current offset.
      *
-     * @param array $with Strings to be tested. The method `will` change this parameter to speed up lookups.
+     * @param array $with Strings to test. The method `will` change this parameter to speed up lookups.
      * @param bool $caseSensitive Whether to perform a case-sensitive comparison.
      * @param int $length Length of the matched string.
      * @param string|null $content Matched string.
      *
-     * @return bool Whether a match is found.
+     * @return bool Whether there is a match.
      *
      * @psalm-param array<array-key, string> $with
      */
@@ -260,7 +260,7 @@ abstract class AbstractTokenizer
     /**
      * Returns a string of the given length starting with the specified offset.
      *
-     * @param int $length String length to be returned.
+     * @param int $length String length to return.
      * @param bool $caseSensitive If it's `false`, the string will be uppercase.
      * @param int|null $offset SQL code offset, defaults to current if `null` is passed.
      *
@@ -292,7 +292,7 @@ abstract class AbstractTokenizer
     /**
      * Returns an index after the given string in the SQL code starting with the specified offset.
      *
-     * @param string $string String to be found.
+     * @param string $string String to find.
      * @param int|null $offset SQL code offset, defaults to current if `null` is passed.
      *
      * @return int Index after the given string or end of string index.

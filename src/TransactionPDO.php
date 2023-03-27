@@ -26,8 +26,8 @@ final class TransactionPDO extends AbstractTransactionPDO
      * @throws Exception
      * @throws InvalidConfigException
      * @throws NotSupportedException
-     * @throws Throwable When unsupported isolation levels are used. SQLite only supports SERIALIZABLE and READ
-     * UNCOMMITTED.
+     * @throws Throwable When unsupported isolation levels are used. SQLite only supports `SERIALIZABLE`
+     * and `READ UNCOMMITTED`.
      *
      * @link http://www.sqlite.org/pragma.html#pragma_read_uncommitted
      */

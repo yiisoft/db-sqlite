@@ -480,7 +480,7 @@ final class Schema extends AbstractSchema
                     $column->scale((int) $values[1]);
                 }
 
-                if ($column->getSize() === 1 && ($type === 'tinyint' || $type === 'bit')) {
+                if (($type === 'tinyint' || $type === 'bit') && $column->getSize() === 1) {
                     $column->type(self::TYPE_BOOLEAN);
                 } elseif ($type === 'bit') {
                     if ($column->getSize() > 32) {
@@ -497,7 +497,7 @@ final class Schema extends AbstractSchema
         if (!$column->isPrimaryKey()) {
             if ($info['dflt_value'] === 'null' || $info['dflt_value'] === '' || $info['dflt_value'] === null) {
                 $column->defaultValue(null);
-            } elseif ($column->getType() === 'timestamp' && $info['dflt_value'] === 'CURRENT_TIMESTAMP') {
+            } elseif ($info['dflt_value'] === 'CURRENT_TIMESTAMP' && $column->getType() === 'timestamp') {
                 $column->defaultValue(new Expression('CURRENT_TIMESTAMP'));
             } else {
                 $value = trim($info['dflt_value'], "'\"");
@@ -575,7 +575,7 @@ final class Schema extends AbstractSchema
 
         if (!isset($result[self::PRIMARY_KEY])) {
             /**
-             * Additional check for PK in case of INTEGER PRIMARY KEY with ROWID.
+             * Extra check for PK in case of `INTEGER PRIMARY KEY` with ROWID.
              *
              * @link https://www.sqlite.org/lang_createtable.html#primkeyconst
              *

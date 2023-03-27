@@ -20,7 +20,7 @@ use function preg_match_all;
 use function strpos;
 
 /**
- * Implements a database command that can be executed against a PDO (PHP Data Object) database connection for SQLite
+ * Implements a database command that can be executed with a PDO (PHP Data Object) database connection for SQLite
  * Server.
  */
 final class CommandPDO extends AbstractCommandPDO
@@ -181,10 +181,10 @@ final class CommandPDO extends AbstractCommandPDO
     }
 
     /**
-     * Splits the specified SQL codes into individual SQL statements and returns them or `false` if there's a single
+     * Splits the specified SQL into individual SQL statements and returns them or `false` if there's a single
      * statement.
      *
-     * @param string $sql SQL codes to be split.
+     * @param string $sql SQL to split.
      *
      * @throws InvalidArgumentException
      *
@@ -226,7 +226,7 @@ final class CommandPDO extends AbstractCommandPDO
      */
     private function extractUsedParams(SqlToken $statement, array $params): array
     {
-        preg_match_all('/(?P<placeholder>[:][a-zA-Z0-9_]+)/', $statement->getSql(), $matches, PREG_SET_ORDER);
+        preg_match_all('/(?P<placeholder>:\w+)/', $statement->getSql(), $matches, PREG_SET_ORDER);
 
         $result = [];
 

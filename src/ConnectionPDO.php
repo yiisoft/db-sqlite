@@ -29,7 +29,7 @@ final class ConnectionPDO extends AbstractConnectionPDO
         $this->transaction = null;
 
         if (!str_starts_with($this->driver->getDsn(), 'sqlite::memory:')) {
-            /** reset PDO connection, unless its sqlite in-memory, which can only have one connection */
+            /** Reset PDO connection, unless its sqlite in-memory, which can only have one connection. */
             $this->pdo = null;
         }
     }
