@@ -93,7 +93,7 @@ final class SqlToken implements ArrayAccess, Stringable
      * It's implicitly called when you use something like `$token[$offset] = $child;`.
      *
      * @param mixed $offset The child token offset.
-     * @param mixed $value Token to be added.
+     * @param mixed $value Token to add.
      *
      * @psalm-suppress MixedPropertyTypeCoercion
      */
@@ -217,8 +217,8 @@ final class SqlToken implements ArrayAccess, Stringable
      * }
      * ```
      *
-     * @param SqlToken $patternToken Tokenized SQL codes to match against.
-     * In addition to normal SQL, the `any` keyword is supported which will match any number of keywords, identifiers,
+     * @param SqlToken $patternToken Tokenized SQL codes to match.
+     * In addition to regular SQL, the `any` keyword is supported which will match any number of keywords, identifiers,
      * whitespaces.
      * @param int $offset Token children offset to start lookup with.
      * @param int|null $firstMatchIndex Token children offset where a successful match begins.
@@ -268,9 +268,9 @@ final class SqlToken implements ArrayAccess, Stringable
         $wildcard = false;
 
         for ($index = 0, $count = count($patternToken->children); $index < $count; $index++) {
-            /**
-             *  Here we iterate token by token with an exception to "any" that toggles an iteration until we matched
-             *  with a next pattern token or EOF.
+            /*
+             Iterate token by token with an exception to "any" that toggles an iteration until matched
+             with a next pattern token or EOF.
              */
             if ($patternToken[$index] instanceof self && $patternToken[$index]->content === 'any') {
                 $wildcard = true;
