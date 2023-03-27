@@ -95,9 +95,9 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 
         foreach ($constraints as $constraint) {
             $constraintCondition = ['and'];
-            /** @psalm-var string[] $columnsNames */
-            $columnsNames = $constraint->getColumnNames();
-            foreach ($columnsNames as $name) {
+            /** @psalm-var string[] $columnNames */
+            $columnNames = $constraint->getColumnNames();
+            foreach ($columnNames as $name) {
                 $quotedName = $this->quoter->quoteColumnName($name);
                 $constraintCondition[] = "$quotedTableName.$quotedName=(SELECT $quotedName FROM `EXCLUDED`)";
             }

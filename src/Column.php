@@ -7,8 +7,7 @@ namespace Yiisoft\Db\Sqlite;
 use Yiisoft\Db\Schema\Builder\AbstractColumn;
 
 /**
- * It's a utility that provides a convenient way to create column schema for use with {@see `\Yiisoft\Db\SQLite\Schema`}
- * for SQLite.
+ * It's a utility that provides a convenient way to create column schema for use with {@see Schema} for SQLite.
  *
  * It provides methods for specifying the properties of a column, such as its type, size, default value, and whether it
  * is nullable or not. It also provides a method for creating a column schema based on the specified properties.
