@@ -22,7 +22,7 @@
         "php": "^8.0",
         "ext-mbstring": "*",
         "ext-pdo": "*",
-        "yiisoft/db": "dev-master"
+        "yiisoft/db": "@dev"
     },
     "require-dev": {
         "ext-json": "*",
