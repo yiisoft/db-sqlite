@@ -25,6 +25,9 @@ jobs:
   psalm:
     name: PHP ${{ matrix.php }}
 
+    env:
+      COMPOSER_ROOT_VERSION: dev-master
+
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -53,7 +56,12 @@ jobs:
         run: composer self-update
 
       - name: Set environment variables pull request linux.
+        if: matrix.os == 'ubuntu-latest'
         uses: yiisoft/actions/db/environment-linux@master
+
+      - name: Set environment variables pull request windows.
+        if: matrix.os == 'windows-latest'
+        uses: yiisoft/actions/db/environment-windows@master
 
       - name: Install db.
         uses: yiisoft/actions/db/subpackage-install@master
