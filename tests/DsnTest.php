@@ -22,19 +22,23 @@ final class DsnTest extends TestCase
         );
     }
 
-    public function testAsStringWithEmpty(): void
+    public function testAsStringWithDatabaseName(): void
     {
-        $this->assertSame(
-            'sqlite:',
-            (new Dsn('sqlite'))->asString(),
-        );
+        $this->assertSame('sqlite:', (new Dsn('sqlite'))->asString());
+    }
+
+    public function testAsStringWithDatabaseNameWithEmpty(): void
+    {
+        $this->assertSame('sqlite:', (new Dsn('sqlite', ''))->asString());
+    }
+
+    public function testAsStringWithDatabaseNameWithNull(): void
+    {
+        $this->assertSame('sqlite:', (new Dsn('sqlite', null))->asString());
     }
 
     public function testAsStringWithMemory(): void
     {
-        $this->assertSame(
-            'sqlite::memory:',
-            (new Dsn('sqlite', 'memory'))->asString(),
-        );
+        $this->assertSame('sqlite::memory:', (new Dsn('sqlite', 'memory'))->asString());
     }
 }

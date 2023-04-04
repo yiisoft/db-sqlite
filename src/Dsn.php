@@ -16,7 +16,7 @@ final class Dsn extends AbstractDsn
     /**
      * @psalm-param string[] $options
      */
-    public function __construct(private string $driver, private string $databaseName = '')
+    public function __construct(private string $driver, private string|null $databaseName = null)
     {
         parent::__construct($driver, '', $databaseName);
     }
@@ -40,8 +40,9 @@ final class Dsn extends AbstractDsn
     public function asString(): string
     {
         return match ($this->databaseName) {
-            'memory' => $this->driver . '::memory:',
             '' => $this->driver . ':',
+            'memory' => $this->driver . '::memory:',
+            null => $this->driver . ':',
             default => $this->driver . ':' . $this->databaseName,
         };
     }
