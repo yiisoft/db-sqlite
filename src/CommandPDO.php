@@ -52,6 +52,15 @@ final class CommandPDO extends AbstractCommandPDO
         return $result;
     }
 
+    public function showDatabases(): array
+    {
+        $sql = <<<SQL
+        SELECT name FROM pragma_database_list;
+        SQL;
+
+        return $this->setSql($sql)->queryColumn();
+    }
+
     protected function getQueryBuilder(): QueryBuilderInterface
     {
         return $this->db->getQueryBuilder();

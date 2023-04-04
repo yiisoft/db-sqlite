@@ -485,4 +485,14 @@ final class CommandTest extends CommonCommandTest
 
         parent::testUpsert($firstData, $secondData);
     }
+
+    public function testShowDatabases(): void
+    {
+        $db = $this->getConnection();
+
+        $command = $db->createCommand();
+
+        $this->assertSame('sqlite::memory:', $db->getDriver()->getDsn());
+        $this->assertSame(['main'], $command->showDatabases());
+    }
 }
