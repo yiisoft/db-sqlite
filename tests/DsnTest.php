@@ -27,7 +27,7 @@ final class DsnTest extends TestCase
         $this->assertSame('sqlite:', (new Dsn('sqlite'))->asString());
     }
 
-    public function testAsStringWithDatabaseNameWithEmpty(): void
+    public function testAsStringWithDatabaseNameWithEmptyString(): void
     {
         $this->assertSame('sqlite:', (new Dsn('sqlite', ''))->asString());
     }
