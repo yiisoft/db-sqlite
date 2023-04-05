@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite\Pdo;
+namespace Yiisoft\Db\Sqlite;
 
 use PDO;
 use Yiisoft\Db\Driver\PDO\AbstractPDODriver;
