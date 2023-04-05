@@ -12,7 +12,7 @@ use Yiisoft\Db\Tests\Common\CommonCommandPDOTest;
  *
  * @psalm-suppress PropertyNotSetInConstructor
  */
-final class CommandPDOTest extends CommonCommandPDOTest
+final class PdoCommandTest extends CommonCommandPDOTest
 {
     use TestTrait;
 }

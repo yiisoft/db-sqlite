@@ -18,7 +18,7 @@ use Yiisoft\Db\Transaction\TransactionInterface;
  *
  * @psalm-suppress PropertyNotSetInConstructor
  */
-final class ConnectionPDOTest extends CommonConnectionPDOTest
+final class PdoConnectionTest extends CommonConnectionPDOTest
 {
     use TestTrait;
 
@@ -105,7 +105,7 @@ final class ConnectionPDOTest extends CommonConnectionPDOTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\TransactionPDO only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.'
+            'Yiisoft\Db\Sqlite\Transaction only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.'
         );
 
         $db->beginTransaction(TransactionInterface::READ_COMMITTED);

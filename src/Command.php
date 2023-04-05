@@ -23,7 +23,7 @@ use function strpos;
  * Implements a database command that can be executed with a PDO (PHP Data Object) database connection for SQLite
  * Server.
  */
-final class CommandPDO extends AbstractCommandPDO
+final class Command extends AbstractCommandPDO
 {
     public function insertWithReturningPks(string $table, array $columns): bool|array
     {

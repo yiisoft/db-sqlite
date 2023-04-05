@@ -13,7 +13,7 @@ use Yiisoft\Db\Exception\NotSupportedException;
 /**
  * Implements the SQLite Server specific transaction.
  */
-final class TransactionPDO extends AbstractTransactionPDO
+final class Transaction extends AbstractTransactionPDO
 {
     /**
      * Sets the isolation level of the current transaction.
