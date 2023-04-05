@@ -31,8 +31,8 @@ final class Dsn extends AbstractDsn
      *
      * ```php
      * $dsn = new Dsn('sqlite', __DIR__ . '/data/test.sq3');
-     * $pdoDriver = new PDODriver($dsn->asString());
-     * $db = new ConnectionPDO($pdoDriver, $schemaCache);
+     * $pdoDriver = new PdoDriver($dsn->asString());
+     * $db = new PdoConnection($pdoDriver, $schemaCache);
      * ```
      *
      * Will result in the DSN string `sqlite:/path/to/data/test.sq3`.
