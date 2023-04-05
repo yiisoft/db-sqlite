@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite;
+namespace Yiisoft\Db\Sqlite\Pdo;
 
 use Throwable;
 use Yiisoft\Db\Driver\PDO\AbstractTransactionPDO;
@@ -13,7 +13,7 @@ use Yiisoft\Db\Exception\NotSupportedException;
 /**
  * Implements the SQLite Server specific transaction.
  */
-final class PdoTransaction extends AbstractTransactionPDO
+final class Transaction extends AbstractTransactionPDO
 {
     /**
      * Sets the isolation level of the current transaction.

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite;
+namespace Yiisoft\Db\Sqlite\Pdo;
 
 use PDO;
 use Yiisoft\Db\Driver\PDO\AbstractPDODriver;
@@ -12,7 +12,7 @@ use Yiisoft\Db\Driver\PDO\AbstractPDODriver;
  *
  * @link https://www.php.net/manual/en/ref.pdo-sqlite.php
  */
-final class PdoDriver extends AbstractPDODriver
+final class Driver extends AbstractPDODriver
 {
     public function createConnection(): PDO
     {

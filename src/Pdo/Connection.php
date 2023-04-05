@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite;
+namespace Yiisoft\Db\Sqlite\Pdo;
 
 use Yiisoft\Db\Driver\PDO\AbstractConnectionPDO;
 use Yiisoft\Db\Driver\PDO\CommandPDOInterface;
@@ -10,6 +10,8 @@ use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 use Yiisoft\Db\Schema\Quoter;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
+use Yiisoft\Db\Sqlite\QueryBuilder;
+use Yiisoft\Db\Sqlite\Schema;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 use function str_starts_with;
@@ -19,7 +21,7 @@ use function str_starts_with;
  *
  * @link https://www.php.net/manual/en/ref.pdo-sqlite.php
  */
-final class PdoConnection extends AbstractConnectionPDO
+final class Connection extends AbstractConnectionPDO
 {
     /**
      * Reset the connection after cloning.
@@ -36,7 +38,7 @@ final class PdoConnection extends AbstractConnectionPDO
 
     public function createCommand(string $sql = null, array $params = []): CommandPDOInterface
     {
-        $command = new PdoCommand($this);
+        $command = new Command($this);
 
         if ($sql !== null) {
             $command->setSql($sql);
@@ -55,7 +57,7 @@ final class PdoConnection extends AbstractConnectionPDO
 
     public function createTransaction(): TransactionInterface
     {
-        return new PdoTransaction($this);
+        return new Transaction($this);
     }
 
     public function getQueryBuilder(): QueryBuilderInterface

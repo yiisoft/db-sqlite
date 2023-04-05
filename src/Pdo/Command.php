@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite;
+namespace Yiisoft\Db\Sqlite\Pdo;
 
 use PDOException;
 use Throwable;
@@ -12,6 +12,8 @@ use Yiisoft\Db\Exception\ConvertException;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
+use Yiisoft\Db\Sqlite\SqlToken;
+use Yiisoft\Db\Sqlite\SqlTokenizer;
 
 use function array_pop;
 use function count;
@@ -23,7 +25,7 @@ use function strpos;
  * Implements a database command that can be executed with a PDO (PHP Data Object) database connection for SQLite
  * Server.
  */
-final class PdoCommand extends AbstractCommandPDO
+final class Command extends AbstractCommandPDO
 {
     public function insertWithReturningPks(string $table, array $columns): bool|array
     {
