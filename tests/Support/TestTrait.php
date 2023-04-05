@@ -9,7 +9,7 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Sqlite\PdoConnection;
 use Yiisoft\Db\Sqlite\Dsn;
-use Yiisoft\Db\Sqlite\PDODriver;
+use Yiisoft\Db\Sqlite\PdoDriver;
 use Yiisoft\Db\Tests\Support\DbHelper;
 
 trait TestTrait
@@ -22,10 +22,7 @@ trait TestTrait
      */
     protected function getConnection(bool $fixture = false): ConnectionPDOInterface
     {
-        $db = new PdoConnection(
-            new PDODriver($this->getDsn()),
-            DbHelper::getSchemaCache()
-        );
+        $db = new PdoConnection(new PdoDriver($this->getDsn()), DbHelper::getSchemaCache());
 
         if ($fixture) {
             DbHelper::loadFixture($db, __DIR__ . '/Fixture/sqlite.sql');
