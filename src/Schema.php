@@ -15,7 +15,7 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Helper\ArrayHelper;
+use Yiisoft\Db\Helper\DbArrayHelper;
 use Yiisoft\Db\Schema\Builder\ColumnInterface;
 use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
@@ -206,15 +206,15 @@ final class Schema extends PdoAbstractSchema
         /** @psalm-var NormalizePragmaForeignKeyList $foreignKeysList */
         $foreignKeysList = $this->normalizeRowKeyCase($foreignKeysList, true);
         /** @psalm-var NormalizePragmaForeignKeyList $foreignKeysList */
-        $foreignKeysList = ArrayHelper::index($foreignKeysList, null, ['table']);
-        ArrayHelper::multisort($foreignKeysList, 'seq');
+        $foreignKeysList = DbArrayHelper::index($foreignKeysList, null, ['table']);
+        DbArrayHelper::multisort($foreignKeysList, 'seq');
 
         /** @psalm-var NormalizePragmaForeignKeyList $foreignKeysList */
         foreach ($foreignKeysList as $table => $foreignKey) {
             $fk = (new ForeignKeyConstraint())
-                ->columnNames(ArrayHelper::getColumn($foreignKey, 'from'))
+                ->columnNames(DbArrayHelper::getColumn($foreignKey, 'from'))
                 ->foreignTableName($table)
-                ->foreignColumnNames(ArrayHelper::getColumn($foreignKey, 'to'))
+                ->foreignColumnNames(DbArrayHelper::getColumn($foreignKey, 'to'))
                 ->onDelete($foreignKey[0]['on_delete'] ?? null)
                 ->onUpdate($foreignKey[0]['on_update'] ?? null);
 
@@ -525,7 +525,7 @@ final class Schema extends PdoAbstractSchema
         /** @psalm-var PragmaTableInfo $tableColumns */
         $tableColumns = $this->normalizeRowKeyCase($tableColumns, true);
 
-        return ArrayHelper::index($tableColumns, 'cid');
+        return DbArrayHelper::index($tableColumns, 'cid');
     }
 
     /**
@@ -557,20 +557,20 @@ final class Schema extends PdoAbstractSchema
 
             if ($index['origin'] === 'pk') {
                 $result[self::PRIMARY_KEY] = (new Constraint())
-                    ->columnNames(ArrayHelper::getColumn($columns, 'name'));
+                    ->columnNames(DbArrayHelper::getColumn($columns, 'name'));
             }
 
             if ($index['origin'] === 'u') {
                 $result[self::UNIQUES][] = (new Constraint())
                     ->name($index['name'])
-                    ->columnNames(ArrayHelper::getColumn($columns, 'name'));
+                    ->columnNames(DbArrayHelper::getColumn($columns, 'name'));
             }
 
             $result[self::INDEXES][] = (new IndexConstraint())
                 ->primary($index['origin'] === 'pk')
                 ->unique((bool) $index['unique'])
                 ->name($index['name'])
-                ->columnNames(ArrayHelper::getColumn($columns, 'name'));
+                ->columnNames(DbArrayHelper::getColumn($columns, 'name'));
         }
 
         if (!isset($result[self::PRIMARY_KEY])) {
@@ -636,7 +636,7 @@ final class Schema extends PdoAbstractSchema
             ->queryAll();
         /** @psalm-var Column $column */
         $column = $this->normalizeRowKeyCase($column, true);
-        ArrayHelper::multisort($column, 'seqno');
+        DbArrayHelper::multisort($column, 'seqno');
 
         return $column;
     }
