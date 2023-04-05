@@ -12,8 +12,6 @@ use Yiisoft\Db\Exception\ConvertException;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
-use Yiisoft\Db\Sqlite\SqlToken;
-use Yiisoft\Db\Sqlite\SqlTokenizer;
 
 use function array_pop;
 use function count;

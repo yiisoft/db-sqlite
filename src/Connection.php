@@ -10,8 +10,6 @@ use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 use Yiisoft\Db\Schema\Quoter;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
-use Yiisoft\Db\Sqlite\QueryBuilder;
-use Yiisoft\Db\Sqlite\Schema;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 use function str_starts_with;
