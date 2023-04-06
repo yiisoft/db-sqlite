@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite\Tests;
+namespace Yiisoft\Db\Sqlite\Tests\Pdo;
 
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
@@ -18,7 +18,7 @@ use Yiisoft\Db\Transaction\TransactionInterface;
  *
  * @psalm-suppress PropertyNotSetInConstructor
  */
-final class PdoConnectionTest extends CommonConnectionPDOTest
+final class ConnectionTest extends \Yiisoft\Db\Tests\Common\Pdo\CommonConnectionTest
 {
     use TestTrait;
 
@@ -33,7 +33,7 @@ final class PdoConnectionTest extends CommonConnectionPDOTest
      */
     public function testClone(): void
     {
-        $this->setDsn('sqlite:' . __DIR__ . '/Support/Runtime/yiitest.sq3');
+        $this->setDsn('sqlite:' . dirname(__DIR__) . '/Support/Runtime/yiitest.sq3');
 
         $db = $this->getConnection();
 

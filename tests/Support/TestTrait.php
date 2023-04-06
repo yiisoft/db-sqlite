@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests\Support;
 
-use Yiisoft\Db\Driver\PDO\ConnectionPDOInterface;
+use Yiisoft\Db\Driver\Pdo\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Sqlite\Connection;
@@ -20,7 +20,7 @@ trait TestTrait
      * @throws Exception
      * @throws InvalidConfigException
      */
-    protected function getConnection(bool $fixture = false): ConnectionPDOInterface
+    protected function getConnection(bool $fixture = false): ConnectionInterface
     {
         $db = new Connection(new Driver($this->getDsn()), DbHelper::getSchemaCache());
 

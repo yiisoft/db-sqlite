@@ -6,8 +6,7 @@ namespace Yiisoft\Db\Sqlite;
 
 use PDOException;
 use Throwable;
-use Yiisoft\Db\Driver\PDO\AbstractCommandPDO;
-use Yiisoft\Db\Driver\PDO\ConnectionPDOInterface;
+use Yiisoft\Db\Driver\Pdo\ConnectionInterface;
 use Yiisoft\Db\Exception\ConvertException;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
@@ -23,7 +22,7 @@ use function strpos;
  * Implements a database command that can be executed with a PDO (PHP Data Object) database connection for SQLite
  * Server.
  */
-final class Command extends AbstractCommandPDO
+final class Command extends \Yiisoft\Db\Driver\Pdo\AbstractCommand
 {
     public function insertWithReturningPks(string $table, array $columns): bool|array
     {
@@ -123,7 +122,7 @@ final class Command extends AbstractCommandPDO
                     && $this->db->getTransaction() === null
                 ) {
                     $this->db->transaction(
-                        fn (ConnectionPDOInterface $db) => $this->internalExecute($rawSql),
+                        fn (ConnectionInterface $db) => $this->internalExecute($rawSql),
                         $this->isolationLevel,
                     );
                 } else {

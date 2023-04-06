@@ -9,7 +9,6 @@ use Yiisoft\Db\Constraint\CheckConstraint;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
 use Yiisoft\Db\Constraint\IndexConstraint;
-use Yiisoft\Db\Driver\PDO\PdoAbstractSchema;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -73,7 +72,7 @@ use function trim;
  *   array{cid:string, name:string, type:string, notnull:string, dflt_value:string|null, pk:string}
  * >
  */
-final class Schema extends PdoAbstractSchema
+final class Schema extends \Yiisoft\Db\Driver\Pdo\AbstractSchema
 {
     /**
      * @var array Mapping from physical column types (keys) to abstract column types (values).

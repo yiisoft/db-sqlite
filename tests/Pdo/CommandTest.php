@@ -2,17 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Sqlite\Tests;
+namespace Yiisoft\Db\Sqlite\Tests\Pdo;
 
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
-use Yiisoft\Db\Tests\Common\CommonCommandPDOTest;
 
 /**
  * @group sqlite
  *
  * @psalm-suppress PropertyNotSetInConstructor
  */
-final class PdoCommandTest extends CommonCommandPDOTest
+final class CommandTest extends \Yiisoft\Db\Tests\Common\Pdo\CommonCommandTest
 {
     use TestTrait;
 }
