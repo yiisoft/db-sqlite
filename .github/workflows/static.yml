@@ -34,7 +34,6 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - windows-latest
 
         php:
           - '8.0'
@@ -56,12 +55,7 @@ jobs:
         run: composer self-update
 
       - name: Set environment variables pull request linux.
-        if: matrix.os == 'ubuntu-latest'
         uses: yiisoft/actions/db/environment-linux@master
-
-      - name: Set environment variables pull request windows.
-        if: matrix.os == 'windows-latest'
-        uses: yiisoft/actions/db/environment-windows@master
 
       - name: Install db.
         uses: yiisoft/actions/db/subpackage-install@master
@@ -71,9 +65,6 @@ jobs:
           CURRENT_PACKAGE: db
           FULL_BRANCH_NAME: ${{ env.FULL_BRANCH_NAME }}
           WORK_PACKAGE_URL: ${{ env.WORK_PACKAGE_URL }}
-
-      - name: Install dependencies with composer.
-        run: composer update --no-interaction --no-progress --optimize-autoloader --ansi
 
       - name: Static analysis.
         run: vendor/bin/psalm --config=${{ inputs.psalm-config }} --shepherd --stats --output-format=github --php-version=${{ matrix.php }}
