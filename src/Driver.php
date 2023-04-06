@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite;
 
 use PDO;
-use Yiisoft\Db\Driver\PDO\AbstractPDODriver;
+use Yiisoft\Db\Driver\Pdo\AbstractPdoDriver;
 
 /**
  * Implements the SQLite Server driver based on the PDO (PHP Data Objects) extension.
  *
  * @link https://www.php.net/manual/en/ref.pdo-sqlite.php
  */
-final class Driver extends AbstractPDODriver
+final class Driver extends AbstractPdoDriver
 {
     public function createConnection(): PDO
     {
