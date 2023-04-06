@@ -54,8 +54,8 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         string $table,
         string $name,
         array|string $columns,
-        string $refTable,
-        array|string $refColumns,
+        string $referenceTable,
+        array|string $referenceColumns,
         string $delete = null,
         string $update = null
     ): string {
