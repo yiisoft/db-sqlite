@@ -1,5 +1,11 @@
 # Testing
 
+## Github actions
+
+All our packages have github actions by default, so you can test your [contribution](https://github.com/yiisoft/db-sqlite/blob/master/.github/CONTRIBUTING.md) in the cloud.
+
+**Note:** Recomended pull request in draft mode until all tests pass.
+
 ## Unit testing
 
 The package is tested with [PHPUnit](https://phpunit.de/).
