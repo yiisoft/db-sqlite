@@ -352,7 +352,7 @@ final class Schema extends PdoAbstractSchema
 
         foreach ($columns as $info) {
             $column = $this->loadColumnSchema($info);
-            $table->columns($column->getName(), $column);
+            $table->column($column->getName(), $column);
 
             if ($column->isPrimaryKey()) {
                 $table->primaryKey($column->getName());
