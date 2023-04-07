@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use Yiisoft\Db\Driver\PDO\AbstractConnectionPDO;
-use Yiisoft\Db\Driver\PDO\CommandPDOInterface;
+use Yiisoft\Db\Driver\Pdo\AbstractPdoConnection;
+use Yiisoft\Db\Driver\Pdo\PdoCommandInterface;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 use Yiisoft\Db\Schema\Quoter;
 use Yiisoft\Db\Schema\QuoterInterface;
@@ -19,7 +19,7 @@ use function str_starts_with;
  *
  * @link https://www.php.net/manual/en/ref.pdo-sqlite.php
  */
-final class Connection extends AbstractConnectionPDO
+final class Connection extends AbstractPdoConnection
 {
     /**
      * Reset the connection after cloning.
@@ -34,7 +34,7 @@ final class Connection extends AbstractConnectionPDO
         }
     }
 
-    public function createCommand(string $sql = null, array $params = []): CommandPDOInterface
+    public function createCommand(string $sql = null, array $params = []): PdoCommandInterface
     {
         $command = new Command($this);
 

@@ -10,7 +10,7 @@ use Yiisoft\Db\Exception\InvalidCallException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
-use Yiisoft\Db\Tests\Common\CommonConnectionPDOTest;
+use Yiisoft\Db\Tests\Common\CommonPdoConnectionTest;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 /**
@@ -18,7 +18,7 @@ use Yiisoft\Db\Transaction\TransactionInterface;
  *
  * @psalm-suppress PropertyNotSetInConstructor
  */
-final class PdoConnectionTest extends CommonConnectionPDOTest
+final class PdoConnectionTest extends CommonPdoConnectionTest
 {
     use TestTrait;
 
