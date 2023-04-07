@@ -33,7 +33,7 @@ final class Column extends AbstractColumn
         return $this->isUnsigned() ? ' UNSIGNED' : '';
     }
 
-    public function asString(): string
+    public function buildString(): string
     {
         $format = match ($this->getTypeCategory()) {
             self::TYPE_CATEGORY_PK => '{type}{check}{append}',
