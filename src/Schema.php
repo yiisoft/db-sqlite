@@ -391,7 +391,7 @@ final class Schema extends AbstractPdoSchema
                 $table->foreignKey($id, [$foreignKey['table'], $foreignKey['from'] => $foreignKey['to']]);
             } else {
                 /** composite FK */
-                $table->compositeFK($id, $foreignKey['from'], $foreignKey['to']);
+                $table->compositeForeignKey($id, $foreignKey['from'], $foreignKey['to']);
             }
         }
     }
