@@ -26,31 +26,31 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         throw new NotSupportedException(__METHOD__ . '() is not supported by SQLite.');
     }
 
-    public function resetSequence(string $tableName, int|string $value = null): string
+    public function resetSequence(string $table, int|string $value = null): string
     {
-        $table = $this->schema->getTableSchema($tableName);
+        $tableSchema = $this->schema->getTableSchema($table);
 
-        if ($table === null) {
-            throw new InvalidArgumentException("Table not found: '$tableName'.");
+        if ($tableSchema === null) {
+            throw new InvalidArgumentException("Table not found: '$table'.");
         }
 
-        $sequenceName = $table->getSequenceName();
+        $sequenceName = $tableSchema->getSequenceName();
 
         if ($sequenceName === null) {
-            throw new InvalidArgumentException("There is not sequence associated with table '$tableName'.'");
+            throw new InvalidArgumentException("There is not sequence associated with table '$table'.'");
         }
 
-        $tableName = $this->quoter->quoteTableName($tableName);
+        $tableName = $this->quoter->quoteTableName($table);
 
         if ($value !== null) {
             $value = "'" . ((int) $value - 1) . "'";
         } else {
-            $pk = $table->getPrimaryKey();
+            $pk = $tableSchema->getPrimaryKey();
             $key = $this->quoter->quoteColumnName(reset($pk));
             $value = '(SELECT MAX(' . $key . ') FROM ' . $tableName . ')';
         }
 
-        return 'UPDATE sqlite_sequence SET seq=' . $value . " WHERE name='" . $table->getName() . "'";
+        return 'UPDATE sqlite_sequence SET seq=' . $value . " WHERE name='" . $tableSchema->getName() . "'";
     }
 
     public function upsert(
