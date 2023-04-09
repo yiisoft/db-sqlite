@@ -225,7 +225,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             <<<SQL
             UNION  SELECT * FROM `admin_profile`
             SQL,
-            $qb->buildUnion($query->getUnion(), $params),
+            $qb->buildUnion($query->getUnions(), $params),
         );
     }
 
