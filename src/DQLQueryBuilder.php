@@ -33,7 +33,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
         $clauses = [
             $this->buildSelect($query->getSelect(), $params, $query->getDistinct(), $query->getSelectOption()),
             $this->buildFrom($query->getFrom(), $params),
-            $this->buildJoin($query->getJoin(), $params),
+            $this->buildJoin($query->getJoins(), $params),
             $this->buildWhere($query->getWhere(), $params),
             $this->buildGroupBy($query->getGroupBy()),
             $this->buildHaving($query->getHaving(), $params),
@@ -63,7 +63,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             }
         }
 
-        $union = $this->buildUnion($query->getUnion(), $params);
+        $union = $this->buildUnion($query->getUnions(), $params);
 
         if ($union !== '') {
             $sql = "$sql$this->separator$union";
