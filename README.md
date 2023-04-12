@@ -5,22 +5,20 @@
     <a href="https://www.sqlite.org/" target="_blank">
         <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/SQLite370.svg" height="80px">
     </a>
-    <h1 align="center">Yii DataBase SQLite Extension</h1>
+    <h1 align="center">SQLite driver for Yii Database</h1>
     <br>
 </p>
 
-**Yii Database SQLite Extension** is a package for working with [SQLite]databases in PHP. It's a part of the [Yii Framework], which is a high-performance, component-based framework for developing modern web applications.
+SQLite driver for [Yii Database](https://github.com/yiisoft/db) is a package for working with [SQLite] databases in PHP.
 
-The package provides a set of classes for interacting with [SQLite]databases in PHP. It includes a database connection class, a command builder class, and a set of classes for representing database tables and rows as PHP objects.
+The package provides a set of classes for interacting with [SQLite] databases in PHP. It includes a database connection class,
+a command builder class, and a set of classes for representing database tables and rows as PHP objects.
 
-You can perform a variety of tasks with [SQLite] databases in PHP, such as connecting to a database, executing SQL queries, and working with database transactions. You can also use it to create and manipulate database tables and rows, and to perform advanced database operations such as joins and aggregates.
-
-Overall, **Yii Database SQLite Extension** is a powerful tool for working with [SQLite] databases in PHP, and is well-suited for use in web applications.
-
-It's used in [Yii Framework] but can be used separately.
+You can perform a variety of tasks with [SQLite] databases in PHP, such as connecting to a database, executing SQL queries,
+and working with database transactions. You can also use it to create and manipulate database tables and rows, and to
+perform advanced database operations such as joins and aggregates.
 
 [SQLite]: https://www.sqlite.org/
-[Yii Framework]: https://www.yiiframework.com
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/db-sqlite/v/stable.png)](https://packagist.org/packages/yiisoft/db-sqlite)
 [![Total Downloads](https://poser.pugx.org/yiisoft/db-sqlite/downloads.png)](https://packagist.org/packages/yiisoft/db-sqlite)
