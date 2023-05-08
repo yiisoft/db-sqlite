@@ -33,17 +33,12 @@ final class Transaction extends AbstractPdoTransaction
      */
     protected function setTransactionIsolationLevel(string $level): void
     {
-        switch ($level) {
-            case self::SERIALIZABLE:
-                $this->db->createCommand('PRAGMA read_uncommitted = False;')->execute();
-                break;
-            case self::READ_UNCOMMITTED:
-                $this->db->createCommand('PRAGMA read_uncommitted = True;')->execute();
-                break;
-            default:
-                throw new NotSupportedException(
-                    self::class . ' only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.'
-                );
-        }
+        match ($level) {
+            self::SERIALIZABLE => $this->db->createCommand('PRAGMA read_uncommitted = False;')->execute(),
+            self::READ_UNCOMMITTED => $this->db->createCommand('PRAGMA read_uncommitted = True;')->execute(),
+            default => throw new NotSupportedException(
+                self::class . ' only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.'
+            ),
+        };
     }
 }
