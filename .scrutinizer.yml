@@ -8,7 +8,7 @@ filter:
 build:
   environment:
     php:
-      version: 8.0.18
+      version: 8.1.18
       ini:
         xdebug.mode: coverage
 
