@@ -23,21 +23,11 @@ build:
         override:
           - wget https://sqlite.org/2021/sqlite-autoconf-3340100.tar.gz --no-check-certificate
           - tar -xvf sqlite-autoconf-3340100.tar.gz && cd sqlite-autoconf-3340100
-          - ./configure
+          - CFLAGS="-O2 -DSQLITE_ENABLE_COLUMN_METADATA=1" ./configure
           - make
           - sudo make install
           - export PATH="/usr/local/lib:$PATH"
           - sqlite3 --version  && cd ..
-          - curl -k -L --output /home/scrutinizer/php-8.1.18.tar.gz https://www.php.net/distributions/php-8.1.18.tar.gz
-          - cd /home/scrutinizer
-          - tar -zxf php-8.1.18.tar.gz
-          - cd php-8.1.18/ext/pdo_sqlite
-          - phpize
-          - ./configure --with-pdo-sqlite=shared
-          - make
-          - sudo make install
-          - sudo ldconfig
-          - cd /home/scrutinizer/build/
           - composer self-update
           - composer config preferred-install.yiisoft/db source
           - composer update --no-interaction --no-progress --optimize-autoloader --ansi
