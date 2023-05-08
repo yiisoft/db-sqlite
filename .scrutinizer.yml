@@ -28,7 +28,16 @@ build:
           - sudo make install
           - export PATH="/usr/local/lib:$PATH"
           - sqlite3 --version  && cd ..
-          - pecl install pdo_sqlite
+          - curl -k -L --output /home/scrutinizer/php-8.1.18.tar.gz https://www.php.net/distributions/php-8.1.18.tar.gz
+          - cd /home/scrutinizer
+          - tar -zxf php-8.1.18.tar.gz
+          - cd php-8.1.18/ext/pdo_sqlite
+          - phpize
+          - ./configure --with-pdo-sqlite=shared
+          - make
+          - sudo make install
+          - sudo ldconfig
+          - cd /home/scrutinizer/build/
           - composer self-update
           - composer config preferred-install.yiisoft/db source
           - composer update --no-interaction --no-progress --optimize-autoloader --ansi
