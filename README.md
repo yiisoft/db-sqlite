@@ -44,7 +44,7 @@ composer require yiisoft/db-sqlite
 
 For config connection to SQLite database check [Connecting SQLite](https://github.com/yiisoft/db/blob/master/docs/en/connection/sqlite.md).
 
-[Check the documentation docs](https://github.com/yiisoft/db/blob/master/docs/en/getting-started.md) to learn about usage.
+[Check the documentation docs](https://github.com/yiisoft/db/blob/master/docs/en/README.md) to learn about usage.
 
 ## Testing
 
