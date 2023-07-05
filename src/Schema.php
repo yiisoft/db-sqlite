@@ -514,7 +514,6 @@ final class Schema extends AbstractPdoSchema
             $defaultValue === '',
             $columnSchema->isPrimaryKey()
                 => null,
-            /** @psalm-var string $defaultValue */
             in_array($defaultValue, [
                 'CURRENT_TIMESTAMP',
                 'CURRENT_DATE',
@@ -522,6 +521,7 @@ final class Schema extends AbstractPdoSchema
             ], true)
                 => new Expression($defaultValue),
             default
+            /** @psalm-var string $defaultValue */
             => $columnSchema->phpTypecast(trim($defaultValue, "'\"")),
         };
     }
