@@ -514,14 +514,15 @@ final class Schema extends AbstractPdoSchema
             $defaultValue === '',
             $columnSchema->isPrimaryKey()
                 => null,
+            /** @psalm-var string $defaultValue */
             in_array($defaultValue, [
-                    'CURRENT_TIMESTAMP',
-                    'CURRENT_DATE',
-                    'CURRENT_TIME'
-                ],true)
-                    => new Expression($defaultValue),
+                'CURRENT_TIMESTAMP',
+                'CURRENT_DATE',
+                'CURRENT_TIME'
+            ],true)
+                => new Expression($defaultValue),
             default
-                => $columnSchema->phpTypecast(trim($defaultValue, "'\"")),
+            => $columnSchema->phpTypecast(trim($defaultValue, "'\"")),
         };
     }
 
