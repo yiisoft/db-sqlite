@@ -518,7 +518,7 @@ final class Schema extends AbstractPdoSchema
             in_array($defaultValue, [
                 'CURRENT_TIMESTAMP',
                 'CURRENT_DATE',
-                'CURRENT_TIME'
+                'CURRENT_TIME',
             ], true)
                 => new Expression($defaultValue),
             default
