@@ -519,7 +519,7 @@ final class Schema extends AbstractPdoSchema
                 'CURRENT_TIMESTAMP',
                 'CURRENT_DATE',
                 'CURRENT_TIME'
-            ],true)
+            ], true)
                 => new Expression($defaultValue),
             default
             => $columnSchema->phpTypecast(trim($defaultValue, "'\"")),
