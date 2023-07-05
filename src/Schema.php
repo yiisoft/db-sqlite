@@ -521,7 +521,7 @@ final class Schema extends AbstractPdoSchema
             ], true)
                 => new Expression($defaultValue),
             default
-            /** @psalm-var string $defaultValue */
+            /** @var string $defaultValue */
             => $columnSchema->phpTypecast(trim($defaultValue, "'\"")),
         };
     }
