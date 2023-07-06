@@ -505,6 +505,8 @@ final class Schema extends AbstractPdoSchema
      * @param ColumnSchemaInterface $columnSchema The column schema object.
      *
      * @return mixed The normalized default value.
+     *
+     * @psalm-suppress PossiblyNullArgument
      */
     private function normalizeDefaultValue(?string $defaultValue, ColumnSchemaInterface $columnSchema): mixed
     {
@@ -521,7 +523,7 @@ final class Schema extends AbstractPdoSchema
             ], true)
                 => new Expression($defaultValue),
             default
-            /** @var string $defaultValue */
+            /** @psalm-var string $defaultValue */
             => $columnSchema->phpTypecast(trim($defaultValue, "'\"")),
         };
     }
