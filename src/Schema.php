@@ -502,19 +502,19 @@ final class Schema extends AbstractPdoSchema
      * Converts column's default value according to {@see ColumnSchema::phpType} after retrieval from the database.
      *
      * @param string|null $defaultValue The default value retrieved from the database.
-     * @param ColumnSchemaInterface $columnSchema The column schema object.
+     * @param ColumnSchemaInterface $column The column schema object.
      *
      * @return mixed The normalized default value.
      *
      * @psalm-suppress PossiblyNullArgument
      */
-    private function normalizeDefaultValue(?string $defaultValue, ColumnSchemaInterface $columnSchema): mixed
+    private function normalizeDefaultValue(?string $defaultValue, ColumnSchemaInterface $column): mixed
     {
         return match (true) {
             $defaultValue === null,
             $defaultValue === 'null',
             $defaultValue === '',
-            $columnSchema->isPrimaryKey()
+            $column->isPrimaryKey()
                 => null,
             in_array($defaultValue, [
                 'CURRENT_TIMESTAMP',
@@ -524,7 +524,7 @@ final class Schema extends AbstractPdoSchema
                 => new Expression($defaultValue),
             default
             /** @psalm-var string $defaultValue */
-            => $columnSchema->phpTypecast(trim($defaultValue, "'\"")),
+            => $column->phpTypecast(trim($defaultValue, "'\"")),
         };
     }
 
