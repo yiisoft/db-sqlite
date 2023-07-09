@@ -131,8 +131,7 @@ CREATE TABLE "type" (
   time timestamp NOT NULL DEFAULT '2002-01-01 00:00:00',
   bool_col tinyint(1) NOT NULL,
   bool_col2 tinyint(1) DEFAULT '1',
-  ts_default TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  date_text text NOT NULL DEFAULT CURRENT_TIMESTAMP
+  ts_default TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "type_bit" (
@@ -162,6 +161,12 @@ CREATE TABLE "notauto_pk" (
   type VARCHAR(255) NOT NULL,
   PRIMARY KEY (id_1, id_2)
 );
+
+CREATE TABLE "timestamp_default" (
+  id INTEGER PRIMARY KEY,
+  text_col TEXT NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
+  timestamp_text TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+) STRICT;
 
 CREATE VIEW "animal_view" AS SELECT * FROM "animal";
 
