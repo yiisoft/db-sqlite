@@ -166,7 +166,7 @@ CREATE TABLE "timestamp_default" (
   id INTEGER PRIMARY KEY,
   text_col TEXT NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
   timestamp_text TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-) STRICT;
+);
 
 CREATE VIEW "animal_view" AS SELECT * FROM "animal";
 
