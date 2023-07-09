@@ -515,17 +515,9 @@ final class Schema extends AbstractPdoSchema
         }
 
         return match ($defaultValue) {
-            null,
-            'null',
-            ''
-                => null,
-            'CURRENT_TIMESTAMP',
-            'CURRENT_DATE',
-            'CURRENT_TIME'
-                => new Expression($defaultValue),
-            default
-            /** @psalm-var string $defaultValue */
-            => $column->phpTypecast(trim($defaultValue, "'\"")),
+            null, 'null', '' => null,
+            'CURRENT_TIMESTAMP', 'CURRENT_DATE', 'CURRENT_TIME' => new Expression($defaultValue),
+            default => $column->phpTypecast(trim($defaultValue, "'\"")),
         };
     }
 
