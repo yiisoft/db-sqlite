@@ -510,17 +510,18 @@ final class Schema extends AbstractPdoSchema
      */
     private function normalizeDefaultValue(?string $defaultValue, ColumnSchemaInterface $column): mixed
     {
-        return match (true) {
-            $defaultValue === null,
-            $defaultValue === 'null',
-            $defaultValue === '',
-            $column->isPrimaryKey()
+        if ($column->isPrimaryKey()) {
+            return null;
+        }
+
+        return match ($defaultValue) {
+            null,
+            'null',
+            ''
                 => null,
-            in_array($defaultValue, [
-                'CURRENT_TIMESTAMP',
-                'CURRENT_DATE',
-                'CURRENT_TIME',
-            ], true)
+            'CURRENT_TIMESTAMP',
+            'CURRENT_DATE',
+            'CURRENT_TIME'
                 => new Expression($defaultValue),
             default
             /** @psalm-var string $defaultValue */
