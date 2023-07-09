@@ -131,7 +131,8 @@ CREATE TABLE "type" (
   time timestamp NOT NULL DEFAULT '2002-01-01 00:00:00',
   bool_col tinyint(1) NOT NULL,
   bool_col2 tinyint(1) DEFAULT '1',
-  ts_default TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  ts_default TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  date_text text NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "type_bit" (
