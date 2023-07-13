@@ -162,6 +162,12 @@ CREATE TABLE "notauto_pk" (
   PRIMARY KEY (id_1, id_2)
 );
 
+CREATE TABLE "timestamp_default" (
+  id INTEGER PRIMARY KEY,
+  text_col TEXT NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
+  timestamp_text TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+); -- STRICT
+
 CREATE VIEW "animal_view" AS SELECT * FROM "animal";
 
 INSERT INTO "animal" ("type") VALUES ('yiiunit\data\ar\Cat');

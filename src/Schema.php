@@ -493,19 +493,32 @@ final class Schema extends AbstractPdoSchema
         }
 
         $column->phpType($this->getColumnPhpType($column));
-
-        if (!$column->isPrimaryKey()) {
-            if ($info['dflt_value'] === 'null' || $info['dflt_value'] === '' || $info['dflt_value'] === null) {
-                $column->defaultValue(null);
-            } elseif ($info['dflt_value'] === 'CURRENT_TIMESTAMP' && $column->getType() === 'timestamp') {
-                $column->defaultValue(new Expression('CURRENT_TIMESTAMP'));
-            } else {
-                $value = trim($info['dflt_value'], "'\"");
-                $column->defaultValue($column->phpTypecast($value));
-            }
-        }
+        $column->defaultValue($this->normalizeDefaultValue($info['dflt_value'], $column));
 
         return $column;
+    }
+
+    /**
+     * Converts column's default value according to {@see ColumnSchema::phpType} after retrieval from the database.
+     *
+     * @param string|null $defaultValue The default value retrieved from the database.
+     * @param ColumnSchemaInterface $column The column schema object.
+     *
+     * @return mixed The normalized default value.
+     *
+     * @psalm-suppress PossiblyNullArgument
+     */
+    private function normalizeDefaultValue(?string $defaultValue, ColumnSchemaInterface $column): mixed
+    {
+        if ($column->isPrimaryKey()) {
+            return null;
+        }
+
+        return match ($defaultValue) {
+            null, 'null', '' => null,
+            'CURRENT_TIMESTAMP', 'CURRENT_DATE', 'CURRENT_TIME' => new Expression($defaultValue),
+            default => $column->phpTypecast(trim($defaultValue, "'\"")),
+        };
     }
 
     /**
