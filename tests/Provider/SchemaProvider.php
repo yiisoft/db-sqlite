@@ -90,7 +90,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         'size' => 100,
                         'precision' => 100,
                         'scale' => null,
-                        'defaultValue' => 'something',
+                        'defaultValue' => 'something"',
                     ],
                     'char_col3' => [
                         'type' => 'text',
