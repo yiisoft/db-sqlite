@@ -505,20 +505,20 @@ final class Schema extends AbstractPdoSchema
      * @param ColumnSchemaInterface $column The column schema object.
      *
      * @return mixed The normalized default value.
-     *
-     * @psalm-suppress PossiblyNullArgument
      */
-    private function normalizeDefaultValue(?string $defaultValue, ColumnSchemaInterface $column): mixed
+    private function normalizeDefaultValue(string|null $defaultValue, ColumnSchemaInterface $column): mixed
     {
-        if ($column->isPrimaryKey()) {
+        if ($column->isPrimaryKey() || in_array($defaultValue, [null, '', 'null', 'NULL'], true)) {
             return null;
         }
 
-        return match ($defaultValue) {
-            null, 'null', '' => null,
-            'CURRENT_TIMESTAMP', 'CURRENT_DATE', 'CURRENT_TIME' => new Expression($defaultValue),
-            default => $column->phpTypecast(trim($defaultValue, "'\"")),
-        };
+        if (in_array($defaultValue, ['CURRENT_TIMESTAMP', 'CURRENT_DATE', 'CURRENT_TIME'], true)) {
+            return new Expression($defaultValue);
+        }
+
+        $value = preg_replace('/^([\'"])(.*)\1$/s', '$2', $defaultValue);
+
+        return $column->phpTypecast($value);
     }
 
     /**
