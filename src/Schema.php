@@ -25,10 +25,10 @@ use function count;
 use function explode;
 use function md5;
 use function preg_match;
+use function preg_replace;
 use function serialize;
 use function strncasecmp;
 use function strtolower;
-use function trim;
 
 /**
  * Implements the SQLite Server specific schema, supporting SQLite 3.3.0 or higher.
