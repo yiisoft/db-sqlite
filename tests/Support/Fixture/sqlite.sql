@@ -128,7 +128,7 @@ CREATE TABLE "type" (
   float_col2 double DEFAULT '1.23',
   blob_col blob,
   numeric_col decimal(5,2) DEFAULT '33.22',
-  time timestamp NOT NULL DEFAULT '2002-01-01 00:00:00',
+  timestamp_col timestamp NOT NULL DEFAULT '2002-01-01 00:00:00',
   bool_col tinyint(1) NOT NULL,
   bool_col2 tinyint(1) DEFAULT '1',
   ts_default TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
