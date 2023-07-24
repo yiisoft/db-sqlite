@@ -1,6 +1,6 @@
 # SQLite driver for Yii Database Change Log
 
-## 1.0.1 under development
+## 1.0.1 July 24, 2023
 
 - Enh #260: Typecast refactoring (@Tigrov)
 - Enh #262: Refactoring of `Schema::normalizeDefaultValue()` method (@Tigrov)
