@@ -157,7 +157,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         'scale' => 2,
                         'defaultValue' => 33.22,
                     ],
-                    'time' => [
+                    'timestamp_col' => [
                         'type' => 'timestamp',
                         'dbType' => 'timestamp',
                         'phpType' => 'string',
