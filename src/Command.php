@@ -122,7 +122,7 @@ final class Command extends AbstractPdoCommand
                     && $this->db->getTransaction() === null
                 ) {
                     $this->db->transaction(
-                        function (): void {
+                        function () use ($rawSql): void {
                             $this->internalExecute($rawSql);
                         },
                         $this->isolationLevel,
