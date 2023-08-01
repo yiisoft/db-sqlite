@@ -14,7 +14,7 @@ use Yiisoft\Db\Tests\Common\CommonPdoConnectionTest;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 /**
- * @group pgsql
+ * @group sqlite
  *
  * @psalm-suppress PropertyNotSetInConstructor
  */
