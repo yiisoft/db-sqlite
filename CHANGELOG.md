@@ -2,7 +2,7 @@
 
 ## 1.0.2 under development
 
-- no changes in this release.
+- Enh #263: Support json type (@Tigrov)
 
 ## 1.0.1 July 24, 2023
 
