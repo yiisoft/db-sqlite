@@ -131,7 +131,9 @@ CREATE TABLE "type" (
   timestamp_col timestamp NOT NULL DEFAULT '2002-01-01 00:00:00',
   bool_col tinyint(1) NOT NULL,
   bool_col2 tinyint(1) DEFAULT '1',
-  ts_default TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  ts_default TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  json_col json NOT NULL DEFAULT '{"number":10}',
+  json_text_col text CHECK(json_text_col IS NULL OR json_valid(json_text_col)) -- for STRICT table
 );
 
 CREATE TABLE "type_bit" (

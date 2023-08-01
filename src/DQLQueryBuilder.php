@@ -6,12 +6,14 @@ namespace Yiisoft\Db\Sqlite;
 
 use Yiisoft\Db\Expression\ExpressionBuilderInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
+use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
 use Yiisoft\Db\QueryBuilder\Condition\InCondition;
 use Yiisoft\Db\QueryBuilder\Condition\LikeCondition;
 use Yiisoft\Db\Sqlite\Builder\InConditionBuilder;
+use Yiisoft\Db\Sqlite\Builder\JsonExpressionBuilder;
 use Yiisoft\Db\Sqlite\Builder\LikeConditionBuilder;
 
 use function array_filter;
@@ -135,6 +137,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
         return array_merge(parent::defaultExpressionBuilders(), [
             LikeCondition::class => LikeConditionBuilder::class,
             InCondition::class => InConditionBuilder::class,
+            JsonExpression::class => JsonExpressionBuilder::class,
         ]);
     }
 }

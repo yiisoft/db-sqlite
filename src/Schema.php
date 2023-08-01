@@ -109,6 +109,7 @@ final class Schema extends AbstractPdoSchema
         'time' => self::TYPE_TIME,
         'timestamp' => self::TYPE_TIMESTAMP,
         'enum' => self::TYPE_STRING,
+        'json' => self::TYPE_JSON,
     ];
 
     public function createColumn(string $type, array|int|string $length = null): ColumnInterface
@@ -349,8 +350,13 @@ final class Schema extends AbstractPdoSchema
     {
         /** @psalm-var PragmaTableInfo $columns */
         $columns = $this->getPragmaTableInfo($table->getName());
+        $jsonColumns = $this->getJsonColumns($table);
 
         foreach ($columns as $info) {
+            if (in_array($info['name'], $jsonColumns, true)) {
+                $info['type'] = self::TYPE_JSON;
+            }
+
             $column = $this->loadColumnSchema($info);
             $table->column($column->getName(), $column);
 
@@ -719,5 +725,26 @@ final class Schema extends AbstractPdoSchema
     protected function getCacheTag(): string
     {
         return md5(serialize(array_merge([self::class], $this->generateCacheKey())));
+    }
+
+    /**
+     * @throws Throwable
+     */
+    private function getJsonColumns(TableSchemaInterface $table): array
+    {
+        $result = [];
+        /** @psalm-var CheckConstraint[] $checks */
+        $checks = $this->getTableChecks((string) $table->getFullName());
+        $regexp = '/\bjson_valid\(\s*["`\[]?(.+?)["`\]]?\s*\)/i';
+
+        foreach ($checks as $check) {
+            if (preg_match_all($regexp, $check->getExpression(), $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
+                    $result[] = $match[1];
+                }
+            }
+        }
+
+        return $result;
     }
 }

@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
+use PDO;
 use PHPUnit\Framework\TestCase;
+use Yiisoft\Db\Command\Param;
+use Yiisoft\Db\Expression\JsonExpression;
+use Yiisoft\Db\Sqlite\ColumnSchema;
+use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 
@@ -35,6 +40,8 @@ final class ColumnSchemaTest extends TestCase
                 'blob_col' => "\x10\x11\x12",
                 'timestamp_col' => '2023-07-11 14:50:23',
                 'bool_col' => false,
+                'json_col' => [['a' => 1, 'b' => null, 'c' => [1, 3, 5]]],
+                'json_text_col' => (new Query($db))->select(new Param('[1,2,3,"string",null]', PDO::PARAM_STR)),
             ]
         );
         $command->execute();
@@ -49,6 +56,8 @@ final class ColumnSchemaTest extends TestCase
         $blobColPhpType = $tableSchema->getColumn('blob_col')?->phpTypecast($query['blob_col']);
         $timestampColPhpType = $tableSchema->getColumn('timestamp_col')?->phpTypecast($query['timestamp_col']);
         $boolColPhpType = $tableSchema->getColumn('bool_col')?->phpTypecast($query['bool_col']);
+        $jsonColPhpType = $tableSchema->getColumn('json_col')?->phpTypecast($query['json_col']);
+        $jsonTextColPhpType = $tableSchema->getColumn('json_text_col')?->phpTypecast($query['json_text_col']);
 
         $this->assertSame(1, $intColPhpType);
         $this->assertSame(str_repeat('x', 100), $charColPhpType);
@@ -57,7 +66,19 @@ final class ColumnSchemaTest extends TestCase
         $this->assertSame("\x10\x11\x12", $blobColPhpType);
         $this->assertSame('2023-07-11 14:50:23', $timestampColPhpType);
         $this->assertFalse($boolColPhpType);
+        $this->assertSame([['a' => 1, 'b' => null, 'c' => [1, 3, 5]]], $jsonColPhpType);
+        $this->assertSame([1, 2, 3, 'string', null], $jsonTextColPhpType);
 
         $db->close();
+    }
+
+    public function testTypeCastJson(): void
+    {
+        $columnSchema = new ColumnSchema('json_col');
+        $columnSchema->dbType(SchemaInterface::TYPE_JSON);
+        $columnSchema->type(SchemaInterface::TYPE_JSON);
+
+        $this->assertSame(['a' => 1], $columnSchema->phpTypeCast('{"a":1}'));
+        $this->assertEquals(new JsonExpression(['a' => 1], SchemaInterface::TYPE_JSON), $columnSchema->dbTypeCast(['a' => 1]));
     }
 }
