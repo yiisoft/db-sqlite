@@ -67,8 +67,8 @@ final class ColumnSchema extends AbstractColumnSchema
      *
      * @param mixed $value The value to be converted.
      *
-     * @return mixed The converted value.
      * @throws JsonException
+     * @return mixed The converted value.
      */
     public function phpTypecast(mixed $value): mixed
     {
