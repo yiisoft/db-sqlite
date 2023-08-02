@@ -271,7 +271,7 @@ final class SchemaTest extends CommonSchemaTest
         $this->assertSame('CASCADE', $tableForeingKeys[0]->getOnUpdate());
 
         $tableTwoForeignKeys = $schema->getTableForeignKeys('foreign_keys_child');
-        $this->assertSame(2, count($tableTwoForeignKeys));
+        $this->assertCount(2, $tableTwoForeignKeys);
     }
 
     /**
