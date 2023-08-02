@@ -33,45 +33,40 @@ use function strtolower;
 /**
  * Implements the SQLite Server specific schema, supporting SQLite 3.3.0 or higher.
  *
- * @psalm-type Column = array<array-key, array{seqno:string, cid:string, name:string}>
- * @psalm-type NormalizePragmaForeignKeyList = array<
- *   string,
- *   array<
- *     array-key,
- *     array{
- *       id:string,
- *       cid:string,
- *       seq:string,
- *       table:string,
- *       from:string,
- *       to:string,
- *       on_update:string,
- *       on_delete:string
- *     }
- *   >
- * >
- * @psalm-type PragmaForeignKeyList = array<
- *   string,
- *   array{
+ * @psalm-type PragmaForeignKeyList = array{
  *     id:string,
  *     cid:string,
  *     seq:string,
  *     table:string,
  *     from:string,
- *     to:string,
+ *     to:string|null,
  *     on_update:string,
  *     on_delete:string
- *   }
+ * }
+ * @psalm-type IndexedPragmaForeignKeyList = array<
+ *     string,
+ *     PragmaForeignKeyList[]
  * >
- * @psalm-type PragmaIndexInfo = array<array-key, array{seqno:string, cid:string, name:string}>
- * @psalm-type PragmaIndexList = array<
- *   array-key,
- *   array{seq:string, name:string, unique:string, origin:string, partial:string}
- * >
- * @psalm-type PragmaTableInfo = array<
- *   array-key,
- *   array{cid:string, name:string, type:string, notnull:string, dflt_value:string|null, pk:string}
- * >
+ * @psalm-type PragmaIndexInfo = array{
+ *     seqno:string,
+ *     cid:string,
+ *     name:string
+ * }
+ * @psalm-type PragmaIndexList = array{
+ *     seq:string,
+ *     name:string,
+ *     unique:string,
+ *     origin:string,
+ *     partial:string
+ * }
+ * @psalm-type PragmaTableInfo = array{
+ *     cid:string,
+ *     name:string,
+ *     type:string,
+ *     notnull:string,
+ *     dflt_value:string|null,
+ *     pk:string
+ * }
  */
 final class Schema extends AbstractPdoSchema
 {
@@ -201,15 +196,14 @@ final class Schema extends AbstractPdoSchema
     protected function loadTableForeignKeys(string $tableName): array
     {
         $result = [];
-        /** @psalm-var PragmaForeignKeyList $foreignKeysList */
+
         $foreignKeysList = $this->getPragmaForeignKeyList($tableName);
-        /** @psalm-var NormalizePragmaForeignKeyList $foreignKeysList */
+        /** @psalm-var PragmaForeignKeyList[] $foreignKeysList */
         $foreignKeysList = $this->normalizeRowKeyCase($foreignKeysList, true);
-        /** @psalm-var NormalizePragmaForeignKeyList $foreignKeysList */
         $foreignKeysList = DbArrayHelper::index($foreignKeysList, null, ['table']);
         DbArrayHelper::multisort($foreignKeysList, 'seq');
 
-        /** @psalm-var NormalizePragmaForeignKeyList $foreignKeysList */
+        /** @psalm-var IndexedPragmaForeignKeyList $foreignKeysList */
         foreach ($foreignKeysList as $table => $foreignKey) {
             $fk = (new ForeignKeyConstraint())
                 ->columnNames(DbArrayHelper::getColumn($foreignKey, 'from'))
@@ -347,7 +341,7 @@ final class Schema extends AbstractPdoSchema
      */
     protected function findColumns(TableSchemaInterface $table): bool
     {
-        /** @psalm-var PragmaTableInfo $columns */
+        /** @psalm-var PragmaTableInfo[] $columns */
         $columns = $this->getPragmaTableInfo($table->getName());
 
         foreach ($columns as $info) {
@@ -380,7 +374,7 @@ final class Schema extends AbstractPdoSchema
      */
     protected function findConstraints(TableSchemaInterface $table): void
     {
-        /** @psalm-var PragmaForeignKeyList $foreignKeysList */
+        /** @psalm-var PragmaForeignKeyList[] $foreignKeysList */
         $foreignKeysList = $this->getPragmaForeignKeyList($table->getName());
 
         foreach ($foreignKeysList as $foreignKey) {
@@ -418,13 +412,13 @@ final class Schema extends AbstractPdoSchema
      */
     public function findUniqueIndexes(TableSchemaInterface $table): array
     {
-        /** @psalm-var PragmaIndexList $indexList */
+        /** @psalm-var PragmaIndexList[] $indexList */
         $indexList = $this->getPragmaIndexList($table->getName());
         $uniqueIndexes = [];
 
         foreach ($indexList as $index) {
             $indexName = $index['name'];
-            /** @psalm-var PragmaIndexInfo $indexInfo */
+            /** @psalm-var PragmaIndexInfo[] $indexInfo */
             $indexInfo = $this->getPragmaIndexInfo($index['name']);
 
             if ($index['unique']) {
@@ -535,7 +529,7 @@ final class Schema extends AbstractPdoSchema
     private function loadTableColumnsInfo(string $tableName): array
     {
         $tableColumns = $this->getPragmaTableInfo($tableName);
-        /** @psalm-var PragmaTableInfo $tableColumns */
+        /** @psalm-var PragmaTableInfo[] $tableColumns */
         $tableColumns = $this->normalizeRowKeyCase($tableColumns, true);
 
         return DbArrayHelper::index($tableColumns, 'cid');
@@ -556,7 +550,7 @@ final class Schema extends AbstractPdoSchema
     private function loadTableConstraints(string $tableName, string $returnType): Constraint|array|null
     {
         $indexList = $this->getPragmaIndexList($tableName);
-        /** @psalm-var PragmaIndexList $indexes */
+        /** @psalm-var PragmaIndexList[] $indexes */
         $indexes = $this->normalizeRowKeyCase($indexList, true);
         $result = [
             self::PRIMARY_KEY => null,
@@ -565,7 +559,7 @@ final class Schema extends AbstractPdoSchema
         ];
 
         foreach ($indexes as $index) {
-            /** @psalm-var Column $columns */
+            /** @psalm-var PragmaIndexInfo[] $columns */
             $columns = $this->getPragmaIndexInfo($index['name']);
 
             if ($index['origin'] === 'pk') {
@@ -592,7 +586,7 @@ final class Schema extends AbstractPdoSchema
              *
              * @link https://www.sqlite.org/lang_createtable.html#primkeyconst
              *
-             * @psalm-var PragmaTableInfo $tableColumns
+             * @psalm-var PragmaTableInfo[] $tableColumns
              */
             $tableColumns = $this->loadTableColumnsInfo($tableName);
 
@@ -645,7 +639,7 @@ final class Schema extends AbstractPdoSchema
         $column = $this->db
             ->createCommand('PRAGMA INDEX_INFO(' . (string) $this->db->getQuoter()->quoteValue($name) . ')')
             ->queryAll();
-        /** @psalm-var Column $column */
+        /** @psalm-var PragmaIndexInfo[] $column */
         $column = $this->normalizeRowKeyCase($column, true);
         DbArrayHelper::multisort($column, 'seqno');
 
