@@ -7,7 +7,6 @@ namespace Yiisoft\Db\Sqlite;
 use PDOException;
 use Throwable;
 use Yiisoft\Db\Driver\Pdo\AbstractPdoCommand;
-use Yiisoft\Db\Driver\Pdo\PdoConnectionInterface;
 use Yiisoft\Db\Exception\ConvertException;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
@@ -123,7 +122,9 @@ final class Command extends AbstractPdoCommand
                     && $this->db->getTransaction() === null
                 ) {
                     $this->db->transaction(
-                        fn (PdoConnectionInterface $db) => $this->internalExecute($rawSql),
+                        function () use ($rawSql): void {
+                            $this->internalExecute($rawSql);
+                        },
                         $this->isolationLevel,
                     );
                 } else {
