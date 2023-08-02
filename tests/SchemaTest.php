@@ -162,6 +162,33 @@ final class SchemaTest extends CommonSchemaTest
         $this->assertSame('NO ACTION', $foreingKeys[1]->getOnUpdate());
     }
 
+    public function testMultiForeingKeys(): void
+    {
+        $db = $this->getConnection(true);
+        $schema = $db->getSchema();
+        $tableSchema = $schema->getTableSchema('foreign_keys_child');
+
+        $this->assertNotNull($tableSchema);
+
+        $foreignKeys = $tableSchema->getForeignKeys();
+
+        $this->assertSame(
+            [
+                [
+                    'foreign_keys_parent',
+                    'y' => 'b',
+                    'z' => 'c',
+                ],
+                [
+                    'foreign_keys_parent',
+                    'x' => 'a',
+                    'y' => 'b',
+                ],
+            ],
+            $foreignKeys
+        );
+    }
+
     /**
      * @throws Exception
      * @throws InvalidConfigException
@@ -242,6 +269,9 @@ final class SchemaTest extends CommonSchemaTest
         $this->assertSame(['C_id_1', 'C_id_2'], $tableForeingKeys[0]->getForeignColumnNames());
         $this->assertSame('CASCADE', $tableForeingKeys[0]->getOnDelete());
         $this->assertSame('CASCADE', $tableForeingKeys[0]->getOnUpdate());
+
+        $tableTwoForeignKeys = $schema->getTableForeignKeys('foreign_keys_child');
+        $this->assertSame(2, count($tableTwoForeignKeys));
     }
 
     /**

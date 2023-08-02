@@ -20,6 +20,7 @@ use Yiisoft\Db\Schema\Builder\ColumnInterface;
 use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 
+use function array_column;
 use function array_merge;
 use function count;
 use function explode;
@@ -44,7 +45,7 @@ use function strtolower;
  *       seq:string,
  *       table:string,
  *       from:string,
- *       to:string,
+ *       to:string|null,
  *       on_update:string,
  *       on_delete:string
  *     }
@@ -58,7 +59,7 @@ use function strtolower;
  *     seq:string,
  *     table:string,
  *     from:string,
- *     to:string,
+ *     to:string|null,
  *     on_update:string,
  *     on_delete:string
  *   }
@@ -210,15 +211,31 @@ final class Schema extends AbstractPdoSchema
         DbArrayHelper::multisort($foreignKeysList, 'seq');
 
         /** @psalm-var NormalizePragmaForeignKeyList $foreignKeysList */
-        foreach ($foreignKeysList as $table => $foreignKey) {
-            $fk = (new ForeignKeyConstraint())
-                ->columnNames(DbArrayHelper::getColumn($foreignKey, 'from'))
-                ->foreignTableName($table)
-                ->foreignColumnNames(DbArrayHelper::getColumn($foreignKey, 'to'))
-                ->onDelete($foreignKey[0]['on_delete'] ?? null)
-                ->onUpdate($foreignKey[0]['on_update'] ?? null);
+        foreach ($foreignKeysList as $table => $foreignKeys) {
+            $foreignKeysById = DbArrayHelper::index($foreignKeys, null, ['id']);
 
-            $result[] = $fk;
+            /** @psalm-var NormalizePragmaForeignKeyList $foreignKeysById */
+            foreach ($foreignKeysById as $id => $foreignKey) {
+                if ($foreignKey[0]['to'] === null) {
+                    $primaryKey = $this->getTablePrimaryKey($table);
+
+                    if ($primaryKey !== null) {
+                        /** @psalm-var string $primaryKeyName */
+                        foreach ((array) $primaryKey->getColumnNames() as $i => $primaryKeyName) {
+                            $foreignKey[$i]['to'] = $primaryKeyName;
+                        }
+                    }
+                }
+
+                $fk = (new ForeignKeyConstraint())
+                    ->columnNames(array_column($foreignKey, 'from'))
+                    ->foreignTableName($table)
+                    ->foreignColumnNames(array_column($foreignKey, 'to'))
+                    ->onDelete($foreignKey[0]['on_delete'])
+                    ->onUpdate($foreignKey[0]['on_update']);
+
+                $result[(int) $id] = $fk;
+            }
         }
 
         return $result;
@@ -380,19 +397,17 @@ final class Schema extends AbstractPdoSchema
      */
     protected function findConstraints(TableSchemaInterface $table): void
     {
-        /** @psalm-var PragmaForeignKeyList $foreignKeysList */
-        $foreignKeysList = $this->getPragmaForeignKeyList($table->getName());
+        /** @psalm-var ForeignKeyConstraint[] $foreignKeysList */
+        $foreignKeysList = $this->getTableForeignKeys($table->getName(), true);
 
-        foreach ($foreignKeysList as $foreignKey) {
-            $id = (int) $foreignKey['id'];
-            $fk = $table->getForeignKeys();
+        foreach ($foreignKeysList as $id => $foreignKey) {
+            /** @var array<string> $columnNames */
+            $columnNames = (array) $foreignKey->getColumnNames();
+            $columnNames = array_combine($columnNames, $foreignKey->getForeignColumnNames());
 
-            if (!isset($fk[$id])) {
-                $table->foreignKey($id, [$foreignKey['table'], $foreignKey['from'] => $foreignKey['to']]);
-            } else {
-                /** composite FK */
-                $table->compositeForeignKey($id, $foreignKey['from'], $foreignKey['to']);
-            }
+            $foreignReference = array_merge([$foreignKey->getForeignTableName()], $columnNames);
+
+            $table->foreignKey($id, $foreignReference);
         }
     }
 
