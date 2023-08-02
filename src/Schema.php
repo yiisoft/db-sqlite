@@ -43,7 +43,7 @@ use function strtolower;
  *     on_update:string,
  *     on_delete:string
  * }
- * @psalm-type IndexedForeignKeyInfo = array<
+ * @psalm-type GroupedForeignKeyInfo = array<
  *     string,
  *     ForeignKeyInfo[]
  * >
@@ -203,7 +203,7 @@ final class Schema extends AbstractPdoSchema
         $foreignKeysList = DbArrayHelper::index($foreignKeysList, null, ['table']);
         DbArrayHelper::multisort($foreignKeysList, 'seq');
 
-        /** @psalm-var IndexedForeignKeyInfo $foreignKeysList */
+        /** @psalm-var GroupedForeignKeyInfo $foreignKeysList */
         foreach ($foreignKeysList as $table => $foreignKey) {
             $fk = (new ForeignKeyConstraint())
                 ->columnNames(DbArrayHelper::getColumn($foreignKey, 'from'))
