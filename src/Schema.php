@@ -39,7 +39,7 @@ use function strtolower;
  *     seq:string,
  *     table:string,
  *     from:string,
- *     to:string|null,
+ *     to:string,
  *     on_update:string,
  *     on_delete:string
  * }
