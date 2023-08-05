@@ -104,10 +104,12 @@ final class Schema extends AbstractPdoSchema
         'char' => self::TYPE_CHAR,
         'blob' => self::TYPE_BINARY,
         'datetime' => self::TYPE_DATETIME,
-        'year' => self::TYPE_DATE,
+        'year' => self::TYPE_SMALLINT,
         'date' => self::TYPE_DATE,
         'time' => self::TYPE_TIME,
+        'timetz' => self::TYPE_TIME,
         'timestamp' => self::TYPE_TIMESTAMP,
+        'timestamptz' => self::TYPE_TIMESTAMP,
         'enum' => self::TYPE_STRING,
     ];
 
@@ -457,42 +459,46 @@ final class Schema extends AbstractPdoSchema
      */
     protected function loadColumnSchema(array $info): ColumnSchemaInterface
     {
+        $dbType = strtolower($info['type']);
+
         $column = $this->createColumnSchema($info['name']);
         $column->allowNull(!$info['notnull']);
         $column->primaryKey($info['pk'] != '0');
-        $column->dbType(strtolower($info['type']));
-        $column->unsigned(str_contains($column->getDbType() ?? '', 'unsigned'));
-        $column->type(self::TYPE_STRING);
+        $column->dbType($dbType);
+        $column->unsigned(str_contains($dbType, 'unsigned'));
 
-        if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->getDbType() ?? '', $matches)) {
-            $type = strtolower($matches[1]);
+        preg_match('/^(\w*)(?:\(([^)]+)\))?/', $dbType, $matches);
+        $type = $matches[1];
 
-            if (isset($this->typeMap[$type])) {
-                $column->type($this->typeMap[$type]);
+        $column->type(match ($info['dflt_value']) {
+            'CURRENT_TIMESTAMP' => self::TYPE_TIMESTAMP,
+            'CURRENT_DATE' => self::TYPE_DATE,
+            'CURRENT_TIME' => self::TYPE_TIME,
+            default => $this->typeMap[$type] ?? self::TYPE_STRING,
+        });
+
+        if (!empty($matches[2])) {
+            $values = explode(',', $matches[2]);
+            $column->precision((int) $values[0]);
+            $column->size((int) $values[0]);
+
+            if (isset($values[1])) {
+                $column->scale((int) $values[1]);
             }
 
-            if (!empty($matches[2])) {
-                $values = explode(',', $matches[2]);
-                $column->precision((int) $values[0]);
-                $column->size((int) $values[0]);
-
-                if (isset($values[1])) {
-                    $column->scale((int) $values[1]);
-                }
-
-                if (($type === 'tinyint' || $type === 'bit') && $column->getSize() === 1) {
-                    $column->type(self::TYPE_BOOLEAN);
-                } elseif ($type === 'bit') {
-                    if ($column->getSize() > 32) {
-                        $column->type(self::TYPE_BIGINT);
-                    } elseif ($column->getSize() === 32) {
-                        $column->type(self::TYPE_INTEGER);
-                    }
+            if (($type === 'tinyint' || $type === 'bit') && $column->getSize() === 1) {
+                $column->type(self::TYPE_BOOLEAN);
+            } elseif ($type === 'bit') {
+                if ($column->getSize() > 32) {
+                    $column->type(self::TYPE_BIGINT);
+                } elseif ($column->getSize() === 32) {
+                    $column->type(self::TYPE_INTEGER);
                 }
             }
         }
 
         $column->phpType($this->getColumnPhpType($column));
+        $column->dateTimeFormat($this->getDateTimeFormat($column));
         $column->defaultValue($this->normalizeDefaultValue($info['dflt_value'], $column));
 
         return $column;
@@ -512,11 +518,11 @@ final class Schema extends AbstractPdoSchema
             return null;
         }
 
-        if (in_array($defaultValue, ['CURRENT_TIMESTAMP', 'CURRENT_DATE', 'CURRENT_TIME'], true)) {
-            return new Expression($defaultValue);
-        }
+        $value = preg_replace('/^([\'"])(.*)\1$/s', '$2', $defaultValue, 1);
 
-        $value = preg_replace('/^([\'"])(.*)\1$/s', '$2', $defaultValue);
+        if ($column->getDateTimeFormat() !== null) {
+            return date_create_immutable($value) ?: new Expression($defaultValue);
+        }
 
         return $column->phpTypecast($value);
     }
