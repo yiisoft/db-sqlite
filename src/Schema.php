@@ -214,7 +214,10 @@ final class Schema extends AbstractPdoSchema
         foreach ($foreignKeysList as $table => $foreignKeys) {
             $foreignKeysById = DbArrayHelper::index($foreignKeys, null, ['id']);
 
-            /** @psalm-var NormalizePragmaForeignKeyList $foreignKeysById */
+            /** 
+             * @psalm-var NormalizePragmaForeignKeyList $foreignKeysById
+             * @psalm-var int $id
+             */
             foreach ($foreignKeysById as $id => $foreignKey) {
                 if ($foreignKey[0]['to'] === null) {
                     $primaryKey = $this->getTablePrimaryKey($table);
