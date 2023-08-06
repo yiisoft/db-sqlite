@@ -2,7 +2,7 @@
 
 ## 1.0.2 under development
 
-- Bug #268: Fix foreign keys (@Tigrov)
+- Bug #268: Fix foreign keys: support multiple foreign keys referencing to one table and possible null columns for reference (@Tigrov)
 
 ## 1.0.1 July 24, 2023
 
