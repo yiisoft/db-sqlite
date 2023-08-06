@@ -228,7 +228,7 @@ final class Schema extends AbstractPdoSchema
                 }
 
                 $fk = (new ForeignKeyConstraint())
-                    ->name($id)
+                    ->name((string) $id)
                     ->columnNames(array_column($foreignKey, 'from'))
                     ->foreignTableName($table)
                     ->foreignColumnNames(array_column($foreignKey, 'to'))
