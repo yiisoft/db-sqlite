@@ -214,7 +214,7 @@ final class Schema extends AbstractPdoSchema
         foreach ($foreignKeysList as $table => $foreignKeys) {
             $foreignKeysById = DbArrayHelper::index($foreignKeys, null, ['id']);
 
-            /** 
+            /**
              * @psalm-var NormalizePragmaForeignKeyList $foreignKeysById
              * @psalm-var int $id
              */
