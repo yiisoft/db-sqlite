@@ -11,6 +11,9 @@ use Yiisoft\Db\Schema\AbstractTableSchema;
  */
 final class TableSchema extends AbstractTableSchema
 {
+    /**
+     * @deprecated will be removed in version 2.0.0
+     */
     public function compositeForeignKey(int $id, string $from, string $to): void
     {
         $this->foreignKeys[$id][$from] = $to;

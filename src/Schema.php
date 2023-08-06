@@ -220,21 +220,22 @@ final class Schema extends AbstractPdoSchema
                     $primaryKey = $this->getTablePrimaryKey($table);
 
                     if ($primaryKey !== null) {
-                        /** @psalm-var string $primaryKeyName */
-                        foreach ((array) $primaryKey->getColumnNames() as $i => $primaryKeyName) {
-                            $foreignKey[$i]['to'] = $primaryKeyName;
+                        /** @psalm-var string $primaryKeyColumnName */
+                        foreach ((array) $primaryKey->getColumnNames() as $i => $primaryKeyColumnName) {
+                            $foreignKey[$i]['to'] = $primaryKeyColumnName;
                         }
                     }
                 }
 
                 $fk = (new ForeignKeyConstraint())
+                    ->name($id)
                     ->columnNames(array_column($foreignKey, 'from'))
                     ->foreignTableName($table)
                     ->foreignColumnNames(array_column($foreignKey, 'to'))
                     ->onDelete($foreignKey[0]['on_delete'])
                     ->onUpdate($foreignKey[0]['on_update']);
 
-                $result[(int) $id] = $fk;
+                $result[] = $fk;
             }
         }
 
@@ -400,14 +401,15 @@ final class Schema extends AbstractPdoSchema
         /** @psalm-var ForeignKeyConstraint[] $foreignKeysList */
         $foreignKeysList = $this->getTableForeignKeys($table->getName(), true);
 
-        foreach ($foreignKeysList as $id => $foreignKey) {
+        foreach ($foreignKeysList as $foreignKey) {
             /** @var array<string> $columnNames */
             $columnNames = (array) $foreignKey->getColumnNames();
             $columnNames = array_combine($columnNames, $foreignKey->getForeignColumnNames());
 
             $foreignReference = array_merge([$foreignKey->getForeignTableName()], $columnNames);
 
-            $table->foreignKey($id, $foreignReference);
+            /** @psalm-suppress InvalidCast */
+            $table->foreignKey((int) $foreignKey->getName(), $foreignReference);
         }
     }
 
