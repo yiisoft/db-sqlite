@@ -412,7 +412,7 @@ final class Schema extends AbstractPdoSchema
             $foreignReference = array_merge([$foreignKey->getForeignTableName()], $columnNames);
 
             /** @psalm-suppress InvalidCast */
-            $table->foreignKey((int) $foreignKey->getName(), $foreignReference);
+            $table->foreignKey($foreignKey->getName(), $foreignReference);
         }
     }
 
