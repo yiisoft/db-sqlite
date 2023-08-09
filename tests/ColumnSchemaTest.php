@@ -35,6 +35,7 @@ final class ColumnSchemaTest extends TestCase
                 'blob_col' => "\x10\x11\x12",
                 'timestamp_col' => '2023-07-11 14:50:23',
                 'bool_col' => false,
+                'bit_col' => 0b0110_0110, // 102
             ]
         );
         $command->execute();
@@ -49,6 +50,7 @@ final class ColumnSchemaTest extends TestCase
         $blobColPhpType = $tableSchema->getColumn('blob_col')?->phpTypecast($query['blob_col']);
         $timestampColPhpType = $tableSchema->getColumn('timestamp_col')?->phpTypecast($query['timestamp_col']);
         $boolColPhpType = $tableSchema->getColumn('bool_col')?->phpTypecast($query['bool_col']);
+        $bitColPhpType = $tableSchema->getColumn('bit_col')?->phpTypecast($query['bit_col']);
 
         $this->assertSame(1, $intColPhpType);
         $this->assertSame(str_repeat('x', 100), $charColPhpType);
@@ -57,6 +59,7 @@ final class ColumnSchemaTest extends TestCase
         $this->assertSame("\x10\x11\x12", $blobColPhpType);
         $this->assertSame('2023-07-11 14:50:23', $timestampColPhpType);
         $this->assertFalse($boolColPhpType);
+        $this->assertSame(0b0110_0110, $bitColPhpType);
 
         $db->close();
     }
