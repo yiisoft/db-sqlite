@@ -6,6 +6,8 @@ namespace Yiisoft\Db\Sqlite;
 
 use Yiisoft\Db\Schema\AbstractColumnSchema;
 
+use function str_contains;
+
 /**
  * Represents the metadata of a column in a database table for SQLite Server.
  *
@@ -32,4 +34,8 @@ use Yiisoft\Db\Schema\AbstractColumnSchema;
  */
 final class ColumnSchema extends AbstractColumnSchema
 {
+    public function hasTimezone(): bool
+    {
+        return str_contains((string) $this->getDbType(), 'tz');
+    }
 }
