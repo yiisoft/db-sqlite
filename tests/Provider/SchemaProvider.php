@@ -405,7 +405,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
         $constraints['2: unique'][2][0]->name(AnyValue::getInstance());
         $constraints['2: index'][2][2]->name(AnyValue::getInstance());
 
-        $constraints['3: foreign key'][2][0]->name(null);
+        $constraints['3: foreign key'][2][0]->name('0');
         $constraints['3: index'][2] = [];
 
         $constraints['4: primary key'][2]->name(null);

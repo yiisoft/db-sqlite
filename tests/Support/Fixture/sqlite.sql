@@ -23,6 +23,8 @@ DROP TABLE IF EXISTS "T_constraints_1";
 DROP TABLE IF EXISTS "T_upsert";
 DROP TABLE IF EXISTS "T_upsert_1";
 DROP TABLE IF EXISTS "T_constraints_check";
+DROP TABLE IF EXISTS "foreign_keys_parent";
+DROP TABLE IF EXISTS "foreign_keys_child";
 
 CREATE TABLE "profile" (
   id INTEGER NOT NULL,
@@ -288,4 +290,22 @@ CREATE TABLE "T_constraints_check"
     "C_check_1" INT NOT NULL CHECK ("C_check_1" > 0),
     "C_check_2" INT NOT NULL CHECK ("C_check_2" > 0),
     CONSTRAINT "CN_constraints_check" CHECK ("C_check_1" > "C_check_2")
+);
+
+CREATE TABLE foreign_keys_parent
+(
+    a INTEGER,
+    b INTEGER,
+    c INTEGER,
+    PRIMARY KEY(a, b),
+    UNIQUE (b, c)
+);
+
+CREATE TABLE foreign_keys_child
+(
+    x INTEGER,
+    y INTEGER,
+    z INTEGER,
+    FOREIGN KEY(x, y) REFERENCES foreign_keys_parent,
+    FOREIGN KEY(y, z) REFERENCES foreign_keys_parent(b, c)
 );
