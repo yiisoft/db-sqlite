@@ -132,7 +132,7 @@ CREATE TABLE "type" (
   bool_col tinyint(1) NOT NULL,
   bool_col2 tinyint(1) DEFAULT '1',
   ts_default TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  bit_col BIT(8) NOT NULL DEFAULT 130 -- 0b1000_0010
+  bit_col BIT(8) NOT NULL DEFAULT 130, -- 0b1000_0010
   json_col json NOT NULL DEFAULT '{"number":10}',
   json_text_col text CHECK(json_text_col IS NULL OR json_valid(json_text_col)) -- for STRICT table
 );
