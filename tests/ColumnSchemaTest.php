@@ -40,6 +40,7 @@ final class ColumnSchemaTest extends TestCase
                 'blob_col' => "\x10\x11\x12",
                 'timestamp_col' => '2023-07-11 14:50:23',
                 'bool_col' => false,
+                'bit_col' => 0b0110_0110, // 102
                 'json_col' => [['a' => 1, 'b' => null, 'c' => [1, 3, 5]]],
                 'json_text_col' => (new Query($db))->select(new Param('[1,2,3,"string",null]', PDO::PARAM_STR)),
             ]
@@ -56,6 +57,7 @@ final class ColumnSchemaTest extends TestCase
         $blobColPhpType = $tableSchema->getColumn('blob_col')?->phpTypecast($query['blob_col']);
         $timestampColPhpType = $tableSchema->getColumn('timestamp_col')?->phpTypecast($query['timestamp_col']);
         $boolColPhpType = $tableSchema->getColumn('bool_col')?->phpTypecast($query['bool_col']);
+        $bitColPhpType = $tableSchema->getColumn('bit_col')?->phpTypecast($query['bit_col']);
         $jsonColPhpType = $tableSchema->getColumn('json_col')?->phpTypecast($query['json_col']);
         $jsonTextColPhpType = $tableSchema->getColumn('json_text_col')?->phpTypecast($query['json_text_col']);
 
@@ -66,6 +68,7 @@ final class ColumnSchemaTest extends TestCase
         $this->assertSame("\x10\x11\x12", $blobColPhpType);
         $this->assertSame('2023-07-11 14:50:23', $timestampColPhpType);
         $this->assertFalse($boolColPhpType);
+        $this->assertSame(0b0110_0110, $bitColPhpType);
         $this->assertSame([['a' => 1, 'b' => null, 'c' => [1, 3, 5]]], $jsonColPhpType);
         $this->assertSame([1, 2, 3, 'string', null], $jsonTextColPhpType);
 
