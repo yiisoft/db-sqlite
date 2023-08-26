@@ -4,6 +4,7 @@
 
 - Enh #263: Support json type (@Tigrov)
 - Bug #268: Fix foreign keys: support multiple foreign keys referencing to one table and possible null columns for reference (@Tigrov)
+- Bug #271: Refactor `DMLQueryBuilder`, related with yiisoft/db#746 (@Tigrov)
 
 ## 1.0.1 July 24, 2023
 
