@@ -20,6 +20,7 @@ use Yiisoft\Db\Schema\Builder\ColumnInterface;
 use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 
+use function array_column;
 use function array_merge;
 use function count;
 use function explode;
@@ -39,7 +40,7 @@ use function strtolower;
  *     seq:string,
  *     table:string,
  *     from:string,
- *     to:string,
+ *     to:string|null,
  *     on_update:string,
  *     on_delete:string
  * }
@@ -104,6 +105,7 @@ final class Schema extends AbstractPdoSchema
         'time' => self::TYPE_TIME,
         'timestamp' => self::TYPE_TIMESTAMP,
         'enum' => self::TYPE_STRING,
+        'json' => self::TYPE_JSON,
     ];
 
     public function createColumn(string $type, array|int|string $length = null): ColumnInterface
@@ -204,15 +206,35 @@ final class Schema extends AbstractPdoSchema
         DbArrayHelper::multisort($foreignKeysList, 'seq');
 
         /** @psalm-var GroupedForeignKeyInfo $foreignKeysList */
-        foreach ($foreignKeysList as $table => $foreignKey) {
-            $fk = (new ForeignKeyConstraint())
-                ->columnNames(DbArrayHelper::getColumn($foreignKey, 'from'))
-                ->foreignTableName($table)
-                ->foreignColumnNames(DbArrayHelper::getColumn($foreignKey, 'to'))
-                ->onDelete($foreignKey[0]['on_delete'] ?? null)
-                ->onUpdate($foreignKey[0]['on_update'] ?? null);
+        foreach ($foreignKeysList as $table => $foreignKeys) {
+            $foreignKeysById = DbArrayHelper::index($foreignKeys, null, ['id']);
 
-            $result[] = $fk;
+            /**
+             * @psalm-var GroupedForeignKeyInfo $foreignKeysById
+             * @psalm-var int $id
+             */
+            foreach ($foreignKeysById as $id => $foreignKey) {
+                if ($foreignKey[0]['to'] === null) {
+                    $primaryKey = $this->getTablePrimaryKey($table);
+
+                    if ($primaryKey !== null) {
+                        /** @psalm-var string $primaryKeyColumnName */
+                        foreach ((array) $primaryKey->getColumnNames() as $i => $primaryKeyColumnName) {
+                            $foreignKey[$i]['to'] = $primaryKeyColumnName;
+                        }
+                    }
+                }
+
+                $fk = (new ForeignKeyConstraint())
+                    ->name((string) $id)
+                    ->columnNames(array_column($foreignKey, 'from'))
+                    ->foreignTableName($table)
+                    ->foreignColumnNames(array_column($foreignKey, 'to'))
+                    ->onDelete($foreignKey[0]['on_delete'])
+                    ->onUpdate($foreignKey[0]['on_update']);
+
+                $result[] = $fk;
+            }
         }
 
         return $result;
@@ -343,8 +365,13 @@ final class Schema extends AbstractPdoSchema
     {
         /** @psalm-var ColumnInfo[] $columns */
         $columns = $this->getPragmaTableInfo($table->getName());
+        $jsonColumns = $this->getJsonColumns($table);
 
         foreach ($columns as $info) {
+            if (in_array($info['name'], $jsonColumns, true)) {
+                $info['type'] = self::TYPE_JSON;
+            }
+
             $column = $this->loadColumnSchema($info);
             $table->column($column->getName(), $column);
 
@@ -374,19 +401,18 @@ final class Schema extends AbstractPdoSchema
      */
     protected function findConstraints(TableSchemaInterface $table): void
     {
-        /** @psalm-var ForeignKeyInfo[] $foreignKeysList */
-        $foreignKeysList = $this->getPragmaForeignKeyList($table->getName());
+        /** @psalm-var ForeignKeyConstraint[] $foreignKeysList */
+        $foreignKeysList = $this->getTableForeignKeys($table->getName(), true);
 
         foreach ($foreignKeysList as $foreignKey) {
-            $id = (int) $foreignKey['id'];
-            $fk = $table->getForeignKeys();
+            /** @var array<string> $columnNames */
+            $columnNames = (array) $foreignKey->getColumnNames();
+            $columnNames = array_combine($columnNames, $foreignKey->getForeignColumnNames());
 
-            if (!isset($fk[$id])) {
-                $table->foreignKey($id, [$foreignKey['table'], $foreignKey['from'] => $foreignKey['to']]);
-            } else {
-                /** composite FK */
-                $table->compositeForeignKey($id, $foreignKey['from'], $foreignKey['to']);
-            }
+            $foreignReference = array_merge([$foreignKey->getForeignTableName()], $columnNames);
+
+            /** @psalm-suppress InvalidCast */
+            $table->foreignKey((string) $foreignKey->getName(), $foreignReference);
         }
     }
 
@@ -713,5 +739,26 @@ final class Schema extends AbstractPdoSchema
     protected function getCacheTag(): string
     {
         return md5(serialize(array_merge([self::class], $this->generateCacheKey())));
+    }
+
+    /**
+     * @throws Throwable
+     */
+    private function getJsonColumns(TableSchemaInterface $table): array
+    {
+        $result = [];
+        /** @psalm-var CheckConstraint[] $checks */
+        $checks = $this->getTableChecks((string) $table->getFullName());
+        $regexp = '/\bjson_valid\(\s*["`\[]?(.+?)["`\]]?\s*\)/i';
+
+        foreach ($checks as $check) {
+            if (preg_match_all($regexp, $check->getExpression(), $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
+                    $result[] = $match[1];
+                }
+            }
+        }
+
+        return $result;
     }
 }

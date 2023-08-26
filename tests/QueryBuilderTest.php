@@ -11,9 +11,11 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionInterface;
+use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
+use Yiisoft\Db\Sqlite\Column;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 
@@ -736,5 +738,31 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         array|bool $updateColumns
     ): void {
         parent::testUpsertExecute($table, $insertColumns, $updateColumns);
+    }
+
+    public function testJsonColumn()
+    {
+        $qb = $this->getConnection()->getQueryBuilder();
+        $columnSchemaBuilder = new Column(SchemaInterface::TYPE_JSON);
+
+        $this->assertSame(
+            'ALTER TABLE `json_table` ADD `json_col` json',
+            $qb->addColumn('json_table', 'json_col', $columnSchemaBuilder->asString()),
+        );
+
+        $this->assertSame(
+            "CREATE TABLE `json_table` (\n\t`json_col` json\n)",
+            $qb->createTable('json_table', ['json_col' => $columnSchemaBuilder]),
+        );
+
+        $this->assertSame(
+            'INSERT INTO `json_table` (`json_col`) VALUES (:qp0)',
+            $qb->insert('json_table', ['json_col' => ['a' => 1, 'b' => 2]]),
+        );
+
+        $this->assertSame(
+            'INSERT INTO `json_table` (`json_col`) VALUES (:qp0)',
+            $qb->insert('json_table', ['json_col' => new JsonExpression(['a' => 1, 'b' => 2])]),
+        );
     }
 }
