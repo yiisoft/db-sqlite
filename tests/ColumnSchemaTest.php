@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests;
 
 use PDO;
-use PHPUnit\Framework\TestCase;
 use Yiisoft\Db\Command\Param;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Schema\Column\BinaryColumnSchema;
@@ -17,13 +16,14 @@ use Yiisoft\Db\Schema\Column\StringColumnSchema;
 use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\Tests\Common\CommonColumnSchemaTest;
 
 use function str_repeat;
 
 /**
  * @group sqlite
  */
-final class ColumnSchemaTest extends TestCase
+final class ColumnSchemaTest extends CommonColumnSchemaTest
 {
     use TestTrait;
 
