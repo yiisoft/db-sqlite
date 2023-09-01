@@ -521,7 +521,9 @@ final class Schema extends AbstractPdoSchema
 
             if (($dbType === 'tinyint' || $dbType === 'bit') && $info['size'] === 1) {
                 return self::TYPE_BOOLEAN;
-            } elseif ($dbType === 'bit') {
+            }
+
+            if ($dbType === 'bit') {
                 return match (true) {
                     $info['size'] === 32 => self::TYPE_INTEGER,
                     $info['size'] > 32 => self::TYPE_BIGINT,
