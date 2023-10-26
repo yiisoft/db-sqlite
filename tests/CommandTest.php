@@ -8,6 +8,7 @@ use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Schema\Builder\ColumnInterface;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
@@ -130,12 +131,8 @@ final class CommandTest extends CommonCommandTest
         parent::testAddUnique($name, $tableName, $column);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws Throwable
-     */
-    public function testAlterColumn(): void
+    /** @dataProvider \Yiisoft\Db\Tests\Provider\CommandProvider::columnTypes */
+    public function testAlterColumn(ColumnInterface|string $type): void
     {
         $db = $this->getConnection();
 

@@ -14,6 +14,7 @@ use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
+use Yiisoft\Db\Schema\Builder\ColumnInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Sqlite\Column;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
@@ -158,11 +159,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->addUnique($table, $name, $columns);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
-    public function testAlterColumn(): void
+    /** @dataProvider \Yiisoft\Db\Tests\Provider\QueryBuilderProvider::columnTypes */
+    public function testAlterColumn(ColumnInterface|string $type): void
     {
         $db = $this->getConnection();
 
