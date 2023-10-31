@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
-use Generator;
 use JsonException;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
@@ -182,7 +181,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
      * @throws NotSupportedException
      * @throws Throwable
      */
-    public function testBatchInsert(string $table, array $columns, iterable|Generator $rows, string $expected): void
+    public function testBatchInsert(string $table, array $columns, iterable $rows, string $expected): void
     {
         parent::testBatchInsert($table, $columns, $rows, $expected);
     }
