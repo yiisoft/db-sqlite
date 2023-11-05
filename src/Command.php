@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use PDOException;
 use Throwable;
 use Yiisoft\Db\Driver\Pdo\AbstractPdoCommand;
-use Yiisoft\Db\Exception\ConvertException;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
-use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 
 use function array_pop;
 use function count;
