@@ -1,11 +1,11 @@
 # SQLite driver for Yii Database Change Log
 
-## 1.0.2 under development
+## 1.1.0 November 12, 2023
 
 - Enh #263: Support json type (@Tigrov)
+- Enh #278: Move methods from `Command` to `AbstractPdoCommand` class (@Tigrov)
 - Bug #268: Fix foreign keys: support multiple foreign keys referencing to one table and possible null columns for reference (@Tigrov)
 - Bug #271: Refactor `DMLQueryBuilder`, related with yiisoft/db#746 (@Tigrov)
-- Enh #278: Move methods from `Command` to `AbstractPdoCommand` class (@Tigrov)
 
 ## 1.0.1 July 24, 2023
 
