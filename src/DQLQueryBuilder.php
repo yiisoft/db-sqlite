@@ -46,7 +46,6 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
         $sql = $this->buildOrderByAndLimit($sql, $orderBy, $query->getLimit(), $query->getOffset());
 
         if (!empty($orderBy)) {
-            /** @psalm-var array<string|ExpressionInterface> $orderBy */
             foreach ($orderBy as $expression) {
                 if ($expression instanceof ExpressionInterface) {
                     $this->buildExpression($expression, $params);
@@ -57,7 +56,6 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
         $groupBy = $query->getGroupBy();
 
         if (!empty($groupBy)) {
-            /** @psalm-var array<string|ExpressionInterface> $groupBy */
             foreach ($groupBy as $expression) {
                 if ($expression instanceof ExpressionInterface) {
                     $this->buildExpression($expression, $params);

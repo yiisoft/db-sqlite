@@ -41,7 +41,6 @@ final class Command extends AbstractPdoCommand
                 continue;
             }
 
-            /** @psalm-var mixed */
             $result[$name] = $columns[$name] ?? $tableSchema?->getColumn($name)?->getDefaultValue();
         }
 
@@ -72,7 +71,6 @@ final class Command extends AbstractPdoCommand
     {
         $sql = $this->getSql();
 
-        /** @psalm-var array<string, string> $params */
         $params = $this->params;
 
         $statements = $this->splitStatements($sql, $params);
@@ -83,11 +81,8 @@ final class Command extends AbstractPdoCommand
 
         $result = 0;
 
-        /** @psalm-var array<array-key, array<array-key, string|array>> $statements */
         foreach ($statements as $statement) {
             [$statementSql, $statementParams] = $statement;
-            $statementSql = is_string($statementSql) ? $statementSql : '';
-            $statementParams = is_array($statementParams) ? $statementParams : [];
             $this->setSql($statementSql)->bindValues($statementParams);
             $result = parent::execute();
         }
@@ -111,7 +106,6 @@ final class Command extends AbstractPdoCommand
     {
         $sql = $this->getSql();
 
-        /** @psalm-var array<string, string> $params */
         $params = $this->params;
 
         $statements = $this->splitStatements($sql, $params);
@@ -122,14 +116,7 @@ final class Command extends AbstractPdoCommand
 
         [$lastStatementSql, $lastStatementParams] = array_pop($statements);
 
-        /**
-         * @psalm-var array<array-key, array> $statements
-         */
         foreach ($statements as $statement) {
-            /**
-             * @psalm-var string $statementSql
-             * @psalm-var array $statementParams
-             */
             [$statementSql, $statementParams] = $statement;
             $this->setSql($statementSql)->bindValues($statementParams);
             parent::execute();
@@ -137,7 +124,6 @@ final class Command extends AbstractPdoCommand
 
         $this->setSql($lastStatementSql)->bindValues($lastStatementParams);
 
-        /** @psalm-var string $result */
         $result = parent::queryInternal($queryMode);
 
         $this->setSql($sql)->bindValues($params);
@@ -154,8 +140,6 @@ final class Command extends AbstractPdoCommand
      * @throws InvalidArgumentException
      *
      * @return array|bool List of SQL statements or `false` if there's a single statement.
-     *
-     * @psalm-param array<string, string> $params
      *
      * @psalm-return false|list<array{0: string, 1: array}>
      */
@@ -186,8 +170,6 @@ final class Command extends AbstractPdoCommand
 
     /**
      * Returns named bindings used in the specified statement token.
-     *
-     * @psalm-param array<string, string> $params
      */
     private function extractUsedParams(SqlToken $statement, array $params): array
     {

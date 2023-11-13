@@ -14,9 +14,7 @@ use Yiisoft\Db\Schema\SchemaInterface;
 final class QueryBuilder extends AbstractQueryBuilder
 {
     /**
-     * @var array Mapping from abstract column types (keys) to physical column types (values).
-     *
-     * @psalm-var string[] $typeMap
+     * @var string[] Mapping from abstract column types (keys) to physical column types (values).
      */
     protected array $typeMap = [
         SchemaInterface::TYPE_PK => 'integer PRIMARY KEY AUTOINCREMENT NOT NULL',
