@@ -2,7 +2,7 @@
 
 ## 1.1.1 under development
 
-- Enh #302: Remove unused code in `Command` class (@vjik)
+- Enh #281: Remove unused code in `Command` class (@vjik)
 
 ## 1.1.0 November 12, 2023
 
