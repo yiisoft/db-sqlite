@@ -56,7 +56,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         bool|array $updateColumns,
         array &$params
     ): string {
-        /** @psalm-var Constraint[] $constraints */
+        /** @var Constraint[] $constraints */
         $constraints = [];
 
         [$uniqueNames, $insertNames, $updateNames] = $this->prepareUpsertColumns(
