@@ -72,9 +72,11 @@ use function strtolower;
 final class Schema extends AbstractPdoSchema
 {
     /**
-     * @var string[] Mapping from physical column types (keys) to abstract column types (values).
+     * Mapping from physical column types (keys) to abstract column types (values).
+     *
+     * @var string[]
      */
-    private array $typeMap = [
+    private const TYPE_MAP = [
         'tinyint' => self::TYPE_TINYINT,
         'bit' => self::TYPE_SMALLINT,
         'boolean' => self::TYPE_BOOLEAN,
@@ -481,8 +483,8 @@ final class Schema extends AbstractPdoSchema
         if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->getDbType() ?? '', $matches)) {
             $type = strtolower($matches[1]);
 
-            if (isset($this->typeMap[$type])) {
-                $column->type($this->typeMap[$type]);
+            if (isset(self::TYPE_MAP[$type])) {
+                $column->type(self::TYPE_MAP[$type]);
             }
 
             if (!empty($matches[2])) {
