@@ -181,9 +181,14 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
      * @throws NotSupportedException
      * @throws Throwable
      */
-    public function testBatchInsert(string $table, array $columns, iterable $rows, string $expected): void
-    {
-        parent::testBatchInsert($table, $columns, $rows, $expected);
+    public function testBatchInsert(
+        string $table,
+        array $columns,
+        iterable $rows,
+        string $expected,
+        array $expectedParams = [],
+    ): void {
+        parent::testBatchInsert($table, $columns, $rows, $expected, $expectedParams);
     }
 
     /**
