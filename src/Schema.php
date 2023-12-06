@@ -251,13 +251,12 @@ final class Schema extends AbstractPdoSchema
      *
      * @return array Indexes for the given table.
      *
-     * @psalm-return array|IndexConstraint[]
+     * @psalm-return IndexConstraint[]
      */
     protected function loadTableIndexes(string $tableName): array
     {
-        $tableIndexes = $this->loadTableConstraints($tableName, self::INDEXES);
-
-        return is_array($tableIndexes) ? $tableIndexes : [];
+        /** @var IndexConstraint[] */
+        return $this->loadTableConstraints($tableName, self::INDEXES);
     }
 
     /**
