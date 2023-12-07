@@ -4,7 +4,7 @@
 
 - Enh #281: Remove unused code in `Command` class (@vjik)
 - Enh #282: Change property `Schema::$typeMap` to constant `Schema::TYPE_MAP` (@Tigrov)
-- Enh #283: Remove unnecessary check for `array` type (@Tigrov)
+- Enh #283: Remove unnecessary check for array type in `Schema::loadTableIndexes()` (@Tigrov)
 
 ## 1.1.0 November 12, 2023
 
