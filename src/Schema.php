@@ -777,7 +777,7 @@ final class Schema extends AbstractPdoSchema
 
         if (preg_match_all($pattern, $columnsDefinition, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
-                $columnName = $match[2] ?: $match[3] ?: $match[4];
+                $columnName = ($match[2] ?: $match[3]) ?: $match[4];
                 $comment = $this->filterComment($match[5] ?: $match[6]);
 
                 $tableSchema->getColumn($columnName)?->comment($comment);
