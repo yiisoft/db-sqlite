@@ -803,11 +803,10 @@ final class Schema extends AbstractPdoSchema
      *
      * @param string $name The table name.
      *
-     * @return string The `CREATE TABLE` SQL string.
-     *
      * @throws Exception
      * @throws InvalidConfigException
      * @throws Throwable
+     * @return string The `CREATE TABLE` SQL string.
      */
     private function getCreateTableSql(string $name): string
     {
