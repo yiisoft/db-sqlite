@@ -31,6 +31,8 @@ use function serialize;
 use function strncasecmp;
 use function strtolower;
 
+use const PREG_SET_ORDER;
+
 /**
  * Implements the SQLite Server specific schema, supporting SQLite 3.3.0 or higher.
  *
@@ -155,8 +157,11 @@ final class Schema extends AbstractPdoSchema
 
         $table->name($name);
         $table->fullName($name);
+        $table->createSql($this->getCreateTableSql($name));
+        $this->findTableComment($table);
 
         if ($this->findColumns($table)) {
+            $this->findComments($table);
             $this->findConstraints($table);
 
             return $table;
@@ -294,12 +299,7 @@ final class Schema extends AbstractPdoSchema
      */
     protected function loadTableChecks(string $tableName): array
     {
-        $sql = $this->db->createCommand(
-            'SELECT `sql` FROM `sqlite_master` WHERE name = :tableName',
-            [':tableName' => $tableName],
-        )->queryScalar();
-
-        $sql = ($sql === false || $sql === null) ? '' : (string) $sql;
+        $sql = $this->getCreateTableSql($tableName);
 
         $code = (new SqlTokenizer($sql))->tokenize();
         $pattern = (new SqlTokenizer('any CREATE any TABLE any()'))->tokenize();
@@ -739,6 +739,84 @@ final class Schema extends AbstractPdoSchema
     protected function getCacheTag(): string
     {
         return md5(serialize(array_merge([self::class], $this->generateCacheKey())));
+    }
+
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
+    private function findTableComment(TableSchemaInterface $tableSchema): void
+    {
+        $sql = $tableSchema->getCreateSql();
+
+        if (preg_match('#^[^(]+?((?:\s*--[^\n]*|\s*/\*.*?\*/)+)\s*\(#', $sql, $matches) === 1) {
+            $comment = $this->filterComment($matches[1]);
+            $tableSchema->comment($comment);
+        }
+    }
+
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
+    private function findComments(TableSchemaInterface $tableSchema): void
+    {
+        $sql = $tableSchema->getCreateSql();
+
+        preg_match('#^(?:[^(]*--[^\n]*|[^(]*/\*.*?\*/)*[^(]*\((.*)\)[^)]*$#s', $sql, $matches);
+
+        $columnsDefinition = $matches[1];
+
+        $identifierPattern = '(?:([`"])([^`"]+)\1|\[([^\]]+)\]|([A-Za-z_]\w*))';
+        $notCommaPattern = '(?:[^,]|\([^()]+\))*?';
+        $commentPattern = '(?:\s*--[^\n]*|\s*/\*.*?\*/)';
+
+        $pattern = "#$identifierPattern\s*$notCommaPattern,?($commentPattern+)#";
+
+        if (preg_match_all($pattern, $columnsDefinition, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $columnName = $match[2] ?: $match[3] ?: $match[4];
+                $comment = $this->filterComment($match[5] ?: $match[6]);
+
+                $tableSchema->getColumn($columnName)?->comment($comment);
+            }
+        }
+    }
+
+    private function filterComment(string $comment): string
+    {
+        preg_match_all('#--([^\n]*)|/\*(.*?)\*/#', $comment, $matches, PREG_SET_ORDER);
+
+        $lines = [];
+
+        foreach ($matches as $match) {
+            $lines[] = trim($match[1] ?: $match[2]);
+        }
+
+        return implode("\n", $lines);
+    }
+
+    /**
+     * Returns the `CREATE TABLE` SQL string.
+     *
+     * @param string $name The table name.
+     *
+     * @return string The `CREATE TABLE` SQL string.
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
+    private function getCreateTableSql(string $name): string
+    {
+        $sql = $this->db->createCommand(
+            'SELECT `sql` FROM `sqlite_master` WHERE `name` = :tableName',
+            [':tableName' => $name],
+        )->queryScalar();
+
+        return (string)$sql;
     }
 
     /**
