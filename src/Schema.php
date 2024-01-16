@@ -748,7 +748,7 @@ final class Schema extends AbstractPdoSchema
      */
     private function findTableComment(TableSchemaInterface $tableSchema): void
     {
-        $sql = $tableSchema->getCreateSql();
+        $sql = $tableSchema->getCreateSql() ?? '';
 
         if (preg_match('#^[^(]+?((?:\s*--[^\n]*|\s*/\*.*?\*/)+)\s*\(#', $sql, $matches) === 1) {
             $comment = $this->filterComment($matches[1]);
@@ -763,7 +763,7 @@ final class Schema extends AbstractPdoSchema
      */
     private function findComments(TableSchemaInterface $tableSchema): void
     {
-        $sql = $tableSchema->getCreateSql();
+        $sql = $tableSchema->getCreateSql() ?? '';
 
         if (!preg_match('#^(?:[^(]*--[^\n]*|[^(]*/\*.*?\*/)*[^(]*\((.*)\)[^)]*$#s', $sql, $matches)) {
             return;
