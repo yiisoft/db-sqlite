@@ -765,7 +765,9 @@ final class Schema extends AbstractPdoSchema
     {
         $sql = $tableSchema->getCreateSql();
 
-        preg_match('#^(?:[^(]*--[^\n]*|[^(]*/\*.*?\*/)*[^(]*\((.*)\)[^)]*$#s', $sql, $matches);
+        if (!preg_match('#^(?:[^(]*--[^\n]*|[^(]*/\*.*?\*/)*[^(]*\((.*)\)[^)]*$#s', $sql, $matches)) {
+            return;
+        }
 
         $columnsDefinition = $matches[1];
 
