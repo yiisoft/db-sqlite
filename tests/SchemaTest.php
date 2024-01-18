@@ -376,6 +376,7 @@ final class SchemaTest extends CommonSchemaTest
         $table = $schema->getTableSchema('comment');
 
         $this->assertSame('primary key', $table->getColumn('id')->getComment());
+        $this->assertSame('USD', $table->getColumn('price')->getComment());
         $this->assertSame("Column comment\nsecond line\nthird line", $table->getColumn('name')->getComment());
     }
 }

@@ -771,8 +771,8 @@ final class Schema extends AbstractPdoSchema
 
         $columnsDefinition = $matches[1];
 
-        $identifierPattern = '(?:([`"])([^`"]+)\1|\[([^\]]+)\]|([A-Za-z_]\w*))';
-        $notCommaPattern = '(?:[^,]|\([^()]+\))*?';
+        $identifierPattern = '(?:([`"])([^`"]+)\1|\[([^\]]+)\]|([a-zA-Z_]\w*))';
+        $notCommaPattern = "(?:[^,]|\([^()]+\)|'[^']+')*?";
         $commentPattern = '(?:\s*--[^\n]*|\s*/\*.*?\*/)';
 
         $pattern = "#$identifierPattern\s*$notCommaPattern,?($commentPattern+)#";

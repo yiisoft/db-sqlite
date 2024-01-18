@@ -179,7 +179,8 @@ CREATE TABLE `comment` -- Table comment
 /* third line */
 (
     `id` integer PRIMARY KEY AUTOINCREMENT NOT NULL, -- primary key
-    `name` varchar(100) -- Column comment
+    price decimal(10,2), -- USD
+    `name` varchar(100) DEFAULT 'Pan, Peter' -- Column comment
     -- second line
     /* third line */
 );
