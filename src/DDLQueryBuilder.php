@@ -105,8 +105,8 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
             [$schema, $table] = $tableParts;
         }
 
-        return 'CREATE ' . ($indexType ? ($indexType . ' ') : '') . 'INDEX '
-            . $this->quoter->quoteTableName(($schema ? $schema . '.' : '') . $name)
+        return 'CREATE ' . ($indexType !== null ? $indexType . ' ' : '') . 'INDEX '
+            . $this->quoter->quoteTableName(($schema !== null ? $schema . '.' : '') . $name)
             . ' ON '
             . $this->quoter->quoteTableName($table)
             . ' (' . $this->queryBuilder->buildColumns($columns) . ')';
