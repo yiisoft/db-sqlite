@@ -753,7 +753,7 @@ final class Schema extends AbstractPdoSchema
         $regexp = '/\bjson_valid\(\s*["`\[]?(.+?)["`\]]?\s*\)/i';
 
         foreach ($checks as $check) {
-            if (preg_match_all($regexp, $check->getExpression(), $matches, PREG_SET_ORDER)) {
+            if (preg_match_all($regexp, $check->getExpression(), $matches, PREG_SET_ORDER) > 0) {
                 foreach ($matches as $match) {
                     $result[] = $match[1];
                 }
