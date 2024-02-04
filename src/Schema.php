@@ -643,9 +643,12 @@ final class Schema extends AbstractPdoSchema
      * @throws Exception
      * @throws InvalidConfigException
      * @throws Throwable
+     *
+     * @psalm-return ForeignKeyInfo[]
      */
     private function getPragmaForeignKeyList(string $tableName): array
     {
+        /** @psalm-var ForeignKeyInfo[] */
         return $this->db->createCommand(
             'PRAGMA FOREIGN_KEY_LIST(' . $this->db->getQuoter()->quoteSimpleTableName($tableName) . ')'
         )->queryAll();
@@ -674,9 +677,12 @@ final class Schema extends AbstractPdoSchema
      * @throws Exception
      * @throws InvalidConfigException
      * @throws Throwable
+     *
+     * @psalm-return IndexListInfo[]
      */
     private function getPragmaIndexList(string $tableName): array
     {
+        /** @psalm-var IndexListInfo[] */
         return $this->db
             ->createCommand('PRAGMA INDEX_LIST(' . (string) $this->db->getQuoter()->quoteValue($tableName) . ')')
             ->queryAll();
@@ -724,10 +730,12 @@ final class Schema extends AbstractPdoSchema
      * @param string $name the table name.
      *
      * @return array The cache key.
+     *
+     * @psalm-suppress DeprecatedMethod
      */
     protected function getCacheKey(string $name): array
     {
-        return array_merge([self::class], $this->generateCacheKey(), [$this->db->getQuoter()->getRawTableName($name)]);
+        return array_merge([self::class], $this->generateCacheKey(), [$this->getRawTableName($name)]);
     }
 
     /**
