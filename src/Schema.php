@@ -21,6 +21,7 @@ use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 
 use function array_column;
+use function array_map;
 use function array_merge;
 use function count;
 use function explode;
@@ -201,7 +202,7 @@ final class Schema extends AbstractPdoSchema
 
         $foreignKeysList = $this->getPragmaForeignKeyList($tableName);
         /** @psalm-var ForeignKeyInfo[] $foreignKeysList */
-        $foreignKeysList = $this->normalizeRowKeyCase($foreignKeysList, true);
+        $foreignKeysList = array_map('array_change_key_case', $foreignKeysList);
         $foreignKeysList = DbArrayHelper::index($foreignKeysList, null, ['table']);
         DbArrayHelper::multisort($foreignKeysList, 'seq');
 
@@ -553,7 +554,7 @@ final class Schema extends AbstractPdoSchema
     {
         $tableColumns = $this->getPragmaTableInfo($tableName);
         /** @psalm-var ColumnInfo[] $tableColumns */
-        $tableColumns = $this->normalizeRowKeyCase($tableColumns, true);
+        $tableColumns = array_map('array_change_key_case', $tableColumns);
 
         /** @psalm-var ColumnInfo[] */
         return DbArrayHelper::index($tableColumns, 'cid');
@@ -575,7 +576,7 @@ final class Schema extends AbstractPdoSchema
     {
         $indexList = $this->getPragmaIndexList($tableName);
         /** @psalm-var IndexListInfo[] $indexes */
-        $indexes = $this->normalizeRowKeyCase($indexList, true);
+        $indexes = array_map('array_change_key_case', $indexList);
         $result = [
             self::PRIMARY_KEY => null,
             self::INDEXES => [],
@@ -642,9 +643,12 @@ final class Schema extends AbstractPdoSchema
      * @throws Exception
      * @throws InvalidConfigException
      * @throws Throwable
+     *
+     * @psalm-return ForeignKeyInfo[]
      */
     private function getPragmaForeignKeyList(string $tableName): array
     {
+        /** @psalm-var ForeignKeyInfo[] */
         return $this->db->createCommand(
             'PRAGMA FOREIGN_KEY_LIST(' . $this->db->getQuoter()->quoteSimpleTableName($tableName) . ')'
         )->queryAll();
@@ -662,7 +666,7 @@ final class Schema extends AbstractPdoSchema
         $column = $this->db
             ->createCommand('PRAGMA INDEX_INFO(' . (string) $this->db->getQuoter()->quoteValue($name) . ')')
             ->queryAll();
-        $column = $this->normalizeRowKeyCase($column, true);
+        $column = array_map('array_change_key_case', $column);
         DbArrayHelper::multisort($column, 'seqno');
 
         /** @psalm-var IndexInfo[] $column */
@@ -673,9 +677,12 @@ final class Schema extends AbstractPdoSchema
      * @throws Exception
      * @throws InvalidConfigException
      * @throws Throwable
+     *
+     * @psalm-return IndexListInfo[]
      */
     private function getPragmaIndexList(string $tableName): array
     {
+        /** @psalm-var IndexListInfo[] */
         return $this->db
             ->createCommand('PRAGMA INDEX_LIST(' . (string) $this->db->getQuoter()->quoteValue($tableName) . ')')
             ->queryAll();
@@ -723,6 +730,8 @@ final class Schema extends AbstractPdoSchema
      * @param string $name the table name.
      *
      * @return array The cache key.
+     *
+     * @psalm-suppress DeprecatedMethod
      */
     protected function getCacheKey(string $name): array
     {
