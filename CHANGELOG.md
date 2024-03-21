@@ -1,12 +1,12 @@
 # SQLite driver for Yii Database Change Log
 
-## 1.1.1 under development
+## 1.2.0 March 21, 2024
 
 - Enh #281: Remove unused code in `Command` class (@vjik)
 - Enh #282: Change property `Schema::$typeMap` to constant `Schema::TYPE_MAP` (@Tigrov)
 - Enh #283: Remove unnecessary check for array type in `Schema::loadTableIndexes()` (@Tigrov)
+- Enh #287: Resolve deprecated methods (@Tigrov)
 - Enh #288: Minor refactoring of `DDLQueryBuilder` and `Schema` (@Tigrov)
-- Enh #287: Resolve deprecated methods (@Tigrov) 
 
 ## 1.1.0 November 12, 2023
 
