@@ -1,5 +1,9 @@
 # SQLite driver for Yii Database Change Log
 
+## 1.2.1 under development
+
+- no changes in this release.
+
 ## 1.2.0 March 21, 2024
 
 - Enh #281: Remove unused code in `Command` class (@vjik)
