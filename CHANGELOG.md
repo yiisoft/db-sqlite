@@ -6,6 +6,7 @@
 - Enh #282: Change property `Schema::$typeMap` to constant `Schema::TYPE_MAP` (@Tigrov)
 - Enh #283: Remove unnecessary check for array type in `Schema::loadTableIndexes()` (@Tigrov)
 - Enh #288: Minor refactoring of `DDLQueryBuilder` and `Schema` (@Tigrov)
+- Enh #287: Resolve deprecated methods (@Tigrov) 
 
 ## 1.1.0 November 12, 2023
 
