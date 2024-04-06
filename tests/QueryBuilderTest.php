@@ -773,5 +773,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     /** @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::selectScalar */
     public function testSelectScalar(array|bool|float|int $columns, string $expected): void
     {
+        parent::testSelectScalar($columns, $expected);
     }
 }
