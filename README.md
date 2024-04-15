@@ -36,11 +36,11 @@ perform advanced database operations such as joins and aggregates.
 
 The package could be installed via composer:
 
-```php
+```shell
 composer require yiisoft/db-sqlite
 ```
 
-## Usage 
+## Usage
 
 For config connection to SQLite database check [Connecting SQLite](https://github.com/yiisoft/db/blob/master/docs/en/connection/sqlite.md).
 
