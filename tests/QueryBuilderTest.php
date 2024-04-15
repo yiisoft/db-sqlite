@@ -703,10 +703,11 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string $table,
         array $columns,
         array|string $condition,
-        string $expectedSQL,
-        array $expectedParams
+        array $params,
+        string $expectedSql,
+        array $expectedParams,
     ): void {
-        parent::testUpdate($table, $columns, $condition, $expectedSQL, $expectedParams);
+        parent::testUpdate($table, $columns, $condition, $params, $expectedSql, $expectedParams);
     }
 
     /**
@@ -768,5 +769,11 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             'INSERT INTO `json_table` (`json_col`) VALUES (:qp0)',
             $qb->insert('json_table', ['json_col' => new JsonExpression(['a' => 1, 'b' => 2])]),
         );
+    }
+
+    /** @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::selectScalar */
+    public function testSelectScalar(array|bool|float|int|string $columns, string $expected): void
+    {
+        parent::testSelectScalar($columns, $expected);
     }
 }
