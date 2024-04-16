@@ -94,7 +94,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             /**
              * Limit isn't optional in SQLite.
              *
-             * {@see http://www.sqlite.org/syntaxdiagrams.html#select-stmt}
+             * {@see https://www.sqlite.org/syntaxdiagrams.html#select-stmt}
              */
             $sql = 'LIMIT 9223372036854775807 OFFSET ' . // 2^63-1
                 ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string)$offset);

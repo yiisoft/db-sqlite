@@ -12,7 +12,7 @@ use function strtr;
  *
  * It's used to obtain `CHECK` constraint information from a `CREATE TABLE` SQL code.
  *
- * @link http://www.sqlite.org/draft/tokenreq.html
+ * @link https://www.sqlite.org/draft/tokenreq.html
  * @link https://sqlite.org/lang.html
  */
 final class SqlTokenizer extends AbstractTokenizer

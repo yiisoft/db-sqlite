@@ -29,7 +29,7 @@ final class Transaction extends AbstractPdoTransaction
      * @throws Throwable When unsupported isolation levels are used. SQLite only supports `SERIALIZABLE`
      * and `READ UNCOMMITTED`.
      *
-     * @link http://www.sqlite.org/pragma.html#pragma_read_uncommitted
+     * @link https://www.sqlite.org/pragma.html#pragma_read_uncommitted
      */
     protected function setTransactionIsolationLevel(string $level): void
     {

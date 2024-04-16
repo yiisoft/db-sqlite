@@ -1,4 +1,4 @@
-# Testing
+# Internals
 
 ## Github actions
 
@@ -8,13 +8,13 @@ All our packages have github actions by default, so you can test your [contribut
 
 ## Unit testing
 
-The package is tested with [PHPUnit](https://phpunit.de/).
+The package is tested with [PHPUnit](https://phpunit.de/). To run tests:
 
 ```shell
-vendor/bin/phpunit
+./vendor/bin/phpunit
 ```
 
-### Mutation testing
+## Mutation testing
 
 The package tests are checked with [Infection](https://infection.github.io/) mutation framework with
 [Infection Static Analysis Plugin](https://github.com/Roave/infection-static-analysis-plugin). To run it:
@@ -33,16 +33,17 @@ The code is statically analyzed with [Psalm](https://psalm.dev/). To run static 
 
 ## Rector
 
-Use [Rector](https://github.com/rectorphp/rector) to make codebase follow some specific rules or 
-use either newest or any specific version of PHP: 
+Use [Rector](https://github.com/rectorphp/rector) to make codebase follow some specific rules or
+use either newest or any specific version of PHP:
 
 ```shell
 ./vendor/bin/rector
 ```
 
-## Composer require checker
+## Dependencies
 
-This package uses [composer-require-checker](https://github.com/maglnet/ComposerRequireChecker) to check if all dependencies are correctly defined in `composer.json`.
+Use [ComposerRequireChecker](https://github.com/maglnet/ComposerRequireChecker) to detect transitive
+[Composer](https://getcomposer.org/) dependencies.
 
 To run the checker, execute the following command:
 
