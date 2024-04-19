@@ -45,7 +45,7 @@ composer require yiisoft/db-sqlite
 English:
 
 - For config connection to SQLite database check [Connecting SQLite](https://github.com/yiisoft/db/blob/master/docs/en/connection/sqlite.md)
-- [Check the documentation docs](https://github.com/yiisoft/db/blob/master/docs/en/README.md) to learn about usage.
+- [Check the yiisoft/db docs](https://github.com/yiisoft/db/blob/master/docs/en/README.md) to learn about usage.
 
 Portuguese - Brazil:
 
