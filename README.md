@@ -49,8 +49,8 @@ English:
 
 Portuguese - Brazil:
 
-- Para configurar a conexão com o SQLite leia [Connecting SQLite](https://github.com/yiisoft/db/blob/master/docs/pt-BR/connection/sqlite.md)
-- [Check the documentation docs](https://github.com/yiisoft/db/blob/master/docs/pt-BR/README.md) para aprender como usar.
+- Para configurar a conexão com o SQLite leia [Connecting SQLite](https://github.com/yiisoft/db/blob/master/docs/pt-BR/connection/sqlite.md).
+- [Confira a documentação](https://github.com/yiisoft/db/blob/master/docs/pt-BR/README.md) para aprender como usar.
 
 Testing:
 
