@@ -47,14 +47,14 @@ English:
 - For config connection to SQLite database check [Connecting SQLite](https://github.com/yiisoft/db/blob/master/docs/en/connection/sqlite.md)
 - [Check the yiisoft/db docs](https://github.com/yiisoft/db/blob/master/docs/en/README.md) to learn about usage.
 
-Portuguese - Brazil:
+Português - Brasil:
 
 - Para configurar a conexão com o SQLite leia [Connecting SQLite](https://github.com/yiisoft/db/blob/master/docs/pt-BR/connection/sqlite.md).
 - [Confira a documentação](https://github.com/yiisoft/db/blob/master/docs/pt-BR/README.md) para aprender como usar.
 
 Testing:
 
-- More information can be found in the [Internals.](docs/internals.md)
+- [Internals](docs/internals.md)
 
 ## Support
 
