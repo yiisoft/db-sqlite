@@ -67,9 +67,10 @@ use either newest or any specific version of PHP:
 ./vendor/bin/rector
 ```
 
-## Composer require checker
+## Dependencies
 
-This package uses [composer-require-checker](https://github.com/maglnet/ComposerRequireChecker) to check if all dependencies are correctly defined in `composer.json`.
+Use [ComposerRequireChecker](https://github.com/maglnet/ComposerRequireChecker) to detect transitive
+[Composer](https://getcomposer.org/) dependencies.
 
 To run the checker, execute the following command:
 
