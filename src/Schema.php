@@ -21,6 +21,7 @@ use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 
 use function array_column;
+use function array_map;
 use function array_merge;
 use function count;
 use function explode;
@@ -75,11 +76,11 @@ use function strtolower;
 final class Schema extends AbstractPdoSchema
 {
     /**
-     * @var array Mapping from physical column types (keys) to abstract column types (values).
+     * Mapping from physical column types (keys) to abstract column types (values).
      *
-     * @psalm-var array<array-key, string> $typeMap
+     * @var string[]
      */
-    private array $typeMap = [
+    private const TYPE_MAP = [
         'tinyint' => self::TYPE_TINYINT,
         'bit' => self::TYPE_SMALLINT,
         'boolean' => self::TYPE_BOOLEAN,
@@ -204,7 +205,7 @@ final class Schema extends AbstractPdoSchema
 
         $foreignKeysList = $this->getPragmaForeignKeyList($tableName);
         /** @psalm-var ForeignKeyInfo[] $foreignKeysList */
-        $foreignKeysList = $this->normalizeRowKeyCase($foreignKeysList, true);
+        $foreignKeysList = array_map('array_change_key_case', $foreignKeysList);
         $foreignKeysList = DbArrayHelper::index($foreignKeysList, null, ['table']);
         DbArrayHelper::multisort($foreignKeysList, 'seq');
 
@@ -221,7 +222,6 @@ final class Schema extends AbstractPdoSchema
                     $primaryKey = $this->getTablePrimaryKey($table);
 
                     if ($primaryKey !== null) {
-                        /** @psalm-var string $primaryKeyColumnName */
                         foreach ((array) $primaryKey->getColumnNames() as $i => $primaryKeyColumnName) {
                             $foreignKey[$i]['to'] = $primaryKeyColumnName;
                         }
@@ -255,13 +255,12 @@ final class Schema extends AbstractPdoSchema
      *
      * @return array Indexes for the given table.
      *
-     * @psalm-return array|IndexConstraint[]
+     * @psalm-return IndexConstraint[]
      */
     protected function loadTableIndexes(string $tableName): array
     {
-        $tableIndexes = $this->loadTableConstraints($tableName, self::INDEXES);
-
-        return is_array($tableIndexes) ? $tableIndexes : [];
+        /** @var IndexConstraint[] */
+        return $this->loadTableConstraints($tableName, self::INDEXES);
     }
 
     /**
@@ -306,7 +305,6 @@ final class Schema extends AbstractPdoSchema
 
         $sql = ($sql === false || $sql === null) ? '' : (string) $sql;
 
-        /** @psalm-var SqlToken[]|SqlToken[][]|SqlToken[][][] $code */
         $code = (new SqlTokenizer($sql))->tokenize();
         $pattern = (new SqlTokenizer('any CREATE any TABLE any()'))->tokenize();
         $result = [];
@@ -366,7 +364,6 @@ final class Schema extends AbstractPdoSchema
      */
     protected function findColumns(TableSchemaInterface $table): bool
     {
-        /** @psalm-var ColumnInfo[] $columns */
         $columns = $this->getPragmaTableInfo($table->getName());
         $jsonColumns = $this->getJsonColumns($table);
 
@@ -447,7 +444,6 @@ final class Schema extends AbstractPdoSchema
 
         foreach ($indexList as $index) {
             $indexName = $index['name'];
-            /** @psalm-var IndexInfo[] $indexInfo */
             $indexInfo = $this->getPragmaIndexInfo($index['name']);
 
             if ($index['unique']) {
@@ -532,7 +528,7 @@ final class Schema extends AbstractPdoSchema
             }
         }
 
-        return $this->typeMap[$dbType] ?? self::TYPE_STRING;
+        return self::TYPE_MAP[$dbType] ?? self::TYPE_STRING;
     }
 
     /**
@@ -568,13 +564,16 @@ final class Schema extends AbstractPdoSchema
      * @throws Throwable
      *
      * @return array The table columns info.
+     *
+     * @psalm-return ColumnInfo[] $tableColumns;
      */
     private function loadTableColumnsInfo(string $tableName): array
     {
         $tableColumns = $this->getPragmaTableInfo($tableName);
         /** @psalm-var ColumnInfo[] $tableColumns */
-        $tableColumns = $this->normalizeRowKeyCase($tableColumns, true);
+        $tableColumns = array_map('array_change_key_case', $tableColumns);
 
+        /** @psalm-var ColumnInfo[] */
         return DbArrayHelper::index($tableColumns, 'cid');
     }
 
@@ -594,7 +593,7 @@ final class Schema extends AbstractPdoSchema
     {
         $indexList = $this->getPragmaIndexList($tableName);
         /** @psalm-var IndexListInfo[] $indexes */
-        $indexes = $this->normalizeRowKeyCase($indexList, true);
+        $indexes = array_map('array_change_key_case', $indexList);
         $result = [
             self::PRIMARY_KEY => null,
             self::INDEXES => [],
@@ -602,7 +601,6 @@ final class Schema extends AbstractPdoSchema
         ];
 
         foreach ($indexes as $index) {
-            /** @psalm-var IndexInfo[] $columns */
             $columns = $this->getPragmaIndexInfo($index['name']);
 
             if ($index['origin'] === 'pk') {
@@ -628,8 +626,6 @@ final class Schema extends AbstractPdoSchema
              * Extra check for PK in case of `INTEGER PRIMARY KEY` with ROWID.
              *
              * @link https://www.sqlite.org/lang_createtable.html#primkeyconst
-             *
-             * @psalm-var ColumnInfo[] $tableColumns
              */
             $tableColumns = $this->loadTableColumnsInfo($tableName);
 
@@ -652,9 +648,12 @@ final class Schema extends AbstractPdoSchema
      * @throws Exception
      * @throws InvalidConfigException
      * @throws Throwable
+     *
+     * @psalm-return ForeignKeyInfo[]
      */
     private function getPragmaForeignKeyList(string $tableName): array
     {
+        /** @psalm-var ForeignKeyInfo[] */
         return $this->db->createCommand(
             'PRAGMA FOREIGN_KEY_LIST(' . $this->db->getQuoter()->quoteSimpleTableName($tableName) . ')'
         )->queryAll();
@@ -664,16 +663,18 @@ final class Schema extends AbstractPdoSchema
      * @throws Exception
      * @throws InvalidConfigException
      * @throws Throwable
+     *
+     * @psalm-return IndexInfo[]
      */
     private function getPragmaIndexInfo(string $name): array
     {
         $column = $this->db
             ->createCommand('PRAGMA INDEX_INFO(' . (string) $this->db->getQuoter()->quoteValue($name) . ')')
             ->queryAll();
-        /** @psalm-var IndexInfo[] $column */
-        $column = $this->normalizeRowKeyCase($column, true);
+        $column = array_map('array_change_key_case', $column);
         DbArrayHelper::multisort($column, 'seqno');
 
+        /** @psalm-var IndexInfo[] $column */
         return $column;
     }
 
@@ -681,9 +682,12 @@ final class Schema extends AbstractPdoSchema
      * @throws Exception
      * @throws InvalidConfigException
      * @throws Throwable
+     *
+     * @psalm-return IndexListInfo[]
      */
     private function getPragmaIndexList(string $tableName): array
     {
+        /** @psalm-var IndexListInfo[] */
         return $this->db
             ->createCommand('PRAGMA INDEX_LIST(' . (string) $this->db->getQuoter()->quoteValue($tableName) . ')')
             ->queryAll();
@@ -693,9 +697,12 @@ final class Schema extends AbstractPdoSchema
      * @throws Exception
      * @throws InvalidConfigException
      * @throws Throwable
+     *
+     * @psalm-return ColumnInfo[]
      */
     private function getPragmaTableInfo(string $tableName): array
     {
+        /** @psalm-var ColumnInfo[] */
         return $this->db->createCommand(
             'PRAGMA TABLE_INFO(' . $this->db->getQuoter()->quoteSimpleTableName($tableName) . ')'
         )->queryAll();
@@ -708,7 +715,7 @@ final class Schema extends AbstractPdoSchema
      */
     protected function findViewNames(string $schema = ''): array
     {
-        /** @psalm-var string[][] $views */
+        /** @var string[][] $views */
         $views = $this->db->createCommand(
             <<<SQL
             SELECT name as view FROM sqlite_master WHERE type = 'view' AND name NOT LIKE 'sqlite_%'
@@ -728,6 +735,8 @@ final class Schema extends AbstractPdoSchema
      * @param string $name the table name.
      *
      * @return array The cache key.
+     *
+     * @psalm-suppress DeprecatedMethod
      */
     protected function getCacheKey(string $name): array
     {
@@ -757,7 +766,7 @@ final class Schema extends AbstractPdoSchema
         $regexp = '/\bjson_valid\(\s*["`\[]?(.+?)["`\]]?\s*\)/i';
 
         foreach ($checks as $check) {
-            if (preg_match_all($regexp, $check->getExpression(), $matches, PREG_SET_ORDER)) {
+            if (preg_match_all($regexp, $check->getExpression(), $matches, PREG_SET_ORDER) > 0) {
                 foreach ($matches as $match) {
                     $result[] = $match[1];
                 }

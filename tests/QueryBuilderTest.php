@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
-use Generator;
 use JsonException;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
@@ -182,9 +181,14 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
      * @throws NotSupportedException
      * @throws Throwable
      */
-    public function testBatchInsert(string $table, array $columns, iterable|Generator $rows, string $expected): void
-    {
-        parent::testBatchInsert($table, $columns, $rows, $expected);
+    public function testBatchInsert(
+        string $table,
+        array $columns,
+        iterable $rows,
+        string $expected,
+        array $expectedParams = [],
+    ): void {
+        parent::testBatchInsert($table, $columns, $rows, $expected, $expectedParams);
     }
 
     /**
@@ -286,7 +290,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->assertSame(
             <<<SQL
-            WITH a1 AS (SELECT `id` FROM `t1` WHERE expr = 1), a2 AS (SELECT `id` FROM `t2` INNER JOIN `a1` ON t2.id = a1.id WHERE expr = 2 UNION  SELECT `id` FROM `t3` WHERE expr = 3) SELECT * FROM `a2`
+            WITH `a1` AS (SELECT `id` FROM `t1` WHERE expr = 1), `a2` AS (SELECT `id` FROM `t2` INNER JOIN `a1` ON t2.id = a1.id WHERE expr = 2 UNION  SELECT `id` FROM `t3` WHERE expr = 3) SELECT * FROM `a2`
             SQL,
             $sql,
         );
@@ -699,10 +703,11 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string $table,
         array $columns,
         array|string $condition,
-        string $expectedSQL,
-        array $expectedParams
+        array $params,
+        string $expectedSql,
+        array $expectedParams,
     ): void {
-        parent::testUpdate($table, $columns, $condition, $expectedSQL, $expectedParams);
+        parent::testUpdate($table, $columns, $condition, $params, $expectedSql, $expectedParams);
     }
 
     /**
@@ -764,5 +769,11 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             'INSERT INTO `json_table` (`json_col`) VALUES (:qp0)',
             $qb->insert('json_table', ['json_col' => new JsonExpression(['a' => 1, 'b' => 2])]),
         );
+    }
+
+    /** @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::selectScalar */
+    public function testSelectScalar(array|bool|float|int|string $columns, string $expected): void
+    {
+        parent::testSelectScalar($columns, $expected);
     }
 }

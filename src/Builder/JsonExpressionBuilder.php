@@ -41,7 +41,6 @@ final class JsonExpressionBuilder implements ExpressionBuilderInterface
      */
     public function build(ExpressionInterface $expression, array &$params = []): string
     {
-        /** @psalm-var mixed $value */
         $value = $expression->getValue();
 
         if ($value instanceof QueryInterface) {

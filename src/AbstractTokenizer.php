@@ -101,7 +101,6 @@ abstract class AbstractTokenizer
         $token[] = (new SqlToken())->type(SqlToken::TYPE_STATEMENT);
 
         $this->tokenStack->push($token[0]);
-        /** @psalm-var SqlToken */
         $this->currentToken = $this->tokenStack->top();
         $length = 0;
 

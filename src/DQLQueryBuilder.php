@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
+use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionBuilderInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
@@ -12,6 +13,7 @@ use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
 use Yiisoft\Db\QueryBuilder\Condition\InCondition;
 use Yiisoft\Db\QueryBuilder\Condition\LikeCondition;
+use Yiisoft\Db\Sqlite\Builder\ExpressionBuilder;
 use Yiisoft\Db\Sqlite\Builder\InConditionBuilder;
 use Yiisoft\Db\Sqlite\Builder\JsonExpressionBuilder;
 use Yiisoft\Db\Sqlite\Builder\LikeConditionBuilder;
@@ -46,7 +48,6 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
         $sql = $this->buildOrderByAndLimit($sql, $orderBy, $query->getLimit(), $query->getOffset());
 
         if (!empty($orderBy)) {
-            /** @psalm-var array<string|ExpressionInterface> $orderBy */
             foreach ($orderBy as $expression) {
                 if ($expression instanceof ExpressionInterface) {
                     $this->buildExpression($expression, $params);
@@ -57,7 +58,6 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
         $groupBy = $query->getGroupBy();
 
         if (!empty($groupBy)) {
-            /** @psalm-var array<string|ExpressionInterface> $groupBy */
             foreach ($groupBy as $expression) {
                 if ($expression instanceof ExpressionInterface) {
                     $this->buildExpression($expression, $params);
@@ -94,7 +94,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             /**
              * Limit isn't optional in SQLite.
              *
-             * {@see http://www.sqlite.org/syntaxdiagrams.html#select-stmt}
+             * {@see https://www.sqlite.org/syntaxdiagrams.html#select-stmt}
              */
             $sql = 'LIMIT 9223372036854775807 OFFSET ' . // 2^63-1
                 ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string)$offset);
@@ -138,6 +138,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             LikeCondition::class => LikeConditionBuilder::class,
             InCondition::class => InConditionBuilder::class,
             JsonExpression::class => JsonExpressionBuilder::class,
+            Expression::class => ExpressionBuilder::class,
         ]);
     }
 }

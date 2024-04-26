@@ -8,13 +8,10 @@ use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDMLQueryBuilder;
 
 use function implode;
-use function ltrim;
-use function reset;
 
 /**
  * Implements a DML (Data Manipulation Language) SQL statements for SQLite Server.
@@ -45,8 +42,8 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         if ($value !== null) {
             $value = "'" . ((int) $value - 1) . "'";
         } else {
-            $pk = $tableSchema->getPrimaryKey();
-            $key = $this->quoter->quoteColumnName(reset($pk));
+            $key = $tableSchema->getPrimaryKey()[0];
+            $key = $this->quoter->quoteColumnName($key);
             $value = '(SELECT MAX(' . $key . ') FROM ' . $tableName . ')';
         }
 
@@ -59,14 +56,9 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         bool|array $updateColumns,
         array &$params
     ): string {
-        /** @psalm-var Constraint[] $constraints */
+        /** @var Constraint[] $constraints */
         $constraints = [];
 
-        /**
-         * @psalm-var string[] $insertNames
-         * @psalm-var string[] $updateNames
-         * @psalm-var array<string, ExpressionInterface|string>|bool $updateColumns
-         */
         [$uniqueNames, $insertNames, $updateNames] = $this->prepareUpsertColumns(
             $table,
             $insertColumns,
@@ -78,20 +70,19 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
             return $this->insert($table, $insertColumns, $params);
         }
 
-        /** @psalm-var string[] $placeholders */
         [, $placeholders, $values, $params] = $this->prepareInsertValues($table, $insertColumns, $params);
 
-        $insertSql = 'INSERT OR IGNORE INTO '
-            . $this->quoter->quoteTableName($table)
+        $quotedTableName = $this->quoter->quoteTableName($table);
+
+        $insertSql = 'INSERT OR IGNORE INTO ' . $quotedTableName
             . (!empty($insertNames) ? ' (' . implode(', ', $insertNames) . ')' : '')
-            . (!empty($placeholders) ? ' VALUES (' . implode(', ', $placeholders) . ')' : "$values");
+            . (!empty($placeholders) ? ' VALUES (' . implode(', ', $placeholders) . ')' : ' ' . $values);
 
         if ($updateColumns === false) {
             return $insertSql;
         }
 
         $updateCondition = ['or'];
-        $quotedTableName = $this->quoter->quoteTableName($table);
 
         foreach ($constraints as $constraint) {
             $constraintCondition = ['and'];
@@ -106,13 +97,9 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 
         if ($updateColumns === true) {
             $updateColumns = [];
-            foreach ($updateNames as $name) {
-                $quotedName = $this->quoter->quoteColumnName($name);
-
-                if (strrpos($quotedName, '.') === false) {
-                    $quotedName = "(SELECT $quotedName FROM `EXCLUDED`)";
-                }
-                $updateColumns[$name] = new Expression($quotedName);
+            /** @psalm-var string[] $updateNames */
+            foreach ($updateNames as $quotedName) {
+                $updateColumns[$quotedName] = new Expression("(SELECT $quotedName FROM `EXCLUDED`)");
             }
         }
 
@@ -120,13 +107,9 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
             return $insertSql;
         }
 
-        /** @psalm-var array $params */
-        $updateSql = 'WITH "EXCLUDED" ('
-            . implode(', ', $insertNames)
-            . ') AS (' . (!empty($placeholders)
-                ? 'VALUES (' . implode(', ', $placeholders) . ')'
-                : ltrim("$values", ' ')) . ') ' .
-                $this->update($table, $updateColumns, $updateCondition, $params);
+        $updateSql = 'WITH "EXCLUDED" (' . implode(', ', $insertNames) . ') AS ('
+            . (!empty($placeholders) ? 'VALUES (' . implode(', ', $placeholders) . ')' : $values)
+            . ') ' . $this->update($table, $updateColumns, $updateCondition, $params);
 
         return "$updateSql; $insertSql;";
     }
