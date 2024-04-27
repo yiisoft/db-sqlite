@@ -6,14 +6,12 @@ namespace Yiisoft\Db\Sqlite\Tests;
 
 use PDO;
 use Yiisoft\Db\Command\Param;
-use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Schema\Column\BinaryColumnSchema;
 use Yiisoft\Db\Schema\Column\BooleanColumnSchema;
 use Yiisoft\Db\Schema\Column\DoubleColumnSchema;
 use Yiisoft\Db\Schema\Column\IntegerColumnSchema;
 use Yiisoft\Db\Schema\Column\JsonColumnSchema;
 use Yiisoft\Db\Schema\Column\StringColumnSchema;
-use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Tests\Common\CommonColumnSchemaTest;
@@ -78,14 +76,6 @@ final class ColumnSchemaTest extends CommonColumnSchemaTest
         $this->assertSame([1, 2, 3, 'string', null], $jsonTextColPhpType);
 
         $db->close();
-    }
-
-    public function testTypeCastJson(): void
-    {
-        $columnSchema = new JsonColumnSchema('json_col');
-
-        $this->assertSame(['a' => 1], $columnSchema->phpTypecast('{"a":1}'));
-        $this->assertEquals(new JsonExpression(['a' => 1], SchemaInterface::TYPE_JSON), $columnSchema->dbTypecast(['a' => 1]));
     }
 
     public function testColumnSchemaInstance()

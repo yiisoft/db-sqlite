@@ -480,7 +480,8 @@ final class Schema extends AbstractPdoSchema
         $type = $this->getColumnType($dbType, $info);
         $isUnsigned = str_contains($dbType, 'unsigned');
         /** @psalm-var ColumnInfo $info */
-        $column = $this->createColumnSchema($type, $info['name'], unsigned: $isUnsigned);
+        $column = $this->createColumnSchema($type, unsigned: $isUnsigned);
+        $column->name($info['name']);
         $column->size($info['size'] ?? null);
         $column->precision($info['precision'] ?? null);
         $column->scale($info['scale'] ?? null);
