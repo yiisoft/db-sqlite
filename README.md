@@ -42,21 +42,9 @@ composer require yiisoft/db-sqlite
 
 ## Documentation
 
-English:
-
-- For config connection to SQLite database check [Connecting SQLite](https://github.com/yiisoft/db/blob/master/docs/en/connection/sqlite.md)
-- [Check the yiisoft/db docs](https://github.com/yiisoft/db/blob/master/docs/en/README.md) to learn about usage.
-
-Português - Brasil:
-
-- Para configurar a conexão com o SQLite leia [Connecting SQLite](https://github.com/yiisoft/db/blob/master/docs/pt-BR/connection/sqlite.md).
-- [Confira a documentação](https://github.com/yiisoft/db/blob/master/docs/pt-BR/README.md) para aprender como usar.
-
-Testing:
-
+- For config connection to SQLite database check [Connecting SQLite](https://github.com/yiisoft/db/blob/master/docs/guide/en/connection/sqlite.md)
+- [Check the yiisoft/db docs](https://github.com/yiisoft/db/blob/master/docs/guide/en/README.md) to learn about usage.
 - [Internals](docs/internals.md)
-
-## Support
 
 If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
 You may also check out other [Yii Community Resources](https://www.yiiframework.com/community).
@@ -71,7 +59,7 @@ You may also check out other [Yii Community Resources](https://www.yiiframework.
 [![Twitter](https://img.shields.io/badge/twitter-follow-1DA1F2?logo=twitter&logoColor=1DA1F2&labelColor=555555?style=flat)](https://twitter.com/yiiframework)
 [![Telegram](https://img.shields.io/badge/telegram-join-1DA1F2?style=flat&logo=telegram)](https://t.me/yii3en)
 [![Facebook](https://img.shields.io/badge/facebook-join-1DA1F2?style=flat&logo=facebook&logoColor=ffffff)](https://www.facebook.com/groups/yiitalk)
-[![Slack](https://img.shields.io/badge/slack-join-1DA1F2?style=flat&logo=slack)](https://yiiframework.com/go/slack)
+[![Slack](https://img.shields.io/badge/slack-join-1DA1F2?style=flat&logo=slack)](https://www.yiiframework.com/go/slack)
 
 ## License
 
