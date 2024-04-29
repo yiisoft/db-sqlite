@@ -24,7 +24,7 @@
         "php": "^8.0",
         "ext-mbstring": "*",
         "ext-pdo": "*",
-        "yiisoft/db": "^1.2",
+        "yiisoft/db": "dev-master",
         "yiisoft/json": "^1.0"
     },
     "require-dev": {
