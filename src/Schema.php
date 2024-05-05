@@ -373,10 +373,10 @@ final class Schema extends AbstractPdoSchema
             }
 
             $column = $this->loadColumnSchema($info);
-            $table->column($column->getName(), $column);
+            $table->column($info['name'], $column);
 
             if ($column->isPrimaryKey()) {
-                $table->primaryKey($column->getName());
+                $table->primaryKey($info['name']);
             }
         }
 
@@ -488,7 +488,6 @@ final class Schema extends AbstractPdoSchema
         $column->allowNull(!$info['notnull']);
         $column->primaryKey((bool) $info['pk']);
         $column->dbType($dbType);
-        $column->phpType($this->getColumnPhpType($type));
         $column->defaultValue($this->normalizeDefaultValue($info['dflt_value'], $column));
 
         return $column;

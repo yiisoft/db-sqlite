@@ -3,6 +3,8 @@
 ## 2.0.0 under development
 
 - Enh #289: Implement `SqlParser` and `ExpressionBuilder` driver classes (@Tigrov)
+- Enh #273: Implement `ColumnSchemaInterface` classes according to the data type of database table columns
+  for type casting performance. Related with yiisoft/db#752 (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
@@ -17,8 +19,6 @@
 - Enh #263: Support json type (@Tigrov)
 - Enh #278: Move methods from `Command` to `AbstractPdoCommand` class (@Tigrov)
 - Bug #268: Fix foreign keys: support multiple foreign keys referencing to one table and possible null columns for reference (@Tigrov)
-- Enh #273: Implement `ColumnSchemaInterface` classes according to the data type of database table columns
-  for type casting performance. Related with yiisoft/db#752 (@Tigrov)
 - Bug #271: Refactor `DMLQueryBuilder`, related with yiisoft/db#746 (@Tigrov)
 
 ## 1.0.1 July 24, 2023
