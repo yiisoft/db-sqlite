@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://github.com/yiisoft" target="_blank">
-        <img src="https://yiisoft.github.io/docs/images/yii_logo.svg" height="100px" alt="Yii">
+        <img src="https://yiisoft.github.io/docs/images/yii_logo.svg" height="80px" alt="Yii">
     </a>
     <a href="https://www.sqlite.org/" target="_blank">
         <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/SQLite370.svg" height="80px" alt="Sqlite">
@@ -42,8 +42,10 @@ composer require yiisoft/db-sqlite
 
 ## Documentation
 
-- For config connection to SQLite database check [Connecting SQLite](https://github.com/yiisoft/db/blob/master/docs/guide/en/connection/sqlite.md)
-- [Check the yiisoft/db docs](https://github.com/yiisoft/db/blob/master/docs/guide/en/README.md) to learn about usage.
+For config connection to SQLite database check [Connecting SQLite](https://github.com/yiisoft/db/blob/master/docs/guide/en/connection/sqlite.md)
+
+[Check the yiisoft/db docs](https://github.com/yiisoft/db/blob/master/docs/guide/en/README.md) to learn about usage.
+
 - [Internals](docs/internals.md)
 
 If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
