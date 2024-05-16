@@ -17,13 +17,13 @@ final class CommandProvider extends \Yiisoft\Db\Tests\Provider\CommandProvider
     {
         $batchInsert = parent::batchInsert();
 
-        $batchInsert['batchInsert binds json params'] = [
+        $batchInsert['binds json params'] = [
             '{{%type}}',
-            ['int_col', 'char_col', 'float_col', 'bool_col', 'json_col'],
             [
                 [1, 'a', 0.0, true, ['a' => 1, 'b' => true, 'c' => [1, 2, 3]]],
                 [2, 'b', -1.0, false, new JsonExpression(['d' => 'e', 'f' => false, 'g' => [4, 5, null]])],
             ],
+            ['int_col', 'char_col', 'float_col', 'bool_col', 'json_col'],
             'expected' => 'INSERT INTO `type` (`int_col`, `char_col`, `float_col`, `bool_col`, `json_col`) '
                 . 'VALUES (:qp0, :qp1, :qp2, :qp3, :qp4), (:qp5, :qp6, :qp7, :qp8, :qp9)',
             'expectedParams' => [
