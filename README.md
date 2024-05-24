@@ -1,13 +1,19 @@
 <p align="center">
     <a href="https://github.com/yiisoft" target="_blank">
-        <img src="https://yiisoft.github.io/docs/images/yii_logo.svg" height="80px">
+        <img src="https://yiisoft.github.io/docs/images/yii_logo.svg" height="80px" alt="Yii">
     </a>
     <a href="https://www.sqlite.org/" target="_blank">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/SQLite370.svg" height="80px">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/SQLite370.svg" height="80px" alt="Sqlite">
     </a>
-    <h1 align="center">SQLite driver for Yii Database</h1>
+    <h1 align="center">Yii Database SQLite driver</h1>
     <br>
 </p>
+
+[![Latest Stable Version](https://poser.pugx.org/yiisoft/db-sqlite/v/stable.png)](https://packagist.org/packages/yiisoft/db-sqlite)
+[![Total Downloads](https://poser.pugx.org/yiisoft/db-sqlite/downloads.png)](https://packagist.org/packages/yiisoft/db-sqlite)
+[![rector](https://github.com/yiisoft/db-sqlite/actions/workflows/rector.yml/badge.svg)](https://github.com/yiisoft/db-sqlite/actions/workflows/rector.yml)
+[![codecov](https://codecov.io/gh/yiisoft/db-sqlite/branch/master/graph/badge.svg?token=YXUHCPPITH)](https://codecov.io/gh/yiisoft/db-sqlite)
+[![StyleCI](https://github.styleci.io/repos/145220194/shield?branch=master)](https://github.styleci.io/repos/145220194?branch=master)
 
 SQLite driver for [Yii Database](https://github.com/yiisoft/db) is a package for working with [SQLite] databases in PHP.
 
@@ -20,21 +26,15 @@ perform advanced database operations such as joins and aggregates.
 
 [SQLite]: https://www.sqlite.org/
 
-[![Latest Stable Version](https://poser.pugx.org/yiisoft/db-sqlite/v/stable.png)](https://packagist.org/packages/yiisoft/db-sqlite)
-[![Total Downloads](https://poser.pugx.org/yiisoft/db-sqlite/downloads.png)](https://packagist.org/packages/yiisoft/db-sqlite)
-[![rector](https://github.com/yiisoft/db-sqlite/actions/workflows/rector.yml/badge.svg)](https://github.com/yiisoft/db-sqlite/actions/workflows/rector.yml)
-[![codecov](https://codecov.io/gh/yiisoft/db-sqlite/branch/master/graph/badge.svg?token=YXUHCPPITH)](https://codecov.io/gh/yiisoft/db-sqlite)
-[![StyleCI](https://github.styleci.io/repos/145220194/shield?branch=master)](https://github.styleci.io/repos/145220194?branch=master)
-
 ## Support version
 
-|  PHP | Sqlite Version            |  CI-Actions
-|:----:|:------------------------:|:---:|
+| PHP | Sqlite Version            | CI-Actions |
+|-----|---------------------------|------------|
 |**8.0 - 8.2**| **3:latest**|[![build](https://github.com/yiisoft/db-sqlite/actions/workflows/build.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-sqlite/actions/workflows/build.yml) [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-sqlite%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-sqlite/master) [![static analysis](https://github.com/yiisoft/db-sqlite/actions/workflows/static.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-sqlite/actions/workflows/static.yml) [![type-coverage](https://shepherd.dev/github/yiisoft/db-sqlite/coverage.svg)](https://shepherd.dev/github/yiisoft/db-sqlite)
 
 ## Installation
 
-The package could be installed via composer:
+The package could be installed with [Composer](https://getcomposer.org):
 
 ```shell
 composer require yiisoft/db-sqlite
@@ -42,24 +42,21 @@ composer require yiisoft/db-sqlite
 
 ## Documentation
 
-English:
+For config connection to SQLite database check [Connecting SQLite](https://github.com/yiisoft/db/blob/master/docs/guide/en/connection/sqlite.md)
 
-- For config connection to SQLite database check [Connecting SQLite](https://github.com/yiisoft/db/blob/master/docs/en/connection/sqlite.md)
-- [Check the yiisoft/db docs](https://github.com/yiisoft/db/blob/master/docs/en/README.md) to learn about usage.
-
-Português - Brasil:
-
-- Para configurar a conexão com o SQLite leia [Connecting SQLite](https://github.com/yiisoft/db/blob/master/docs/pt-BR/connection/sqlite.md).
-- [Confira a documentação](https://github.com/yiisoft/db/blob/master/docs/pt-BR/README.md) para aprender como usar.
-
-Testing:
+[Check the yiisoft/db docs](https://github.com/yiisoft/db/blob/master/docs/guide/en/README.md) to learn about usage.
 
 - [Internals](docs/internals.md)
 
-## Support
-
 If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
 You may also check out other [Yii Community Resources](https://www.yiiframework.com/community).
+
+## License
+
+The Yii Database SQLite driver is free software. It is released under the terms of the BSD License.
+Please see [`LICENSE`](./LICENSE.md) for more information.
+
+Maintained by [Yii Software](https://www.yiiframework.com/).
 
 ## Support the project
 
@@ -72,10 +69,3 @@ You may also check out other [Yii Community Resources](https://www.yiiframework.
 [![Telegram](https://img.shields.io/badge/telegram-join-1DA1F2?style=flat&logo=telegram)](https://t.me/yii3en)
 [![Facebook](https://img.shields.io/badge/facebook-join-1DA1F2?style=flat&logo=facebook&logoColor=ffffff)](https://www.facebook.com/groups/yiitalk)
 [![Slack](https://img.shields.io/badge/slack-join-1DA1F2?style=flat&logo=slack)](https://yiiframework.com/go/slack)
-
-## License
-
-The Yii DataBase SQLite Extension is free software. It is released under the terms of the BSD License.
-Please see [`LICENSE`](./LICENSE.md) for more information.
-
-Maintained by [Yii Software](https://www.yiiframework.com/).
