@@ -5,20 +5,23 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests;
 
 use PDO;
-use PHPUnit\Framework\TestCase;
 use Yiisoft\Db\Command\Param;
-use Yiisoft\Db\Expression\JsonExpression;
-use Yiisoft\Db\Sqlite\ColumnSchema;
-use Yiisoft\Db\Schema\SchemaInterface;
+use Yiisoft\Db\Schema\Column\BinaryColumnSchema;
+use Yiisoft\Db\Schema\Column\BooleanColumnSchema;
+use Yiisoft\Db\Schema\Column\DoubleColumnSchema;
+use Yiisoft\Db\Schema\Column\IntegerColumnSchema;
+use Yiisoft\Db\Schema\Column\JsonColumnSchema;
+use Yiisoft\Db\Schema\Column\StringColumnSchema;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\Tests\Common\CommonColumnSchemaTest;
 
 use function str_repeat;
 
 /**
  * @group sqlite
  */
-final class ColumnSchemaTest extends TestCase
+final class ColumnSchemaTest extends CommonColumnSchemaTest
 {
     use TestTrait;
 
@@ -75,13 +78,17 @@ final class ColumnSchemaTest extends TestCase
         $db->close();
     }
 
-    public function testTypeCastJson(): void
+    public function testColumnSchemaInstance()
     {
-        $columnSchema = new ColumnSchema('json_col');
-        $columnSchema->dbType(SchemaInterface::TYPE_JSON);
-        $columnSchema->type(SchemaInterface::TYPE_JSON);
+        $db = $this->getConnection(true);
+        $schema = $db->getSchema();
+        $tableSchema = $schema->getTableSchema('type');
 
-        $this->assertSame(['a' => 1], $columnSchema->phpTypeCast('{"a":1}'));
-        $this->assertEquals(new JsonExpression(['a' => 1], SchemaInterface::TYPE_JSON), $columnSchema->dbTypeCast(['a' => 1]));
+        $this->assertInstanceOf(IntegerColumnSchema::class, $tableSchema->getColumn('int_col'));
+        $this->assertInstanceOf(StringColumnSchema::class, $tableSchema->getColumn('char_col'));
+        $this->assertInstanceOf(DoubleColumnSchema::class, $tableSchema->getColumn('float_col'));
+        $this->assertInstanceOf(BinaryColumnSchema::class, $tableSchema->getColumn('blob_col'));
+        $this->assertInstanceOf(BooleanColumnSchema::class, $tableSchema->getColumn('bool_col'));
+        $this->assertInstanceOf(JsonColumnSchema::class, $tableSchema->getColumn('json_col'));
     }
 }

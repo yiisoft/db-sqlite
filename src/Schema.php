@@ -17,7 +17,7 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Helper\DbArrayHelper;
 use Yiisoft\Db\Schema\Builder\ColumnInterface;
-use Yiisoft\Db\Schema\ColumnSchemaInterface;
+use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 
 use function array_column;
@@ -67,7 +67,10 @@ use function strtolower;
  *     type:string,
  *     notnull:string,
  *     dflt_value:string|null,
- *     pk:string
+ *     pk:string,
+ *     size?: int,
+ *     precision?: int,
+ *     scale?: int,
  * }
  */
 final class Schema extends AbstractPdoSchema
@@ -370,10 +373,10 @@ final class Schema extends AbstractPdoSchema
             }
 
             $column = $this->loadColumnSchema($info);
-            $table->column($column->getName(), $column);
+            $table->column($info['name'], $column);
 
             if ($column->isPrimaryKey()) {
-                $table->primaryKey($column->getName());
+                $table->primaryKey($info['name']);
             }
         }
 
@@ -469,49 +472,63 @@ final class Schema extends AbstractPdoSchema
      *
      * @return ColumnSchemaInterface The column schema object.
      *
-     * @psalm-param array{cid:string, name:string, type:string, notnull:string, dflt_value:string|null, pk:string} $info
+     * @psalm-param ColumnInfo $info
      */
-    protected function loadColumnSchema(array $info): ColumnSchemaInterface
+    private function loadColumnSchema(array $info): ColumnSchemaInterface
     {
-        $column = $this->createColumnSchema($info['name']);
+        $dbType = strtolower($info['type']);
+        $type = $this->getColumnType($dbType, $info);
+        $isUnsigned = str_contains($dbType, 'unsigned');
+        /** @psalm-var ColumnInfo $info */
+        $column = $this->createColumnSchema($type, unsigned: $isUnsigned);
+        $column->name($info['name']);
+        $column->size($info['size'] ?? null);
+        $column->precision($info['precision'] ?? null);
+        $column->scale($info['scale'] ?? null);
         $column->allowNull(!$info['notnull']);
-        $column->primaryKey($info['pk'] != '0');
-        $column->dbType(strtolower($info['type']));
-        $column->unsigned(str_contains($column->getDbType() ?? '', 'unsigned'));
-        $column->type(self::TYPE_STRING);
-
-        if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->getDbType() ?? '', $matches)) {
-            $type = strtolower($matches[1]);
-
-            if (isset(self::TYPE_MAP[$type])) {
-                $column->type(self::TYPE_MAP[$type]);
-            }
-
-            if (!empty($matches[2])) {
-                $values = explode(',', $matches[2]);
-                $column->precision((int) $values[0]);
-                $column->size((int) $values[0]);
-
-                if (isset($values[1])) {
-                    $column->scale((int) $values[1]);
-                }
-
-                if (($type === 'tinyint' || $type === 'bit') && $column->getSize() === 1) {
-                    $column->type(self::TYPE_BOOLEAN);
-                } elseif ($type === 'bit') {
-                    if ($column->getSize() > 32) {
-                        $column->type(self::TYPE_BIGINT);
-                    } elseif ($column->getSize() === 32) {
-                        $column->type(self::TYPE_INTEGER);
-                    }
-                }
-            }
-        }
-
-        $column->phpType($this->getColumnPhpType($column));
+        $column->primaryKey((bool) $info['pk']);
+        $column->dbType($dbType);
         $column->defaultValue($this->normalizeDefaultValue($info['dflt_value'], $column));
 
         return $column;
+    }
+
+    /**
+     * Get the abstract data type for the database data type.
+     *
+     * @param string $dbType The database data type
+     * @param array $info Column information.
+     *
+     * @return string The abstract data type.
+     */
+    private function getColumnType(string $dbType, array &$info): string
+    {
+        preg_match('/^(\w*)(?:\(([^)]+)\))?/', $dbType, $matches);
+        $dbType = strtolower($matches[1]);
+
+        if (!empty($matches[2])) {
+            $values = explode(',', $matches[2], 2);
+            $info['size'] = (int) $values[0];
+            $info['precision'] = (int) $values[0];
+
+            if (isset($values[1])) {
+                $info['scale'] = (int) $values[1];
+            }
+
+            if (($dbType === 'tinyint' || $dbType === 'bit') && $info['size'] === 1) {
+                return self::TYPE_BOOLEAN;
+            }
+
+            if ($dbType === 'bit') {
+                return match (true) {
+                    $info['size'] === 32 => self::TYPE_INTEGER,
+                    $info['size'] > 32 => self::TYPE_BIGINT,
+                    default => self::TYPE_SMALLINT,
+                };
+            }
+        }
+
+        return self::TYPE_MAP[$dbType] ?? self::TYPE_STRING;
     }
 
     /**
@@ -625,18 +642,6 @@ final class Schema extends AbstractPdoSchema
         }
 
         return $result[$returnType];
-    }
-
-    /**
-     * Creates a column schema for the database.
-     *
-     * This method may be overridden by child classes to create a DBMS-specific column schema.
-     *
-     * @param string $name Name of the column.
-     */
-    private function createColumnSchema(string $name): ColumnSchemaInterface
-    {
-        return new ColumnSchema($name);
     }
 
     /**
