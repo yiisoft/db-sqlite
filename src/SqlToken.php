@@ -92,8 +92,6 @@ final class SqlToken implements ArrayAccess, Stringable
      *
      * It's implicitly called when you use something like `$token[$offset] = $child;`.
      *
-     * @param mixed $offset The child token offset.
-     * @param mixed $value Token to add.
      *
      * @psalm-suppress MixedPropertyTypeCoercion
      */
