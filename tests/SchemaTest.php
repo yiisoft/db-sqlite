@@ -359,4 +359,24 @@ final class SchemaTest extends CommonSchemaTest
 
         $schema->refresh();
     }
+
+    public function testTableComment(): void
+    {
+        $db = $this->getConnection(true);
+        $schema = $db->getSchema();
+        $table = $schema->getTableSchema('comment');
+
+        $this->assertSame("Table comment\nsecond line\nthird line", $table->getComment());
+    }
+
+    public function testColumnComments(): void
+    {
+        $db = $this->getConnection(true);
+        $schema = $db->getSchema();
+        $table = $schema->getTableSchema('comment');
+
+        $this->assertSame('primary key', $table->getColumn('id')->getComment());
+        $this->assertSame('USD', $table->getColumn('price')->getComment());
+        $this->assertSame("Column comment\nsecond line\nthird line", $table->getColumn('name')->getComment());
+    }
 }

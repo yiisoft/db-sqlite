@@ -15,6 +15,7 @@ DROP TABLE IF EXISTS "negative_default_values";
 DROP TABLE IF EXISTS "animal";
 DROP TABLE IF EXISTS "default_pk";
 DROP TABLE IF EXISTS "notauto_pk";
+DROP TABLE IF EXISTS "comment";
 DROP VIEW IF EXISTS "animal_view";
 DROP TABLE IF EXISTS "T_constraints_4";
 DROP TABLE IF EXISTS "T_constraints_3";
@@ -172,6 +173,17 @@ CREATE TABLE "timestamp_default" (
   text_col TEXT NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
   timestamp_text TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 ); -- STRICT
+
+CREATE TABLE `comment` -- Table comment
+-- second line
+/* third line */
+(
+    `id` integer PRIMARY KEY AUTOINCREMENT NOT NULL, -- primary key
+    price decimal(10,2), -- USD
+    `name` varchar(100) DEFAULT 'Pan, Peter' -- Column comment
+    -- second line
+    /* third line */
+);
 
 CREATE VIEW "animal_view" AS SELECT * FROM "animal";
 
