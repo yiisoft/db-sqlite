@@ -15,6 +15,8 @@ DROP TABLE IF EXISTS "negative_default_values";
 DROP TABLE IF EXISTS "animal";
 DROP TABLE IF EXISTS "default_pk";
 DROP TABLE IF EXISTS "notauto_pk";
+DROP TABLE IF EXISTS "timestamp_default";
+DROP TABLE IF EXISTS "json_type";
 DROP VIEW IF EXISTS "animal_view";
 DROP TABLE IF EXISTS "T_constraints_4";
 DROP TABLE IF EXISTS "T_constraints_3";
@@ -25,6 +27,7 @@ DROP TABLE IF EXISTS "T_upsert_1";
 DROP TABLE IF EXISTS "T_constraints_check";
 DROP TABLE IF EXISTS "foreign_keys_parent";
 DROP TABLE IF EXISTS "foreign_keys_child";
+DROP TABLE IF EXISTS "json_type";
 
 CREATE TABLE "profile" (
   id INTEGER NOT NULL,
@@ -173,6 +176,11 @@ CREATE TABLE "timestamp_default" (
   timestamp_text TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 ); -- STRICT
 
+CREATE TABLE "json_type" (
+  id INTEGER PRIMARY KEY,
+  json_col JSON
+);
+
 CREATE VIEW "animal_view" AS SELECT * FROM "animal";
 
 INSERT INTO "animal" ("type") VALUES ('yiiunit\data\ar\Cat');
@@ -215,6 +223,11 @@ INSERT INTO "order_item_with_null_fk" (order_id, item_id, quantity, subtotal) VA
 INSERT INTO "order_item_with_null_fk" (order_id, item_id, quantity, subtotal) VALUES (2, 5, 1, 15.0);
 INSERT INTO "order_item_with_null_fk" (order_id, item_id, quantity, subtotal) VALUES (2, 3, 1, 8.0);
 INSERT INTO "order_item_with_null_fk" (order_id, item_id, quantity, subtotal) VALUES (3, 2, 1, 40.0);
+
+INSERT INTO "json_type" (json_col) VALUES (null);
+INSERT INTO "json_type" (json_col) VALUES ('[]');
+INSERT INTO "json_type" (json_col) VALUES ('[1,2,3,null]');
+INSERT INTO "json_type" (json_col) VALUES ('[3,4,5]');
 
 /* bit test, see https://github.com/yiisoft/yii2/issues/9006 */
 
