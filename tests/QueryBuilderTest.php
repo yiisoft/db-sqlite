@@ -9,6 +9,7 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Query\Query;
@@ -792,11 +793,21 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         );
         $this->assertSame([':qp0' => '[1,2,3]'], $params);
 
+        // Test column as Expression
+        $params = [];
+        $sql = $qb->buildExpression(new JsonOverlapsCondition(new Expression('column'), [1, 2, 3]), $params);
+
+        $this->assertSame(
+            'EXISTS(SELECT value FROM json_each(column) INTERSECT SELECT value FROM json_each(:qp0))=1',
+            $sql
+        );
+        $this->assertSame([':qp0' => '[1,2,3]'], $params);
+
         $db->close();
     }
 
     /** @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::overlapsCondition */
-    public function testOverlapsCondition(iterable|ExpressionInterface $values, int $expectedCount): void
+    public function testJsonOverlapsCondition(iterable|ExpressionInterface $values, int $expectedCount): void
     {
         $db = $this->getConnection(true);
 
@@ -811,7 +822,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /** @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::overlapsCondition */
-    public function testOverlapsConditionOperator(iterable|ExpressionInterface $values, int $expectedCount): void
+    public function testJsonOverlapsConditionOperator(iterable|ExpressionInterface $values, int $expectedCount): void
     {
         $db = $this->getConnection(true);
 
