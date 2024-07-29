@@ -82,7 +82,7 @@ final class Schema extends AbstractPdoSchema
      */
     private const TYPE_MAP = [
         'tinyint' => self::TYPE_TINYINT,
-        'bit' => self::TYPE_SMALLINT,
+        'bit' => self::TYPE_BIT,
         'boolean' => self::TYPE_BOOLEAN,
         'bool' => self::TYPE_BOOLEAN,
         'smallint' => self::TYPE_SMALLINT,
@@ -517,14 +517,6 @@ final class Schema extends AbstractPdoSchema
 
             if (($dbType === 'tinyint' || $dbType === 'bit') && $info['size'] === 1) {
                 return self::TYPE_BOOLEAN;
-            }
-
-            if ($dbType === 'bit') {
-                return match (true) {
-                    $info['size'] === 32 => self::TYPE_INTEGER,
-                    $info['size'] > 32 => self::TYPE_BIGINT,
-                    default => self::TYPE_SMALLINT,
-                };
             }
         }
 

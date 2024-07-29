@@ -210,7 +210,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         'defaultValue' => new Expression('CURRENT_TIMESTAMP'),
                     ],
                     'bit_col' => [
-                        'type' => 'smallint',
+                        'type' => 'bit',
                         'dbType' => 'bit(8)',
                         'phpType' => 'integer',
                         'primaryKey' => false,
@@ -361,7 +361,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         'defaultValue' => true,
                     ],
                     'bit_col_3' => [
-                        'type' => 'integer',
+                        'type' => 'bit',
                         'dbType' => 'bit(32)',
                         'phpType' => 'integer',
                         'primaryKey' => false,
@@ -374,7 +374,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         'defaultValue' => null,
                     ],
                     'bit_col_4' => [
-                        'type' => 'integer',
+                        'type' => 'bit',
                         'dbType' => 'bit(32)',
                         'phpType' => 'integer',
                         'primaryKey' => false,
@@ -387,7 +387,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         'defaultValue' => 1,
                     ],
                     'bit_col_5' => [
-                        'type' => 'bigint',
+                        'type' => 'bit',
                         'dbType' => 'bit(64)',
                         'phpType' => 'integer',
                         'primaryKey' => false,
@@ -400,7 +400,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         'defaultValue' => null,
                     ],
                     'bit_col_6' => [
-                        'type' => 'bigint',
+                        'type' => 'bit',
                         'dbType' => 'bit(64)',
                         'phpType' => 'integer',
                         'primaryKey' => false,
