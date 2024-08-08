@@ -7,6 +7,7 @@
   for type casting performance. Related with yiisoft/db#752 (@Tigrov)
 - Chg #307: Replace call of `SchemaInterface::getRawTableName()` to `QuoterInterface::getRawTableName()` (@Tigrov)
 - Enh #310: Add JSON overlaps condition builder (@Tigrov)
+- Enh #312: Update `bit` type according to main PR yiisoft/db#860 (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
