@@ -136,12 +136,13 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
      */
     protected function defaultExpressionBuilders(): array
     {
-        return array_merge(parent::defaultExpressionBuilders(), [
+        return [
+            ...parent::defaultExpressionBuilders(),
             JsonOverlapsCondition::class => JsonOverlapsConditionBuilder::class,
             LikeCondition::class => LikeConditionBuilder::class,
             InCondition::class => InConditionBuilder::class,
             JsonExpression::class => JsonExpressionBuilder::class,
             Expression::class => ExpressionBuilder::class,
-        ]);
+        ];
     }
 }

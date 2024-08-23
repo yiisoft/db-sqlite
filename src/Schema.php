@@ -22,9 +22,9 @@ use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 use Yiisoft\Db\Sqlite\Column\ColumnFactory;
 
+use function array_change_key_case;
 use function array_column;
 use function array_map;
-use function array_merge;
 use function count;
 use function md5;
 use function preg_replace;
@@ -173,7 +173,7 @@ final class Schema extends AbstractPdoSchema
 
         $foreignKeysList = $this->getPragmaForeignKeyList($tableName);
         /** @psalm-var ForeignKeyInfo[] $foreignKeysList */
-        $foreignKeysList = array_map('array_change_key_case', $foreignKeysList);
+        $foreignKeysList = array_map(array_change_key_case(...), $foreignKeysList);
         $foreignKeysList = DbArrayHelper::index($foreignKeysList, null, ['table']);
         DbArrayHelper::multisort($foreignKeysList, 'seq');
 
@@ -377,7 +377,7 @@ final class Schema extends AbstractPdoSchema
             $columnNames = (array) $foreignKey->getColumnNames();
             $columnNames = array_combine($columnNames, $foreignKey->getForeignColumnNames());
 
-            $foreignReference = array_merge([$foreignKey->getForeignTableName()], $columnNames);
+            $foreignReference = [$foreignKey->getForeignTableName(), ...$columnNames];
 
             /** @psalm-suppress InvalidCast */
             $table->foreignKey((string) $foreignKey->getName(), $foreignReference);
@@ -494,7 +494,7 @@ final class Schema extends AbstractPdoSchema
     {
         $tableColumns = $this->getPragmaTableInfo($tableName);
         /** @psalm-var ColumnInfo[] $tableColumns */
-        $tableColumns = array_map('array_change_key_case', $tableColumns);
+        $tableColumns = array_map(array_change_key_case(...), $tableColumns);
 
         /** @psalm-var ColumnInfo[] */
         return DbArrayHelper::index($tableColumns, 'cid');
@@ -516,7 +516,7 @@ final class Schema extends AbstractPdoSchema
     {
         $indexList = $this->getPragmaIndexList($tableName);
         /** @psalm-var IndexListInfo[] $indexes */
-        $indexes = array_map('array_change_key_case', $indexList);
+        $indexes = array_map(array_change_key_case(...), $indexList);
         $result = [
             self::PRIMARY_KEY => null,
             self::INDEXES => [],
@@ -594,7 +594,7 @@ final class Schema extends AbstractPdoSchema
         $column = $this->db
             ->createCommand('PRAGMA INDEX_INFO(' . (string) $this->db->getQuoter()->quoteValue($name) . ')')
             ->queryAll();
-        $column = array_map('array_change_key_case', $column);
+        $column = array_map(array_change_key_case(...), $column);
         DbArrayHelper::multisort($column, 'seqno');
 
         /** @psalm-var IndexInfo[] $column */
@@ -658,12 +658,10 @@ final class Schema extends AbstractPdoSchema
      * @param string $name the table name.
      *
      * @return array The cache key.
-     *
-     * @psalm-suppress DeprecatedMethod
      */
     protected function getCacheKey(string $name): array
     {
-        return array_merge([self::class], $this->generateCacheKey(), [$this->db->getQuoter()->getRawTableName($name)]);
+        return [self::class, ...$this->generateCacheKey(), $this->db->getQuoter()->getRawTableName($name)];
     }
 
     /**
@@ -675,7 +673,7 @@ final class Schema extends AbstractPdoSchema
      */
     protected function getCacheTag(): string
     {
-        return md5(serialize(array_merge([self::class], $this->generateCacheKey())));
+        return md5(serialize([self::class, ...$this->generateCacheKey()]));
     }
 
     /**
