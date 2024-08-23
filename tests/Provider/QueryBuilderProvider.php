@@ -30,7 +30,8 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             $buildCondition['inCondition-custom-6'],
         );
 
-        return array_merge($buildCondition, [
+        return [
+            ...$buildCondition,
             'composite in using array objects' => [
                 [
                     'in',
@@ -154,7 +155,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ['=', new Expression("(json_col->>'$.someKey')"), 42],
                 "(json_col->>'$.someKey') = :qp0", [':qp0' => 42],
             ],
-        ]);
+        ];
     }
 
     public static function insert(): array
