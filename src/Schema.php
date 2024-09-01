@@ -17,16 +17,16 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Helper\DbArrayHelper;
 use Yiisoft\Db\Schema\Builder\ColumnInterface;
+use Yiisoft\Db\Schema\Column\ColumnFactoryInterface;
 use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
+use Yiisoft\Db\Sqlite\Column\ColumnFactory;
 
 use function array_change_key_case;
 use function array_column;
 use function array_map;
 use function count;
-use function explode;
 use function md5;
-use function preg_match;
 use function preg_replace;
 use function serialize;
 use function strncasecmp;
@@ -75,46 +75,14 @@ use function strtolower;
  */
 final class Schema extends AbstractPdoSchema
 {
-    /**
-     * Mapping from physical column types (keys) to abstract column types (values).
-     *
-     * @var string[]
-     */
-    private const TYPE_MAP = [
-        'tinyint' => self::TYPE_TINYINT,
-        'bit' => self::TYPE_BIT,
-        'boolean' => self::TYPE_BOOLEAN,
-        'bool' => self::TYPE_BOOLEAN,
-        'smallint' => self::TYPE_SMALLINT,
-        'mediumint' => self::TYPE_INTEGER,
-        'int' => self::TYPE_INTEGER,
-        'integer' => self::TYPE_INTEGER,
-        'bigint' => self::TYPE_BIGINT,
-        'float' => self::TYPE_FLOAT,
-        'double' => self::TYPE_DOUBLE,
-        'real' => self::TYPE_FLOAT,
-        'decimal' => self::TYPE_DECIMAL,
-        'numeric' => self::TYPE_DECIMAL,
-        'tinytext' => self::TYPE_TEXT,
-        'mediumtext' => self::TYPE_TEXT,
-        'longtext' => self::TYPE_TEXT,
-        'text' => self::TYPE_TEXT,
-        'varchar' => self::TYPE_STRING,
-        'string' => self::TYPE_STRING,
-        'char' => self::TYPE_CHAR,
-        'blob' => self::TYPE_BINARY,
-        'datetime' => self::TYPE_DATETIME,
-        'year' => self::TYPE_DATE,
-        'date' => self::TYPE_DATE,
-        'time' => self::TYPE_TIME,
-        'timestamp' => self::TYPE_TIMESTAMP,
-        'enum' => self::TYPE_STRING,
-        'json' => self::TYPE_JSON,
-    ];
-
     public function createColumn(string $type, array|int|string $length = null): ColumnInterface
     {
         return new Column($type, $length);
+    }
+
+    public function getColumnFactory(): ColumnFactoryInterface
+    {
+        return new ColumnFactory();
     }
 
     /**
@@ -477,50 +445,13 @@ final class Schema extends AbstractPdoSchema
     private function loadColumnSchema(array $info): ColumnSchemaInterface
     {
         $dbType = strtolower($info['type']);
-        $type = $this->getColumnType($dbType, $info);
-        $isUnsigned = str_contains($dbType, 'unsigned');
-        /** @psalm-var ColumnInfo $info */
-        $column = $this->createColumnSchema($type, unsigned: $isUnsigned);
-        $column->name($info['name']);
-        $column->size($info['size'] ?? null);
-        $column->precision($info['precision'] ?? null);
-        $column->scale($info['scale'] ?? null);
+        $column = $this->getColumnFactory()->fromDefinition($dbType, ['name' => $info['name']]);
+        $column->dbType($dbType);
         $column->allowNull(!$info['notnull']);
         $column->primaryKey((bool) $info['pk']);
-        $column->dbType($dbType);
         $column->defaultValue($this->normalizeDefaultValue($info['dflt_value'], $column));
 
         return $column;
-    }
-
-    /**
-     * Get the abstract data type for the database data type.
-     *
-     * @param string $dbType The database data type
-     * @param array $info Column information.
-     *
-     * @return string The abstract data type.
-     */
-    private function getColumnType(string $dbType, array &$info): string
-    {
-        preg_match('/^(\w*)(?:\(([^)]+)\))?/', $dbType, $matches);
-        $dbType = strtolower($matches[1]);
-
-        if (!empty($matches[2])) {
-            $values = explode(',', $matches[2], 2);
-            $info['size'] = (int) $values[0];
-            $info['precision'] = (int) $values[0];
-
-            if (isset($values[1])) {
-                $info['scale'] = (int) $values[1];
-            }
-
-            if (($dbType === 'tinyint' || $dbType === 'bit') && $info['size'] === 1) {
-                return self::TYPE_BOOLEAN;
-            }
-        }
-
-        return self::TYPE_MAP[$dbType] ?? self::TYPE_STRING;
     }
 
     /**
