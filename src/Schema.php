@@ -165,15 +165,10 @@ final class Schema extends AbstractPdoSchema
         $result = [];
 
         $foreignKeysList = $this->getPragmaForeignKeyList($tableName);
-        /** @psalm-var ForeignKeyInfo[] $foreignKeysList */
-        $foreignKeysList = array_map(array_change_key_case(...), $foreignKeysList);
-        $foreignKeysList = DbArrayHelper::index($foreignKeysList, null, ['table']);
-        DbArrayHelper::multisort($foreignKeysList, 'seq');
-
         /** @psalm-var GroupedForeignKeyInfo $foreignKeysList */
-        foreach ($foreignKeysList as $table => $foreignKeys) {
-            $foreignKeysById = DbArrayHelper::index($foreignKeys, null, ['id']);
+        $foreignKeysList = DbArrayHelper::index($foreignKeysList, null, ['table', 'id']);
 
+        foreach ($foreignKeysList as $table => $foreignKeysById) {
             /**
              * @psalm-var GroupedForeignKeyInfo $foreignKeysById
              * @psalm-var int $id
@@ -501,20 +496,20 @@ final class Schema extends AbstractPdoSchema
 
             if ($index['origin'] === 'pk') {
                 $result[self::PRIMARY_KEY] = (new Constraint())
-                    ->columnNames(DbArrayHelper::getColumn($columns, 'name'));
+                    ->columnNames(array_column($columns, 'name'));
             }
 
             if ($index['origin'] === 'u') {
                 $result[self::UNIQUES][] = (new Constraint())
                     ->name($index['name'])
-                    ->columnNames(DbArrayHelper::getColumn($columns, 'name'));
+                    ->columnNames(array_column($columns, 'name'));
             }
 
             $result[self::INDEXES][] = (new IndexConstraint())
                 ->primary($index['origin'] === 'pk')
                 ->unique((bool) $index['unique'])
                 ->name($index['name'])
-                ->columnNames(DbArrayHelper::getColumn($columns, 'name'));
+                ->columnNames(array_column($columns, 'name'));
         }
 
         if (!isset($result[self::PRIMARY_KEY])) {
@@ -549,10 +544,14 @@ final class Schema extends AbstractPdoSchema
      */
     private function getPragmaForeignKeyList(string $tableName): array
     {
-        /** @psalm-var ForeignKeyInfo[] */
-        return $this->db->createCommand(
+        $foreignKeysList = $this->db->createCommand(
             'PRAGMA FOREIGN_KEY_LIST(' . $this->db->getQuoter()->quoteSimpleTableName($tableName) . ')'
         )->queryAll();
+        $foreignKeysList = array_map(array_change_key_case(...), $foreignKeysList);
+        DbArrayHelper::multisort($foreignKeysList, 'seq');
+
+        /** @psalm-var ForeignKeyInfo[] $foreignKeysList */
+        return $foreignKeysList;
     }
 
     /**
