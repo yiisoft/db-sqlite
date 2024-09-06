@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests;
 
 use Throwable;
+use Yiisoft\Db\Constant\ColumnType;
+use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\JsonExpression;
-use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonCommandTest;
 
@@ -391,7 +392,7 @@ final class CommandTest extends CommonCommandTest
 
         $command->createTable(
             '{{testCreateTable}}',
-            ['id' => SchemaInterface::TYPE_PK, 'bar' => SchemaInterface::TYPE_INTEGER],
+            ['id' => PseudoType::PK, 'bar' => ColumnType::INTEGER],
         )->execute();
 
         $command->insert('{{testCreateTable}}', ['bar' => 1])->execute();
@@ -508,8 +509,8 @@ final class CommandTest extends CommonCommandTest
         }
 
         $command->createTable('json_table', [
-            'id' => SchemaInterface::TYPE_PK,
-            'json_col' => SchemaInterface::TYPE_JSON,
+            'id' => PseudoType::PK,
+            'json_col' => ColumnType::JSON,
         ])->execute();
 
         $command->insert('json_table', ['id' => 1, 'json_col' => ['a' => 1, 'b' => 2]])->execute();

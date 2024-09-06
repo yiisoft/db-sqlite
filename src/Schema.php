@@ -337,7 +337,7 @@ final class Schema extends AbstractPdoSchema
 
         foreach ($columns as $info) {
             if (in_array($info['name'], $jsonColumns, true)) {
-                $info['type'] = self::TYPE_JSON;
+                $info['type'] = ColumnType::JSON;
             }
 
             $column = $this->loadColumnSchema($info);
