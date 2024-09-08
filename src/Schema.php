@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite;
 
 use Throwable;
+use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Constraint\CheckConstraint;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
