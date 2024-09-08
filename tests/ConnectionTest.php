@@ -14,6 +14,7 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Profiler\ProfilerInterface;
+use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonConnectionTest;
 use Yiisoft\Db\Transaction\TransactionInterface;
@@ -179,6 +180,13 @@ final class ConnectionTest extends CommonConnectionTest
         }
 
         $this->assertTrue($thrown, 'An exception should have been thrown by the command.');
+    }
+
+    public function testGetColumnBuilderClass(): void
+    {
+        $db = $this->getConnection();
+
+        $this->assertSame(ColumnBuilder::class, $db->getColumnBuilderClass());
     }
 
     private function createProfiler(): ProfilerInterface

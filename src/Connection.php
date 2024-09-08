@@ -10,6 +10,7 @@ use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 use Yiisoft\Db\Schema\Quoter;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
+use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 use function str_starts_with;
@@ -68,6 +69,11 @@ final class Connection extends AbstractPdoConnection
         }
 
         return $this->queryBuilder;
+    }
+
+    public function getColumnBuilderClass(): string
+    {
+        return ColumnBuilder::class;
     }
 
     public function getQuoter(): QuoterInterface

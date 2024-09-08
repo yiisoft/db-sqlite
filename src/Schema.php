@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite;
 
 use Throwable;
+use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Constraint\CheckConstraint;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
@@ -17,10 +18,8 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Helper\DbArrayHelper;
 use Yiisoft\Db\Schema\Builder\ColumnInterface;
-use Yiisoft\Db\Schema\Column\ColumnFactoryInterface;
 use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
-use Yiisoft\Db\Sqlite\Column\ColumnFactory;
 
 use function array_change_key_case;
 use function array_column;
@@ -78,11 +77,6 @@ final class Schema extends AbstractPdoSchema
     public function createColumn(string $type, array|int|string $length = null): ColumnInterface
     {
         return new Column($type, $length);
-    }
-
-    public function getColumnFactory(): ColumnFactoryInterface
-    {
-        return new ColumnFactory();
     }
 
     /**
@@ -444,8 +438,10 @@ final class Schema extends AbstractPdoSchema
      */
     private function loadColumnSchema(array $info): ColumnSchemaInterface
     {
+        $columnFactory = $this->db->getColumnBuilderClass()::columnFactory();
+
         $dbType = strtolower($info['type']);
-        $column = $this->getColumnFactory()->fromDefinition($dbType, ['name' => $info['name']]);
+        $column = $columnFactory->fromDefinition($dbType, ['name' => $info['name']]);
         $column->dbType($dbType);
         $column->allowNull(!$info['notnull']);
         $column->primaryKey((bool) $info['pk']);
