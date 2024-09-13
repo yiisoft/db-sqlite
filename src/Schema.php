@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite;
 
 use Throwable;
+use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Constraint\CheckConstraint;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
@@ -337,7 +338,7 @@ final class Schema extends AbstractPdoSchema
 
         foreach ($columns as $info) {
             if (in_array($info['name'], $jsonColumns, true)) {
-                $info['type'] = self::TYPE_JSON;
+                $info['type'] = ColumnType::JSON;
             }
 
             $column = $this->loadColumnSchema($info);

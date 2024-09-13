@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests;
 
 use JsonException;
+use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -15,7 +16,6 @@ use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
-use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Sqlite\Column;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
@@ -172,7 +172,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::alterColumn is not supported by SQLite.');
 
-        $qb->alterColumn('customer', 'email', SchemaInterface::TYPE_STRING);
+        $qb->alterColumn('customer', 'email', ColumnType::STRING);
     }
 
     /**
@@ -750,7 +750,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testJsonColumn()
     {
         $qb = $this->getConnection()->getQueryBuilder();
-        $columnSchemaBuilder = new Column(SchemaInterface::TYPE_JSON);
+        $columnSchemaBuilder = new Column(ColumnType::JSON);
 
         $this->assertSame(
             'ALTER TABLE `json_table` ADD `json_col` json',
