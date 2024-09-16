@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-use Yiisoft\Db\Sqlite\Column\ColumnFactory;
+namespace Yiisoft\Db\Sqlite\Tests;
+
+use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\AbstractColumnBuilderTest;
 
@@ -13,11 +15,8 @@ class ColumnBuilderTest extends AbstractColumnBuilderTest
 {
     use TestTrait;
 
-    public function testColumnFactory(): void
+    public function getColumnBuilderClass(): string
     {
-        $db = $this->getConnection();
-        $columnBuilderClass = $db->getColumnBuilderClass();
-
-        $this->assertInstanceOf(ColumnFactory::class, $columnBuilderClass::columnFactory());
+        return ColumnBuilder::class;
     }
 }
