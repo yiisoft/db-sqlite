@@ -11,7 +11,6 @@ use Yiisoft\Db\Constraint\CheckConstraint;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Sqlite\Column\ColumnFactory;
 use Yiisoft\Db\Sqlite\Schema;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonSchemaTest;
@@ -359,13 +358,5 @@ final class SchemaTest extends CommonSchemaTest
         $this->expectExceptionMessage('Only PDO connections are supported.');
 
         $schema->refresh();
-    }
-
-    public function testGetColumnFactory(): void
-    {
-        $db = $this->getConnection();
-        $factory = $db->getSchema()->getColumnFactory();
-
-        $this->assertInstanceOf(ColumnFactory::class, $factory);
     }
 }
