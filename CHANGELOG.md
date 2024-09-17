@@ -12,6 +12,7 @@
 - Enh #314: Implement `ColumnFactory` class (@Tigrov)
 - Enh #317: Separate column type constants (@Tigrov)
 - Enh #318: Realize `ColumnBuilder` class (@Tigrov)
+- Enh #319: Set more specific result type in `Connection::createCommand()` method (@vjik)
 
 ## 1.2.0 March 21, 2024
 
