@@ -16,11 +16,7 @@ trait TestTrait
 {
     private string $dsn = '';
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
-    protected function getConnection(bool $fixture = false): PdoConnectionInterface
+    protected function getConnection(bool $fixture = false): Connection
     {
         $db = new Connection(new Driver($this->getDsn()), DbHelper::getSchemaCache());
 
