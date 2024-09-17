@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests\Support;
 
-use Yiisoft\Db\Driver\Pdo\PdoConnectionInterface;
-use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Sqlite\Connection;
 use Yiisoft\Db\Sqlite\Driver;
 use Yiisoft\Db\Sqlite\Dsn;
