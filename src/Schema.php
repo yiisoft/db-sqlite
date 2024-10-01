@@ -68,7 +68,6 @@ use function strtolower;
  *     dflt_value:string|null,
  *     pk:string,
  *     size?: int,
- *     precision?: int,
  *     scale?: int,
  * }
  */
@@ -346,7 +345,7 @@ final class Schema extends AbstractPdoSchema
 
         if ($column !== null && !strncasecmp($column->getDbType() ?? '', 'int', 3)) {
             $table->sequenceName('');
-            $column->autoIncrement(true);
+            $column->autoIncrement();
         }
 
         return !empty($columns);
@@ -443,7 +442,7 @@ final class Schema extends AbstractPdoSchema
         $dbType = strtolower($info['type']);
         $column = $columnFactory->fromDefinition($dbType, ['name' => $info['name']]);
         $column->dbType($dbType);
-        $column->allowNull(!$info['notnull']);
+        $column->notNull((bool) $info['notnull']);
         $column->primaryKey((bool) $info['pk']);
         $column->defaultValue($this->normalizeDefaultValue($info['dflt_value'], $column));
 
