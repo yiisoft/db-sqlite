@@ -16,6 +16,7 @@ use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
+use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
 use Yiisoft\Db\Sqlite\Column;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
@@ -834,5 +835,11 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->assertSame($expectedCount, $count);
 
         $db->close();
+    }
+
+    /** @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::buildColumnDefinition() */
+    public function testBuildColumnDefinition(string $expected, ColumnSchemaInterface|string $column): void
+    {
+        parent::testBuildColumnDefinition($expected, $column);
     }
 }
