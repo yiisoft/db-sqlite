@@ -12,19 +12,6 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
 {
     protected const AUTO_INCREMENT_KEYWORD = 'AUTOINCREMENT';
 
-    protected const CLAUSES = [
-        'type',
-        'primary_key',
-        'auto_increment',
-        'unique',
-        'not_null',
-        'default',
-        'check',
-        'references',
-        'extra',
-        'comment',
-    ];
-
     protected const TYPES_WITH_SIZE = [
         'bit',
         'tinyint',
@@ -54,6 +41,20 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
         'decimal',
         'numeric',
     ];
+
+    public function build(ColumnSchemaInterface $column): string
+    {
+        return $this->buildType($column)
+            . $this->buildPrimaryKey($column)
+            . $this->buildAutoIncrement($column)
+            . $this->buildUnique($column)
+            . $this->buildNotNull($column)
+            . $this->buildDefault($column)
+            . $this->buildCheck($column)
+            . $this->buildReferences($column)
+            . $this->buildExtra($column)
+            . $this->buildComment($column);
+    }
 
     protected function buildComment(ColumnSchemaInterface $column): string
     {
