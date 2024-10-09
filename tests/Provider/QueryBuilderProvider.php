@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests\Provider;
 
+use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Query\Query;
@@ -256,5 +257,37 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         }
 
         return $upsert;
+    }
+
+    public static function buildColumnDefinition(): array
+    {
+        $values = parent::buildColumnDefinition();
+
+        $values[PseudoType::PK][0] = 'integer PRIMARY KEY AUTOINCREMENT NOT NULL';
+        $values[PseudoType::UPK][0] = 'integer PRIMARY KEY AUTOINCREMENT NOT NULL';
+        $values[PseudoType::BIGPK][0] = 'integer PRIMARY KEY AUTOINCREMENT NOT NULL';
+        $values[PseudoType::UBIGPK][0] = 'integer PRIMARY KEY AUTOINCREMENT NOT NULL';
+        $values[PseudoType::UUID_PK][0] = 'blob(16) PRIMARY KEY NOT NULL';
+        $values[PseudoType::UUID_PK_SEQ][0] = 'blob(16) PRIMARY KEY NOT NULL';
+        $values['primaryKey()'][0] = 'integer PRIMARY KEY AUTOINCREMENT NOT NULL';
+        $values['primaryKey(false)'][0] = 'integer PRIMARY KEY NOT NULL';
+        $values['smallPrimaryKey()'][0] = 'integer PRIMARY KEY AUTOINCREMENT NOT NULL';
+        $values['smallPrimaryKey(false)'][0] = 'smallint PRIMARY KEY NOT NULL';
+        $values['bigPrimaryKey()'][0] = 'integer PRIMARY KEY AUTOINCREMENT NOT NULL';
+        $values['bigPrimaryKey(false)'][0] = 'bigint PRIMARY KEY NOT NULL';
+        $values['uuidPrimaryKey()'][0] = 'blob(16) PRIMARY KEY NOT NULL';
+        $values['uuidPrimaryKey(false)'][0] = 'blob(16) PRIMARY KEY NOT NULL';
+        $values['money()'][0] = 'decimal(19,4)';
+        $values['money(10)'][0] = 'decimal(10,4)';
+        $values['money(10,2)'][0] = 'decimal(10,2)';
+        $values['money(null)'][0] = 'decimal';
+        $values['binary()'][0] = 'blob';
+        $values['binary(1000)'][0] = 'blob(1000)';
+        $values['uuid()'][0] = 'blob(16)';
+        $values["comment('comment')"][0] = 'varchar(255) /* comment */';
+        $values['integer()->primaryKey()'][0] = 'integer PRIMARY KEY NOT NULL';
+        $values['unsigned()'][0] = 'integer';
+
+        return $values;
     }
 }

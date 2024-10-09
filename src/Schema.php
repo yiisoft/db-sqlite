@@ -18,8 +18,11 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Helper\DbArrayHelper;
 use Yiisoft\Db\Schema\Builder\ColumnInterface;
+use Yiisoft\Db\Schema\Column\ColumnFactoryInterface;
 use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
+use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
+use Yiisoft\Db\Sqlite\Column\ColumnFactory;
 
 use function array_change_key_case;
 use function array_column;
@@ -73,9 +76,15 @@ use function strtolower;
  */
 final class Schema extends AbstractPdoSchema
 {
+    /** @deprecated Use {@see ColumnBuilder} instead. Will be removed in 2.0. */
     public function createColumn(string $type, array|int|string $length = null): ColumnInterface
     {
         return new Column($type, $length);
+    }
+
+    public function getColumnFactory(): ColumnFactoryInterface
+    {
+        return new ColumnFactory();
     }
 
     /**
@@ -437,7 +446,7 @@ final class Schema extends AbstractPdoSchema
      */
     private function loadColumnSchema(array $info): ColumnSchemaInterface
     {
-        $columnFactory = $this->db->getColumnFactory();
+        $columnFactory = $this->getColumnFactory();
 
         $dbType = strtolower($info['type']);
         $column = $columnFactory->fromDefinition($dbType, ['name' => $info['name']]);
