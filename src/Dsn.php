@@ -13,10 +13,7 @@ use Yiisoft\Db\Connection\AbstractDsn;
  */
 final class Dsn extends AbstractDsn
 {
-    /**
-     * @psalm-param string[] $options
-     */
-    public function __construct(private string $driver, private string|null $databaseName = null)
+    public function __construct(string $driver = 'sqlite', string|null $databaseName = null)
     {
         parent::__construct($driver, '', $databaseName);
     }
@@ -39,11 +36,14 @@ final class Dsn extends AbstractDsn
      */
     public function asString(): string
     {
-        return match ($this->databaseName) {
-            '' => $this->driver . ':',
-            'memory' => $this->driver . '::memory:',
-            null => $this->driver . ':',
-            default => $this->driver . ':' . $this->databaseName,
+        $driver = $this->getDriver();
+        $databaseName = $this->getDatabaseName();
+
+        return match ($databaseName) {
+            '' => "$driver:",
+            null => "$driver:",
+            'memory' => "$driver::memory:",
+            default => "$driver:$databaseName",
         };
     }
 }
