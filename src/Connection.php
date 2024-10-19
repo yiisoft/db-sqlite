@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite;
 
 use Yiisoft\Db\Driver\Pdo\AbstractPdoConnection;
-use Yiisoft\Db\Driver\Pdo\PdoCommandInterface;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 use Yiisoft\Db\Schema\Quoter;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
-use Yiisoft\Db\Transaction\TransactionInterface;
 
 use function str_starts_with;
 
@@ -34,7 +32,7 @@ final class Connection extends AbstractPdoConnection
         }
     }
 
-    public function createCommand(string $sql = null, array $params = []): PdoCommandInterface
+    public function createCommand(string $sql = null, array $params = []): Command
     {
         $command = new Command($this);
 
@@ -53,7 +51,7 @@ final class Connection extends AbstractPdoConnection
         return $command->bindValues($params);
     }
 
-    public function createTransaction(): TransactionInterface
+    public function createTransaction(): Transaction
     {
         return new Transaction($this);
     }

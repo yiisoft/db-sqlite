@@ -15,6 +15,7 @@
 - Enh #320: Update according changes in `ColumnSchemaInterface` (@Tigrov)
 - New #322: Add `ColumnDefinitionBuilder` class (@Tigrov)
 - Enh #323: Refactor `Dsn` class (@Tigrov)
+- Enh #324: Set more specific result type in `Connection` methods `createCommand()` and `createTransaction()` (@vjik)
 
 ## 1.2.0 March 21, 2024
 
