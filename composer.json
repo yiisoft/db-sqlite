@@ -47,7 +47,6 @@
         "vimeo/psalm": "^5.25",
         "yiisoft/aliases": "^2.0",
         "yiisoft/cache-file": "^3.1",
-        "yiisoft/json": "^1.0",
         "yiisoft/var-dumper": "^1.5"
     },
     "autoload": {
