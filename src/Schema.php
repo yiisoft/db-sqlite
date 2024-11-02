@@ -72,6 +72,8 @@ use function strtolower;
  *     pk:string,
  *     size?: int,
  *     scale?: int,
+ *     schema: string|null,
+ *     table: string
  * }
  */
 final class Schema extends AbstractPdoSchema
@@ -342,6 +344,9 @@ final class Schema extends AbstractPdoSchema
                 $info['type'] = ColumnType::JSON;
             }
 
+            $info['schema'] = $table->getSchemaName();
+            $info['table'] = $table->getName();
+
             $column = $this->loadColumnSchema($info);
             $table->column($info['name'], $column);
 
@@ -446,16 +451,15 @@ final class Schema extends AbstractPdoSchema
      */
     private function loadColumnSchema(array $info): ColumnSchemaInterface
     {
-        $columnFactory = $this->getColumnFactory();
+        $column = $this->getColumnFactory()->fromDefinition($info['type'], [
+            'name' => $info['name'],
+            'notNull' => (bool) $info['notnull'],
+            'primaryKey' => (bool) $info['pk'],
+            'schema' => $info['schema'],
+            'table' => $info['table'],
+        ]);
 
-        $dbType = strtolower($info['type']);
-        $column = $columnFactory->fromDefinition($dbType, ['name' => $info['name']]);
-        $column->dbType($dbType);
-        $column->notNull((bool) $info['notnull']);
-        $column->primaryKey((bool) $info['pk']);
-        $column->defaultValue($this->normalizeDefaultValue($info['dflt_value'], $column));
-
-        return $column;
+        return $column->defaultValue($this->normalizeDefaultValue($info['dflt_value'], $column));
     }
 
     /**
