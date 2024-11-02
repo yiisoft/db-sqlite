@@ -32,7 +32,6 @@ use function md5;
 use function preg_replace;
 use function serialize;
 use function strncasecmp;
-use function strtolower;
 
 /**
  * Implements the SQLite Server specific schema, supporting SQLite 3.3.0 or higher.
