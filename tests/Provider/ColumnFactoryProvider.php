@@ -60,4 +60,13 @@ final class ColumnFactoryProvider extends \Yiisoft\Db\Tests\Provider\ColumnFacto
 
         return $definitions;
     }
+
+    public static function defaultValueRaw(): array
+    {
+        $defaultValueRaw = parent::defaultValueRaw();
+
+        $defaultValueRaw[] = [ColumnType::STRING, '"str""ing"', 'str"ing'];
+
+        return $defaultValueRaw;
+    }
 }

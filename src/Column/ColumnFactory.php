@@ -6,6 +6,10 @@ namespace Yiisoft\Db\Sqlite\Column;
 
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Schema\Column\AbstractColumnFactory;
+use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
+
+use function str_replace;
+use function substr;
 
 final class ColumnFactory extends AbstractColumnFactory
 {
@@ -54,5 +58,17 @@ final class ColumnFactory extends AbstractColumnFactory
                 : parent::getType($dbType, $info),
             default => parent::getType($dbType, $info),
         };
+    }
+
+    protected function normalizeNotNullDefaultValue(string $defaultValue, ColumnSchemaInterface $column): mixed
+    {
+        if ($defaultValue[0] === '"' && $defaultValue[-1] === '"') {
+            $value = substr($defaultValue, 1, -1);
+            $value = str_replace('""', '"', $value);
+
+            return $column->phpTypecast($value);
+        }
+
+        return parent::normalizeNotNullDefaultValue($defaultValue, $column);
     }
 }

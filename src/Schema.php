@@ -450,38 +450,14 @@ final class Schema extends AbstractPdoSchema
      */
     private function loadColumnSchema(array $info): ColumnSchemaInterface
     {
-        $column = $this->getColumnFactory()->fromDefinition($info['type'], [
+        return $this->getColumnFactory()->fromDefinition($info['type'], [
+            'defaultValueRaw' => $info['dflt_value'],
             'name' => $info['name'],
             'notNull' => (bool) $info['notnull'],
             'primaryKey' => (bool) $info['pk'],
             'schema' => $info['schema'],
             'table' => $info['table'],
         ]);
-
-        return $column->defaultValue($this->normalizeDefaultValue($info['dflt_value'], $column));
-    }
-
-    /**
-     * Converts column's default value according to {@see ColumnSchema::phpType} after retrieval from the database.
-     *
-     * @param string|null $defaultValue The default value retrieved from the database.
-     * @param ColumnSchemaInterface $column The column schema object.
-     *
-     * @return mixed The normalized default value.
-     */
-    private function normalizeDefaultValue(string|null $defaultValue, ColumnSchemaInterface $column): mixed
-    {
-        if ($column->isPrimaryKey() || in_array($defaultValue, [null, '', 'null', 'NULL'], true)) {
-            return null;
-        }
-
-        if (in_array($defaultValue, ['CURRENT_TIMESTAMP', 'CURRENT_DATE', 'CURRENT_TIME'], true)) {
-            return new Expression($defaultValue);
-        }
-
-        $value = preg_replace('/^([\'"])(.*)\1$/s', '$2', $defaultValue);
-
-        return $column->phpTypecast($value);
     }
 
     /**
