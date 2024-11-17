@@ -12,6 +12,9 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
 {
     protected const AUTO_INCREMENT_KEYWORD = 'AUTOINCREMENT';
 
+    protected const GENERATE_UUID_EXPRESSION =
+        "(unhex(format('%016X', random() & 0xFFFFFFFFFFFF4FFF | 0x4000) || format('%016X', random() & 0xBFFFFFFFFFFFFFFF | 0xB000000000000000)))";
+
     protected const TYPES_WITH_SIZE = [
         'bit',
         'tinyint',
@@ -71,7 +74,7 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
     protected function getDbType(ColumnSchemaInterface $column): string
     {
         /** @psalm-suppress DocblockTypeContradiction */
-        return match ($column->getType()) {
+        return $column->getDbType() ?? match ($column->getType()) {
             ColumnType::BOOLEAN => 'boolean',
             ColumnType::BIT => 'bit',
             ColumnType::TINYINT => $column->isAutoIncrement() ? 'integer' : 'tinyint',
@@ -83,7 +86,7 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
             ColumnType::DECIMAL => 'decimal',
             ColumnType::MONEY => 'decimal',
             ColumnType::CHAR => 'char',
-            ColumnType::STRING => 'varchar',
+            ColumnType::STRING => 'varchar(' . ($column->getSize() ?? 255) . ')',
             ColumnType::TEXT => 'text',
             ColumnType::BINARY => 'blob',
             ColumnType::UUID => 'blob(16)',
