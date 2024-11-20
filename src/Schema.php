@@ -573,7 +573,7 @@ final class Schema extends AbstractPdoSchema
     private function getPragmaIndexInfo(string $name): array
     {
         $column = $this->db
-            ->createCommand('PRAGMA INDEX_INFO(' . (string) $this->db->getQuoter()->quoteValue($name) . ')')
+            ->createCommand('PRAGMA INDEX_INFO(' . $this->db->getQuoter()->quoteValue($name) . ')')
             ->queryAll();
         $column = array_map(array_change_key_case(...), $column);
         DbArrayHelper::multisort($column, 'seqno');
@@ -593,7 +593,7 @@ final class Schema extends AbstractPdoSchema
     {
         /** @psalm-var IndexListInfo[] */
         return $this->db
-            ->createCommand('PRAGMA INDEX_LIST(' . (string) $this->db->getQuoter()->quoteValue($tableName) . ')')
+            ->createCommand('PRAGMA INDEX_LIST(' . $this->db->getQuoter()->quoteValue($tableName) . ')')
             ->queryAll();
     }
 

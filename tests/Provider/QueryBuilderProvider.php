@@ -291,4 +291,23 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
 
         return $values;
     }
+
+    public static function prepareParam(): array
+    {
+        $values = parent::prepareParam();
+
+        $values['binary'][0] = "x'737472696e67'";
+
+        return $values;
+    }
+
+    public static function prepareValue(): array
+    {
+        $values = parent::prepareValue();
+
+        $values['binary'][0] = "x'737472696e67'";
+        $values['paramBinary'][0] = "x'737472696e67'";
+
+        return $values;
+    }
 }
