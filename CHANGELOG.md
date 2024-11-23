@@ -17,6 +17,7 @@
 - Enh #323: Refactor `Dsn` class (@Tigrov)
 - Enh #324: Set more specific result type in `Connection` methods `createCommand()` and `createTransaction()` (@vjik)
 - Enh #326: Refactor `Schema::normalizeDefaultValue()` method and move it to `ColumnFactory` class (@Tigrov)
+- New #328: Override `QueryBuilder::prepareBinary()` method (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 

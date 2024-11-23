@@ -11,6 +11,8 @@ use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Sqlite\Column\ColumnDefinitionBuilder;
 
+use function bin2hex;
+
 /**
  * Implements the SQLite Server specific query builder.
  */
@@ -54,5 +56,10 @@ final class QueryBuilder extends AbstractQueryBuilder
         $columnDefinitionBuilder = new ColumnDefinitionBuilder($this);
 
         parent::__construct($quoter, $schema, $ddlBuilder, $dmlBuilder, $dqlBuilder, $columnDefinitionBuilder);
+    }
+
+    protected function prepareBinary(string $binary): string
+    {
+        return "x'" . bin2hex($binary) . "'";
     }
 }
