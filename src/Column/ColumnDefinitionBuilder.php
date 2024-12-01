@@ -12,8 +12,7 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
 {
     protected const AUTO_INCREMENT_KEYWORD = 'AUTOINCREMENT';
 
-    protected const GENERATE_UUID_EXPRESSION =
-        "(unhex(format('%016X', random() & 0xFFFFFFFFFFFF4FFF | 0x4000) || format('%016X', random() & 0xBFFFFFFFFFFFFFFF | 0xB000000000000000)))";
+    protected const GENERATE_UUID_EXPRESSION = '(randomblob(16))';
 
     protected const TYPES_WITH_SIZE = [
         'bit',
