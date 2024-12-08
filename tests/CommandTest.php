@@ -482,7 +482,7 @@ final class CommandTest extends CommonCommandTest
     {
         $db = $this->getConnection();
 
-        if (version_compare($db->getServerVersion(), '3.8.3', '<')) {
+        if (version_compare($db->getServerInfo()->getVersion(), '3.8.3', '<')) {
             $this->markTestSkipped('SQLite < 3.8.3 does not support "WITH" keyword.');
         }
 
