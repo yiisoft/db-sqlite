@@ -6,7 +6,6 @@ namespace Yiisoft\Db\Sqlite\Tests;
 
 use JsonException;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
-use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -18,7 +17,7 @@ use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
 use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
-use Yiisoft\Db\Sqlite\Column;
+use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
 use Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
@@ -31,6 +30,11 @@ use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 final class QueryBuilderTest extends CommonQueryBuilderTest
 {
     use TestTrait;
+
+    public function getBuildColumnDefinitionProvider(): array
+    {
+        return QueryBuilderProvider::buildColumnDefinition();
+    }
 
     /**
      * @throws Exception
@@ -162,20 +166,13 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->addUnique($table, $name, $columns);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
-    public function testAlterColumn(): void
+    #[DataProviderExternal(QueryBuilderProvider::class, 'alterColumn')]
+    public function testAlterColumn(string|ColumnSchemaInterface $type, string $expected): void
     {
-        $db = $this->getConnection();
-
-        $qb = $db->getQueryBuilder();
-
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::alterColumn is not supported by SQLite.');
 
-        $qb->alterColumn('customer', 'email', ColumnType::STRING);
+        parent::testAlterColumn($type, $expected);
     }
 
     /**
@@ -753,16 +750,16 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testJsonColumn()
     {
         $qb = $this->getConnection()->getQueryBuilder();
-        $columnSchemaBuilder = new Column(ColumnType::JSON);
+        $column = ColumnBuilder::json();
 
         $this->assertSame(
             'ALTER TABLE `json_table` ADD `json_col` json',
-            $qb->addColumn('json_table', 'json_col', $columnSchemaBuilder->asString()),
+            $qb->addColumn('json_table', 'json_col', $column),
         );
 
         $this->assertSame(
             "CREATE TABLE `json_table` (\n\t`json_col` json\n)",
-            $qb->createTable('json_table', ['json_col' => $columnSchemaBuilder]),
+            $qb->createTable('json_table', ['json_col' => $column]),
         );
 
         $this->assertSame(
