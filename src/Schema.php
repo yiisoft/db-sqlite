@@ -16,11 +16,9 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Helper\DbArrayHelper;
-use Yiisoft\Db\Schema\Builder\ColumnInterface;
 use Yiisoft\Db\Schema\Column\ColumnFactoryInterface;
 use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
-use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
 use Yiisoft\Db\Sqlite\Column\ColumnFactory;
 
 use function array_change_key_case;
