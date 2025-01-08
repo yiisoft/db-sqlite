@@ -287,6 +287,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $values["check('value > 5')"][0] = 'integer CHECK (`col_59` > 5)';
         $values["comment('comment')"][0] = 'varchar(255) /* comment */';
         $values['integer()->primaryKey()'][0] = 'integer PRIMARY KEY NOT NULL';
+        $values['string()->primaryKey()'][0] = 'varchar(255) PRIMARY KEY NOT NULL';
         $values['unsigned()'][0] = 'integer';
 
         return $values;
