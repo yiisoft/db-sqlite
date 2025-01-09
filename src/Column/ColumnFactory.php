@@ -6,7 +6,7 @@ namespace Yiisoft\Db\Sqlite\Column;
 
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Schema\Column\AbstractColumnFactory;
-use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
+use Yiisoft\Db\Schema\Column\ColumnInterface;
 
 use function str_replace;
 use function substr;
@@ -60,7 +60,7 @@ final class ColumnFactory extends AbstractColumnFactory
         };
     }
 
-    protected function normalizeNotNullDefaultValue(string $defaultValue, ColumnSchemaInterface $column): mixed
+    protected function normalizeNotNullDefaultValue(string $defaultValue, ColumnInterface $column): mixed
     {
         if ($defaultValue[0] === '"' && $defaultValue[-1] === '"') {
             $value = substr($defaultValue, 1, -1);
