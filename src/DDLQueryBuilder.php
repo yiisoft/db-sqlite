@@ -6,8 +6,7 @@ namespace Yiisoft\Db\Sqlite;
 
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\QueryBuilder\AbstractDDLQueryBuilder;
-use Yiisoft\Db\Schema\Builder\ColumnInterface;
-use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
+use Yiisoft\Db\Schema\Column\ColumnInterface;
 
 use function count;
 
@@ -82,7 +81,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     /**
      * @throws NotSupportedException SQLite doesn't support this method.
      */
-    public function alterColumn(string $table, string $column, ColumnInterface|ColumnSchemaInterface|string $type): string
+    public function alterColumn(string $table, string $column, ColumnInterface|string $type): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }

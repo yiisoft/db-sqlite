@@ -16,7 +16,7 @@ use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
-use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
+use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
 use Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
@@ -167,7 +167,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     #[DataProviderExternal(QueryBuilderProvider::class, 'alterColumn')]
-    public function testAlterColumn(string|ColumnSchemaInterface $type, string $expected): void
+    public function testAlterColumn(string|ColumnInterface $type, string $expected): void
     {
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::alterColumn is not supported by SQLite.');
@@ -837,7 +837,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     #[DataProviderExternal(QueryBuilderProvider::class, 'buildColumnDefinition')]
-    public function testBuildColumnDefinition(string $expected, ColumnSchemaInterface|string $column): void
+    public function testBuildColumnDefinition(string $expected, ColumnInterface|string $column): void
     {
         parent::testBuildColumnDefinition($expected, $column);
     }
