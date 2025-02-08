@@ -24,6 +24,7 @@ use Yiisoft\Db\Sqlite\Column\ColumnFactory;
 use function array_change_key_case;
 use function array_column;
 use function array_map;
+use function array_unshift;
 use function count;
 use function md5;
 use function serialize;
@@ -523,6 +524,12 @@ final class Schema extends AbstractPdoSchema
             foreach ($tableColumns as $tableColumn) {
                 if ($tableColumn['pk'] > 0) {
                     $result[self::PRIMARY_KEY] = (new Constraint())->columnNames([$tableColumn['name']]);
+                    array_unshift(
+                        $result[self::INDEXES],
+                        (new IndexConstraint())
+                            ->primary(true)
+                            ->columnNames([$tableColumn['name']])
+                    );
                     break;
                 }
             }
