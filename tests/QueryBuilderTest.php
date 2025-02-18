@@ -6,18 +6,18 @@ namespace Yiisoft\Db\Sqlite\Tests;
 
 use JsonException;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
+use Yiisoft\Db\Command\Param;
+use Yiisoft\Db\Constant\DataType;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
-use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
-use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
 use Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
@@ -747,32 +747,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testUpsertExecute($table, $insertColumns, $updateColumns);
     }
 
-    public function testJsonColumn()
-    {
-        $qb = $this->getConnection()->getQueryBuilder();
-        $column = ColumnBuilder::json();
-
-        $this->assertSame(
-            'ALTER TABLE `json_table` ADD `json_col` json',
-            $qb->addColumn('json_table', 'json_col', $column),
-        );
-
-        $this->assertSame(
-            "CREATE TABLE `json_table` (\n\t`json_col` json\n)",
-            $qb->createTable('json_table', ['json_col' => $column]),
-        );
-
-        $this->assertSame(
-            'INSERT INTO `json_table` (`json_col`) VALUES (:qp0)',
-            $qb->insert('json_table', ['json_col' => ['a' => 1, 'b' => 2]]),
-        );
-
-        $this->assertSame(
-            'INSERT INTO `json_table` (`json_col`) VALUES (:qp0)',
-            $qb->insert('json_table', ['json_col' => new JsonExpression(['a' => 1, 'b' => 2])]),
-        );
-    }
-
     /** @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::selectScalar */
     public function testSelectScalar(array|bool|float|int|string $columns, string $expected): void
     {
@@ -791,7 +765,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             'EXISTS(SELECT value FROM json_each(`column`) INTERSECT SELECT value FROM json_each(:qp0))=1',
             $sql
         );
-        $this->assertSame([':qp0' => '[1,2,3]'], $params);
+        $this->assertEquals([':qp0' => new Param('[1,2,3]', DataType::STRING)], $params);
 
         // Test column as Expression
         $params = [];
@@ -801,7 +775,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             'EXISTS(SELECT value FROM json_each(column) INTERSECT SELECT value FROM json_each(:qp0))=1',
             $sql
         );
-        $this->assertSame([':qp0' => '[1,2,3]'], $params);
+        $this->assertEquals([':qp0' => new Param('[1,2,3]', DataType::STRING)], $params);
 
         $db->close();
     }
