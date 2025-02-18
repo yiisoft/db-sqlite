@@ -30,7 +30,8 @@ final class ColumnFactoryTest extends AbstractColumnFactoryTest
     }
 
     #[DataProviderExternal(ColumnFactoryProvider::class, 'pseudoTypes')]
-    public function testFromPseudoType(string $pseudoType, ColumnInterface $expected): void {
+    public function testFromPseudoType(string $pseudoType, ColumnInterface $expected): void
+    {
         parent::testFromPseudoType($pseudoType, $expected);
     }
 
