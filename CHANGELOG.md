@@ -23,6 +23,7 @@
 - Enh #332: Remove `ColumnInterface` (@Tigrov)
 - Enh #334: Rename `ColumnSchemaInterface` to `ColumnInterface` (@Tigrov)
 - Enh #335: Replace `DbArrayHelper::getColumn()` with `array_column()` (@Tigrov) 
+- Bug #338: Explicitly mark nullable parameters (@vjik)
 
 ## 1.2.0 March 21, 2024
 
