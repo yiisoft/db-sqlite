@@ -32,7 +32,7 @@ final class Connection extends AbstractPdoConnection
         }
     }
 
-    public function createCommand(string $sql = null, array $params = []): Command
+    public function createCommand(?string $sql = null, array $params = []): Command
     {
         $command = new Command($this);
 

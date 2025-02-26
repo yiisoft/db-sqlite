@@ -225,7 +225,7 @@ abstract class AbstractTokenizer
         array $with,
         bool $caseSensitive,
         int &$length,
-        string &$content = null
+        ?string &$content = null
     ): bool {
         if (empty($with)) {
             return false;
@@ -265,7 +265,7 @@ abstract class AbstractTokenizer
      *
      * @return string Result string, it may be empty if there's nothing to return.
      */
-    protected function substring(int $length, bool $caseSensitive = true, int $offset = null): string
+    protected function substring(int $length, bool $caseSensitive = true, ?int $offset = null): string
     {
         if ($offset === null) {
             $offset = $this->offset;
@@ -296,7 +296,7 @@ abstract class AbstractTokenizer
      *
      * @return int Index after the given string or end of string index.
      */
-    protected function indexAfter(string $string, int $offset = null): int
+    protected function indexAfter(string $string, ?int $offset = null): int
     {
         if ($offset === null) {
             $offset = $this->offset;

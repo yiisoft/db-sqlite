@@ -23,7 +23,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         throw new NotSupportedException(__METHOD__ . '() is not supported by SQLite.');
     }
 
-    public function resetSequence(string $table, int|string $value = null): string
+    public function resetSequence(string $table, int|string|null $value = null): string
     {
         $tableSchema = $this->schema->getTableSchema($table);
 
