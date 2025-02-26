@@ -7,7 +7,6 @@ namespace Yiisoft\Db\Sqlite;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionBuilderInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
-use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
@@ -16,7 +15,6 @@ use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
 use Yiisoft\Db\QueryBuilder\Condition\LikeCondition;
 use Yiisoft\Db\Sqlite\Builder\ExpressionBuilder;
 use Yiisoft\Db\Sqlite\Builder\InConditionBuilder;
-use Yiisoft\Db\Sqlite\Builder\JsonExpressionBuilder;
 use Yiisoft\Db\Sqlite\Builder\JsonOverlapsConditionBuilder;
 use Yiisoft\Db\Sqlite\Builder\LikeConditionBuilder;
 
@@ -141,7 +139,6 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             JsonOverlapsCondition::class => JsonOverlapsConditionBuilder::class,
             LikeCondition::class => LikeConditionBuilder::class,
             InCondition::class => InConditionBuilder::class,
-            JsonExpression::class => JsonExpressionBuilder::class,
             Expression::class => ExpressionBuilder::class,
         ];
     }
