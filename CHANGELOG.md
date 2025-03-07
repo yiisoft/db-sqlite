@@ -11,7 +11,7 @@
 - Enh #315: Raise minimum PHP version to `^8.1` with minor refactoring (@Tigrov)
 - New #314, #325: Implement `ColumnFactory` class (@Tigrov)
 - Enh #317: Separate column type constants (@Tigrov)
-- Enh #318: Realize `ColumnBuilder` class (@Tigrov)
+- New #318: Realize `ColumnBuilder` class (@Tigrov)
 - Enh #319: Set more specific result type in `Connection::createCommand()` method (@vjik)
 - Enh #320: Update according changes in `ColumnSchemaInterface` (@Tigrov)
 - New #322, #327: Add `ColumnDefinitionBuilder` class (@Tigrov)
