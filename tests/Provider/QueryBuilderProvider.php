@@ -6,8 +6,6 @@ namespace Yiisoft\Db\Sqlite\Tests\Provider;
 
 use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Expression\JsonExpression;
-use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\QueryBuilder\Condition\InCondition;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Support\TraversableObject;
@@ -95,66 +93,6 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ['like', new Expression('CONCAT(col1, col2)'), 'b'],
                 'CONCAT(col1, col2) LIKE :qp0 ESCAPE \'\\\'',
                 [':qp0' => '%b%'],
-            ],
-
-            /* json conditions */
-            [
-                ['=', 'json_col', new JsonExpression(['type' => 'iron', 'weight' => 15])],
-                '[[json_col]] = :qp0', [':qp0' => '{"type":"iron","weight":15}'],
-            ],
-            'object with type, that is ignored in SQLite' => [
-                ['=', 'json_col', new JsonExpression(['type' => 'iron', 'weight' => 15], 'json')],
-                '[[json_col]] = :qp0', [':qp0' => '{"type":"iron","weight":15}'],
-            ],
-            'false value' => [
-                ['=', 'json_col', new JsonExpression([false])],
-                '[[json_col]] = :qp0', [':qp0' => '[false]'],
-            ],
-            'null value' => [
-                ['=', 'json_col', new JsonExpression(null)],
-                '[[json_col]] = :qp0', [':qp0' => 'null'],
-            ],
-            'null as array value' => [
-                ['=', 'json_col', new JsonExpression([null])],
-                '[[json_col]] = :qp0', [':qp0' => '[null]'],
-            ],
-            'null as object value' => [
-                ['=', 'json_col', new JsonExpression(['nil' => null])],
-                '[[json_col]] = :qp0', [':qp0' => '{"nil":null}'],
-            ],
-            'query' => [
-                [
-                    '=',
-                    'json_col',
-                    new JsonExpression((new Query(self::getDb()))->select('params')->from('user')->where(['id' => 1])),
-                ],
-                '[[json_col]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)',
-                [':qp0' => 1],
-            ],
-            'query with type, that is ignored in SQLite' => [
-                [
-                    '=',
-                    'json_col',
-                    new JsonExpression(
-                        (new Query(self::getDb()))->select('params')->from('user')->where(['id' => 1]),
-                        'json'
-                    ),
-                ],
-                '[[json_col]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)', [':qp0' => 1],
-            ],
-            'nested and combined json expression' => [
-                [
-                    '=',
-                    'json_col',
-                    new JsonExpression(
-                        new JsonExpression(['a' => 1, 'b' => 2, 'd' => new JsonExpression(['e' => 3])])
-                    ),
-                ],
-                '[[json_col]] = :qp0', [':qp0' => '{"a":1,"b":2,"d":{"e":3}}'],
-            ],
-            'search by property in JSON column' => [
-                ['=', new Expression("(json_col->>'$.someKey')"), 42],
-                "(json_col->>'$.someKey') = :qp0", [':qp0' => 42],
             ],
         ];
     }
@@ -284,7 +222,6 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $values['binary()'][0] = 'blob';
         $values['binary(1000)'][0] = 'blob(1000)';
         $values['uuid()'][0] = 'blob(16)';
-        $values["check('value > 5')"][0] = 'integer CHECK (`col_59` > 5)';
         $values["comment('comment')"][0] = 'varchar(255) /* comment */';
         $values['integer()->primaryKey()'][0] = 'integer PRIMARY KEY NOT NULL';
         $values['string()->primaryKey()'][0] = 'varchar(255) PRIMARY KEY NOT NULL';

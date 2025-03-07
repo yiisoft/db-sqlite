@@ -14,14 +14,14 @@ use Yiisoft\Db\Schema\Column\JsonColumn;
 use Yiisoft\Db\Schema\Column\StringColumn;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\Tests\Common\CommonColumnTest;
+use Yiisoft\Db\Tests\AbstractColumnTest;
 
 use function str_repeat;
 
 /**
  * @group sqlite
  */
-final class ColumnTest extends CommonColumnTest
+final class ColumnTest extends AbstractColumnTest
 {
     use TestTrait;
 

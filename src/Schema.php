@@ -6,6 +6,7 @@ namespace Yiisoft\Db\Sqlite;
 
 use Throwable;
 use Yiisoft\Db\Constant\ColumnType;
+use Yiisoft\Db\Constant\ReferentialAction;
 use Yiisoft\Db\Constraint\CheckConstraint;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
@@ -39,8 +40,8 @@ use function strncasecmp;
  *     table:string,
  *     from:string,
  *     to:string|null,
- *     on_update:string,
- *     on_delete:string
+ *     on_update:ReferentialAction::*,
+ *     on_delete:ReferentialAction::*
  * }
  * @psalm-type GroupedForeignKeyInfo = array<
  *     string,
