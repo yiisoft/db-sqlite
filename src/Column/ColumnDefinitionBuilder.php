@@ -6,7 +6,7 @@ namespace Yiisoft\Db\Sqlite\Column;
 
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\QueryBuilder\AbstractColumnDefinitionBuilder;
-use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
+use Yiisoft\Db\Schema\Column\ColumnInterface;
 
 final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
 {
@@ -42,7 +42,7 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
         'numeric',
     ];
 
-    public function build(ColumnSchemaInterface $column): string
+    public function build(ColumnInterface $column): string
     {
         return $this->buildType($column)
             . $this->buildPrimaryKey($column)
@@ -56,22 +56,22 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
             . $this->buildComment($column);
     }
 
-    protected function buildComment(ColumnSchemaInterface $column): string
+    protected function buildComment(ColumnInterface $column): string
     {
         $comment = $column->getComment();
 
         return $comment === null || $comment === '' ? '' : ' /* ' . str_replace('*/', '*\/', $comment) . ' */';
     }
 
-    protected function buildNotNull(ColumnSchemaInterface $column): string
+    protected function buildNotNull(ColumnInterface $column): string
     {
         return $column->isPrimaryKey() ? ' NOT NULL' : parent::buildNotNull($column);
     }
 
-    protected function getDbType(ColumnSchemaInterface $column): string
+    protected function getDbType(ColumnInterface $column): string
     {
         /** @psalm-suppress DocblockTypeContradiction */
-        return match ($column->getType()) {
+        return $column->getDbType() ?? match ($column->getType()) {
             ColumnType::BOOLEAN => 'boolean',
             ColumnType::BIT => 'bit',
             ColumnType::TINYINT => $column->isAutoIncrement() ? 'integer' : 'tinyint',
@@ -83,7 +83,7 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
             ColumnType::DECIMAL => 'decimal',
             ColumnType::MONEY => 'decimal',
             ColumnType::CHAR => 'char',
-            ColumnType::STRING => 'varchar',
+            ColumnType::STRING => 'varchar(' . ($column->getSize() ?? 255) . ')',
             ColumnType::TEXT => 'text',
             ColumnType::BINARY => 'blob',
             ColumnType::UUID => 'blob(16)',
@@ -96,5 +96,10 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
             ColumnType::JSON => 'json',
             default => 'varchar',
         };
+    }
+
+    protected function getDefaultUuidExpression(): string
+    {
+        return '(randomblob(16))';
     }
 }

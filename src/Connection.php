@@ -9,7 +9,6 @@ use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 use Yiisoft\Db\Schema\Quoter;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
-use Yiisoft\Db\Transaction\TransactionInterface;
 
 use function str_starts_with;
 
@@ -33,7 +32,7 @@ final class Connection extends AbstractPdoConnection
         }
     }
 
-    public function createCommand(string $sql = null, array $params = []): Command
+    public function createCommand(?string $sql = null, array $params = []): Command
     {
         $command = new Command($this);
 
@@ -52,21 +51,18 @@ final class Connection extends AbstractPdoConnection
         return $command->bindValues($params);
     }
 
-    public function createTransaction(): TransactionInterface
+    public function createTransaction(): Transaction
     {
         return new Transaction($this);
     }
 
     public function getQueryBuilder(): QueryBuilderInterface
     {
-        if ($this->queryBuilder === null) {
-            $this->queryBuilder = new QueryBuilder(
-                $this->getQuoter(),
-                $this->getSchema(),
-            );
-        }
-
-        return $this->queryBuilder;
+        return $this->queryBuilder ??= new QueryBuilder(
+            $this->getQuoter(),
+            $this->getSchema(),
+            $this->getServerInfo(),
+        );
     }
 
     public function getQuoter(): QuoterInterface

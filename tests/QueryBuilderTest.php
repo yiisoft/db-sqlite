@@ -5,19 +5,20 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests;
 
 use JsonException;
-use Yiisoft\Db\Constant\ColumnType;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
+use Yiisoft\Db\Command\Param;
+use Yiisoft\Db\Constant\DataType;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
-use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
-use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
-use Yiisoft\Db\Sqlite\Column;
+use Yiisoft\Db\Schema\Column\ColumnInterface;
+use Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 
@@ -29,6 +30,11 @@ use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 final class QueryBuilderTest extends CommonQueryBuilderTest
 {
     use TestTrait;
+
+    public function getBuildColumnDefinitionProvider(): array
+    {
+        return QueryBuilderProvider::buildColumnDefinition();
+    }
 
     /**
      * @throws Exception
@@ -160,20 +166,13 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->addUnique($table, $name, $columns);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
-    public function testAlterColumn(): void
+    #[DataProviderExternal(QueryBuilderProvider::class, 'alterColumn')]
+    public function testAlterColumn(string|ColumnInterface $type, string $expected): void
     {
-        $db = $this->getConnection();
-
-        $qb = $db->getQueryBuilder();
-
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::alterColumn is not supported by SQLite.');
 
-        $qb->alterColumn('customer', 'email', ColumnType::STRING);
+        parent::testAlterColumn($type, $expected);
     }
 
     /**
@@ -748,32 +747,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testUpsertExecute($table, $insertColumns, $updateColumns);
     }
 
-    public function testJsonColumn()
-    {
-        $qb = $this->getConnection()->getQueryBuilder();
-        $columnSchemaBuilder = new Column(ColumnType::JSON);
-
-        $this->assertSame(
-            'ALTER TABLE `json_table` ADD `json_col` json',
-            $qb->addColumn('json_table', 'json_col', $columnSchemaBuilder->asString()),
-        );
-
-        $this->assertSame(
-            "CREATE TABLE `json_table` (\n\t`json_col` json\n)",
-            $qb->createTable('json_table', ['json_col' => $columnSchemaBuilder]),
-        );
-
-        $this->assertSame(
-            'INSERT INTO `json_table` (`json_col`) VALUES (:qp0)',
-            $qb->insert('json_table', ['json_col' => ['a' => 1, 'b' => 2]]),
-        );
-
-        $this->assertSame(
-            'INSERT INTO `json_table` (`json_col`) VALUES (:qp0)',
-            $qb->insert('json_table', ['json_col' => new JsonExpression(['a' => 1, 'b' => 2])]),
-        );
-    }
-
     /** @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::selectScalar */
     public function testSelectScalar(array|bool|float|int|string $columns, string $expected): void
     {
@@ -792,7 +765,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             'EXISTS(SELECT value FROM json_each(`column`) INTERSECT SELECT value FROM json_each(:qp0))=1',
             $sql
         );
-        $this->assertSame([':qp0' => '[1,2,3]'], $params);
+        $this->assertEquals([':qp0' => new Param('[1,2,3]', DataType::STRING)], $params);
 
         // Test column as Expression
         $params = [];
@@ -802,7 +775,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             'EXISTS(SELECT value FROM json_each(column) INTERSECT SELECT value FROM json_each(:qp0))=1',
             $sql
         );
-        $this->assertSame([':qp0' => '[1,2,3]'], $params);
+        $this->assertEquals([':qp0' => new Param('[1,2,3]', DataType::STRING)], $params);
 
         $db->close();
     }
@@ -837,9 +810,21 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->close();
     }
 
-    /** @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::buildColumnDefinition() */
-    public function testBuildColumnDefinition(string $expected, ColumnSchemaInterface|string $column): void
+    #[DataProviderExternal(QueryBuilderProvider::class, 'buildColumnDefinition')]
+    public function testBuildColumnDefinition(string $expected, ColumnInterface|string $column): void
     {
         parent::testBuildColumnDefinition($expected, $column);
+    }
+
+    #[DataProviderExternal(QueryBuilderProvider::class, 'prepareParam')]
+    public function testPrepareParam(string $expected, mixed $value, int $type): void
+    {
+        parent::testPrepareParam($expected, $value, $type);
+    }
+
+    #[DataProviderExternal(QueryBuilderProvider::class, 'prepareValue')]
+    public function testPrepareValue(string $expected, mixed $value): void
+    {
+        parent::testPrepareValue($expected, $value);
     }
 }

@@ -6,7 +6,7 @@ namespace Yiisoft\Db\Sqlite;
 
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\QueryBuilder\AbstractDDLQueryBuilder;
-use Yiisoft\Db\Schema\Builder\ColumnInterface;
+use Yiisoft\Db\Schema\Column\ColumnInterface;
 
 use function count;
 
@@ -56,8 +56,8 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         array|string $columns,
         string $referenceTable,
         array|string $referenceColumns,
-        string $delete = null,
-        string $update = null
+        ?string $delete = null,
+        ?string $update = null
     ): string {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
@@ -95,8 +95,8 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         string $table,
         string $name,
         array|string $columns,
-        string $indexType = null,
-        string $indexMethod = null
+        ?string $indexType = null,
+        ?string $indexMethod = null
     ): string {
         $tableParts = explode('.', $table);
 

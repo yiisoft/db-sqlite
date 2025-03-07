@@ -10,7 +10,6 @@ use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonCommandTest;
 
@@ -487,7 +486,7 @@ final class CommandTest extends CommonCommandTest
     {
         $db = $this->getConnection();
 
-        if (version_compare($db->getServerVersion(), '3.8.3', '<')) {
+        if (version_compare($db->getServerInfo()->getVersion(), '3.8.3', '<')) {
             $this->markTestSkipped('SQLite < 3.8.3 does not support "WITH" keyword.');
         }
 
@@ -502,39 +501,5 @@ final class CommandTest extends CommonCommandTest
 
         $this->assertSame('sqlite::memory:', $db->getDriver()->getDsn());
         $this->assertSame(['main'], $command->showDatabases());
-    }
-
-    public function testJsonTable(): void
-    {
-        $db = $this->getConnection();
-        $command = $db->createCommand();
-
-        if ($db->getTableSchema('json_table', true) !== null) {
-            $command->dropTable('json_table')->execute();
-        }
-
-        $command->createTable('json_table', [
-            'id' => PseudoType::PK,
-            'json_col' => ColumnType::JSON,
-        ])->execute();
-
-        $command->insert('json_table', ['id' => 1, 'json_col' => ['a' => 1, 'b' => 2]])->execute();
-        $command->insert('json_table', ['id' => 2, 'json_col' => new JsonExpression(['c' => 3, 'd' => 4])])->execute();
-
-        $tableSchema = $db->getTableSchema('json_table', true);
-        $this->assertNotNull($tableSchema);
-        $this->assertSame('json_col', $tableSchema->getColumn('json_col')->getName());
-        $this->assertSame('json', $tableSchema->getColumn('json_col')->getType());
-        $this->assertSame('json', $tableSchema->getColumn('json_col')->getDbType());
-
-        $this->assertSame(
-            '{"a":1,"b":2}',
-            $command->setSql('SELECT `json_col` FROM `json_table` WHERE `id`=1')->queryScalar(),
-        );
-
-        $this->assertSame(
-            '{"c":3,"d":4}',
-            $command->setSql('SELECT `json_col` FROM `json_table` WHERE `id`=2')->queryScalar(),
-        );
     }
 }

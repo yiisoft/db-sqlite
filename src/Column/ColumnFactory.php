@@ -6,6 +6,10 @@ namespace Yiisoft\Db\Sqlite\Column;
 
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Schema\Column\AbstractColumnFactory;
+use Yiisoft\Db\Schema\Column\ColumnInterface;
+
+use function str_replace;
+use function substr;
 
 final class ColumnFactory extends AbstractColumnFactory
 {
@@ -13,10 +17,9 @@ final class ColumnFactory extends AbstractColumnFactory
      * Mapping from physical column types (keys) to abstract column types (values).
      *
      * @var string[]
-     *
-     * @psalm-suppress MissingClassConstType
+     * @psalm-var array<string, ColumnType::*>
      */
-    private const TYPE_MAP = [
+    protected const TYPE_MAP = [
         'bool' => ColumnType::BOOLEAN,
         'boolean' => ColumnType::BOOLEAN,
         'bit' => ColumnType::BIT,
@@ -49,21 +52,23 @@ final class ColumnFactory extends AbstractColumnFactory
 
     protected function getType(string $dbType, array $info = []): string
     {
-        $type = self::TYPE_MAP[$dbType] ?? ColumnType::STRING;
-
-        if (
-            ($type === ColumnType::BIT || $type === ColumnType::TINYINT)
-            && isset($info['size'])
-            && $info['size'] === 1
-        ) {
-            return ColumnType::BOOLEAN;
-        }
-
-        return $type;
+        return match ($dbType) {
+            'bit', 'tinyint' => isset($info['size']) && $info['size'] === 1
+                ? ColumnType::BOOLEAN
+                : parent::getType($dbType, $info),
+            default => parent::getType($dbType, $info),
+        };
     }
 
-    protected function isDbType(string $dbType): bool
+    protected function normalizeNotNullDefaultValue(string $defaultValue, ColumnInterface $column): mixed
     {
-        return isset(self::TYPE_MAP[$dbType]);
+        if ($defaultValue[0] === '"' && $defaultValue[-1] === '"') {
+            $value = substr($defaultValue, 1, -1);
+            $value = str_replace('""', '"', $value);
+
+            return $column->phpTypecast($value);
+        }
+
+        return parent::normalizeNotNullDefaultValue($defaultValue, $column);
     }
 }

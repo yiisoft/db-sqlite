@@ -39,17 +39,17 @@ final class SchemaTest extends CommonSchemaTest
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::columns
      */
-    public function testColumnSchema(array $columns, string $tableName): void
+    public function testColumns(array $columns, string $tableName): void
     {
-        parent::testColumnSchema($columns, $tableName);
+        parent::testColumns($columns, $tableName);
     }
 
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::columnsTypeBit
      */
-    public function testColumnSchemaWithTypeBit(array $columns): void
+    public function testColumnWithTypeBit(array $columns): void
     {
-        $this->columnSchema($columns, 'type_bit');
+        $this->assertTableColumns($columns, 'type_bit');
     }
 
     /**

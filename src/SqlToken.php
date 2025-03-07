@@ -229,8 +229,8 @@ final class SqlToken implements ArrayAccess, Stringable
     public function matches(
         self $patternToken,
         int $offset = 0,
-        int &$firstMatchIndex = null,
-        int &$lastMatchIndex = null
+        ?int &$firstMatchIndex = null,
+        ?int &$lastMatchIndex = null
     ): bool {
         $result = false;
 
@@ -248,8 +248,8 @@ final class SqlToken implements ArrayAccess, Stringable
         self $patternToken,
         self $token,
         int $offset = 0,
-        int &$firstMatchIndex = null,
-        int &$lastMatchIndex = null
+        ?int &$firstMatchIndex = null,
+        ?int &$lastMatchIndex = null
     ): bool {
         if (
             $patternToken->getIsCollection() !== $token->getIsCollection() ||

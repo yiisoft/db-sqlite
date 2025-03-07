@@ -6,6 +6,7 @@ namespace Yiisoft\Db\Sqlite;
 
 use Throwable;
 use Yiisoft\Db\Constant\ColumnType;
+use Yiisoft\Db\Constant\ReferentialAction;
 use Yiisoft\Db\Constraint\CheckConstraint;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
@@ -15,13 +16,10 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Helper\DbArrayHelper;
-use Yiisoft\Db\Schema\Builder\ColumnInterface;
 use Yiisoft\Db\Schema\Column\ColumnFactoryInterface;
-use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
+use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
-use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
 use Yiisoft\Db\Sqlite\Column\ColumnFactory;
 
 use function array_change_key_case;
@@ -29,10 +27,8 @@ use function array_column;
 use function array_map;
 use function count;
 use function md5;
-use function preg_replace;
 use function serialize;
 use function strncasecmp;
-use function strtolower;
 
 /**
  * Implements the SQLite Server specific schema, supporting SQLite 3.3.0 or higher.
@@ -44,8 +40,8 @@ use function strtolower;
  *     table:string,
  *     from:string,
  *     to:string|null,
- *     on_update:string,
- *     on_delete:string
+ *     on_update:ReferentialAction::*,
+ *     on_delete:ReferentialAction::*
  * }
  * @psalm-type GroupedForeignKeyInfo = array<
  *     string,
@@ -72,16 +68,12 @@ use function strtolower;
  *     pk:string,
  *     size?: int,
  *     scale?: int,
+ *     schema: string|null,
+ *     table: string
  * }
  */
 final class Schema extends AbstractPdoSchema
 {
-    /** @deprecated Use {@see ColumnBuilder} instead. Will be removed in 2.0. */
-    public function createColumn(string $type, array|int|string $length = null): ColumnInterface
-    {
-        return new Column($type, $length);
-    }
-
     public function getColumnFactory(): ColumnFactoryInterface
     {
         return new ColumnFactory();
@@ -174,15 +166,10 @@ final class Schema extends AbstractPdoSchema
         $result = [];
 
         $foreignKeysList = $this->getPragmaForeignKeyList($tableName);
-        /** @psalm-var ForeignKeyInfo[] $foreignKeysList */
-        $foreignKeysList = array_map(array_change_key_case(...), $foreignKeysList);
-        $foreignKeysList = DbArrayHelper::index($foreignKeysList, null, ['table']);
-        DbArrayHelper::multisort($foreignKeysList, 'seq');
-
         /** @psalm-var GroupedForeignKeyInfo $foreignKeysList */
-        foreach ($foreignKeysList as $table => $foreignKeys) {
-            $foreignKeysById = DbArrayHelper::index($foreignKeys, null, ['id']);
+        $foreignKeysList = DbArrayHelper::index($foreignKeysList, null, ['table', 'id']);
 
+        foreach ($foreignKeysList as $table => $foreignKeysById) {
             /**
              * @psalm-var GroupedForeignKeyInfo $foreignKeysById
              * @psalm-var int $id
@@ -342,7 +329,10 @@ final class Schema extends AbstractPdoSchema
                 $info['type'] = ColumnType::JSON;
             }
 
-            $column = $this->loadColumnSchema($info);
+            $info['schema'] = $table->getSchemaName();
+            $info['table'] = $table->getName();
+
+            $column = $this->loadColumn($info);
             $table->column($info['name'], $column);
 
             if ($column->isPrimaryKey()) {
@@ -436,49 +426,24 @@ final class Schema extends AbstractPdoSchema
     }
 
     /**
-     * Loads the column information into a {@see ColumnSchemaInterface} object.
+     * Loads the column information into a {@see ColumnInterface} object.
      *
      * @param array $info The column information.
      *
-     * @return ColumnSchemaInterface The column schema object.
+     * @return ColumnInterface The column object.
      *
      * @psalm-param ColumnInfo $info
      */
-    private function loadColumnSchema(array $info): ColumnSchemaInterface
+    private function loadColumn(array $info): ColumnInterface
     {
-        $columnFactory = $this->getColumnFactory();
-
-        $dbType = strtolower($info['type']);
-        $column = $columnFactory->fromDefinition($dbType, ['name' => $info['name']]);
-        $column->dbType($dbType);
-        $column->notNull((bool) $info['notnull']);
-        $column->primaryKey((bool) $info['pk']);
-        $column->defaultValue($this->normalizeDefaultValue($info['dflt_value'], $column));
-
-        return $column;
-    }
-
-    /**
-     * Converts column's default value according to {@see ColumnSchema::phpType} after retrieval from the database.
-     *
-     * @param string|null $defaultValue The default value retrieved from the database.
-     * @param ColumnSchemaInterface $column The column schema object.
-     *
-     * @return mixed The normalized default value.
-     */
-    private function normalizeDefaultValue(string|null $defaultValue, ColumnSchemaInterface $column): mixed
-    {
-        if ($column->isPrimaryKey() || in_array($defaultValue, [null, '', 'null', 'NULL'], true)) {
-            return null;
-        }
-
-        if (in_array($defaultValue, ['CURRENT_TIMESTAMP', 'CURRENT_DATE', 'CURRENT_TIME'], true)) {
-            return new Expression($defaultValue);
-        }
-
-        $value = preg_replace('/^([\'"])(.*)\1$/s', '$2', $defaultValue);
-
-        return $column->phpTypecast($value);
+        return $this->getColumnFactory()->fromDefinition($info['type'], [
+            'defaultValueRaw' => $info['dflt_value'],
+            'name' => $info['name'],
+            'notNull' => (bool) $info['notnull'],
+            'primaryKey' => (bool) $info['pk'],
+            'schema' => $info['schema'],
+            'table' => $info['table'],
+        ]);
     }
 
     /**
@@ -532,20 +497,20 @@ final class Schema extends AbstractPdoSchema
 
             if ($index['origin'] === 'pk') {
                 $result[self::PRIMARY_KEY] = (new Constraint())
-                    ->columnNames(DbArrayHelper::getColumn($columns, 'name'));
+                    ->columnNames(array_column($columns, 'name'));
             }
 
             if ($index['origin'] === 'u') {
                 $result[self::UNIQUES][] = (new Constraint())
                     ->name($index['name'])
-                    ->columnNames(DbArrayHelper::getColumn($columns, 'name'));
+                    ->columnNames(array_column($columns, 'name'));
             }
 
             $result[self::INDEXES][] = (new IndexConstraint())
                 ->primary($index['origin'] === 'pk')
                 ->unique((bool) $index['unique'])
                 ->name($index['name'])
-                ->columnNames(DbArrayHelper::getColumn($columns, 'name'));
+                ->columnNames(array_column($columns, 'name'));
         }
 
         if (!isset($result[self::PRIMARY_KEY])) {
@@ -580,10 +545,14 @@ final class Schema extends AbstractPdoSchema
      */
     private function getPragmaForeignKeyList(string $tableName): array
     {
-        /** @psalm-var ForeignKeyInfo[] */
-        return $this->db->createCommand(
+        $foreignKeysList = $this->db->createCommand(
             'PRAGMA FOREIGN_KEY_LIST(' . $this->db->getQuoter()->quoteSimpleTableName($tableName) . ')'
         )->queryAll();
+        $foreignKeysList = array_map(array_change_key_case(...), $foreignKeysList);
+        DbArrayHelper::multisort($foreignKeysList, 'seq');
+
+        /** @psalm-var ForeignKeyInfo[] $foreignKeysList */
+        return $foreignKeysList;
     }
 
     /**
@@ -596,7 +565,7 @@ final class Schema extends AbstractPdoSchema
     private function getPragmaIndexInfo(string $name): array
     {
         $column = $this->db
-            ->createCommand('PRAGMA INDEX_INFO(' . (string) $this->db->getQuoter()->quoteValue($name) . ')')
+            ->createCommand('PRAGMA INDEX_INFO(' . $this->db->getQuoter()->quoteValue($name) . ')')
             ->queryAll();
         $column = array_map(array_change_key_case(...), $column);
         DbArrayHelper::multisort($column, 'seqno');
@@ -616,7 +585,7 @@ final class Schema extends AbstractPdoSchema
     {
         /** @psalm-var IndexListInfo[] */
         return $this->db
-            ->createCommand('PRAGMA INDEX_LIST(' . (string) $this->db->getQuoter()->quoteValue($tableName) . ')')
+            ->createCommand('PRAGMA INDEX_LIST(' . $this->db->getQuoter()->quoteValue($tableName) . ')')
             ->queryAll();
     }
 
