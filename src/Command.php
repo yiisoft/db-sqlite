@@ -8,7 +8,6 @@ use Throwable;
 use Yiisoft\Db\Driver\Pdo\AbstractPdoCommand;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
-use Yiisoft\Db\Exception\NotSupportedException;
 
 use function array_pop;
 use function count;
@@ -22,17 +21,6 @@ use function strpos;
  */
 final class Command extends AbstractPdoCommand
 {
-    /**
-     * @throws NotSupportedException SQLite doesn't support cascade drop table.
-     */
-    public function dropTable(string $table, bool $ifExists = false, bool $cascade = false): static
-    {
-        if ($cascade) {
-            throw new NotSupportedException('SQLite doesn\'t support cascade drop table.');
-        }
-        return parent::dropTable($table, $ifExists, false);
-    }
-
     public function insertWithReturningPks(string $table, array $columns): bool|array
     {
         $params = [];
