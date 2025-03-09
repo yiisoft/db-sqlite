@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite;
 
 use Yiisoft\Db\Connection\ServerInfoInterface;
+use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\QueryBuilder\AbstractQueryBuilder;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
@@ -28,6 +29,17 @@ final class QueryBuilder extends AbstractQueryBuilder
             new DQLQueryBuilder($this, $quoter),
             new ColumnDefinitionBuilder($this),
         );
+    }
+
+    /**
+     * @throws NotSupportedException SQLite doesn't support cascade drop table.
+     */
+    public function dropTable(string $table, bool $ifExists = false, bool $cascade = false): string
+    {
+        if ($cascade) {
+            throw new NotSupportedException('SQLite doesn\'t support cascade drop table.');
+        }
+        return parent::dropTable($table, $ifExists, false);
     }
 
     protected function prepareBinary(string $binary): string

@@ -22,12 +22,15 @@ use function strpos;
  */
 final class Command extends AbstractPdoCommand
 {
+    /**
+     * @throws NotSupportedException SQLite doesn't support cascade drop table.
+     */
     public function dropTable(string $table, bool $ifExists = false, bool $cascade = false): static
     {
         if ($cascade) {
             throw new NotSupportedException('SQLite doesn\'t support cascade drop table.');
         }
-        return parent::dropTable($table, $ifExists);
+        return parent::dropTable($table, $ifExists, false);
     }
 
     public function insertWithReturningPks(string $table, array $columns): bool|array
