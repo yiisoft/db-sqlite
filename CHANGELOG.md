@@ -12,7 +12,6 @@
 - New #314, #325: Implement `ColumnFactory` class (@Tigrov)
 - Enh #317: Separate column type constants (@Tigrov)
 - New #318: Realize `ColumnBuilder` class (@Tigrov)
-- Enh #319: Set more specific result type in `Connection::createCommand()` method (@vjik)
 - Enh #320: Update according changes in `ColumnSchemaInterface` (@Tigrov)
 - New #322, #327: Add `ColumnDefinitionBuilder` class (@Tigrov)
 - Enh #323: Refactor `Dsn` class (@Tigrov)
@@ -26,6 +25,8 @@
 - Enh #335: Replace `DbArrayHelper::getColumn()` with `array_column()` (@Tigrov)
 - Bug #338: Explicitly mark nullable parameters (@vjik)
 - Enh #337: Move `JsonExpressionBuilder` and JSON type tests to `yiisoft/db` package (@Tigrov)
+- New #319: Add parameters `$ifExists` and `$cascade` to `CommandInterface::dropTable()` and
+  `DDLQueryBuilderInterface::dropTable()` methods (@vjik)
 
 ## 1.2.0 March 21, 2024
 
