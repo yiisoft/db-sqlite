@@ -25,6 +25,8 @@
 - Enh #335: Replace `DbArrayHelper::getColumn()` with `array_column()` (@Tigrov)
 - Bug #338: Explicitly mark nullable parameters (@vjik)
 - Enh #337: Move `JsonExpressionBuilder` and JSON type tests to `yiisoft/db` package (@Tigrov)
+- Chg #339: Change supported PHP versions to `8.1 - 8.4` (@Tigrov)
+- Chg #339: Change return type of `Command::insertWithReturningPks()` method to `array|false` (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
