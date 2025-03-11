@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests;
 
 use JsonException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Yiisoft\Db\Command\Param;
 use Yiisoft\Db\Constant\DataType;
@@ -555,6 +556,25 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\DDLQueryBuilder::dropPrimaryKey is not supported by SQLite.');
 
         $qb->dropPrimaryKey('T_constraints_1', 'CN_pk');
+    }
+
+    #[DataProvider('dataDropTable')]
+    public function testDropTable(string $expected, ?bool $ifExists, ?bool $cascade): void
+    {
+        if ($cascade) {
+            $qb = $this->getConnection()->getQueryBuilder();
+
+            $this->expectException(NotSupportedException::class);
+            $this->expectExceptionMessage('SQLite doesn\'t support cascade drop table.');
+
+            $ifExists === null
+                ? $qb->dropTable('customer', cascade: true)
+                : $qb->dropTable('customer', ifExists: $ifExists, cascade: true);
+
+            return;
+        }
+
+        parent::testDropTable($expected, $ifExists, $cascade);
     }
 
     /**

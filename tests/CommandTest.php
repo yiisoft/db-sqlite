@@ -291,10 +291,15 @@ final class CommandTest extends CommonCommandTest
         $command->dropPrimaryKey('{{table}}', '{{name}}');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
+    public function testDropTableCascade(): void
+    {
+        $command = $this->getConnection()->createCommand();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('SQLite doesn\'t support cascade drop table.');
+        $command->dropTable('{{table}}', cascade: true);
+    }
+
     public function testDropUnique(): void
     {
         $db = $this->getConnection();

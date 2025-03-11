@@ -174,6 +174,17 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
+     * @throws NotSupportedException SQLite doesn't support cascade drop table.
+     */
+    public function dropTable(string $table, bool $ifExists = false, bool $cascade = false): string
+    {
+        if ($cascade) {
+            throw new NotSupportedException('SQLite doesn\'t support cascade drop table.');
+        }
+        return parent::dropTable($table, $ifExists, false);
+    }
+
+    /**
      * @throws NotSupportedException SQLite doesn't support this method.
      */
     public function dropUnique(string $table, string $name): string
