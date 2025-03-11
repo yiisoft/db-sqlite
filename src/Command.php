@@ -21,7 +21,7 @@ use function strpos;
  */
 final class Command extends AbstractPdoCommand
 {
-    public function insertWithReturningPks(string $table, array $columns): bool|array
+    public function insertWithReturningPks(string $table, array $columns): array|false
     {
         $params = [];
         $sql = $this->db->getQueryBuilder()->insert($table, $columns, $params);
