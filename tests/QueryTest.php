@@ -7,10 +7,13 @@ namespace Yiisoft\Db\Sqlite\Tests;
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
+use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonQueryTest;
+
+use function in_array;
 
 /**
  * @group sqlite
@@ -76,5 +79,19 @@ final class QueryTest extends CommonQueryTest
         $result = $query->all();
         $this->assertNotEmpty($result);
         $this->assertCount(7, $result);
+    }
+
+    public static function dataLike(): iterable
+    {
+        foreach (parent::dataLike() as $name => $data) {
+            if (in_array($name, ['otherCase-caseSensitive', 'sameCase-caseSensitive'], true)) {
+                yield $name => [
+                    new NotSupportedException('SQLite doesn\'t support case-sensitive "LIKE" conditions.'),
+                    $data[1]
+                ];
+            } else {
+                yield $name => $data;
+            }
+        }
     }
 }
