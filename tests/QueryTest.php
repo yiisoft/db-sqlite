@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -81,17 +82,18 @@ final class QueryTest extends CommonQueryTest
         $this->assertCount(7, $result);
     }
 
-    public static function dataLike(): iterable
+    #[DataProvider('dataLikeCaseSensitive')]
+    public function testLikeCaseSensitive(mixed $expected, string $value): void
     {
-        foreach (parent::dataLike() as $name => $data) {
-            if (in_array($name, ['otherCase-caseSensitive', 'sameCase-caseSensitive'], true)) {
-                yield $name => [
-                    new NotSupportedException('SQLite doesn\'t support case-sensitive "LIKE" conditions.'),
-                    $data[1]
-                ];
-            } else {
-                yield $name => $data;
-            }
-        }
+        $db = $this->getConnection(true);
+
+        $query = (new Query($db))
+            ->select('name')
+            ->from('customer')
+            ->where(['like', 'name', $value, true]);
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('SQLite doesn\'t support case-sensitive "LIKE" conditions.');
+        $query->scalar();
     }
 }
