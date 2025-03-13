@@ -14,8 +14,6 @@ use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonQueryTest;
 
-use function in_array;
-
 /**
  * @group sqlite
  *
