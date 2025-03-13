@@ -29,6 +29,7 @@
 - Chg #339: Change return type of `Command::insertWithReturningPks()` method to `array|false` (@Tigrov)
 - New #319: Add parameters `$ifExists` and `$cascade` to `CommandInterface::dropTable()` and
   `DDLQueryBuilderInterface::dropTable()` methods (@vjik)
+- Chg #342: Remove usage of `hasLimit()` and `hasOffset()` methods of `DQLQueryBuilder` class (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
