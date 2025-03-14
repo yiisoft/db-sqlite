@@ -34,11 +34,9 @@
         "php": "8.1 - 8.4",
         "ext-mbstring": "*",
         "ext-pdo": "*",
-        "yiisoft/db": "dev-master",
-        "yiisoft/json": "^1.0"
+        "yiisoft/db": "dev-master"
     },
     "require-dev": {
-        "ext-json": "*",
         "maglnet/composer-require-checker": "^4.7.1",
         "phpunit/phpunit": "^10.5.45",
         "rector/rector": "^2.0.10",
