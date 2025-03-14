@@ -84,13 +84,13 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
     {
         $sql = '';
 
-        if ($this->hasLimit($limit)) {
+        if ($limit !== null) {
             $sql = 'LIMIT ' . ($limit instanceof ExpressionInterface ? $this->buildExpression($limit) : (string)$limit);
-            if ($this->hasOffset($offset)) {
+            if (!empty($offset)) {
                 $sql .= ' OFFSET ' .
                     ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string)$offset);
             }
-        } elseif ($this->hasOffset($offset)) {
+        } elseif (!empty($offset)) {
             /**
              * Limit isn't optional in SQLite.
              *
