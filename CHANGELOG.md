@@ -29,6 +29,7 @@
 - Chg #339: Change return type of `Command::insertWithReturningPks()` method to `array|false` (@Tigrov)
 - New #319: Add parameters `$ifExists` and `$cascade` to `CommandInterface::dropTable()` and
   `DDLQueryBuilderInterface::dropTable()` methods (@vjik)
+- Chg #343: Remove `yiisoft/json` dependency (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
