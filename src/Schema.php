@@ -74,11 +74,6 @@ use function strncasecmp;
  */
 final class Schema extends AbstractPdoSchema
 {
-    public function getColumnFactory(): ColumnFactoryInterface
-    {
-        return new ColumnFactory();
-    }
-
     /**
      * Returns all table names in the database.
      *
@@ -436,7 +431,7 @@ final class Schema extends AbstractPdoSchema
      */
     private function loadColumn(array $info): ColumnInterface
     {
-        return $this->getColumnFactory()->fromDefinition($info['type'], [
+        return $this->db->getColumnFactory()->fromDefinition($info['type'], [
             'defaultValueRaw' => $info['dflt_value'],
             'name' => $info['name'],
             'notNull' => (bool) $info['notnull'],

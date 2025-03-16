@@ -360,11 +360,4 @@ final class SchemaTest extends CommonSchemaTest
 
         $schema->refresh();
     }
-
-    public function testGetColumnFactory(): void
-    {
-        $db = $this->getConnection();
-
-        $this->assertInstanceOf(ColumnFactory::class, $db->getSchema()->getColumnFactory());
-    }
 }
