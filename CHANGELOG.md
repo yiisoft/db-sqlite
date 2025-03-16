@@ -31,6 +31,7 @@
   `DDLQueryBuilderInterface::dropTable()` methods (@vjik)
 - Chg #342: Remove usage of `hasLimit()` and `hasOffset()` methods of `DQLQueryBuilder` class (@Tigrov)
 - Chg #343: Remove `yiisoft/json` dependency (@Tigrov)
+- Enh #345: Refactor according changes in `db` package (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
