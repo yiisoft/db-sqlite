@@ -12,6 +12,7 @@ use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 
 use Yiisoft\Db\Sqlite\Column\ColumnFactory;
+
 use function str_starts_with;
 
 /**
