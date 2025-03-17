@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests\Provider;
 
+use Yiisoft\Db\Command\Param;
+use Yiisoft\Db\Constant\DataType;
 use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\QueryBuilder\Condition\InCondition;
@@ -83,7 +85,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 '(([[id]] = :qp0 AND [[name]] = :qp1))',
                 [':qp0' => 1, ':qp1' => 'oy'],
             ],
-            'like-custom-1' => [['like', 'a', 'b'], '[[a]] LIKE :qp0 ESCAPE \'\\\'', [':qp0' => '%b%']],
+            'like-custom-1' => [['like', 'a', 'b'], '[[a]] LIKE :qp0 ESCAPE \'\\\'', [':qp0' => new Param('%b%', DataType::STRING)]],
             'like-custom-2' => [
                 ['like', 'a', new Expression(':qp0', [':qp0' => '%b%'])],
                 '[[a]] LIKE :qp0 ESCAPE \'\\\'',
@@ -92,7 +94,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             'like-custom-3' => [
                 ['like', new Expression('CONCAT(col1, col2)'), 'b'],
                 'CONCAT(col1, col2) LIKE :qp0 ESCAPE \'\\\'',
-                [':qp0' => '%b%'],
+                [':qp0' => new Param('%b%', DataType::STRING)],
             ],
         ];
     }
