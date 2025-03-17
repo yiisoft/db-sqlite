@@ -17,10 +17,8 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Helper\DbArrayHelper;
-use Yiisoft\Db\Schema\Column\ColumnFactoryInterface;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
-use Yiisoft\Db\Sqlite\Column\ColumnFactory;
 
 use function array_change_key_case;
 use function array_column;
@@ -74,11 +72,6 @@ use function strncasecmp;
  */
 final class Schema extends AbstractPdoSchema
 {
-    public function getColumnFactory(): ColumnFactoryInterface
-    {
-        return new ColumnFactory();
-    }
-
     /**
      * Returns all table names in the database.
      *
@@ -436,7 +429,7 @@ final class Schema extends AbstractPdoSchema
      */
     private function loadColumn(array $info): ColumnInterface
     {
-        return $this->getColumnFactory()->fromDefinition($info['type'], [
+        return $this->db->getColumnFactory()->fromDefinition($info['type'], [
             'defaultValueRaw' => $info['dflt_value'],
             'name' => $info['name'],
             'notNull' => (bool) $info['notnull'],
