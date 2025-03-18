@@ -50,9 +50,10 @@ final class ColumnFactory extends AbstractColumnFactory
         'json' => ColumnType::JSON,
     ];
 
-    protected function getType(string $dbType, array $info = []): string
+    protected function getType(string $dbType, array &$info = []): string
     {
-        return match ($dbType) {
+        /** @psalm-var ColumnType::* */
+        return $this->mapType($this->typeMap, $dbType, $info) ?? match ($dbType) {
             'bit', 'tinyint' => isset($info['size']) && $info['size'] === 1
                 ? ColumnType::BOOLEAN
                 : parent::getType($dbType, $info),
