@@ -24,8 +24,6 @@ use function array_change_key_case;
 use function array_column;
 use function array_map;
 use function count;
-use function md5;
-use function serialize;
 use function strncasecmp;
 
 /**
@@ -616,30 +614,6 @@ final class Schema extends AbstractPdoSchema
         }
 
         return $views;
-    }
-
-    /**
-     * Returns the cache key for the specified table name.
-     *
-     * @param string $name the table name.
-     *
-     * @return array The cache key.
-     */
-    protected function getCacheKey(string $name): array
-    {
-        return [self::class, ...$this->generateCacheKey(), $this->db->getQuoter()->getRawTableName($name)];
-    }
-
-    /**
-     * Returns the cache tag name.
-     *
-     * This allows {@see refresh()} to invalidate all cached table schemas.
-     *
-     * @return string The cache tag name.
-     */
-    protected function getCacheTag(): string
-    {
-        return md5(serialize([self::class, ...$this->generateCacheKey()]));
     }
 
     /**
