@@ -12,6 +12,7 @@ use Yiisoft\Db\Schema\Column\DoubleColumn;
 use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Schema\Column\JsonColumn;
 use Yiisoft\Db\Schema\Column\StringColumn;
+use Yiisoft\Db\Sqlite\Connection;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Tests\AbstractColumnTest;
@@ -25,13 +26,9 @@ final class ColumnTest extends AbstractColumnTest
 {
     use TestTrait;
 
-    public function testPhpTypeCast(): void
+    private function insertTypeValues(Connection $db): void
     {
-        $db = $this->getConnection(true);
-
         $command = $db->createCommand();
-        $schema = $db->getSchema();
-        $tableSchema = $schema->getTableSchema('type');
 
         $command->insert(
             'type',
@@ -49,9 +46,78 @@ final class ColumnTest extends AbstractColumnTest
             ]
         );
         $command->execute();
-        $query = (new Query($db))->from('type')->one();
+    }
 
-        $this->assertNotNull($tableSchema);
+    private function assertResultValues(array $result): void
+    {
+        $this->assertSame(1, $result['int_col']);
+        $this->assertSame(str_repeat('x', 100), $result['char_col']);
+        $this->assertNull($result['char_col3']);
+        $this->assertSame(1.234, $result['float_col']);
+        $this->assertSame("\x10\x11\x12", $result['blob_col']);
+        $this->assertSame('2023-07-11 14:50:23', $result['timestamp_col']);
+        $this->assertFalse($result['bool_col']);
+        $this->assertSame(0b0110_0110, $result['bit_col']);
+        $this->assertSame([['a' => 1, 'b' => null, 'c' => [1, 3, 5]]], $result['json_col']);
+        $this->assertSame('[1,2,3,"string",null]', $result['json_text_col']);
+    }
+
+    public function testQueryTypecasting(): void
+    {
+        $db = $this->getConnection(true);
+
+        $this->insertTypeValues($db);
+
+        $result = (new Query($db))->typecasting()->from('type')->one();
+
+        $this->assertResultValues($result);
+
+        $db->close();
+    }
+
+    public function testCommandPhpTypecasting(): void
+    {
+        $db = $this->getConnection(true);
+
+        $this->insertTypeValues($db);
+
+        $result = $db->createCommand('SELECT * FROM type')->phpTypecasting()->queryOne();
+
+        $this->assertResultValues($result);
+
+        $db->close();
+    }
+
+    public function testSelectPhpTypecasting(): void
+    {
+        $db = $this->getConnection();
+
+        $result = $db->createCommand("SELECT null, 1, 2.5, true, false, 'string'")->phpTypecasting()->queryOne();
+
+        $this->assertSame(
+            [
+                'null' => null,
+                1 => 1,
+                '2.5' => 2.5,
+                'true' => 1,
+                'false' => 0,
+                '\'string\'' => 'string',
+            ],
+            $result,
+        );
+
+        $db->close();
+    }
+
+    public function testPhpTypeCast(): void
+    {
+        $db = $this->getConnection(true);
+        $schema = $db->getSchema();
+        $tableSchema = $schema->getTableSchema('type');
+
+        $this->insertTypeValues($db);
+
+        $query = (new Query($db))->from('type')->one();
 
         $intColPhpType = $tableSchema->getColumn('int_col')?->phpTypecast($query['int_col']);
         $charColPhpType = $tableSchema->getColumn('char_col')?->phpTypecast($query['char_col']);
