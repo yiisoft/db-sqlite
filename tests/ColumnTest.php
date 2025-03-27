@@ -94,17 +94,18 @@ final class ColumnTest extends AbstractColumnTest
 
         $result = $db->createCommand("SELECT null, 1, 2.5, true, false, 'string'")->phpTypecasting()->queryOne();
 
-        $this->assertSame(
-            [
-                'null' => null,
-                1 => 1,
-                '2.5' => 2.5,
-                'true' => 1,
-                'false' => 0,
-                '\'string\'' => 'string',
-            ],
-            $result,
-        );
+        $this->assertSame([
+            'null' => null,
+            1 => 1,
+            '2.5' => 2.5,
+            'true' => 1,
+            'false' => 0,
+            '\'string\'' => 'string',
+        ], $result);
+
+        $result = $db->createCommand('SELECT 2.5')->phpTypecasting()->queryScalar();
+
+        $this->assertSame(2.5, $result);
 
         $db->close();
     }
