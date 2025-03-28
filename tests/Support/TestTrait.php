@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests\Support;
 
+use Yiisoft\Db\Driver\Pdo\PdoDriverInterface;
 use Yiisoft\Db\Sqlite\Connection;
 use Yiisoft\Db\Sqlite\Driver;
 use Yiisoft\Db\Sqlite\Dsn;
@@ -15,7 +16,7 @@ trait TestTrait
 
     protected function getConnection(bool $fixture = false): Connection
     {
-        $db = new Connection(new Driver($this->getDsn()), DbHelper::getSchemaCache());
+        $db = new Connection($this->getDriver(), DbHelper::getSchemaCache());
 
         if ($fixture) {
             DbHelper::loadFixture($db, __DIR__ . '/Fixture/sqlite.sql');
@@ -31,6 +32,11 @@ trait TestTrait
         }
 
         return $this->dsn;
+    }
+
+    protected function getDriver(): PdoDriverInterface
+    {
+        return new Driver($this->getDsn());
     }
 
     protected function getDriverName(): string
