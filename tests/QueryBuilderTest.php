@@ -281,10 +281,10 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db = $this->getConnection();
 
         $qb = $db->getQueryBuilder();
-        $with1Query = (new query($db))->select('id')->from('t1')->where('expr = 1');
-        $with2Query = (new query($db))->select('id')->from('t2')->innerJoin('a1', 't2.id = a1.id')->where('expr = 2');
-        $with3Query = (new query($db))->select('id')->from('t3')->where('expr = 3');
-        $query = (new query($db))
+        $with1Query = (new Query($db))->select('id')->from('t1')->where('expr = 1');
+        $with2Query = (new Query($db))->select('id')->from('t2')->innerJoin('a1', 't2.id = a1.id')->where('expr = 2');
+        $with3Query = (new Query($db))->select('id')->from('t3')->where('expr = 3');
+        $query = (new Query($db))
             ->withQuery($with1Query, 'a1')
             ->withQuery($with2Query->union($with3Query), 'a2')
             ->from('a2');
