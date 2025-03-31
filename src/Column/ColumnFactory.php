@@ -42,10 +42,12 @@ final class ColumnFactory extends AbstractColumnFactory
         'longtext' => ColumnType::TEXT,
         'text' => ColumnType::TEXT,
         'blob' => ColumnType::BINARY,
-        'year' => ColumnType::DATE,
+        'year' => ColumnType::SMALLINT,
         'date' => ColumnType::DATE,
         'time' => ColumnType::TIME,
+        'timetz' => ColumnType::TIMETZ,
         'datetime' => ColumnType::DATETIME,
+        'datetimetz' => ColumnType::DATETIMETZ,
         'timestamp' => ColumnType::TIMESTAMP,
         'json' => ColumnType::JSON,
     ];
@@ -56,6 +58,12 @@ final class ColumnFactory extends AbstractColumnFactory
             'bit', 'tinyint' => isset($info['size']) && $info['size'] === 1
                 ? ColumnType::BOOLEAN
                 : parent::getType($dbType, $info),
+            'text' => match($info['defaultValueRaw'] ?? null) {
+                'CURRENT_TIMESTAMP' => ColumnType::DATETIMETZ,
+                'CURRENT_DATE' => ColumnType::DATE,
+                'CURRENT_TIME' => ColumnType::TIMETZ,
+                default => parent::getType($dbType, $info),
+            },
             default => parent::getType($dbType, $info),
         };
     }
