@@ -529,7 +529,7 @@ final class Schema extends AbstractPdoSchema
      * @throws InvalidConfigException
      * @throws Throwable
      *
-     * @psalm-return ForeignKeyInfo[]
+     * @psalm-return list<ForeignKeyInfo>
      */
     private function getPragmaForeignKeyList(string $tableName): array
     {
@@ -539,7 +539,7 @@ final class Schema extends AbstractPdoSchema
         $foreignKeysList = array_map(array_change_key_case(...), $foreignKeysList);
         DbArrayHelper::multisort($foreignKeysList, 'seq');
 
-        /** @psalm-var ForeignKeyInfo[] $foreignKeysList */
+        /** @psalm-var list<ForeignKeyInfo> $foreignKeysList */
         return $foreignKeysList;
     }
 
