@@ -453,7 +453,7 @@ final class Schema extends AbstractPdoSchema
     private function loadTableColumnsInfo(string $tableName): array
     {
         $tableColumns = $this->getPragmaTableInfo($tableName);
-        /** @psalm-var ColumnInfo[] $tableColumns */
+        /** @psalm-var ColumnInfo[] */
         return array_map(array_change_key_case(...), $tableColumns);
     }
 
