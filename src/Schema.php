@@ -158,7 +158,7 @@ final class Schema extends AbstractPdoSchema
 
         $foreignKeysList = $this->getPragmaForeignKeyList($tableName);
         /** @psalm-var GroupedForeignKeyInfo $foreignKeysList */
-        $foreignKeysList = DbArrayHelper::index($foreignKeysList, null, ['table', 'id']);
+        $foreignKeysList = DbArrayHelper::arrange($foreignKeysList, ['table', 'id']);
 
         foreach ($foreignKeysList as $table => $foreignKeysById) {
             /**
@@ -453,11 +453,8 @@ final class Schema extends AbstractPdoSchema
     private function loadTableColumnsInfo(string $tableName): array
     {
         $tableColumns = $this->getPragmaTableInfo($tableName);
-        /** @psalm-var ColumnInfo[] $tableColumns */
-        $tableColumns = array_map(array_change_key_case(...), $tableColumns);
-
         /** @psalm-var ColumnInfo[] */
-        return DbArrayHelper::index($tableColumns, 'cid');
+        return array_map(array_change_key_case(...), $tableColumns);
     }
 
     /**
