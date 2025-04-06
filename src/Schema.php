@@ -41,7 +41,7 @@ use function strncasecmp;
  * }
  * @psalm-type GroupedForeignKeyInfo = array<
  *     string,
- *     ForeignKeyInfo[]
+ *     list<ForeignKeyInfo>
  * >
  * @psalm-type IndexInfo = array{
  *     seqno:string,
