@@ -426,25 +426,25 @@ final class Schema extends AbstractPdoSchema
      *     name: string,
      *     len: int,
      *     precision: int,
-     * } $info
+     * } $metadata
      *
      * @psalm-suppress MoreSpecificImplementedParamType
      */
-    protected function loadResultColumn(array $info): ColumnInterface|null
+    protected function loadResultColumn(array $metadata): ColumnInterface|null
     {
-        if (empty($info['sqlite:decl_type']) && (empty($info['native_type']) || $info['native_type'] === 'null')) {
+        if (empty($metadata['sqlite:decl_type']) && (empty($metadata['native_type']) || $metadata['native_type'] === 'null')) {
             return null;
         }
 
-        $dbType = $info['sqlite:decl_type'] ?? $info['native_type'];
+        $dbType = $metadata['sqlite:decl_type'] ?? $metadata['native_type'];
 
         $columnInfo = ['fromResult' => true];
 
-        if (!empty($info['table'])) {
-            $columnInfo['table'] = $info['table'];
-            $columnInfo['name'] = $info['name'];
-        } elseif (!empty($info['name'])) {
-            $columnInfo['name'] = $info['name'];
+        if (!empty($metadata['table'])) {
+            $columnInfo['table'] = $metadata['table'];
+            $columnInfo['name'] = $metadata['name'];
+        } elseif (!empty($metadata['name'])) {
+            $columnInfo['name'] = $metadata['name'];
         }
 
         return $this->db->getColumnFactory()->fromDefinition($dbType, $columnInfo);
