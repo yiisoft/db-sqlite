@@ -6,6 +6,7 @@ namespace Yiisoft\Db\Sqlite\Tests;
 
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
+use Yiisoft\Db\Sqlite\Column\ColumnFactory;
 use Yiisoft\Db\Sqlite\Tests\Provider\ColumnFactoryProvider;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\AbstractColumnFactoryTest;
@@ -16,6 +17,11 @@ use Yiisoft\Db\Tests\AbstractColumnFactoryTest;
 final class ColumnFactoryTest extends AbstractColumnFactoryTest
 {
     use TestTrait;
+
+    protected function getColumnFactoryClass(): string
+    {
+        return ColumnFactory::class;
+    }
 
     #[DataProviderExternal(ColumnFactoryProvider::class, 'dbTypes')]
     public function testFromDbType(string $dbType, string $expectedType, string $expectedInstanceOf): void
