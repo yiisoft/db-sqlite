@@ -417,6 +417,40 @@ final class Schema extends AbstractPdoSchema
     }
 
     /**
+     * @psalm-param array{
+     *     native_type: string,
+     *     pdo_type: int,
+     *     "sqlite:decl_type"?: string,
+     *     table?: string,
+     *     flags: string[],
+     *     name: string,
+     *     len: int,
+     *     precision: int,
+     * } $metadata
+     *
+     * @psalm-suppress MoreSpecificImplementedParamType
+     */
+    protected function loadResultColumn(array $metadata): ColumnInterface|null
+    {
+        if (empty($metadata['sqlite:decl_type']) && (empty($metadata['native_type']) || $metadata['native_type'] === 'null')) {
+            return null;
+        }
+
+        $dbType = $metadata['sqlite:decl_type'] ?? $metadata['native_type'];
+
+        $columnInfo = ['fromResult' => true];
+
+        if (!empty($metadata['table'])) {
+            $columnInfo['table'] = $metadata['table'];
+            $columnInfo['name'] = $metadata['name'];
+        } elseif (!empty($metadata['name'])) {
+            $columnInfo['name'] = $metadata['name'];
+        }
+
+        return $this->db->getColumnFactory()->fromDefinition($dbType, $columnInfo);
+    }
+
+    /**
      * Loads the column information into a {@see ColumnInterface} object.
      *
      * @param array $info The column information.

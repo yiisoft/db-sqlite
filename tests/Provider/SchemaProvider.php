@@ -6,6 +6,7 @@ namespace Yiisoft\Db\Sqlite\Tests\Provider;
 
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Schema\Column\ArrayColumn;
 use Yiisoft\Db\Schema\Column\BinaryColumn;
 use Yiisoft\Db\Schema\Column\BitColumn;
 use Yiisoft\Db\Schema\Column\BooleanColumn;
@@ -218,5 +219,127 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
         $constraints['4: unique'][2][0]->name(AnyValue::getInstance());
 
         return $constraints;
+    }
+
+    public static function resultColumns(): array
+    {
+        return [
+            [null, []],
+            [null, ['native_type' => 'null']],
+            [new IntegerColumn(dbType: 'integer', name: 'int_col'), [
+                'native_type' => 'null',
+                'pdo_type' => 0,
+                'sqlite:decl_type' => 'INTEGER',
+                'table' => 'type',
+                'flags' => [],
+                'name' => 'int_col',
+                'len' => -1,
+                'precision' => 0,
+            ]],
+            [new IntegerColumn(ColumnType::TINYINT, dbType: 'tinyint', name: 'tinyint_col', size: 3), [
+                'native_type' => 'null',
+                'pdo_type' => 0,
+                'sqlite:decl_type' => 'TINYINT(3)',
+                'table' => 'type',
+                'flags' => [],
+                'name' => 'tinyint_col',
+                'len' => -1,
+                'precision' => 0,
+            ]],
+            [new StringColumn(dbType: 'varchar', name: 'char_col2', size: 100), [
+                'native_type' => 'null',
+                'pdo_type' => 0,
+                'sqlite:decl_type' => 'varchar(100)',
+                'table' => 'type',
+                'flags' => [],
+                'name' => 'char_col2',
+                'len' => -1,
+                'precision' => 0,
+            ]],
+            [new DoubleColumn(dbType: 'double', name: 'float_col', size: 4, scale: 3), [
+                'native_type' => 'null',
+                'pdo_type' => 0,
+                'sqlite:decl_type' => 'double(4,3)',
+                'table' => 'type',
+                'flags' => [],
+                'name' => 'float_col',
+                'len' => -1,
+                'precision' => 0,
+            ]],
+            [new StringColumn(ColumnType::TIMESTAMP, dbType: 'timestamp', name: 'timestamp_col'), [
+                'native_type' => 'null',
+                'pdo_type' => 0,
+                'sqlite:decl_type' => 'timestamp',
+                'table' => 'type',
+                'flags' => [],
+                'name' => 'timestamp_col',
+                'len' => -1,
+                'precision' => 0,
+            ]],
+            [new BooleanColumn(dbType: 'tinyint', name: 'bool_col', size: 1), [
+                'native_type' => 'null',
+                'pdo_type' => 0,
+                'sqlite:decl_type' => 'tinyint(1)',
+                'table' => 'type',
+                'flags' => [],
+                'name' => 'bool_col',
+                'len' => -1,
+                'precision' => 0,
+            ]],
+            [new BitColumn(dbType: 'bit', name: 'bit_col', size: 8), [
+                'native_type' => 'null',
+                'pdo_type' => 0,
+                'sqlite:decl_type' => 'BIT(8)',
+                'table' => 'type',
+                'flags' => [],
+                'name' => 'bit_col',
+                'len' => -1,
+                'precision' => 0,
+            ]],
+            [new JsonColumn(dbType: 'json', name: 'json_col'), [
+                'native_type' => 'null',
+                'pdo_type' => 0,
+                'sqlite:decl_type' => 'json',
+                'table' => 'type',
+                'flags' => [],
+                'name' => 'json_col',
+                'len' => -1,
+                'precision' => 0,
+            ]],
+            [new ArrayColumn(dbType: 'int', name: 'int_arr', dimension: 1, column: new IntegerColumn(dbType: 'int', name: 'int_arr')), [
+                'native_type' => 'null',
+                'pdo_type' => 0,
+                'sqlite:decl_type' => 'int[]',
+                'table' => 'type',
+                'flags' => [],
+                'name' => 'int_arr',
+                'len' => -1,
+                'precision' => 0,
+            ]],
+            [new IntegerColumn(dbType: 'integer', name: '1'), [
+                'native_type' => 'integer',
+                'pdo_type' => 1,
+                'flags' => [],
+                'name' => '1',
+                'len' => -1,
+                'precision' => 0,
+            ]],
+            [new DoubleColumn(dbType: 'double', name: '2.5'), [
+                'native_type' => 'double',
+                'pdo_type' => 2,
+                'flags' => [],
+                'name' => '2.5',
+                'len' => -1,
+                'precision' => 0,
+            ]],
+            [new StringColumn(name: 'string'), [
+                'native_type' => 'string',
+                'pdo_type' => 2,
+                'flags' => [],
+                'name' => 'string',
+                'len' => -1,
+                'precision' => 0,
+            ]],
+        ];
     }
 }

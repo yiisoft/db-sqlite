@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests;
 
 use JsonException;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Throwable;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Constraint\CheckConstraint;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Sqlite\Schema;
+use Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonSchemaTest;
 use Yiisoft\Db\Tests\Support\DbHelper;
@@ -358,5 +361,11 @@ final class SchemaTest extends CommonSchemaTest
         $this->expectExceptionMessage('Only PDO connections are supported.');
 
         $schema->refresh();
+    }
+
+    #[DataProviderExternal(SchemaProvider::class, 'resultColumns')]
+    public function testGetResultColumn(ColumnInterface|null $expected, array $info): void
+    {
+        parent::testGetResultColumn($expected, $info);
     }
 }
