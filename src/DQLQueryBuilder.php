@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionBuilderInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\Query;
@@ -13,7 +12,6 @@ use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
 use Yiisoft\Db\QueryBuilder\Condition\InCondition;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
 use Yiisoft\Db\QueryBuilder\Condition\LikeCondition;
-use Yiisoft\Db\Sqlite\Builder\ExpressionBuilder;
 use Yiisoft\Db\Sqlite\Builder\InConditionBuilder;
 use Yiisoft\Db\Sqlite\Builder\JsonOverlapsConditionBuilder;
 use Yiisoft\Db\Sqlite\Builder\LikeConditionBuilder;
@@ -123,15 +121,6 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
         return trim($result);
     }
 
-    /**
-     * Has an array of default expression builders.
-     *
-     * Extend this method and override it if you want to change default expression builders for this query builder.
-     *
-     * {@see ExpressionBuilder} docs for details.
-     *
-     * @psalm-return array<string, class-string<ExpressionBuilderInterface>>
-     */
     protected function defaultExpressionBuilders(): array
     {
         return [
@@ -139,7 +128,6 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             JsonOverlapsCondition::class => JsonOverlapsConditionBuilder::class,
             LikeCondition::class => LikeConditionBuilder::class,
             InCondition::class => InConditionBuilder::class,
-            Expression::class => ExpressionBuilder::class,
         ];
     }
 }
