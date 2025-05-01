@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
+use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
@@ -38,6 +39,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             $this->buildWhere($query->getWhere(), $params),
             $this->buildGroupBy($query->getGroupBy()),
             $this->buildHaving($query->getHaving(), $params),
+            $this->buildFor($query->getFor(), $params),
         ];
 
         $orderBy = $query->getOrderBy();
@@ -75,6 +77,11 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
         }
 
         return [$sql, $params];
+    }
+
+    public function buildFor(string|ExpressionInterface|null $value, array &$params): string
+    {
+        throw new NotSupportedException('SQLite don\'t supports FOR clause.');
     }
 
     public function buildLimit(ExpressionInterface|int|null $limit, ExpressionInterface|int|null $offset): string
