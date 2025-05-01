@@ -89,7 +89,7 @@ final class PdoConnectionTest extends CommonPdoConnectionTest
             ]
         )->execute();
 
-        $this->assertSame('4', $db->getLastInsertID());
+        $this->assertSame('4', $db->getLastInsertId());
 
         $db->close();
     }
