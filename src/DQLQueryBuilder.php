@@ -81,6 +81,10 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
 
     public function buildFor(string|ExpressionInterface|null $value, array &$params): string
     {
+        if ($value === null) {
+            return '';
+        }
+
         throw new NotSupportedException('SQLite don\'t supports FOR clause.');
     }
 
