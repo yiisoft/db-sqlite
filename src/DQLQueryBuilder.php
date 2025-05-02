@@ -79,9 +79,9 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
         return [$sql, $params];
     }
 
-    public function buildFor(string|ExpressionInterface|null $value, array &$params): string
+    public function buildFor(array $values, array &$params): string
     {
-        if ($value === null) {
+        if (empty($values)) {
             return '';
         }
 
