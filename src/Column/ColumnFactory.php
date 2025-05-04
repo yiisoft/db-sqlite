@@ -58,7 +58,7 @@ final class ColumnFactory extends AbstractColumnFactory
             'bit', 'tinyint' => isset($info['size']) && $info['size'] === 1
                 ? ColumnType::BOOLEAN
                 : parent::getType($dbType, $info),
-            'text' => match($info['defaultValueRaw'] ?? null) {
+            'text' => match ($info['defaultValueRaw'] ?? null) {
                 'CURRENT_TIMESTAMP' => ColumnType::DATETIMETZ,
                 'CURRENT_DATE' => ColumnType::DATE,
                 'CURRENT_TIME' => ColumnType::TIMETZ,

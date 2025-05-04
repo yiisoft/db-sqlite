@@ -282,7 +282,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                 'len' => -1,
                 'precision' => 0,
             ]],
-            [new DateTimeColumn(ColumnType::TIMESTAMP, dbType: 'timestamp', name: 'timestamp_col'), [
+            [new DatetimeColumn(ColumnType::TIMESTAMP, dbType: 'timestamp', name: 'timestamp_col'), [
                 'native_type' => 'null',
                 'pdo_type' => 0,
                 'sqlite:decl_type' => 'timestamp',
