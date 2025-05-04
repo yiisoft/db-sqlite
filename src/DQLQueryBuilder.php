@@ -39,7 +39,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             $this->buildWhere($query->getWhere(), $params),
             $this->buildGroupBy($query->getGroupBy()),
             $this->buildHaving($query->getHaving(), $params),
-            $this->buildFor($query->getFor(), $params),
+            $this->buildFor($query->getFor()),
         ];
 
         $orderBy = $query->getOrderBy();
@@ -79,7 +79,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
         return [$sql, $params];
     }
 
-    public function buildFor(array $values, array &$params): string
+    public function buildFor(array $values): string
     {
         if (empty($values)) {
             return '';
