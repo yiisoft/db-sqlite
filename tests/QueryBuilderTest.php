@@ -195,7 +195,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     #[DataProvider('dataBuildFor')]
     public function testBuildFor(string $expected, array $value): void
     {
-        if ($value !== []) {
+        if ($value === []) {
             parent::testBuildFor($expected, $value);
             return;
         }
