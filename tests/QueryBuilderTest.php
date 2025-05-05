@@ -19,6 +19,8 @@ use Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 
+use function PHPUnit\Framework\assertSame;
+
 /**
  * @group sqlite
  */
@@ -188,6 +190,33 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testBuildWithFrom(mixed $table, string $expectedSql, array $expectedParams = []): void
     {
         parent::testBuildWithFrom($table, $expectedSql, $expectedParams);
+    }
+
+    #[DataProvider('dataBuildFor')]
+    public function testBuildFor(string $expected, array $value): void
+    {
+        if ($value !== []) {
+            parent::testBuildFor($expected, $value);
+            return;
+        }
+
+        $queryBuilder = $this->getConnection()->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('SQLite don\'t supports FOR clause.');
+        $queryBuilder->buildFor($value);
+    }
+
+    public function testBuildWithFor(): void
+    {
+        $db = $this->getConnection();
+        $queryBuilder = $db->getQueryBuilder();
+
+        $query = (new Query($db))->from('test')->for('UPDATE OF {{t1}}');
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('SQLite don\'t supports FOR clause.');
+        $queryBuilder->build($query);
     }
 
     public function testBuildWithOffset(): void
