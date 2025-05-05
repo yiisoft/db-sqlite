@@ -19,8 +19,6 @@ use Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 
-use function PHPUnit\Framework\assertSame;
-
 /**
  * @group sqlite
  */
