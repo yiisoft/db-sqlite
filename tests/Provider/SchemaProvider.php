@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests\Provider;
 
+use DateTimeImmutable;
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Schema\Column\ArrayColumn;
 use Yiisoft\Db\Schema\Column\BinaryColumn;
 use Yiisoft\Db\Schema\Column\BitColumn;
 use Yiisoft\Db\Schema\Column\BooleanColumn;
+use Yiisoft\Db\Schema\Column\DatetimeColumn;
 use Yiisoft\Db\Schema\Column\DoubleColumn;
 use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Schema\Column\JsonColumn;
@@ -78,11 +80,19 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         scale: 2,
                         defaultValue: 33.22,
                     ),
-                    'timestamp_col' => new StringColumn(
+                    'timestamp_col' => new DatetimeColumn(
                         ColumnType::TIMESTAMP,
                         dbType: 'timestamp',
                         notNull: true,
-                        defaultValue: '2002-01-01 00:00:00',
+                        defaultValue: new DateTimeImmutable('2002-01-01 00:00:00'),
+                        hasTimezone: false,
+                        shouldConvertTimezone: true,
+                    ),
+                    'timestamp_default' => new DatetimeColumn(
+                        ColumnType::TIMESTAMP,
+                        dbType: 'timestamp',
+                        notNull: true,
+                        defaultValue: new Expression('CURRENT_TIMESTAMP'),
                     ),
                     'bool_col' => new BooleanColumn(
                         dbType: 'tinyint',
@@ -93,12 +103,6 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         dbType: 'tinyint',
                         size: 1,
                         defaultValue: true,
-                    ),
-                    'ts_default' => new StringColumn(
-                        ColumnType::TIMESTAMP,
-                        dbType: 'timestamp',
-                        notNull: true,
-                        defaultValue: new Expression('CURRENT_TIMESTAMP'),
                     ),
                     'bit_col' => new BitColumn(
                         dbType: 'bit',
@@ -146,11 +150,23 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         notNull: true,
                         defaultValue: 'CURRENT_TIMESTAMP',
                     ),
-                    'timestamp_text' => new StringColumn(
-                        ColumnType::TEXT,
+                    'timestamp_text' => new DatetimeColumn(
+                        ColumnType::DATETIMETZ,
                         dbType: 'text',
                         notNull: true,
                         defaultValue: new Expression('CURRENT_TIMESTAMP'),
+                    ),
+                    'time_text' => new DatetimeColumn(
+                        ColumnType::TIMETZ,
+                        dbType: 'text',
+                        notNull: true,
+                        defaultValue: new Expression('CURRENT_TIME'),
+                    ),
+                    'date_text' => new DatetimeColumn(
+                        ColumnType::DATE,
+                        dbType: 'text',
+                        notNull: true,
+                        defaultValue: new Expression('CURRENT_DATE'),
                     ),
                 ],
                 'timestamp_default',
@@ -266,7 +282,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                 'len' => -1,
                 'precision' => 0,
             ]],
-            [new StringColumn(ColumnType::TIMESTAMP, dbType: 'timestamp', name: 'timestamp_col'), [
+            [new DatetimeColumn(ColumnType::TIMESTAMP, dbType: 'timestamp', name: 'timestamp_col'), [
                 'native_type' => 'null',
                 'pdo_type' => 0,
                 'sqlite:decl_type' => 'timestamp',

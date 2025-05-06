@@ -29,9 +29,11 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
         'varchar',
         'text',
         'blob',
-        'time',
-        'datetime',
         'timestamp',
+        'datetime',
+        'datetimetz',
+        'time',
+        'timetz',
     ];
 
     protected const TYPES_WITH_SCALE = [
@@ -87,10 +89,12 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
             ColumnType::TEXT => 'text',
             ColumnType::BINARY => 'blob',
             ColumnType::UUID => 'blob(16)',
-            ColumnType::DATETIME => 'datetime',
             ColumnType::TIMESTAMP => 'timestamp',
-            ColumnType::DATE => 'date',
+            ColumnType::DATETIME => 'datetime',
+            ColumnType::DATETIMETZ => 'datetimetz',
             ColumnType::TIME => 'time',
+            ColumnType::TIMETZ => 'timetz',
+            ColumnType::DATE => 'date',
             ColumnType::ARRAY => 'json',
             ColumnType::STRUCTURED => 'json',
             ColumnType::JSON => 'json',

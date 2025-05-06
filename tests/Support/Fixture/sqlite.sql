@@ -134,9 +134,9 @@ CREATE TABLE "type" (
   blob_col blob,
   numeric_col decimal(5,2) DEFAULT '33.22',
   timestamp_col timestamp NOT NULL DEFAULT '2002-01-01 00:00:00',
+  timestamp_default TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   bool_col tinyint(1) NOT NULL,
   bool_col2 tinyint(1) DEFAULT '1',
-  ts_default TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   bit_col BIT(8) NOT NULL DEFAULT 130, -- 0b1000_0010
   json_col json NOT NULL DEFAULT '{"number":10}',
   json_text_col text CHECK(json_text_col IS NULL OR json_valid(json_text_col)) -- for STRICT table
@@ -173,7 +173,9 @@ CREATE TABLE "notauto_pk" (
 CREATE TABLE "timestamp_default" (
   id INTEGER PRIMARY KEY,
   text_col TEXT NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
-  timestamp_text TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  timestamp_text TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  time_text TEXT NOT NULL DEFAULT CURRENT_TIME,
+  date_text TEXT NOT NULL DEFAULT CURRENT_DATE
 ); -- STRICT
 
 CREATE TABLE "json_type" (
