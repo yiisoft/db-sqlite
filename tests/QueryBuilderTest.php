@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
-use JsonException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Yiisoft\Db\Command\Param;
 use Yiisoft\Db\Constant\DataType;
-use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidArgumentException;
-use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
@@ -25,8 +21,6 @@ use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 
 /**
  * @group sqlite
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class QueryBuilderTest extends CommonQueryBuilderTest
 {
@@ -37,10 +31,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         return QueryBuilderProvider::buildColumnDefinition();
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testAddcheck(): void
     {
         $db = $this->getConnection();
@@ -53,10 +43,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->addCheck('id', 'customer', 'id > 0');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testAddCommentOnColumn(): void
     {
         $db = $this->getConnection();
@@ -71,10 +57,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->addCommentOnColumn('customer', 'id', 'Primary key.');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testAddCommentOnTable(): void
     {
         $db = $this->getConnection();
@@ -89,10 +71,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->addCommentOnTable('customer', 'Customer table.');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testAddDefaultValue(): void
     {
         $db = $this->getConnection();
@@ -105,12 +83,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->addDefaultValue('T_constraints_1', 'CN_pk', 'C_default', 1);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Tests\Provider\QueryBuilderProvider::addForeignKey
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
+    #[DataProviderExternal(\Yiisoft\Db\Tests\Provider\QueryBuilderProvider::class, 'addForeignKey')]
     public function testAddForeignKey(
         string $name,
         string $table,
@@ -131,12 +104,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->addForeignKey($table, $name, $columns, $refTable, $refColumns, $delete, $update);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Tests\Provider\QueryBuilderProvider::addPrimaryKey
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
+    #[DataProviderExternal(\Yiisoft\Db\Tests\Provider\QueryBuilderProvider::class, 'addPrimaryKey')]
     public function testAddPrimaryKey(string $name, string $table, array|string $columns, string $expected): void
     {
         $db = $this->getConnection();
@@ -149,12 +117,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->addPrimaryKey($table, $name, $columns);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Tests\Provider\QueryBuilderProvider::addUnique
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
+    #[DataProviderExternal(\Yiisoft\Db\Tests\Provider\QueryBuilderProvider::class, 'addUnique')]
     public function testAddUnique(string $name, string $table, array|string $columns, string $expected): void
     {
         $db = $this->getConnection();
@@ -176,14 +139,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testAlterColumn($type, $expected);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::batchInsert
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     * @throws Throwable
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'batchInsert')]
     public function testBatchInsert(
         string $table,
         iterable $rows,
@@ -194,9 +150,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testBatchInsert($table, $rows, $columns, $expected, $expectedParams);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::buildCondition
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'buildCondition')]
     public function testBuildCondition(
         array|ExpressionInterface|string $condition,
         string|null $expected,
@@ -205,9 +159,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testBuildCondition($condition, $expected, $expectedParams);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::buildLikeCondition
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'buildLikeCondition')]
     public function testBuildLikeCondition(
         array|ExpressionInterface $condition,
         string $expected,
@@ -216,12 +168,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testBuildLikeCondition($condition, $expected, $expectedParams);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws NotSupportedException
-     */
     public function testBuildUnion(): void
     {
         $db = $this->getConnection();
@@ -238,21 +184,40 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         );
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::buildFrom
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'buildFrom')]
     public function testBuildWithFrom(mixed $table, string $expectedSql, array $expectedParams = []): void
     {
         parent::testBuildWithFrom($table, $expectedSql, $expectedParams);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws NotSupportedException
-     */
-    public function testBuildwithOffset(): void
+    #[DataProvider('dataBuildFor')]
+    public function testBuildFor(string $expected, array $value): void
+    {
+        if ($value === []) {
+            parent::testBuildFor($expected, $value);
+            return;
+        }
+
+        $queryBuilder = $this->getConnection()->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('SQLite don\'t supports FOR clause.');
+        $queryBuilder->buildFor($value);
+    }
+
+    public function testBuildWithFor(): void
+    {
+        $db = $this->getConnection();
+        $queryBuilder = $db->getQueryBuilder();
+
+        $query = (new Query($db))->from('test')->for('UPDATE OF {{t1}}');
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('SQLite don\'t supports FOR clause.');
+        $queryBuilder->build($query);
+    }
+
+    public function testBuildWithOffset(): void
     {
         $db = $this->getConnection();
 
@@ -270,12 +235,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->assertSame([], $params);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws NotSupportedException
-     */
     public function testBuildWithQuery(): void
     {
         $db = $this->getConnection();
@@ -300,12 +259,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->assertSame([], $queryParams);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws NotSupportedException
-     */
     public function testBuildWithUnion(): void
     {
         $db = $this->getConnection();
@@ -332,18 +285,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->assertSame([], $queryParams);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::buildWhereExists
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'buildWhereExists')]
     public function testBuildWithWhereExists(string $cond, string $expectedQuerySql): void
     {
         parent::testBuildWithWhereExists($cond, $expectedQuerySql);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testCheckIntegrity(): void
     {
         $qb = $this->getConnection();
@@ -379,10 +326,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         );
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testCreateTable(): void
     {
         $db = $this->getConnection();
@@ -412,18 +355,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         );
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::delete
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'delete')]
     public function testDelete(string $table, array|string $condition, string $expectedSQL, array $expectedParams): void
     {
         parent::testDelete($table, $condition, $expectedSQL, $expectedParams);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testDropCheck(): void
     {
         $db = $this->getConnection();
@@ -436,10 +373,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->dropCheck('T_constraints_1', 'CN_check');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testDropCommentFromColumn(): void
     {
         $db = $this->getConnection(true);
@@ -454,10 +387,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->dropCommentFromColumn('customer', 'id');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testDropColumn(): void
     {
         $db = $this->getConnection();
@@ -472,10 +401,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->dropColumn('customer', 'id');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testDropCommentFromTable(): void
     {
         $db = $this->getConnection();
@@ -490,10 +415,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->dropCommentFromTable('customer');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testDropDefaultValue(): void
     {
         $db = $this->getConnection(true);
@@ -508,10 +429,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->dropDefaultValue('T_constraints_1', 'CN_pk');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testDropForeignKey(): void
     {
         $db = $this->getConnection();
@@ -524,10 +441,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->dropForeignKey('T_constraints_3', 'CN_constraints_3');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testDropIndex(): void
     {
         $db = $this->getConnection();
@@ -542,10 +455,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         );
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testDropPrimaryKey(): void
     {
         $db = $this->getConnection();
@@ -577,10 +486,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testDropTable($expected, $ifExists, $cascade);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testDropUnique(): void
     {
         $db = $this->getConnection();
@@ -593,9 +498,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->dropUnique('test_uq', 'test_uq_constraint');
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::insert
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'insert')]
     public function testInsert(
         string $table,
         array|QueryInterface $columns,
@@ -606,11 +509,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testInsert($table, $columns, $params, $expectedSQL, $expectedParams);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::insertWithReturningPks
-     *
-     * @throws Exception
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'insertWithReturningPks')]
     public function testInsertWithReturningPks(
         string $table,
         array|QueryInterface $columns,
@@ -628,10 +527,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->insertWithReturningPks($table, $columns, $params);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testRenameColumn(): void
     {
         $db = $this->getConnection();
@@ -646,10 +541,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->renameColumn('alpha', 'string_identifier', 'string_identifier_test');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testRenameTable(): void
     {
         $db = $this->getConnection();
@@ -664,11 +555,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         );
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     */
     public function testResetSequence(): void
     {
         $db = $this->getConnection(true);
@@ -690,10 +576,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         );
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testTruncateTable(): void
     {
         $db = $this->getConnection();
@@ -718,9 +600,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         );
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::update
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'update')]
     public function testUpdate(
         string $table,
         array $columns,
@@ -732,13 +612,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testUpdate($table, $columns, $condition, $params, $expectedSql, $expectedParams);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::upsert
-     *
-     * @throws Exception
-     * @throws JsonException
-     * @throws InvalidConfigException
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'upsert')]
     public function testUpsert(
         string $table,
         array|QueryInterface $insertColumns,
@@ -756,9 +630,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->assertSame($expectedParams, $actualParams);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::upsert
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'upsert')]
     public function testUpsertExecute(
         string $table,
         array|QueryInterface $insertColumns,
@@ -767,7 +639,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testUpsertExecute($table, $insertColumns, $updateColumns);
     }
 
-    /** @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::selectScalar */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'selectScalar')]
     public function testSelectScalar(array|bool|float|int|string $columns, string $expected): void
     {
         parent::testSelectScalar($columns, $expected);
@@ -800,7 +672,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->close();
     }
 
-    /** @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::overlapsCondition */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'overlapsCondition')]
     public function testJsonOverlapsCondition(iterable|ExpressionInterface $values, int $expectedCount): void
     {
         $db = $this->getConnection(true);
@@ -815,7 +687,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->close();
     }
 
-    /** @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider::overlapsCondition */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'overlapsCondition')]
     public function testJsonOverlapsConditionOperator(iterable|ExpressionInterface $values, int $expectedCount): void
     {
         $db = $this->getConnection(true);
