@@ -115,72 +115,72 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $concreteData = [
             'regular values' => [
                 3 => <<<SQL
-                WITH "EXCLUDED" (`email`, `address`, `status`, `profile_id`) AS (VALUES (:qp0, :qp1, :qp2, :qp3)) UPDATE `T_upsert` SET `address`=(SELECT `address` FROM `EXCLUDED`), `status`=(SELECT `status` FROM `EXCLUDED`), `profile_id`=(SELECT `profile_id` FROM `EXCLUDED`) WHERE `T_upsert`.`email`=(SELECT `email` FROM `EXCLUDED`); INSERT OR IGNORE INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3);
+                INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3) ON CONFLICT (`email`) DO UPDATE SET `address`=EXCLUDED.`address`, `status`=EXCLUDED.`status`, `profile_id`=EXCLUDED.`profile_id`
                 SQL,
             ],
             'regular values with unique at not the first position' => [
                 3 => <<<SQL
-                WITH "EXCLUDED" (`address`, `email`, `status`, `profile_id`) AS (VALUES (:qp0, :qp1, :qp2, :qp3)) UPDATE `T_upsert` SET `address`=(SELECT `address` FROM `EXCLUDED`), `status`=(SELECT `status` FROM `EXCLUDED`), `profile_id`=(SELECT `profile_id` FROM `EXCLUDED`) WHERE `T_upsert`.`email`=(SELECT `email` FROM `EXCLUDED`); INSERT OR IGNORE INTO `T_upsert` (`address`, `email`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3);
+                INSERT INTO `T_upsert` (`address`, `email`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3) ON CONFLICT (`email`) DO UPDATE SET `address`=EXCLUDED.`address`, `status`=EXCLUDED.`status`, `profile_id`=EXCLUDED.`profile_id`
                 SQL,
             ],
             'regular values with update part' => [
                 3 => <<<SQL
-                WITH "EXCLUDED" (`email`, `address`, `status`, `profile_id`) AS (VALUES (:qp0, :qp1, :qp2, :qp3)) UPDATE `T_upsert` SET `address`=:qp4, `status`=:qp5, `orders`=T_upsert.orders + 1 WHERE `T_upsert`.`email`=(SELECT `email` FROM `EXCLUDED`); INSERT OR IGNORE INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3);
+                INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3) ON CONFLICT (`email`) DO UPDATE SET `address`=:qp4, `status`=:qp5, `orders`=T_upsert.orders + 1
                 SQL,
             ],
             'regular values without update part' => [
                 3 => <<<SQL
-                INSERT OR IGNORE INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3)
+                INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3) ON CONFLICT DO NOTHING
                 SQL,
             ],
             'query' => [
                 3 => <<<SQL
-                WITH "EXCLUDED" (`email`, `status`) AS (SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1) UPDATE `T_upsert` SET `status`=(SELECT `status` FROM `EXCLUDED`) WHERE `T_upsert`.`email`=(SELECT `email` FROM `EXCLUDED`); INSERT OR IGNORE INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1;
+                INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1 ON CONFLICT (`email`) DO UPDATE SET `status`=EXCLUDED.`status`
                 SQL,
             ],
             'query with update part' => [
                 3 => <<<SQL
-                WITH "EXCLUDED" (`email`, `status`) AS (SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1) UPDATE `T_upsert` SET `address`=:qp1, `status`=:qp2, `orders`=T_upsert.orders + 1 WHERE `T_upsert`.`email`=(SELECT `email` FROM `EXCLUDED`); INSERT OR IGNORE INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1;
+                INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1 ON CONFLICT (`email`) DO UPDATE SET `address`=:qp1, `status`=:qp2, `orders`=T_upsert.orders + 1
                 SQL,
             ],
             'query without update part' => [
                 3 => <<<SQL
-                INSERT OR IGNORE INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1
+                INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1 ON CONFLICT DO NOTHING
                 SQL,
             ],
             'values and expressions' => [
                 3 => <<<SQL
-                WITH "EXCLUDED" (`email`, `ts`) AS (VALUES (:qp0, CURRENT_TIMESTAMP)) UPDATE {{%T_upsert}} SET `ts`=(SELECT `ts` FROM `EXCLUDED`) WHERE {{%T_upsert}}.`email`=(SELECT `email` FROM `EXCLUDED`); INSERT OR IGNORE INTO {{%T_upsert}} (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP);
+                INSERT INTO {{%T_upsert}} (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP) ON CONFLICT (`email`) DO UPDATE SET `ts`=EXCLUDED.`ts`
                 SQL,
             ],
             'values and expressions with update part' => [
                 3 => <<<SQL
-                WITH "EXCLUDED" (`email`, `ts`) AS (VALUES (:qp0, CURRENT_TIMESTAMP)) UPDATE {{%T_upsert}} SET `orders`=T_upsert.orders + 1 WHERE {{%T_upsert}}.`email`=(SELECT `email` FROM `EXCLUDED`); INSERT OR IGNORE INTO {{%T_upsert}} (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP);
+                INSERT INTO {{%T_upsert}} (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP) ON CONFLICT (`email`) DO UPDATE SET `orders`=T_upsert.orders + 1
                 SQL,
             ],
             'values and expressions without update part' => [
                 3 => <<<SQL
-                INSERT OR IGNORE INTO {{%T_upsert}} (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP)
+                INSERT INTO {{%T_upsert}} (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP) ON CONFLICT DO NOTHING
                 SQL,
             ],
             'query, values and expressions with update part' => [
                 3 => <<<SQL
-                WITH "EXCLUDED" (`email`, [[ts]]) AS (SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]) UPDATE {{%T_upsert}} SET `ts`=:qp1, `orders`=T_upsert.orders + 1 WHERE {{%T_upsert}}.`email`=(SELECT `email` FROM `EXCLUDED`); INSERT OR IGNORE INTO {{%T_upsert}} (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]];
+                INSERT INTO {{%T_upsert}} (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]] ON CONFLICT (`email`) DO UPDATE SET `ts`=:qp1, `orders`=T_upsert.orders + 1
                 SQL,
             ],
             'query, values and expressions without update part' => [
                 3 => <<<SQL
-                INSERT OR IGNORE INTO {{%T_upsert}} (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]
+                INSERT INTO {{%T_upsert}} (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]] ON CONFLICT DO NOTHING
                 SQL,
             ],
             'no columns to update' => [
                 3 => <<<SQL
-                INSERT OR IGNORE INTO `T_upsert_1` (`a`) VALUES (:qp0)
+                INSERT INTO `T_upsert_1` (`a`) VALUES (:qp0) ON CONFLICT DO NOTHING
                 SQL,
             ],
             'no columns to update with unique' => [
                 3 => <<<SQL
-                INSERT OR IGNORE INTO {{%T_upsert}} (`email`) VALUES (:qp0)
+                INSERT INTO {{%T_upsert}} (`email`) VALUES (:qp0) ON CONFLICT DO NOTHING
                 SQL,
             ],
             'no unique columns in table - simple insert' => [
@@ -197,6 +197,36 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         }
 
         return $upsert;
+    }
+
+    public static function upsertWithReturningPks(): array
+    {
+        $upsert = static::upsert();
+
+        foreach ($upsert as &$data) {
+            $data[3] .= ' RETURNING `id`';
+        }
+
+        $upsert['no columns to update'][3] = 'INSERT INTO `T_upsert_1` (`a`) VALUES (:qp0) ON CONFLICT DO NOTHING RETURNING `a`';
+
+        return [
+            ...$upsert,
+            'composite primary key' => [
+                'notauto_pk',
+                ['id_1' => 1, 'id_2' => 2.5, 'type' => 'Test'],
+                true,
+                'INSERT INTO `notauto_pk` (`id_1`, `id_2`, `type`) VALUES (:qp0, :qp1, :qp2)'
+                . ' ON CONFLICT (`id_1`, `id_2`) DO UPDATE SET `type`=EXCLUDED.`type` RETURNING `id_1`, `id_2`',
+                [':qp0' => 1, ':qp1' => 2.5, ':qp2' => 'Test'],
+            ],
+            'no primary key' => [
+                'type',
+                ['int_col' => 3, 'char_col' => 'a', 'float_col' => 1.2, 'bool_col' => true],
+                true,
+                'INSERT INTO `type` (`int_col`, `char_col`, `float_col`, `bool_col`) VALUES (:qp0, :qp1, :qp2, :qp3)',
+                [':qp0' => 3, ':qp1' => 'a', ':qp2' => 1.2, ':qp3' => true],
+            ],
+        ];
     }
 
     public static function buildColumnDefinition(): array

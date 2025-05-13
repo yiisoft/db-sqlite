@@ -8,10 +8,14 @@ use Throwable;
 use Yiisoft\Db\Driver\Pdo\AbstractPdoCommand;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
+use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Query\QueryInterface;
 
+use Yiisoft\Db\Schema\Column\ColumnInterface;
 use function array_pop;
 use function count;
 use function ltrim;
+use function mb_strlen;
 use function preg_match_all;
 use function strpos;
 
@@ -21,27 +25,45 @@ use function strpos;
  */
 final class Command extends AbstractPdoCommand
 {
-    public function insertWithReturningPks(string $table, array $columns): array|false
+    public function insertWithReturningPks(string $table, array|QueryInterface $columns): array|false
     {
         $params = [];
         $sql = $this->db->getQueryBuilder()->insert($table, $columns, $params);
         $this->setSql($sql)->bindValues($params);
 
-        if (!$this->execute()) {
+        if ($this->execute() === 0) {
             return false;
         }
 
         $tableSchema = $this->db->getSchema()->getTableSchema($table);
         $tablePrimaryKeys = $tableSchema?->getPrimaryKey() ?? [];
 
+        if (empty($tablePrimaryKeys)) {
+            return [];
+        }
+
+        if ($columns instanceof QueryInterface) {
+            throw new NotSupportedException(__METHOD__ . '() not supported for QueryInterface by SQLite.');
+        }
+
         $result = [];
+
+        /** @var TableSchema $tableSchema */
         foreach ($tablePrimaryKeys as $name) {
-            if ($tableSchema?->getColumn($name)?->isAutoIncrement()) {
-                $result[$name] = $this->db->getLastInsertId((string) $tableSchema?->getSequenceName());
-                continue;
+            /** @var ColumnInterface $column */
+            $column = $tableSchema->getColumn($name);
+
+            if ($column->isAutoIncrement()) {
+                $value = $this->db->getLastInsertId();
+            } else {
+                $value = $columns[$name] ?? $column->getDefaultValue();
             }
 
-            $result[$name] = $columns[$name] ?? $tableSchema?->getColumn($name)?->getDefaultValue();
+            if ($this->phpTypecasting) {
+                $value = $column->phpTypecast($value);
+            }
+
+            $result[$name] = $value;
         }
 
         return $result;
@@ -139,11 +161,11 @@ final class Command extends AbstractPdoCommand
      *
      * @throws InvalidArgumentException
      *
-     * @return array|bool List of SQL statements or `false` if there's a single statement.
+     * @return array|false List of SQL statements or `false` if there's a single statement.
      *
      * @psalm-return false|list<array{0: string, 1: array}>
      */
-    private function splitStatements(string $sql, array $params): bool|array
+    private function splitStatements(string $sql, array $params): array|false
     {
         $semicolonIndex = strpos($sql, ';');
 
