@@ -10,8 +10,8 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Query\QueryInterface;
-
 use Yiisoft\Db\Schema\Column\ColumnInterface;
+
 use function array_pop;
 use function count;
 use function ltrim;
