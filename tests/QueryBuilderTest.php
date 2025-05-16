@@ -617,26 +617,21 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string $table,
         array|QueryInterface $insertColumns,
         array|bool $updateColumns,
-        string $expectedSQL,
+        string $expectedSql,
         array $expectedParams
     ): void {
-        $db = $this->getConnection(true);
-
-        $actualParams = [];
-        $actualSQL = $db->getQueryBuilder()->upsert($table, $insertColumns, $updateColumns, $actualParams);
-
-        $this->assertSame($expectedSQL, $actualSQL);
-
-        $this->assertSame($expectedParams, $actualParams);
+        parent::testUpsert($table, $insertColumns, $updateColumns, $expectedSql, $expectedParams);
     }
 
-    #[DataProviderExternal(QueryBuilderProvider::class, 'upsert')]
-    public function testUpsertExecute(
+    #[DataProviderExternal(QueryBuilderProvider::class, 'upsertWithReturningPks')]
+    public function testUpsertWithReturningPks(
         string $table,
         array|QueryInterface $insertColumns,
-        array|bool $updateColumns
+        array|bool $updateColumns,
+        string $expectedSql,
+        array $expectedParams
     ): void {
-        parent::testUpsertExecute($table, $insertColumns, $updateColumns);
+        parent::testUpsertWithReturningPks($table, $insertColumns, $updateColumns, $expectedSql, $expectedParams);
     }
 
     #[DataProviderExternal(QueryBuilderProvider::class, 'selectScalar')]

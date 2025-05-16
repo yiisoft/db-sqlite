@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDMLQueryBuilder;
 
+use function array_map;
 use function implode;
 
 /**
@@ -18,7 +18,7 @@ use function implode;
  */
 final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 {
-    public function insertWithReturningPks(string $table, QueryInterface|array $columns, array &$params = []): string
+    public function insertWithReturningPks(string $table, array|QueryInterface $columns, array &$params = []): string
     {
         throw new NotSupportedException(__METHOD__ . '() is not supported by SQLite.');
     }
@@ -52,65 +52,55 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 
     public function upsert(
         string $table,
-        QueryInterface|array $insertColumns,
-        bool|array $updateColumns,
-        array &$params
+        array|QueryInterface $insertColumns,
+        array|bool $updateColumns = true,
+        array &$params = [],
     ): string {
-        /** @var Constraint[] $constraints */
-        $constraints = [];
+        $insertSql = $this->insert($table, $insertColumns, $params);
 
-        [$uniqueNames, $insertNames, $updateNames] = $this->prepareUpsertColumns(
-            $table,
-            $insertColumns,
-            $updateColumns,
-            $constraints
-        );
+        [$uniqueNames, , $updateNames] = $this->prepareUpsertColumns($table, $insertColumns, $updateColumns);
 
         if (empty($uniqueNames)) {
-            return $this->insert($table, $insertColumns, $params);
-        }
-
-        [, $placeholders, $values, $params] = $this->prepareInsertValues($table, $insertColumns, $params);
-
-        $quotedTableName = $this->quoter->quoteTableName($table);
-
-        $insertSql = 'INSERT OR IGNORE INTO ' . $quotedTableName
-            . (!empty($insertNames) ? ' (' . implode(', ', $insertNames) . ')' : '')
-            . (!empty($placeholders) ? ' VALUES (' . implode(', ', $placeholders) . ')' : ' ' . $values);
-
-        if ($updateColumns === false) {
             return $insertSql;
         }
 
-        $updateCondition = ['or'];
-
-        foreach ($constraints as $constraint) {
-            $constraintCondition = ['and'];
-            /** @psalm-var string[] $columnNames */
-            $columnNames = $constraint->getColumnNames();
-            foreach ($columnNames as $name) {
-                $quotedName = $this->quoter->quoteColumnName($name);
-                $constraintCondition[] = "$quotedTableName.$quotedName=(SELECT $quotedName FROM `EXCLUDED`)";
-            }
-            $updateCondition[] = $constraintCondition;
+        if ($updateColumns === false || $updateNames === []) {
+            /** there are no columns to update */
+            return "$insertSql ON CONFLICT DO NOTHING";
         }
 
         if ($updateColumns === true) {
             $updateColumns = [];
+
             /** @psalm-var string[] $updateNames */
-            foreach ($updateNames as $quotedName) {
-                $updateColumns[$quotedName] = new Expression("(SELECT $quotedName FROM `EXCLUDED`)");
+            foreach ($updateNames as $name) {
+                $updateColumns[$name] = new Expression(
+                    'EXCLUDED.' . $this->quoter->quoteColumnName($name)
+                );
             }
         }
 
-        if ($updateColumns === []) {
-            return $insertSql;
+        [$updates, $params] = $this->prepareUpdateSets($table, $updateColumns, $params);
+
+        return $insertSql
+            . ' ON CONFLICT (' . implode(', ', $uniqueNames) . ') DO UPDATE SET ' . implode(', ', $updates);
+    }
+
+    public function upsertWithReturningPks(
+        string $table,
+        array|QueryInterface $insertColumns,
+        array|bool $updateColumns = true,
+        array &$params = [],
+    ): string {
+        $sql = $this->upsert($table, $insertColumns, $updateColumns, $params);
+        $returnColumns = $this->schema->getTableSchema($table)?->getPrimaryKey();
+
+        if (!empty($returnColumns)) {
+            $returnColumns = array_map($this->quoter->quoteColumnName(...), $returnColumns);
+
+            $sql .= ' RETURNING ' . implode(', ', $returnColumns);
         }
 
-        $updateSql = 'WITH "EXCLUDED" (' . implode(', ', $insertNames) . ') AS ('
-            . (!empty($placeholders) ? 'VALUES (' . implode(', ', $placeholders) . ')' : $values)
-            . ') ' . $this->update($table, $updateColumns, $updateCondition, $params);
-
-        return "$updateSql; $insertSql;";
+        return $sql;
     }
 }
