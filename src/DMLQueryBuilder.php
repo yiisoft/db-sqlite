@@ -80,27 +80,55 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
             }
         }
 
-        [$updates, $params] = $this->prepareUpdateSets($table, $updateColumns, $params);
+        $quotedUniqueNames = array_map($this->quoter->quoteColumnName(...), $uniqueNames);
+        $updates = $this->prepareUpdateSets($table, $updateColumns, $params);
 
         return $insertSql
-            . ' ON CONFLICT (' . implode(', ', $uniqueNames) . ') DO UPDATE SET ' . implode(', ', $updates);
+            . ' ON CONFLICT (' . implode(', ', $quotedUniqueNames) . ')'
+            . ' DO UPDATE SET ' . implode(', ', $updates);
     }
 
-    public function upsertWithReturningPks(
+    public function upsertWithReturning(
         string $table,
         array|QueryInterface $insertColumns,
         array|bool $updateColumns = true,
+        array|null $returnColumns = null,
         array &$params = [],
     ): string {
-        $sql = $this->upsert($table, $insertColumns, $updateColumns, $params);
-        $returnColumns = $this->schema->getTableSchema($table)?->getPrimaryKey();
+        $upsertSql = $this->upsert($table, $insertColumns, $updateColumns, $params);
 
-        if (!empty($returnColumns)) {
-            $returnColumns = array_map($this->quoter->quoteColumnName(...), $returnColumns);
+        $returnColumns ??= $this->schema->getTableSchema($table)?->getColumnNames();
 
-            $sql .= ' RETURNING ' . implode(', ', $returnColumns);
+        if (empty($returnColumns)) {
+            return $upsertSql;
         }
 
-        return $sql;
+        $returnColumns = array_map($this->quoter->quoteColumnName(...), $returnColumns);
+
+        if (str_ends_with($upsertSql, ' ON CONFLICT DO NOTHING')) {
+            $dummyColumn = $this->getDummyColumn($table);
+
+            $upsertSql = substr($upsertSql, 0, -10) . "DO UPDATE SET $dummyColumn = $dummyColumn";
+        }
+
+        return $upsertSql . ' RETURNING ' . implode(', ', $returnColumns);
+    }
+
+    private function getDummyColumn(string $table): string
+    {
+        /** @psalm-suppress PossiblyNullReference */
+        $columns = $this->schema->getTableSchema($table)->getColumns();
+
+        foreach ($columns as $column) {
+            if ($column->isPrimaryKey() || $column->isUnique()) {
+                continue;
+            }
+
+            /** @psalm-suppress PossiblyNullArgument */
+            return $this->quoter->quoteColumnName($column->getName());
+        }
+
+        /** @psalm-suppress PossiblyNullArgument, PossiblyFalseReference */
+        return $this->quoter->quoteColumnName(end($columns)->getName());
     }
 }
