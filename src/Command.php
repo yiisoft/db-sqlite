@@ -69,6 +69,7 @@ final class Command extends AbstractPdoCommand
             if ($column->isAutoIncrement()) {
                 $value = $this->db->getLastInsertId();
             } else {
+                /** @var array $columns */
                 $value = $columns[$name] ?? $column->getDefaultValue();
             }
 
