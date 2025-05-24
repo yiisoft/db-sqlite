@@ -27,31 +27,44 @@ final class Command extends AbstractPdoCommand
 {
     public function insertWithReturningPks(string $table, array|QueryInterface $columns): array|false
     {
+        $tableSchema = $this->db->getSchema()->getTableSchema($table);
+        $primaryKeys = $tableSchema?->getPrimaryKey() ?? [];
+        $tableColumns = $tableSchema?->getColumns() ?? [];
+
+        foreach ($primaryKeys as $name) {
+            /** @var ColumnInterface $column */
+            $column = $tableColumns[$name];
+
+            if ($column->isAutoIncrement()) {
+                continue;
+            }
+
+            if ($columns instanceof QueryInterface) {
+                throw new NotSupportedException(
+                    __METHOD__ . '() is not supported by Sqlite for tables without auto increment when inserting sub-query.'
+                );
+            }
+
+            break;
+        }
+
         $params = [];
-        $sql = $this->db->getQueryBuilder()->insert($table, $columns, $params);
-        $this->setSql($sql)->bindValues($params);
+        $insertSql = $this->db->getQueryBuilder()->insert($table, $columns, $params);
+        $this->setSql($insertSql)->bindValues($params);
 
         if ($this->execute() === 0) {
             return false;
         }
 
-        $tableSchema = $this->db->getSchema()->getTableSchema($table);
-        $tablePrimaryKeys = $tableSchema?->getPrimaryKey() ?? [];
-
-        if (empty($tablePrimaryKeys)) {
+        if (empty($primaryKeys)) {
             return [];
-        }
-
-        if ($columns instanceof QueryInterface) {
-            throw new NotSupportedException(__METHOD__ . '() not supported for QueryInterface by SQLite.');
         }
 
         $result = [];
 
-        /** @var TableSchema $tableSchema */
-        foreach ($tablePrimaryKeys as $name) {
+        foreach ($primaryKeys as $name) {
             /** @var ColumnInterface $column */
-            $column = $tableSchema->getColumn($name);
+            $column = $tableColumns[$name];
 
             if ($column->isAutoIncrement()) {
                 $value = $this->db->getLastInsertId();

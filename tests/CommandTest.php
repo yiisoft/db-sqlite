@@ -10,6 +10,7 @@ use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonCommandTest;
 
@@ -324,6 +325,21 @@ final class CommandTest extends CommonCommandTest
     public function testGetRawSql(string $sql, array $params, string $expectedRawSql): void
     {
         parent::testGetRawSql($sql, $params, $expectedRawSql);
+    }
+
+    public function testInsertWithReturningPksWithSubqueryAndNoAutoincrement(): void
+    {
+        $db = $this->getConnection(true);
+        $command = $db->createCommand();
+
+        $query = (new Query($db))->select(['order_id' => 1, 'item_id' => 2, 'quantity' => 3, 'subtotal' => 4]);
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Sqlite\Command::insertWithReturningPks() is not supported by Sqlite for tables without auto increment when inserting sub-query.'
+        );
+
+        $command->insertWithReturningPks('order_item', $query);
     }
 
     /**
