@@ -8,7 +8,6 @@ use Throwable;
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Constant\ReferentialAction;
 use Yiisoft\Db\Constraint\CheckConstraint;
-use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
 use Yiisoft\Db\Constraint\IndexConstraint;
 use Yiisoft\Db\Driver\Pdo\AbstractPdoSchema;
@@ -73,8 +72,8 @@ final class Schema extends AbstractPdoSchema
     {
         /** @var string[] */
         return $this->db->createCommand(
-               "SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name<>'sqlite_sequence' ORDER BY tbl_name"
-           )->queryColumn();
+            "SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name<>'sqlite_sequence' ORDER BY tbl_name"
+        )->queryColumn();
     }
 
     protected function loadTableSchema(string $name): TableSchemaInterface|null
