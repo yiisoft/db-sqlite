@@ -218,21 +218,18 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
     {
         $constraints = parent::constraints();
 
-        $constraints['1: primary key'][2]->name(null);
-        $constraints['1: check'][2][0]->columnNames(null);
+        $constraints['1: check'][2][0]->columnNames([]);
         $constraints['1: check'][2][0]->expression('"C_check" <> \'\'');
-        $constraints['1: unique'][2][0]->name(AnyValue::getInstance());
-        $constraints['1: index'][2][1]->name(AnyValue::getInstance());
-
-        $constraints['2: primary key'][2]->name(null);
-        $constraints['2: unique'][2][0]->name(AnyValue::getInstance());
-        $constraints['2: index'][2][2]->name(AnyValue::getInstance());
-
+        $constraints['1: unique'][2][0]->name('sqlite_autoindex_T_constraints_1_2');
+        $constraints['1: index'][2][0]->name('sqlite_autoindex_T_constraints_1_1');
+        $constraints['1: index'][2][1]->name('sqlite_autoindex_T_constraints_1_2');
+        $constraints['2: primary key'][2]->name('');
+        $constraints['2: unique'][2][0]->name('sqlite_autoindex_T_constraints_2_2');
+        $constraints['2: index'][2][0]->name('sqlite_autoindex_T_constraints_2_1');
+        $constraints['2: index'][2][2]->name('sqlite_autoindex_T_constraints_2_2');
         $constraints['3: foreign key'][2][0]->name('0');
         $constraints['3: index'][2] = [];
-
-        $constraints['4: primary key'][2]->name(null);
-        $constraints['4: unique'][2][0]->name(AnyValue::getInstance());
+        $constraints['4: unique'][2][0]->name('sqlite_autoindex_T_constraints_4_2');
 
         return $constraints;
     }
