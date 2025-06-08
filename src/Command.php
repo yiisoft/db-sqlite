@@ -41,7 +41,7 @@ final class Command extends AbstractPdoCommand
 
             if ($columns instanceof QueryInterface) {
                 throw new NotSupportedException(
-                    __METHOD__ . '() is not supported by Sqlite for tables without auto increment when inserting sub-query.'
+                    __METHOD__ . '() is not supported by SQLite for tables without auto increment when inserting sub-query.'
                 );
             }
 

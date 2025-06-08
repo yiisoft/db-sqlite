@@ -336,7 +336,7 @@ final class CommandTest extends CommonCommandTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\Command::insertWithReturningPks() is not supported by Sqlite for tables without auto increment when inserting sub-query.'
+            'Yiisoft\Db\Sqlite\Command::insertWithReturningPks() is not supported by SQLite for tables without auto increment when inserting sub-query.'
         );
 
         $command->insertWithReturningPks('order_item', $query);
