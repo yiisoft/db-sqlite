@@ -38,8 +38,8 @@
 - New #348: Realize `Schema::loadResultColumn()` method (@Tigrov)
 - New #354: Add `FOR` clause to query (@vjik)
 - New #355: Use `DateTimeColumn` class for datetime column types (@Tigrov)
-- New #356: Implement `DMLQueryBuilder::upsertWithReturningPks()` method (@Tigrov)
-- Enh #356: Refactor `Command::insertWithReturningPks()` and `DMLQueryBuilder::upsert()` methods (@Tigrov)
+- New #356, #357: Implement `DMLQueryBuilder::upsertReturning()` method (@Tigrov)
+- Enh #356, #357: Refactor `Command::insertWithReturningPks()` and `DMLQueryBuilder::upsert()` methods (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
