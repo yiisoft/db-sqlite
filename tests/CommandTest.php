@@ -327,21 +327,6 @@ final class CommandTest extends CommonCommandTest
         parent::testGetRawSql($sql, $params, $expectedRawSql);
     }
 
-    public function testInsertWithReturningPksWithSubqueryAndNoAutoincrement(): void
-    {
-        $db = $this->getConnection(true);
-        $command = $db->createCommand();
-
-        $query = (new Query($db))->select(['order_id' => 1, 'item_id' => 2, 'quantity' => 3, 'subtotal' => 4]);
-
-        $this->expectException(NotSupportedException::class);
-        $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\Command::insertWithReturningPks() is not supported by SQLite for tables without auto increment when inserting sub-query.'
-        );
-
-        $command->insertWithReturningPks('order_item', $query);
-    }
-
     /**
      * @throws Throwable
      * @throws InvalidConfigException

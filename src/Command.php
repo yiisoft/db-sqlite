@@ -8,9 +8,6 @@ use Throwable;
 use Yiisoft\Db\Driver\Pdo\AbstractPdoCommand;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
-use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Query\QueryInterface;
-use Yiisoft\Db\Schema\Column\ColumnInterface;
 
 use function array_pop;
 use function count;
@@ -25,64 +22,6 @@ use function strpos;
  */
 final class Command extends AbstractPdoCommand
 {
-    public function insertWithReturningPks(string $table, array|QueryInterface $columns): array|false
-    {
-        $tableSchema = $this->db->getSchema()->getTableSchema($table);
-        $primaryKeys = $tableSchema?->getPrimaryKey() ?? [];
-        $tableColumns = $tableSchema?->getColumns() ?? [];
-
-        foreach ($primaryKeys as $name) {
-            /** @var ColumnInterface $column */
-            $column = $tableColumns[$name];
-
-            if ($column->isAutoIncrement()) {
-                continue;
-            }
-
-            if ($columns instanceof QueryInterface) {
-                throw new NotSupportedException(
-                    __METHOD__ . '() is not supported by SQLite for tables without auto increment when inserting sub-query.'
-                );
-            }
-
-            break;
-        }
-
-        $params = [];
-        $insertSql = $this->db->getQueryBuilder()->insert($table, $columns, $params);
-        $this->setSql($insertSql)->bindValues($params);
-
-        if ($this->execute() === 0) {
-            return false;
-        }
-
-        if (empty($primaryKeys)) {
-            return [];
-        }
-
-        $result = [];
-
-        foreach ($primaryKeys as $name) {
-            /** @var ColumnInterface $column */
-            $column = $tableColumns[$name];
-
-            if ($column->isAutoIncrement()) {
-                $value = $this->db->getLastInsertId();
-            } else {
-                /** @var array $columns */
-                $value = $columns[$name] ?? $column->getDefaultValue();
-            }
-
-            if ($this->phpTypecasting) {
-                $value = $column->phpTypecast($value);
-            }
-
-            $result[$name] = $value;
-        }
-
-        return $result;
-    }
-
     public function showDatabases(): array
     {
         $sql = <<<SQL

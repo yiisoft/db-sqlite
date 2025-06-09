@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite;
 
 use Yiisoft\Db\Exception\InvalidArgumentException;
-use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDMLQueryBuilder;
@@ -20,7 +19,17 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 {
     public function insertWithReturningPks(string $table, array|QueryInterface $columns, array &$params = []): string
     {
-        throw new NotSupportedException(__METHOD__ . '() is not supported by SQLite.');
+        $insertSql = $this->insert($table, $columns, $params);
+        $tableSchema = $this->schema->getTableSchema($table);
+        $primaryKeys = $tableSchema?->getPrimaryKey() ?? [];
+
+        if (empty($primaryKeys)) {
+            return $insertSql;
+        }
+
+        $primaryKeys = array_map($this->quoter->quoteColumnName(...), $primaryKeys);
+
+        return $insertSql . ' RETURNING ' . implode(', ', $primaryKeys);
     }
 
     public function resetSequence(string $table, int|string|null $value = null): string
