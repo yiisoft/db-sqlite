@@ -41,6 +41,8 @@
 - New #356: Implement `DMLQueryBuilder::upsertWithReturningPks()` method (@Tigrov)
 - Enh #356: Refactor `Command::insertWithReturningPks()` and `DMLQueryBuilder::upsert()` methods (@Tigrov)
 - Enh #358: Refactor constraints (@Tigrov)
+- New #356, #357: Implement `DMLQueryBuilder::upsertReturning()` method (@Tigrov)
+- Enh #356, #357: Refactor `Command::insertWithReturningPks()` and `DMLQueryBuilder::upsert()` methods (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
