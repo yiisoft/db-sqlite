@@ -295,6 +295,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $values = parent::prepareParam();
 
         $values['binary'][0] = "x'737472696e67'";
+        $values['resource'][0] = "x'737472696e67'";
 
         return $values;
     }
@@ -305,6 +306,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
 
         $values['binary'][0] = "x'737472696e67'";
         $values['paramBinary'][0] = "x'737472696e67'";
+        $values['paramResource'][0] = "x'737472696e67'";
 
         return $values;
     }
