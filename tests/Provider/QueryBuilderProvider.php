@@ -120,7 +120,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 [
                     'email' => 'test@example.com',
                     'name' => 'John Doe',
-                    'address' => 'New York {{city}}, USA',
+                    'address' => 'New York {{city}}',
                     'is_active' => false,
                     'related_id' => null,
                 ],
@@ -131,7 +131,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 [
                     ':qp0' => 'test@example.com',
                     ':qp1' => 'John Doe',
-                    ':qp2' => 'New York {{city}}, USA',
+                    ':qp2' => 'New York {{city}}',
                     ':qp3' => false,
                     ':qp4' => null,
                 ],
