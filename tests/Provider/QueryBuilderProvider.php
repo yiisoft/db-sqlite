@@ -8,6 +8,7 @@ use Yiisoft\Db\Command\Param;
 use Yiisoft\Db\Constant\DataType;
 use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\QueryBuilder\Condition\InCondition;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Support\TraversableObject;
@@ -109,6 +110,103 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         SQL;
 
         return $insert;
+    }
+
+    public static function insertWithReturningPks(): array
+    {
+        return [
+            'regular-values' => [
+                'customer',
+                [
+                    'email' => 'test@example.com',
+                    'name' => 'John Doe',
+                    'address' => 'New York {{city}}',
+                    'is_active' => false,
+                    'related_id' => null,
+                ],
+                [],
+                <<<SQL
+                INSERT INTO `customer` (`email`, `name`, `address`, `is_active`, `related_id`) VALUES (:qp0, :qp1, :qp2, :qp3, :qp4) RETURNING `id`
+                SQL,
+                [
+                    ':qp0' => 'test@example.com',
+                    ':qp1' => 'John Doe',
+                    ':qp2' => 'New York {{city}}',
+                    ':qp3' => false,
+                    ':qp4' => null,
+                ],
+            ],
+            'params-and-expressions' => [
+                '{{%type}}',
+                ['{{%type}}.[[related_id]]' => null, '[[time]]' => new Expression('now()')],
+                [],
+                <<<SQL
+                INSERT INTO {{%type}} (`related_id`, `time`) VALUES (:qp0, now())
+                SQL,
+                [':qp0' => null],
+            ],
+            'carry passed params' => [
+                'customer',
+                [
+                    'email' => 'test@example.com',
+                    'name' => 'John Doe',
+                    'address' => '{{city}}',
+                    'is_active' => false,
+                    'related_id' => null,
+                    'col' => new Expression('CONCAT(:phFoo, :phBar)', [':phFoo' => 'foo']),
+                ],
+                [':phBar' => 'bar'],
+                <<<SQL
+                INSERT INTO `customer` (`email`, `name`, `address`, `is_active`, `related_id`, `col`) VALUES (:qp1, :qp2, :qp3, :qp4, :qp5, CONCAT(:phFoo, :phBar)) RETURNING `id`
+                SQL,
+                [
+                    ':phBar' => 'bar',
+                    ':qp1' => 'test@example.com',
+                    ':qp2' => 'John Doe',
+                    ':qp3' => '{{city}}',
+                    ':qp4' => false,
+                    ':qp5' => null,
+                    ':phFoo' => 'foo',
+                ],
+            ],
+            'carry passed params (query)' => [
+                'customer',
+                (new Query(self::getDb()))
+                    ->select(['email', 'name', 'address', 'is_active', 'related_id'])
+                    ->from('customer')
+                    ->where(
+                        [
+                            'email' => 'test@example.com',
+                            'name' => 'John Doe',
+                            'address' => '{{city}}',
+                            'is_active' => false,
+                            'related_id' => null,
+                            'col' => new Expression('CONCAT(:phFoo, :phBar)', [':phFoo' => 'foo']),
+                        ],
+                    ),
+                [':phBar' => 'bar'],
+                <<<SQL
+                INSERT INTO `customer` (`email`, `name`, `address`, `is_active`, `related_id`) SELECT `email`, `name`, `address`, `is_active`, `related_id` FROM `customer` WHERE (`email`=:qp1) AND (`name`=:qp2) AND (`address`=:qp3) AND (`is_active`=:qp4) AND (`related_id` IS NULL) AND (`col`=CONCAT(:phFoo, :phBar)) RETURNING `id`
+                SQL,
+                [
+                    ':phBar' => 'bar',
+                    ':qp1' => 'test@example.com',
+                    ':qp2' => 'John Doe',
+                    ':qp3' => '{{city}}',
+                    ':qp4' => false,
+                    ':phFoo' => 'foo',
+                ],
+            ],
+            [
+                '{{%order_item}}',
+                ['order_id' => 1, 'item_id' => 1, 'quantity' => 1, 'subtotal' => 1.0],
+                [],
+                <<<SQL
+                INSERT INTO {{%order_item}} (`order_id`, `item_id`, `quantity`, `subtotal`) VALUES (:qp0, :qp1, :qp2, :qp3) RETURNING `order_id`, `item_id`
+                SQL,
+                [':qp0' => 1, ':qp1' => 1, ':qp2' => 1, ':qp3' => 1.0,],
+            ],
+        ];
     }
 
     public static function upsert(): array

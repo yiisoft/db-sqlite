@@ -517,14 +517,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string $expectedSQL,
         array $expectedParams
     ): void {
-        $this->expectException(NotSupportedException::class);
-        $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DMLQueryBuilder::insertWithReturningPks() is not supported by SQLite.'
-        );
-
-        $db = $this->getConnection(true);
-        $qb = $db->getQueryBuilder();
-        $qb->insertWithReturningPks($table, $columns, $params);
+        parent::testInsertWithReturningPks($table, $columns, $params, $expectedSQL, $expectedParams);
     }
 
     public function testRenameColumn(): void
