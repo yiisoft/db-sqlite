@@ -112,7 +112,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         return $insert;
     }
 
-    public static function insertWithReturningPks(): array
+    public static function insertReturningPks(): array
     {
         return [
             'regular-values' => [
