@@ -70,7 +70,7 @@ final class Connection extends AbstractPdoConnection
 
     public function getQuoter(): QuoterInterface
     {
-        return $this->quoter ??= new Quoter('`', '`', $this->getTablePrefix());
+        return $this->quoter ??= new Quoter('"', '"', $this->getTablePrefix());
     }
 
     public function getSchema(): SchemaInterface
