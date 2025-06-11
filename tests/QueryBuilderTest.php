@@ -178,7 +178,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->assertSame(
             <<<SQL
-            UNION  SELECT * FROM `admin_profile`
+            UNION  SELECT * FROM "admin_profile"
             SQL,
             $qb->buildUnion($query->getUnions(), $params),
         );
@@ -252,7 +252,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->assertSame(
             <<<SQL
-            WITH `a1` AS (SELECT `id` FROM `t1` WHERE expr = 1), `a2` AS (SELECT `id` FROM `t2` INNER JOIN `a1` ON t2.id = a1.id WHERE expr = 2 UNION  SELECT `id` FROM `t3` WHERE expr = 3) SELECT * FROM `a2`
+            WITH "a1" AS (SELECT "id" FROM "t1" WHERE expr = 1), "a2" AS (SELECT "id" FROM "t2" INNER JOIN "a1" ON t2.id = a1.id WHERE expr = 2 UNION  SELECT "id" FROM "t3" WHERE expr = 3) SELECT * FROM "a2"
             SQL,
             $sql,
         );
@@ -278,7 +278,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->assertSame(
             <<<SQL
-            SELECT `id` FROM `TotalExample` `t1` WHERE (w > 0) AND (x < 2) UNION  SELECT `id` FROM `TotalTotalExample` `t2` WHERE w > 5 UNION ALL  SELECT `id` FROM `TotalTotalExample` `t3` WHERE w = 3
+            SELECT "id" FROM "TotalExample" "t1" WHERE (w > 0) AND (x < 2) UNION  SELECT "id" FROM "TotalTotalExample" "t2" WHERE w > 5 UNION ALL  SELECT "id" FROM "TotalTotalExample" "t3" WHERE w = 3
             SQL,
             $sql,
         );
@@ -320,7 +320,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->assertSame(
             <<<SQL
-            CREATE INDEX `myschema`.`myindex` ON `myindex` (`C_index_1`)
+            CREATE INDEX "myschema"."myindex" ON "myindex" ("C_index_1")
             SQL,
             $qb->createIndex('myschema' . '.' . 'myindex', 'myindex', 'C_index_1'),
         );
@@ -334,12 +334,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->assertSame(
             <<<SQL
-            CREATE TABLE `test` (
-            \t`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-            \t`name` varchar(255) NOT NULL,
-            \t`email` varchar(255) NOT NULL,
-            \t`status` integer NOT NULL,
-            \t`created_at` datetime NOT NULL
+            CREATE TABLE "test" (
+            \t"id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+            \t"name" varchar(255) NOT NULL,
+            \t"email" varchar(255) NOT NULL,
+            \t"status" integer NOT NULL,
+            \t"created_at" datetime NOT NULL
             )
             SQL,
             $qb->createTable(
@@ -449,7 +449,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->assertSame(
             <<<SQL
-            DROP INDEX `CN_constraints_2_single`
+            DROP INDEX "CN_constraints_2_single"
             SQL,
             $qb->dropIndex('T_constraints_2', 'CN_constraints_2_single'),
         );
@@ -542,7 +542,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->assertSame(
             <<<SQL
-            ALTER TABLE `alpha` RENAME TO `alpha-test`
+            ALTER TABLE "alpha" RENAME TO "alpha-test"
             SQL,
             $qb->renameTable('alpha', 'alpha-test'),
         );
@@ -556,7 +556,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->assertSame(
             <<<SQL
-            UPDATE sqlite_sequence SET seq=(SELECT MAX(`id`) FROM `item`) WHERE name='item'
+            UPDATE sqlite_sequence SET seq=(SELECT MAX("id") FROM "item") WHERE name='item'
             SQL,
             $qb->resetSequence('item'),
         );
@@ -578,7 +578,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->assertSame(
             <<<SQL
-            DELETE FROM `customer`
+            DELETE FROM "customer"
             SQL,
             $sql,
         );
@@ -587,7 +587,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->assertSame(
             <<<SQL
-            DELETE FROM `T_constraints_1`
+            DELETE FROM "T_constraints_1"
             SQL,
             $sql,
         );
@@ -643,7 +643,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $sql = $qb->buildExpression(new JsonOverlapsCondition('column', [1, 2, 3]), $params);
 
         $this->assertSame(
-            'EXISTS(SELECT value FROM json_each(`column`) INTERSECT SELECT value FROM json_each(:qp0))=1',
+            'EXISTS(SELECT value FROM json_each("column") INTERSECT SELECT value FROM json_each(:qp0))=1',
             $sql
         );
         $this->assertEquals([':qp0' => new Param('[1,2,3]', DataType::STRING)], $params);

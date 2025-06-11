@@ -106,7 +106,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $insert = parent::insert();
 
         $insert['empty columns'][3] = <<<SQL
-        INSERT INTO `customer` DEFAULT VALUES
+        INSERT INTO "customer" DEFAULT VALUES
         SQL;
 
         return $insert;
@@ -126,7 +126,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ],
                 [],
                 <<<SQL
-                INSERT INTO `customer` (`email`, `name`, `address`, `is_active`, `related_id`) VALUES (:qp0, :qp1, :qp2, :qp3, :qp4) RETURNING `id`
+                INSERT INTO "customer" ("email", "name", "address", "is_active", "related_id") VALUES (:qp0, :qp1, :qp2, :qp3, :qp4) RETURNING "id"
                 SQL,
                 [
                     ':qp0' => 'test@example.com',
@@ -141,7 +141,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ['{{%type}}.[[related_id]]' => null, '[[time]]' => new Expression('now()')],
                 [],
                 <<<SQL
-                INSERT INTO {{%type}} (`related_id`, `time`) VALUES (:qp0, now())
+                INSERT INTO {{%type}} ("related_id", "time") VALUES (:qp0, now())
                 SQL,
                 [':qp0' => null],
             ],
@@ -157,7 +157,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ],
                 [':phBar' => 'bar'],
                 <<<SQL
-                INSERT INTO `customer` (`email`, `name`, `address`, `is_active`, `related_id`, `col`) VALUES (:qp1, :qp2, :qp3, :qp4, :qp5, CONCAT(:phFoo, :phBar)) RETURNING `id`
+                INSERT INTO "customer" ("email", "name", "address", "is_active", "related_id", "col") VALUES (:qp1, :qp2, :qp3, :qp4, :qp5, CONCAT(:phFoo, :phBar)) RETURNING "id"
                 SQL,
                 [
                     ':phBar' => 'bar',
@@ -186,7 +186,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                     ),
                 [':phBar' => 'bar'],
                 <<<SQL
-                INSERT INTO `customer` (`email`, `name`, `address`, `is_active`, `related_id`) SELECT `email`, `name`, `address`, `is_active`, `related_id` FROM `customer` WHERE (`email`=:qp1) AND (`name`=:qp2) AND (`address`=:qp3) AND (`is_active`=:qp4) AND (`related_id` IS NULL) AND (`col`=CONCAT(:phFoo, :phBar)) RETURNING `id`
+                INSERT INTO "customer" ("email", "name", "address", "is_active", "related_id") SELECT "email", "name", "address", "is_active", "related_id" FROM "customer" WHERE ("email"=:qp1) AND ("name"=:qp2) AND ("address"=:qp3) AND ("is_active"=:qp4) AND ("related_id" IS NULL) AND ("col"=CONCAT(:phFoo, :phBar)) RETURNING "id"
                 SQL,
                 [
                     ':phBar' => 'bar',
@@ -202,7 +202,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ['order_id' => 1, 'item_id' => 1, 'quantity' => 1, 'subtotal' => 1.0],
                 [],
                 <<<SQL
-                INSERT INTO {{%order_item}} (`order_id`, `item_id`, `quantity`, `subtotal`) VALUES (:qp0, :qp1, :qp2, :qp3) RETURNING `order_id`, `item_id`
+                INSERT INTO {{%order_item}} ("order_id", "item_id", "quantity", "subtotal") VALUES (:qp0, :qp1, :qp2, :qp3) RETURNING "order_id", "item_id"
                 SQL,
                 [':qp0' => 1, ':qp1' => 1, ':qp2' => 1, ':qp3' => 1.0,],
             ],
@@ -214,77 +214,77 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $concreteData = [
             'regular values' => [
                 3 => <<<SQL
-                INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3) ON CONFLICT (`email`) DO UPDATE SET `address`=EXCLUDED.`address`, `status`=EXCLUDED.`status`, `profile_id`=EXCLUDED.`profile_id`
+                INSERT INTO "T_upsert" ("email", "address", "status", "profile_id") VALUES (:qp0, :qp1, :qp2, :qp3) ON CONFLICT ("email") DO UPDATE SET "address"=EXCLUDED."address", "status"=EXCLUDED."status", "profile_id"=EXCLUDED."profile_id"
                 SQL,
             ],
             'regular values with unique at not the first position' => [
                 3 => <<<SQL
-                INSERT INTO `T_upsert` (`address`, `email`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3) ON CONFLICT (`email`) DO UPDATE SET `address`=EXCLUDED.`address`, `status`=EXCLUDED.`status`, `profile_id`=EXCLUDED.`profile_id`
+                INSERT INTO "T_upsert" ("address", "email", "status", "profile_id") VALUES (:qp0, :qp1, :qp2, :qp3) ON CONFLICT ("email") DO UPDATE SET "address"=EXCLUDED."address", "status"=EXCLUDED."status", "profile_id"=EXCLUDED."profile_id"
                 SQL,
             ],
             'regular values with update part' => [
                 3 => <<<SQL
-                INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3) ON CONFLICT (`email`) DO UPDATE SET `address`=:qp4, `status`=:qp5, `orders`=T_upsert.orders + 1
+                INSERT INTO "T_upsert" ("email", "address", "status", "profile_id") VALUES (:qp0, :qp1, :qp2, :qp3) ON CONFLICT ("email") DO UPDATE SET "address"=:qp4, "status"=:qp5, "orders"=T_upsert.orders + 1
                 SQL,
             ],
             'regular values without update part' => [
                 3 => <<<SQL
-                INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3) ON CONFLICT DO NOTHING
+                INSERT INTO "T_upsert" ("email", "address", "status", "profile_id") VALUES (:qp0, :qp1, :qp2, :qp3) ON CONFLICT DO NOTHING
                 SQL,
             ],
             'query' => [
                 3 => <<<SQL
-                INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1 ON CONFLICT (`email`) DO UPDATE SET `status`=EXCLUDED.`status`
+                INSERT INTO "T_upsert" ("email", "status") SELECT "email", 2 AS "status" FROM "customer" WHERE "name"=:qp0 LIMIT 1 ON CONFLICT ("email") DO UPDATE SET "status"=EXCLUDED."status"
                 SQL,
             ],
             'query with update part' => [
                 3 => <<<SQL
-                INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1 ON CONFLICT (`email`) DO UPDATE SET `address`=:qp1, `status`=:qp2, `orders`=T_upsert.orders + 1
+                INSERT INTO "T_upsert" ("email", "status") SELECT "email", 2 AS "status" FROM "customer" WHERE "name"=:qp0 LIMIT 1 ON CONFLICT ("email") DO UPDATE SET "address"=:qp1, "status"=:qp2, "orders"=T_upsert.orders + 1
                 SQL,
             ],
             'query without update part' => [
                 3 => <<<SQL
-                INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1 ON CONFLICT DO NOTHING
+                INSERT INTO "T_upsert" ("email", "status") SELECT "email", 2 AS "status" FROM "customer" WHERE "name"=:qp0 LIMIT 1 ON CONFLICT DO NOTHING
                 SQL,
             ],
             'values and expressions' => [
                 3 => <<<SQL
-                INSERT INTO {{%T_upsert}} (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP) ON CONFLICT (`email`) DO UPDATE SET `ts`=EXCLUDED.`ts`
+                INSERT INTO {{%T_upsert}} ("email", "ts") VALUES (:qp0, CURRENT_TIMESTAMP) ON CONFLICT ("email") DO UPDATE SET "ts"=EXCLUDED."ts"
                 SQL,
             ],
             'values and expressions with update part' => [
                 3 => <<<SQL
-                INSERT INTO {{%T_upsert}} (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP) ON CONFLICT (`email`) DO UPDATE SET `orders`=T_upsert.orders + 1
+                INSERT INTO {{%T_upsert}} ("email", "ts") VALUES (:qp0, CURRENT_TIMESTAMP) ON CONFLICT ("email") DO UPDATE SET "orders"=T_upsert.orders + 1
                 SQL,
             ],
             'values and expressions without update part' => [
                 3 => <<<SQL
-                INSERT INTO `T_upsert` (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP) ON CONFLICT DO NOTHING
+                INSERT INTO "T_upsert" ("email", "ts") VALUES (:qp0, CURRENT_TIMESTAMP) ON CONFLICT DO NOTHING
                 SQL,
             ],
             'query, values and expressions with update part' => [
                 3 => <<<SQL
-                INSERT INTO {{%T_upsert}} (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]] ON CONFLICT (`email`) DO UPDATE SET `ts`=:qp1, `orders`=T_upsert.orders + 1
+                INSERT INTO {{%T_upsert}} ("email", [[ts]]) SELECT :phEmail AS "email", CURRENT_TIMESTAMP AS [[ts]] ON CONFLICT ("email") DO UPDATE SET "ts"=:qp1, "orders"=T_upsert.orders + 1
                 SQL,
             ],
             'query, values and expressions without update part' => [
                 3 => <<<SQL
-                INSERT INTO `T_upsert` (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]] ON CONFLICT DO NOTHING
+                INSERT INTO "T_upsert" ("email", [[ts]]) SELECT :phEmail AS "email", CURRENT_TIMESTAMP AS [[ts]] ON CONFLICT DO NOTHING
                 SQL,
             ],
             'no columns to update' => [
                 3 => <<<SQL
-                INSERT INTO `T_upsert_1` (`a`) VALUES (:qp0) ON CONFLICT DO NOTHING
+                INSERT INTO "T_upsert_1" ("a") VALUES (:qp0) ON CONFLICT DO NOTHING
                 SQL,
             ],
             'no columns to update with unique' => [
                 3 => <<<SQL
-                INSERT INTO `T_upsert` (`email`) VALUES (:qp0) ON CONFLICT DO NOTHING
+                INSERT INTO "T_upsert" ("email") VALUES (:qp0) ON CONFLICT DO NOTHING
                 SQL,
             ],
             'no unique columns in table - simple insert' => [
                 3 => <<<SQL
-                INSERT INTO {{%animal}} (`type`) VALUES (:qp0)
+                INSERT INTO {{%animal}} ("type") VALUES (:qp0)
                 SQL,
             ],
         ];
@@ -313,14 +313,14 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         foreach ($upsert as $name => &$data) {
             array_splice($data, 3, 0, [['id']]);
             if (in_array($name, $withoutUpdate, true)) {
-                $data[4] = substr($data[4], 0, -10) . 'DO UPDATE SET `ts` = `ts`';
+                $data[4] = substr($data[4], 0, -10) . 'DO UPDATE SET "ts" = "ts"';
             }
 
-            $data[4] .= ' RETURNING `id`';
+            $data[4] .= ' RETURNING "id"';
         }
 
         $upsert['no columns to update'][3] = ['a'];
-        $upsert['no columns to update'][4] = 'INSERT INTO `T_upsert_1` (`a`) VALUES (:qp0) ON CONFLICT DO UPDATE SET `a` = `a` RETURNING `a`';
+        $upsert['no columns to update'][4] = 'INSERT INTO "T_upsert_1" ("a") VALUES (:qp0) ON CONFLICT DO UPDATE SET "a" = "a" RETURNING "a"';
 
         return [
             ...$upsert,
@@ -329,8 +329,8 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ['id_1' => 1, 'id_2' => 2.5, 'type' => 'Test'],
                 true,
                 ['id_1', 'id_2'],
-                'INSERT INTO `notauto_pk` (`id_1`, `id_2`, `type`) VALUES (:qp0, :qp1, :qp2)'
-                . ' ON CONFLICT (`id_1`, `id_2`) DO UPDATE SET `type`=EXCLUDED.`type` RETURNING `id_1`, `id_2`',
+                'INSERT INTO "notauto_pk" ("id_1", "id_2", "type") VALUES (:qp0, :qp1, :qp2)'
+                . ' ON CONFLICT ("id_1", "id_2") DO UPDATE SET "type"=EXCLUDED."type" RETURNING "id_1", "id_2"',
                 [':qp0' => 1, ':qp1' => 2.5, ':qp2' => 'Test'],
             ],
             'no return columns' => [
@@ -338,7 +338,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ['int_col' => 3, 'char_col' => 'a', 'float_col' => 1.2, 'bool_col' => true],
                 true,
                 [],
-                'INSERT INTO `type` (`int_col`, `char_col`, `float_col`, `bool_col`) VALUES (:qp0, :qp1, :qp2, :qp3)',
+                'INSERT INTO "type" ("int_col", "char_col", "float_col", "bool_col") VALUES (:qp0, :qp1, :qp2, :qp3)',
                 [':qp0' => 3, ':qp1' => 'a', ':qp2' => 1.2, ':qp3' => true],
             ],
             'return all columns' => [
@@ -346,10 +346,10 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ['email' => 'test@example.com', 'address' => 'test address', 'status' => 1, 'profile_id' => 1],
                 true,
                 null,
-                'INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3)'
-                . ' ON CONFLICT (`email`) DO UPDATE SET'
-                . ' `address`=EXCLUDED.`address`, `status`=EXCLUDED.`status`, `profile_id`=EXCLUDED.`profile_id`'
-                . ' RETURNING `id`, `ts`, `email`, `recovery_email`, `address`, `status`, `orders`, `profile_id`',
+                'INSERT INTO "T_upsert" ("email", "address", "status", "profile_id") VALUES (:qp0, :qp1, :qp2, :qp3)'
+                . ' ON CONFLICT ("email") DO UPDATE SET'
+                . ' "address"=EXCLUDED."address", "status"=EXCLUDED."status", "profile_id"=EXCLUDED."profile_id"'
+                . ' RETURNING "id", "ts", "email", "recovery_email", "address", "status", "orders", "profile_id"',
                 [':qp0' => 'test@example.com', ':qp1' => 'test address', ':qp2' => 1, ':qp3' => 1],
             ],
         ];
