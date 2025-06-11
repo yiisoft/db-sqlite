@@ -247,7 +247,7 @@ final class Schema extends AbstractPdoSchema
     protected function loadTableChecks(string $tableName): array
     {
         $sql = $this->db->createCommand(
-            'SELECT `sql` FROM `sqlite_master` WHERE name = :tableName',
+            'SELECT "sql" FROM "sqlite_master" WHERE name = :tableName',
             [':tableName' => $tableName],
         )->queryScalar();
 
