@@ -39,7 +39,7 @@ trait TestTrait
         return new Driver($this->getDsn());
     }
 
-    protected function getDriverName(): string
+    protected static function getDriverName(): string
     {
         return 'sqlite';
     }
