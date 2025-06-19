@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite;
 
 use SplStack;
-use Yiisoft\Db\Exception\InvalidArgumentException;
+use InvalidArgumentException;
 
 use function is_array;
 use function is_string;
