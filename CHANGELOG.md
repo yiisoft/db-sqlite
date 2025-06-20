@@ -2,6 +2,7 @@
 
 ## 2.0.0 under development
 
+- Chg #364: Use `\InvalidArgumentException` instead of `Yiisoft\Db\Exception\InvalidArgumentException` (@DikoIbragimov)
 - Enh #289, #352: Implement and use `SqlParser` class (@Tigrov)
 - New #273: Implement `ColumnSchemaInterface` classes according to the data type of database table columns
   for type casting performance. Related with yiisoft/db#752 (@Tigrov)
@@ -43,7 +44,8 @@
 - Enh #358: Refactor constraints (@Tigrov)
 - New #356, #357: Implement `DMLQueryBuilder::upsertReturning()` method (@Tigrov)
 - Enh #356, #357: Refactor `Command::insertWithReturningPks()` and `DMLQueryBuilder::upsert()` methods (@Tigrov)
-- Enh #360: Implement `DMLQueryBuilder::insertWithReturningPks()` method (@Tigrov)
+- Enh #360, #361: Implement `DMLQueryBuilder::insertReturningPks()` method (@Tigrov)
+- Chg #362: Replace column and table name quote character from ` to " (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 

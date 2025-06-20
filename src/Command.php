@@ -7,7 +7,7 @@ namespace Yiisoft\Db\Sqlite;
 use Throwable;
 use Yiisoft\Db\Driver\Pdo\AbstractPdoCommand;
 use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidArgumentException;
+use InvalidArgumentException;
 
 use function array_pop;
 use function count;
