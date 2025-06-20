@@ -368,4 +368,11 @@ final class SchemaTest extends CommonSchemaTest
     {
         parent::testGetResultColumn($expected, $info);
     }
+
+    public function testTestClass(): void
+    {
+        $testClass = new Yiisoft\Db\Tests\Support\TestClass();
+
+        $this->assertInstanceOf(Yiisoft\Db\Tests\Support\TestClass::class, $testClass);
+    }
 }
