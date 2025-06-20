@@ -8,7 +8,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use PDO;
 use Yiisoft\Db\Command\Param;
-use Yiisoft\Db\Driver\Pdo\PdoConnectionInterface;
+use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Schema\Column\BinaryColumn;
 use Yiisoft\Db\Schema\Column\BooleanColumn;
 use Yiisoft\Db\Schema\Column\DoubleColumn;
@@ -32,7 +32,7 @@ final class ColumnTest extends CommonColumnTest
 
     protected const COLUMN_BUILDER = ColumnBuilder::class;
 
-    protected function insertTypeValues(PdoConnectionInterface $db): void
+    protected function insertTypeValues(ConnectionInterface $db): void
     {
         $command = $db->createCommand();
 
