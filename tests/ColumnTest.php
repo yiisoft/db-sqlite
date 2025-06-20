@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use PDO;
 use Yiisoft\Db\Command\Param;
+use Yiisoft\Db\Driver\Pdo\PdoConnectionInterface;
 use Yiisoft\Db\Schema\Column\BinaryColumn;
 use Yiisoft\Db\Schema\Column\BooleanColumn;
 use Yiisoft\Db\Schema\Column\DoubleColumn;
@@ -15,11 +16,11 @@ use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Schema\Column\JsonColumn;
 use Yiisoft\Db\Schema\Column\StringColumn;
 use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
-use Yiisoft\Db\Sqlite\Connection;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Tests\Common\CommonColumnTest;
 
+use function iterator_to_array;
 use function str_repeat;
 
 /**
@@ -31,7 +32,7 @@ final class ColumnTest extends CommonColumnTest
 
     protected const COLUMN_BUILDER = ColumnBuilder::class;
 
-    private function insertTypeValues(Connection $db): void
+    protected function insertTypeValues(PdoConnectionInterface $db): void
     {
         $command = $db->createCommand();
 
@@ -54,7 +55,7 @@ final class ColumnTest extends CommonColumnTest
         $command->execute();
     }
 
-    private function assertTypecastedValues(array $result, bool $allTypecasted = false): void
+    protected function assertTypecastedValues(array $result, bool $allTypecasted = false): void
     {
         $this->assertSame(1, $result['int_col']);
         $this->assertSame(str_repeat('x', 100), $result['char_col']);
@@ -74,87 +75,37 @@ final class ColumnTest extends CommonColumnTest
         }
     }
 
-    public function testQueryWithTypecasting(): void
-    {
-        $db = $this->getConnection(true);
-
-        $this->insertTypeValues($db);
-
-        $query = (new Query($db))->from('type')->withTypecasting();
-
-        $result = $query->one();
-
-        $this->assertTypecastedValues($result);
-
-        $result = $query->all();
-
-        $this->assertTypecastedValues($result[0]);
-
-        $db->close();
-    }
-
-    public function testCommandWithPhpTypecasting(): void
-    {
-        $db = $this->getConnection(true);
-
-        $this->insertTypeValues($db);
-
-        $command = $db->createCommand('SELECT * FROM type')->withPhpTypecasting();
-
-        $result = $command->queryOne();
-
-        $this->assertTypecastedValues($result);
-
-        $result = $command->queryAll();
-
-        $this->assertTypecastedValues($result[0]);
-
-        $db->close();
-    }
-
     public function testSelectWithPhpTypecasting(): void
     {
         $db = $this->getConnection();
 
-        $result = $db->createCommand("SELECT null, 1, 2.5, true, false, 'string'")
-            ->withPhpTypecasting()
-            ->queryOne();
-
-        $this->assertSame([
+        $sql = "SELECT null, 1, 2.5, true, false, 'string'";
+        $expected = [
             'null' => null,
             1 => 1,
             '2.5' => 2.5,
             'true' => 1,
             'false' => 0,
-            '\'string\'' => 'string',
-        ], $result);
+            "'string'" => 'string',
+        ];
+
+        $result = $db->createCommand($sql)
+            ->withPhpTypecasting()
+            ->queryOne();
+
+        $this->assertSame($expected, $result);
+
+        $result = $db->createCommand($sql)
+            ->withPhpTypecasting()
+            ->query();
+
+        $this->assertSame([$expected], iterator_to_array($result));
 
         $result = $db->createCommand('SELECT 2.5')
             ->withPhpTypecasting()
             ->queryScalar();
 
         $this->assertSame(2.5, $result);
-
-        $db->close();
-    }
-
-    public function testPhpTypeCast(): void
-    {
-        $db = $this->getConnection(true);
-        $schema = $db->getSchema();
-        $columns = $schema->getTableSchema('type')->getColumns();
-
-        $this->insertTypeValues($db);
-
-        $query = (new Query($db))->from('type')->one();
-
-        $result = [];
-
-        foreach ($columns as $columnName => $column) {
-            $result[$columnName] = $column->phpTypecast($query[$columnName]);
-        }
-
-        $this->assertTypecastedValues($result, true);
 
         $db->close();
     }
