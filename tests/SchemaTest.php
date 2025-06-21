@@ -18,6 +18,7 @@ use Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonSchemaTest;
 use Yiisoft\Db\Tests\Support\DbHelper;
+use Yiisoft\Db\Tests\Support\TestClass;
 
 /**
  * @group sqlite
@@ -367,5 +368,12 @@ final class SchemaTest extends CommonSchemaTest
     public function testGetResultColumn(ColumnInterface|null $expected, array $info): void
     {
         parent::testGetResultColumn($expected, $info);
+    }
+
+    public function testTestClass(): void
+    {
+        $testClass = new TestClass();
+
+        $this->assertInstanceOf(TestClass::class, $testClass);
     }
 }
