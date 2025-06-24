@@ -2,6 +2,7 @@
 
 ## 2.0.0 under development
 
+- Chg #364: Use `\InvalidArgumentException` instead of `Yiisoft\Db\Exception\InvalidArgumentException` (@DikoIbragimov)
 - Enh #289, #352: Implement and use `SqlParser` class (@Tigrov)
 - New #273: Implement `ColumnSchemaInterface` classes according to the data type of database table columns
   for type casting performance. Related with yiisoft/db#752 (@Tigrov)
@@ -38,6 +39,7 @@
 - New #348: Realize `Schema::loadResultColumn()` method (@Tigrov)
 - New #354: Add `FOR` clause to query (@vjik)
 - New #355: Use `DateTimeColumn` class for datetime column types (@Tigrov)
+- Enh #358: Refactor constraints (@Tigrov)
 - New #356, #357: Implement `DMLQueryBuilder::upsertReturning()` method (@Tigrov)
 - Enh #356, #357: Refactor `Command::insertWithReturningPks()` and `DMLQueryBuilder::upsert()` methods (@Tigrov)
 - Enh #360, #361: Implement `DMLQueryBuilder::insertReturningPks()` method (@Tigrov)
