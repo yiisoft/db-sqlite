@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Builder;
 
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\QueryBuilder\Condition\Interface\LikeConditionInterface;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 
@@ -20,7 +21,10 @@ final class LikeConditionBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Buil
         parent::__construct($queryBuilder, $this->getEscapeSql());
     }
 
-    public function build(LikeConditionInterface $expression, array &$params = []): string
+    /**
+     * @param LikeConditionInterface $expression
+     */
+    public function build(ExpressionInterface $expression, array &$params = []): string
     {
         if ($expression->getCaseSensitive() === true) {
             throw new NotSupportedException('SQLite doesn\'t support case-sensitive "LIKE" conditions.');
