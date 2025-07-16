@@ -6,7 +6,6 @@ namespace Yiisoft\Db\Sqlite\Builder;
 
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionInterface;
-use Yiisoft\Db\QueryBuilder\Condition\Interface\LikeConditionInterface;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 
 /**
@@ -21,10 +20,6 @@ final class LikeConditionBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Buil
         parent::__construct($queryBuilder, $this->getEscapeSql());
     }
 
-    /**
-     * @param LikeConditionInterface $expression
-     * @psalm-suppress MoreSpecificImplementedParamType
-     */
     public function build(ExpressionInterface $expression, array &$params = []): string
     {
         if ($expression->getCaseSensitive() === true) {
