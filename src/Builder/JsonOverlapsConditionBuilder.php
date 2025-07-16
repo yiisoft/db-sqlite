@@ -15,6 +15,8 @@ use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
 
 /**
  * Builds expressions for {@see JsonOverlapsCondition} for SQLite Server.
+ *
+ * @extends AbstractOverlapsConditionBuilder<JsonOverlapsCondition>
  */
 final class JsonOverlapsConditionBuilder extends AbstractOverlapsConditionBuilder
 {
