@@ -8,7 +8,9 @@ use JsonException;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Throwable;
 use Yiisoft\Db\Connection\ConnectionInterface;
-use Yiisoft\Db\Constraint\CheckConstraint;
+use Yiisoft\Db\Constant\ReferentialAction;
+use Yiisoft\Db\Constraint\Check;
+use Yiisoft\Db\Constraint\ForeignKey;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
@@ -81,7 +83,7 @@ final class SchemaTest extends CommonSchemaTest
      * @throws InvalidConfigException
      * @throws Throwable
      */
-    public function testForeingKey(): void
+    public function testForeignKey(): void
     {
         $db = $this->getConnection();
 
@@ -115,10 +117,9 @@ final class SchemaTest extends CommonSchemaTest
                 'name' => 'nvarchar(50) null',
             ],
         )->execute();
-        $foreingKeys = $schema->getTableForeignKeys($tableMaster);
+        $foreignKeys = $schema->getTableForeignKeys($tableMaster);
 
-        $this->assertCount(0, $foreingKeys);
-        $this->assertSame([], $foreingKeys);
+        $this->assertSame([], $foreignKeys);
 
         $command->createTable(
             $tableRelation,
@@ -130,14 +131,21 @@ final class SchemaTest extends CommonSchemaTest
                 'CONSTRAINT fk_departments FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE CASCADE',
             ],
         )->execute();
-        $foreingKeys = $schema->getTableForeignKeys($tableRelation);
 
-        $this->assertCount(1, $foreingKeys);
-        $this->assertSame(['department_id'], $foreingKeys[0]->getColumnNames());
-        $this->assertSame($tableMaster, $foreingKeys[0]->getForeignTableName());
-        $this->assertSame(['id'], $foreingKeys[0]->getForeignColumnNames());
-        $this->assertSame('CASCADE', $foreingKeys[0]->getOnDelete());
-        $this->assertSame('NO ACTION', $foreingKeys[0]->getOnUpdate());
+        $foreignKeys = $schema->getTableForeignKeys($tableRelation);
+        $expectedForeignKeys = [
+            new ForeignKey(
+                '0',
+                ['department_id'],
+                '',
+                $tableMaster,
+                ['id'],
+                ReferentialAction::CASCADE,
+                ReferentialAction::NO_ACTION,
+            )
+        ];
+
+        $this->assertEquals($expectedForeignKeys, $foreignKeys);
 
         $command->createTable(
             $tableRelation1,
@@ -150,19 +158,19 @@ final class SchemaTest extends CommonSchemaTest
                 'CONSTRAINT fk_departments FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE CASCADE',
             ],
         )->execute();
-        $foreingKeys = $schema->getTableForeignKeys($tableRelation1);
 
-        $this->assertCount(2, $foreingKeys);
-        $this->assertSame(['department_id'], $foreingKeys[0]->getColumnNames());
-        $this->assertSame($tableMaster, $foreingKeys[0]->getForeignTableName());
-        $this->assertSame(['id'], $foreingKeys[0]->getForeignColumnNames());
-        $this->assertSame('CASCADE', $foreingKeys[0]->getOnDelete());
-        $this->assertSame('NO ACTION', $foreingKeys[0]->getOnUpdate());
-        $this->assertSame(['student_id'], $foreingKeys[1]->getColumnNames());
-        $this->assertSame($tableRelation, $foreingKeys[1]->getForeignTableName());
-        $this->assertSame(['id'], $foreingKeys[1]->getForeignColumnNames());
-        $this->assertSame('CASCADE', $foreingKeys[1]->getOnDelete());
-        $this->assertSame('NO ACTION', $foreingKeys[1]->getOnUpdate());
+        $foreignKeys = $schema->getTableForeignKeys($tableRelation1);
+        $expectedForeignKeys[] = new ForeignKey(
+            '1',
+            ['student_id'],
+            '',
+            $tableRelation,
+            ['id'],
+            ReferentialAction::CASCADE,
+            ReferentialAction::NO_ACTION,
+        );
+
+        $this->assertEquals($expectedForeignKeys, $foreignKeys);
     }
 
     public function testMultiForeingKeys(): void
@@ -204,7 +212,7 @@ final class SchemaTest extends CommonSchemaTest
         $tableChecks = $schema->getTableChecks('T_constraints_check');
 
         $this->assertIsArray($tableChecks);
-        $this->assertContainsOnlyInstancesOf(CheckConstraint::class, $tableChecks);
+        $this->assertContainsOnlyInstancesOf(Check::class, $tableChecks);
     }
 
     /**
@@ -264,14 +272,20 @@ final class SchemaTest extends CommonSchemaTest
         $db = $this->getConnection(true);
 
         $schema = $db->getSchema();
-        $tableForeingKeys = $schema->getTableForeignKeys('T_constraints_3');
+        $tableForeignKeys = $schema->getTableForeignKeys('T_constraints_3');
 
-        $this->assertCount(1, $tableForeingKeys);
-        $this->assertSame([ 'C_fk_id_1', 'C_fk_id_2'], $tableForeingKeys[0]->getColumnNames());
-        $this->assertSame('T_constraints_2', $tableForeingKeys[0]->getForeignTableName());
-        $this->assertSame(['C_id_1', 'C_id_2'], $tableForeingKeys[0]->getForeignColumnNames());
-        $this->assertSame('CASCADE', $tableForeingKeys[0]->getOnDelete());
-        $this->assertSame('CASCADE', $tableForeingKeys[0]->getOnUpdate());
+        $this->assertEquals(
+            [new ForeignKey(
+                '0',
+                [ 'C_fk_id_1', 'C_fk_id_2'],
+                '',
+                'T_constraints_2',
+                ['C_id_1', 'C_id_2'],
+                ReferentialAction::CASCADE,
+                ReferentialAction::CASCADE,
+            )],
+            $tableForeignKeys
+        );
 
         $tableTwoForeignKeys = $schema->getTableForeignKeys('foreign_keys_child');
         $this->assertCount(2, $tableTwoForeignKeys);
