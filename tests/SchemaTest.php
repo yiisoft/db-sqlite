@@ -142,7 +142,7 @@ final class SchemaTest extends CommonSchemaTest
                 ['id'],
                 ReferentialAction::CASCADE,
                 ReferentialAction::NO_ACTION,
-            )
+            ),
         ];
 
         $this->assertEquals($expectedForeignKeys, $foreignKeys);
