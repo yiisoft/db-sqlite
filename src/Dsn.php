@@ -4,18 +4,28 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
-use Yiisoft\Db\Connection\AbstractDsn;
+use Stringable;
 
 /**
- * Implement a Data Source Name (DSN) for an SQLite Server.
+ * Represents a Data Source Name (DSN) for a SQLite Server that's used to configure a {@see Driver} instance.
+ *
+ * To get DSN in string format, use the `(string)` type casting operator.
  *
  * @link https://www.php.net/manual/en/ref.pdo-sqlite.connection.php
  */
-final class Dsn extends AbstractDsn
+final class Dsn implements Stringable
 {
-    public function __construct(string $driver = 'sqlite', string|null $databaseName = null)
-    {
-        parent::__construct($driver, '', $databaseName);
+    /**
+     * @param string $driver The database driver name.
+     * @param string $databaseName The database name to connect to. It can be
+     * - absolute file path for a file database;
+     * - 'memory' for a database in memory;
+     * - empty string for a temporary file database which is deleted when the connection is closed.
+     */
+    public function __construct(
+        public readonly string $driver = 'sqlite',
+        public readonly string $databaseName = '',
+    ) {
     }
 
     /**
@@ -23,27 +33,22 @@ final class Dsn extends AbstractDsn
      *
      * Please refer to the [PHP manual](https://php.net/manual/en/pdo.construct.php) on the format of the DSN string.
      *
-     * The `driver` array key is used as the driver prefix of the DSN, all further key-value pairs are rendered as
-     * `key=value` and concatenated by `;`. For example:
+     * The `driver` property is used as the driver prefix of the DSN. For example:
      *
      * ```php
      * $dsn = new Dsn('sqlite', __DIR__ . '/data/test.sq3');
-     * $driver = new Driver($dsn->asString());
+     * $driver = new Driver($dsn);
      * $db = new Connection($driver, $schemaCache);
      * ```
      *
      * Will result in the DSN string `sqlite:/path/to/data/test.sq3`.
      */
-    public function asString(): string
+    public function __toString(): string
     {
-        $driver = $this->getDriver();
-        $databaseName = $this->getDatabaseName();
+        if ($this->databaseName === 'memory') {
+            return "$this->driver::memory:";
+        }
 
-        return match ($databaseName) {
-            '' => "$driver:",
-            null => "$driver:",
-            'memory' => "$driver::memory:",
-            default => "$driver:$databaseName",
-        };
+        return "$this->driver:$this->databaseName";
     }
 }

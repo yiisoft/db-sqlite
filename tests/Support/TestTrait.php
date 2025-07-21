@@ -28,7 +28,7 @@ trait TestTrait
     protected function getDsn(): string
     {
         if ($this->dsn === '') {
-            $this->dsn = (new Dsn('sqlite', 'memory'))->asString();
+            $this->dsn = (string) new Dsn('sqlite', 'memory');
         }
 
         return $this->dsn;
