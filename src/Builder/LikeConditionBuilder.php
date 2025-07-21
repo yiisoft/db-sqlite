@@ -22,7 +22,7 @@ final class LikeConditionBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Buil
 
     public function build(ExpressionInterface $expression, array &$params = []): string
     {
-        if ($expression->getCaseSensitive() === true) {
+        if ($expression->caseSensitive === true) {
             throw new NotSupportedException('SQLite doesn\'t support case-sensitive "LIKE" conditions.');
         }
         return parent::build($expression, $params);
