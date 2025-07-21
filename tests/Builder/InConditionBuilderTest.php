@@ -17,7 +17,7 @@ use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 /**
  * @group sqlite
  */
-final class InconditionBuilderTest extends TestCase
+final class InConditionBuilderTest extends TestCase
 {
     use TestTrait;
 

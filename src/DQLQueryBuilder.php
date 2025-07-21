@@ -11,7 +11,7 @@ use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
 use Yiisoft\Db\QueryBuilder\Condition\InCondition;
 use Yiisoft\Db\QueryBuilder\Condition\LikeCondition;
-use Yiisoft\Db\QueryBuilder\Condition\Overlaps\JsonOverlapsCondition;
+use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
 use Yiisoft\Db\Sqlite\Builder\InConditionBuilder;
 use Yiisoft\Db\Sqlite\Builder\JsonOverlapsConditionBuilder;
 use Yiisoft\Db\Sqlite\Builder\LikeConditionBuilder;
