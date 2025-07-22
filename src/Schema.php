@@ -7,9 +7,9 @@ namespace Yiisoft\Db\Sqlite;
 use Throwable;
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Constant\ReferentialAction;
-use Yiisoft\Db\Constraint\CheckConstraint;
-use Yiisoft\Db\Constraint\ForeignKeyConstraint;
-use Yiisoft\Db\Constraint\IndexConstraint;
+use Yiisoft\Db\Constraint\Check;
+use Yiisoft\Db\Constraint\ForeignKey;
+use Yiisoft\Db\Constraint\Index;
 use Yiisoft\Db\Driver\Pdo\AbstractPdoSchema;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -92,9 +92,9 @@ final class Schema extends AbstractPdoSchema
         return null;
     }
 
-    protected function loadTablePrimaryKey(string $tableName): IndexConstraint|null
+    protected function loadTablePrimaryKey(string $tableName): Index|null
     {
-        /** @var IndexConstraint|null */
+        /** @var Index|null */
         return $this->loadTableConstraints($tableName, self::PRIMARY_KEY);
     }
 
@@ -113,21 +113,22 @@ final class Schema extends AbstractPdoSchema
              */
             foreach ($foreignKeysById as $id => $foreignKey) {
                 if ($foreignKey[0]['to'] === null) {
-                    /** @var IndexConstraint $primaryKey */
+                    /** @var Index $primaryKey */
                     $primaryKey = $this->getTablePrimaryKey($table);
-                    $foreignColumnNames = $primaryKey->getColumnNames();
+                    $foreignColumnNames = $primaryKey->columnNames;
                 } else {
                     /** @var string[] $foreignColumnNames */
                     $foreignColumnNames = array_column($foreignKey, 'to');
                 }
 
-                $result[] = new ForeignKeyConstraint(
+                $result[] = new ForeignKey(
                     (string) $id,
                     array_column($foreignKey, 'from'),
+                    '',
                     $table,
                     $foreignColumnNames,
-                    $foreignKey[0]['on_update'],
                     $foreignKey[0]['on_delete'],
+                    $foreignKey[0]['on_update'],
                 );
             }
         }
@@ -137,13 +138,13 @@ final class Schema extends AbstractPdoSchema
 
     protected function loadTableIndexes(string $tableName): array
     {
-        /** @var IndexConstraint[] */
+        /** @var Index[] */
         return $this->loadTableConstraints($tableName, self::INDEXES);
     }
 
     protected function loadTableUniques(string $tableName): array
     {
-        /** @var IndexConstraint[] */
+        /** @var Index[] */
         return $this->loadTableConstraints($tableName, self::UNIQUES);
     }
 
@@ -181,7 +182,7 @@ final class Schema extends AbstractPdoSchema
                     $name = $sqlToken?->getContent() ?? '';
                 }
 
-                $result[] = new CheckConstraint($name, expression: $checkSql);
+                $result[] = new Check($name, expression: $checkSql);
             }
         }
 
@@ -242,18 +243,18 @@ final class Schema extends AbstractPdoSchema
      */
     protected function findConstraints(TableSchemaInterface $table): void
     {
-        /** @psalm-var ForeignKeyConstraint[] $foreignKeysList */
+        /** @psalm-var ForeignKey[] $foreignKeysList */
         $foreignKeysList = $this->getTableForeignKeys($table->getName(), true);
 
         foreach ($foreignKeysList as $foreignKey) {
             /** @var array<string> $columnNames */
-            $columnNames = $foreignKey->getColumnNames();
-            $columnNames = array_combine($columnNames, $foreignKey->getForeignColumnNames());
+            $columnNames = $foreignKey->columnNames;
+            $columnNames = array_combine($columnNames, $foreignKey->foreignColumnNames);
 
-            $foreignReference = [$foreignKey->getForeignTableName(), ...$columnNames];
+            $foreignReference = [$foreignKey->foreignTableName, ...$columnNames];
 
             /** @psalm-suppress InvalidCast */
-            $table->foreignKey($foreignKey->getName(), $foreignReference);
+            $table->foreignKey($foreignKey->name, $foreignReference);
         }
     }
 
@@ -363,9 +364,9 @@ final class Schema extends AbstractPdoSchema
      * @param string $tableName The table name.
      * @param string $returnType Return type: (primaryKey, indexes, uniques).
      *
-     * @psalm-return IndexConstraint[]|IndexConstraint|null
+     * @psalm-return Index[]|Index|null
      */
-    private function loadTableConstraints(string $tableName, string $returnType): array|IndexConstraint|null
+    private function loadTableConstraints(string $tableName, string $returnType): array|Index|null
     {
         $indexList = $this->getPragmaIndexList($tableName);
         /** @psalm-var IndexListInfo[] $indexes */
@@ -380,12 +381,12 @@ final class Schema extends AbstractPdoSchema
             $columns = $this->getPragmaIndexInfo($index['name']);
 
             if ($index['origin'] === 'pk') {
-                $result[self::PRIMARY_KEY] = new IndexConstraint('', array_column($columns, 'name'), true, true);
+                $result[self::PRIMARY_KEY] = new Index('', array_column($columns, 'name'), true, true);
             } elseif ($index['origin'] === 'u') {
-                $result[self::UNIQUES][] = new IndexConstraint($index['name'], array_column($columns, 'name'), true);
+                $result[self::UNIQUES][] = new Index($index['name'], array_column($columns, 'name'), true);
             }
 
-            $result[self::INDEXES][] = new IndexConstraint(
+            $result[self::INDEXES][] = new Index(
                 $index['name'],
                 array_column($columns, 'name'),
                 (bool) $index['unique'],
@@ -403,7 +404,7 @@ final class Schema extends AbstractPdoSchema
 
             foreach ($tableColumns as $tableColumn) {
                 if ($tableColumn['pk'] > 0) {
-                    $result[self::PRIMARY_KEY] = new IndexConstraint('', [$tableColumn['name']], true, true);
+                    $result[self::PRIMARY_KEY] = new Index('', [$tableColumn['name']], true, true);
                     $result[self::INDEXES][] = $result[self::PRIMARY_KEY];
                     break;
                 }
@@ -482,12 +483,12 @@ final class Schema extends AbstractPdoSchema
     private function getJsonColumns(TableSchemaInterface $table): array
     {
         $result = [];
-        /** @psalm-var CheckConstraint[] $checks */
+        /** @psalm-var Check[] $checks */
         $checks = $this->getTableChecks((string) $table->getFullName());
         $regexp = '/\bjson_valid\(\s*["`\[]?(.+?)["`\]]?\s*\)/i';
 
         foreach ($checks as $check) {
-            if (preg_match_all($regexp, $check->getExpression(), $matches, PREG_SET_ORDER) > 0) {
+            if (preg_match_all($regexp, $check->expression, $matches, PREG_SET_ORDER) > 0) {
                 foreach ($matches as $match) {
                     $result[] = $match[1];
                 }
