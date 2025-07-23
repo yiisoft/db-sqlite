@@ -9,36 +9,33 @@ use Yiisoft\Db\Sqlite\Dsn;
 
 /**
  * @group sqlite
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class DsnTest extends TestCase
 {
-    public function testAsString(): void
+    public function testConstruct(): void
     {
-        $this->assertSame(
-            'sqlite:' . __DIR__ . '/runtime/yiitest.sq3',
-            (new Dsn('sqlite', __DIR__ . '/runtime/yiitest.sq3'))->asString(),
-        );
+        $dsn = new Dsn('sqlite', __DIR__ . '/runtime/yiitest.sq3');
+
+        $this->assertSame('sqlite', $dsn->driver);
+        $this->assertSame(__DIR__ . '/runtime/yiitest.sq3', $dsn->databaseName);
+        $this->assertSame('sqlite:' . __DIR__ . '/runtime/yiitest.sq3', (string) $dsn);
     }
 
-    public function testAsStringWithDatabaseName(): void
+    public function testConstructDefaults(): void
     {
-        $this->assertSame('sqlite:', (new Dsn('sqlite'))->asString());
+        $dsn = new Dsn();
+
+        $this->assertSame('sqlite', $dsn->driver);
+        $this->assertSame('', $dsn->databaseName);
+        $this->assertSame('sqlite:', (string) $dsn);
     }
 
-    public function testAsStringWithDatabaseNameWithEmptyString(): void
+    public function testConstructWithMemory(): void
     {
-        $this->assertSame('sqlite:', (new Dsn('sqlite', ''))->asString());
-    }
+        $dsn = new Dsn('sqlite', 'memory');
 
-    public function testAsStringWithDatabaseNameWithNull(): void
-    {
-        $this->assertSame('sqlite:', (new Dsn('sqlite', null))->asString());
-    }
-
-    public function testAsStringWithMemory(): void
-    {
-        $this->assertSame('sqlite::memory:', (new Dsn('sqlite', 'memory'))->asString());
+        $this->assertSame('sqlite', $dsn->driver);
+        $this->assertSame('memory', $dsn->databaseName);
+        $this->assertSame('sqlite::memory:', (string) $dsn);
     }
 }
