@@ -9,12 +9,12 @@ use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
-use Yiisoft\Db\QueryBuilder\Condition\InCondition;
-use Yiisoft\Db\QueryBuilder\Condition\LikeCondition;
-use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
-use Yiisoft\Db\Sqlite\Builder\InConditionBuilder;
-use Yiisoft\Db\Sqlite\Builder\JsonOverlapsConditionBuilder;
-use Yiisoft\Db\Sqlite\Builder\LikeConditionBuilder;
+use Yiisoft\Db\QueryBuilder\Condition\In;
+use Yiisoft\Db\QueryBuilder\Condition\Like;
+use Yiisoft\Db\QueryBuilder\Condition\JsonOverlaps;
+use Yiisoft\Db\Sqlite\Builder\InBuilder;
+use Yiisoft\Db\Sqlite\Builder\JsonOverlapsBuilder;
+use Yiisoft\Db\Sqlite\Builder\LikeBuilder;
 
 use function array_filter;
 use function array_merge;
@@ -135,9 +135,9 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
     {
         return [
             ...parent::defaultExpressionBuilders(),
-            JsonOverlapsCondition::class => JsonOverlapsConditionBuilder::class,
-            LikeCondition::class => LikeConditionBuilder::class,
-            InCondition::class => InConditionBuilder::class,
+            JsonOverlaps::class => JsonOverlapsBuilder::class,
+            Like::class => LikeBuilder::class,
+            In::class => InBuilder::class,
         ];
     }
 }
