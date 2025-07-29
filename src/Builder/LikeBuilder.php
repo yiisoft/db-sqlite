@@ -11,7 +11,7 @@ use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 /**
  * Build an object of {@see \Yiisoft\Db\QueryBuilder\Condition\LikeCondition} into SQL expressions for SQLite Server.
  */
-final class LikeConditionBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Builder\LikeConditionBuilder
+final class LikeBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Builder\LikeBuilder
 {
     private string $escapeCharacter = '\\';
 
