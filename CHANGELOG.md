@@ -46,6 +46,7 @@
 - Chg #362: Replace column and table name quote character from ` to " (@Tigrov)
 - Enh #368: Provide `yiisoft/db-implementation` virtual package (@vjik)
 - Enh #371, #374: Adapt to conditions refactoring in `yiisoft/db` package (@vjik)
+- Enh #377: Remove `TableSchema` class and refactor `Schema` class (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
