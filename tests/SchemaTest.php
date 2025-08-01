@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
-use JsonException;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
-use Throwable;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Constant\ReferentialAction;
 use Yiisoft\Db\Constraint\Check;
 use Yiisoft\Db\Constraint\ForeignKey;
-use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Sqlite\Schema;
@@ -23,8 +19,6 @@ use Yiisoft\Db\Tests\Support\DbHelper;
 
 /**
  * @group sqlite
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class SchemaTest extends CommonSchemaTest
 {
@@ -40,26 +34,18 @@ final class SchemaTest extends CommonSchemaTest
         parent::testColumnComment();
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::columns
-     */
+    #[DataProviderExternal(SchemaProvider::class, 'columns')]
     public function testColumns(array $columns, string $tableName): void
     {
         parent::testColumns($columns, $tableName);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::columnsTypeBit
-     */
+    #[DataProviderExternal(SchemaProvider::class, 'columnsTypeBit')]
     public function testColumnWithTypeBit(array $columns): void
     {
         $this->assertTableColumns($columns, 'type_bit');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testCompositeFk(): void
     {
         $db = $this->getConnection(true);
@@ -73,16 +59,10 @@ final class SchemaTest extends CommonSchemaTest
 
         $this->assertCount(1, $fk);
         $this->assertTrue(isset($fk[0]));
-        $this->assertEquals('order_item', $fk[0][0]);
-        $this->assertEquals('order_id', $fk[0]['order_id']);
-        $this->assertEquals('item_id', $fk[0]['item_id']);
+        $this->assertSame('order_item', $fk[0]->foreignTableName);
+        $this->assertSame(['order_id', 'item_id'], $fk[0]->foreignColumnNames);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws Throwable
-     */
     public function testForeignKey(): void
     {
         $db = $this->getConnection();
@@ -183,27 +163,17 @@ final class SchemaTest extends CommonSchemaTest
 
         $foreignKeys = $tableSchema->getForeignKeys();
 
-        $this->assertSame(
-            [
-                [
-                    'foreign_keys_parent',
-                    'y' => 'b',
-                    'z' => 'c',
-                ],
-                [
-                    'foreign_keys_parent',
-                    'x' => 'a',
-                    'y' => 'b',
-                ],
-            ],
-            $foreignKeys
-        );
+        $this->assertCount(2, $foreignKeys);
+
+        $this->assertSame('foreign_keys_parent', $foreignKeys[0]->foreignTableName);
+        $this->assertSame(['y', 'z'], $foreignKeys[0]->columnNames);
+        $this->assertSame(['b', 'c'], $foreignKeys[0]->foreignColumnNames);
+
+        $this->assertSame('foreign_keys_parent', $foreignKeys[1]->foreignTableName);
+        $this->assertSame(['x', 'y'], $foreignKeys[1]->columnNames);
+        $this->assertSame(['a', 'b'], $foreignKeys[1]->foreignColumnNames);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testGetTableChecks(): void
     {
         $db = $this->getConnection(true);
@@ -215,10 +185,6 @@ final class SchemaTest extends CommonSchemaTest
         $this->assertContainsOnlyInstancesOf(Check::class, $tableChecks);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testGetSchemaDefaultValues(): void
     {
         $db = $this->getConnection();
@@ -229,10 +195,6 @@ final class SchemaTest extends CommonSchemaTest
         $db->getSchema()->getSchemaDefaultValues();
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testGetSchemaNames(): void
     {
         $db = $this->getConnection();
@@ -247,10 +209,6 @@ final class SchemaTest extends CommonSchemaTest
         $schema->getSchemaNames();
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testGetTableDefaultValues(): void
     {
         $db = $this->getConnection();
@@ -263,10 +221,6 @@ final class SchemaTest extends CommonSchemaTest
         $schema->getTableDefaultValues('customer');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testGetTableForeignKeys(): void
     {
         $db = $this->getConnection(true);
@@ -291,36 +245,19 @@ final class SchemaTest extends CommonSchemaTest
         $this->assertCount(2, $tableTwoForeignKeys);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::constraints
-     *
-     * @throws Exception
-     * @throws JsonException
-     */
+    #[DataProviderExternal(SchemaProvider::class, 'constraints')]
     public function testTableSchemaConstraints(string $tableName, string $type, mixed $expected): void
     {
         parent::testTableSchemaConstraints($tableName, $type, $expected);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::constraints
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws JsonException
-     * @throws NotSupportedException
-     */
+    #[DataProviderExternal(SchemaProvider::class, 'constraints')]
     public function testTableSchemaConstraintsWithPdoLowercase(string $tableName, string $type, mixed $expected): void
     {
         parent::testTableSchemaConstraintsWithPdoLowercase($tableName, $type, $expected);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider::constraints
-     *
-     * @throws Exception
-     * @throws JsonException
-     */
+    #[DataProviderExternal(SchemaProvider::class, 'constraints')]
     public function testTableSchemaConstraintsWithPdoUppercase(string $tableName, string $type, mixed $expected): void
     {
         parent::testTableSchemaConstraintsWithPdoUppercase($tableName, $type, $expected);
