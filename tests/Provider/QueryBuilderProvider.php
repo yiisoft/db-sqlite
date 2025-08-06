@@ -73,17 +73,17 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 [':qp0' => 1, ':qp1' => 'foo', ':qp2' => 2, ':qp3' => 'bar'],
             ],
             'inCondition-custom-3' => [
-                new In(['id', 'name'], 'in', [['id' => 1]]),
+                new In(['id', 'name'], [['id' => 1]]),
                 '(([[id]] = :qp0 AND [[name]] IS NULL))',
                 [':qp0' => 1],
             ],
             'inCondition-custom-4' => [
-                new In(['id', 'name'], 'in', [['name' => 'oy']]),
+                new In(['id', 'name'], [['name' => 'oy']]),
                 '(([[id]] IS NULL AND [[name]] = :qp0))',
                 [':qp0' => 'oy'],
             ],
             'inCondition-custom-5' => [
-                new In(['id', 'name'], 'in', [['id' => 1, 'name' => 'oy']]),
+                new In(['id', 'name'], [['id' => 1, 'name' => 'oy']]),
                 '(([[id]] = :qp0 AND [[name]] = :qp1))',
                 [':qp0' => 1, ':qp1' => 'oy'],
             ],
