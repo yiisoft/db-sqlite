@@ -23,7 +23,6 @@ final class InBuilderTest extends TestCase
         $db = $this->getConnection();
         $inCondition = new In(
             ['id'],
-            'in',
             (new Query($db))->select('id')->from('users')->where(['active' => 1]),
         );
 
