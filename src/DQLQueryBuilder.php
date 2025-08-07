@@ -12,6 +12,7 @@ use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
 use Yiisoft\Db\QueryBuilder\Condition\In;
 use Yiisoft\Db\QueryBuilder\Condition\Like;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlaps;
+use Yiisoft\Db\QueryBuilder\Condition\NotIn;
 use Yiisoft\Db\Sqlite\Builder\InBuilder;
 use Yiisoft\Db\Sqlite\Builder\JsonOverlapsBuilder;
 use Yiisoft\Db\Sqlite\Builder\LikeBuilder;
@@ -138,6 +139,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             JsonOverlaps::class => JsonOverlapsBuilder::class,
             Like::class => LikeBuilder::class,
             In::class => InBuilder::class,
+            NotIn::class => InBuilder::class,
         ];
     }
 }
