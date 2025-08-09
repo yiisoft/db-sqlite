@@ -13,12 +13,7 @@ use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
  */
 final class LikeBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Builder\LikeBuilder
 {
-    private string $escapeCharacter = '\\';
-
-    public function __construct(QueryBuilderInterface $queryBuilder)
-    {
-        parent::__construct($queryBuilder, $this->getEscapeSql());
-    }
+    protected const ESCAPE_SQL = " ESCAPE '\\'";
 
     public function build(ExpressionInterface $expression, array &$params = []): string
     {
@@ -26,14 +21,5 @@ final class LikeBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Builder\LikeB
             throw new NotSupportedException('SQLite doesn\'t support case-sensitive "LIKE" conditions.');
         }
         return parent::build($expression, $params);
-    }
-
-    /**
-     * @return string Character used to escape special characters in `LIKE` conditions.
-     * By default, it's assumed to be `\`.
-     */
-    private function getEscapeSql(): string
-    {
-        return $this->escapeCharacter !== '' ? " ESCAPE '$this->escapeCharacter'" : '';
     }
 }
