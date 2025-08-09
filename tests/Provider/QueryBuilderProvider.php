@@ -10,6 +10,7 @@ use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\QueryBuilder\Condition\In;
+use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Support\TraversableObject;
 
@@ -379,6 +380,10 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $values['binary()'][0] = 'blob';
         $values['binary(1000)'][0] = 'blob(1000)';
         $values['uuid()'][0] = 'blob(16)';
+        $values["collation('collation_name')"] = [
+            'varchar(255) COLLATE RTRIM',
+            ColumnBuilder::string()->collation('RTRIM'),
+        ];
         $values["comment('comment')"][0] = 'varchar(255) /* comment */';
         $values['integer()->primaryKey()'][0] = 'integer PRIMARY KEY NOT NULL';
         $values['string()->primaryKey()'][0] = 'varchar(255) PRIMARY KEY NOT NULL';
