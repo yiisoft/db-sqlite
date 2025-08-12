@@ -6,12 +6,12 @@ namespace Yiisoft\Db\Sqlite\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
-use Yiisoft\Db\Command\Param;
 use Yiisoft\Db\Constant\DataType;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\CaseExpression;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
+use Yiisoft\Db\Expression\Param;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlaps;
