@@ -428,7 +428,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
     {
         $data = parent::multiOperandFunctionBuilder();
 
-        $intQuery = static::getDb()->select(10);
+        $intQuery = self::getDb()->select(10);
         $intQuerySql = '(SELECT 10)';
         $stringParam = new Param('[3,4,5]', DataType::STRING);
 
