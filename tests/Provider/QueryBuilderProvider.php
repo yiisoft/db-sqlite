@@ -426,7 +426,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
 
     public static function multiOperandFunctionBuilder(): array
     {
-        $data = null;
+        $data = parent::multiOperandFunctionBuilder();
 
         $intQuery = self::getDb()->select(10);
         $intQuerySql = '(SELECT 10)';
