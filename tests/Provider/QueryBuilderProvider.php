@@ -7,6 +7,7 @@ namespace Yiisoft\Db\Sqlite\Tests\Provider;
 use Yiisoft\Db\Constant\DataType;
 use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Expression\Function\ArrayMerge;
 use Yiisoft\Db\Expression\Param;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\QueryBuilder\Condition\In;
@@ -16,6 +17,7 @@ use Yiisoft\Db\Tests\Support\TraversableObject;
 
 use function array_replace;
 use function array_splice;
+use function strtr;
 
 final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilderProvider
 {
@@ -412,5 +414,56 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $values['ResourceStream'][0] = "x'737472696e67'";
 
         return $values;
+    }
+
+    public static function multiOperandFunctionClasses(): array
+    {
+        return [
+            ...parent::multiOperandFunctionClasses(),
+            ArrayMerge::class => [ArrayMerge::class],
+        ];
+    }
+
+    public static function multiOperandFunctionBuilder(): array
+    {
+        $data = parent::multiOperandFunctionBuilder();
+
+        $intQuery = static::getDb()->select(10);
+        $intQuerySql = '(SELECT 10)';
+        $stringParam = new Param('[3,4,5]', DataType::STRING);
+
+        foreach ($data as &$value) {
+            $value[2] = strtr($value[2], [
+                'GREATEST(' => 'MAX(',
+                'LEAST(' => 'MIN(',
+            ]);
+        }
+
+        return [
+            ...$data,
+            'ArrayMerge with 1 operand' => [
+                ArrayMerge::class,
+                ["'[1,2,3]'"],
+                "('[1,2,3]')",
+                '[1,2,3]',
+            ],
+            'ArrayMerge with 2 operands' => [
+                ArrayMerge::class,
+                ["'[1,2,3]'", $stringParam],
+                "(SELECT json_group_array(value) AS value FROM (SELECT value FROM json_each('[1,2,3]') UNION SELECT value FROM json_each(:qp0)))",
+                '[1,2,3,4,5]',
+                [':qp0' => $stringParam],
+            ],
+            'ArrayMerge with 4 operands' => [
+                ArrayMerge::class,
+                ["'[1,2,3]'", [5,6,7], $stringParam, $intQuery],
+                "(SELECT json_group_array(value) AS value FROM (SELECT value FROM json_each('[1,2,3]') UNION SELECT value FROM json_each(:qp0) UNION SELECT value FROM json_each(:qp1) UNION SELECT value FROM json_each($intQuerySql)))",
+                '[1,2,3,4,5,6,7,10]',
+                [
+                    ':qp0' => new Param('[5,6,7]', DataType::STRING),
+                    ':qp1' => $stringParam,
+                ],
+            ],
+        ];
     }
 }
