@@ -6,6 +6,9 @@ namespace Yiisoft\Db\Sqlite;
 
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionInterface;
+use Yiisoft\Db\Expression\Function\ArrayMerge;
+use Yiisoft\Db\Expression\Function\Greatest;
+use Yiisoft\Db\Expression\Function\Least;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
@@ -14,8 +17,11 @@ use Yiisoft\Db\QueryBuilder\Condition\Like;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlaps;
 use Yiisoft\Db\QueryBuilder\Condition\NotIn;
 use Yiisoft\Db\QueryBuilder\Condition\NotLike;
+use Yiisoft\Db\Sqlite\Builder\ArrayMergeBuilder;
+use Yiisoft\Db\Sqlite\Builder\GreatestBuilder;
 use Yiisoft\Db\Sqlite\Builder\InBuilder;
 use Yiisoft\Db\Sqlite\Builder\JsonOverlapsBuilder;
+use Yiisoft\Db\Sqlite\Builder\LeastBuilder;
 use Yiisoft\Db\Sqlite\Builder\LikeBuilder;
 
 use function array_filter;
@@ -142,6 +148,9 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             NotLike::class => LikeBuilder::class,
             In::class => InBuilder::class,
             NotIn::class => InBuilder::class,
+            ArrayMerge::class => ArrayMergeBuilder::class,
+            Greatest::class => GreatestBuilder::class,
+            Least::class => LeastBuilder::class,
         ];
     }
 }
