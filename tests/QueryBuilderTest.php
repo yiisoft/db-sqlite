@@ -735,7 +735,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string $class,
         array $operands,
         string $expectedSql,
-        string|int $expectedResult,
+        array|string|int $expectedResult,
         array $expectedParams = [],
     ): void {
         parent::testMultiOperandFunctionBuilder($class, $operands, $expectedSql, $expectedResult, $expectedParams);

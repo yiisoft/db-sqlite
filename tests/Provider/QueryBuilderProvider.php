@@ -445,20 +445,20 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ArrayMerge::class,
                 ["'[1,2,3]'"],
                 "('[1,2,3]')",
-                '[1,2,3]',
+                [1, 2, 3],
             ],
             'ArrayMerge with 2 operands' => [
                 ArrayMerge::class,
                 ["'[1,2,3]'", $stringParam],
                 "(SELECT json_group_array(value) AS value FROM (SELECT value FROM json_each('[1,2,3]') UNION SELECT value FROM json_each(:qp0)))",
-                '[1,2,3,4,5]',
+                [1, 2, 3, 4, 5],
                 [':qp0' => $stringParam],
             ],
             'ArrayMerge with 4 operands' => [
                 ArrayMerge::class,
                 ["'[1,2,3]'", [5,6,7], $stringParam, $intQuery],
                 "(SELECT json_group_array(value) AS value FROM (SELECT value FROM json_each('[1,2,3]') UNION SELECT value FROM json_each(:qp0) UNION SELECT value FROM json_each(:qp1) UNION SELECT value FROM json_each($intQuerySql)))",
-                '[1,2,3,4,5,6,7,10]',
+                [1, 2, 3, 4, 5, 6, 7, 10],
                 [
                     ':qp0' => new Param('[5,6,7]', DataType::STRING),
                     ':qp1' => $stringParam,
