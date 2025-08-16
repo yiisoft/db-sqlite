@@ -15,7 +15,6 @@ use Yiisoft\Db\Schema\Column\DoubleColumn;
 use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Schema\Column\JsonColumn;
 use Yiisoft\Db\Schema\Column\StringColumn;
-use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Tests\Common\CommonColumnTest;
@@ -29,8 +28,6 @@ use function str_repeat;
 final class ColumnTest extends CommonColumnTest
 {
     use TestTrait;
-
-    protected const COLUMN_BUILDER = ColumnBuilder::class;
 
     protected function insertTypeValues(ConnectionInterface $db): void
     {

@@ -8,12 +8,10 @@ use PDO;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Throwable;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidConfigException;
-use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Profiler\ProfilerInterface;
+use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
 use Yiisoft\Db\Sqlite\Column\ColumnFactory;
 use Yiisoft\Db\Sqlite\Connection;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
@@ -23,18 +21,11 @@ use Yiisoft\Db\Transaction\TransactionInterface;
 
 /**
  * @group sqlite
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class ConnectionTest extends CommonConnectionTest
 {
     use TestTrait;
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws Throwable
-     */
     public function testExceptionContainsRawQuery(): void
     {
         $db = $this->getConnection();
@@ -73,10 +64,6 @@ final class ConnectionTest extends CommonConnectionTest
         $this->runExceptionTest($db);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testSettingDefaultAttributes(): void
     {
         $db = $this->getConnection();
@@ -86,12 +73,6 @@ final class ConnectionTest extends CommonConnectionTest
         $db->close();
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     * @throws Throwable
-     */
     public function testTransactionIsolation(): void
     {
         $db = $this->getConnection(true);
@@ -106,11 +87,6 @@ final class ConnectionTest extends CommonConnectionTest
         $this->assertTrue(true);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws Throwable
-     */
     public function testTransactionShortcutCustom(): void
     {
         $db = $this->getConnection(true);
@@ -143,9 +119,6 @@ final class ConnectionTest extends CommonConnectionTest
         return $this->createMock(LoggerInterface::class);
     }
 
-    /**
-     * @throws Throwable
-     */
     private function runExceptionTest(ConnectionInterface $db): void
     {
         $thrown = false;
@@ -187,6 +160,15 @@ final class ConnectionTest extends CommonConnectionTest
     private function createProfiler(): ProfilerInterface
     {
         return $this->createMock(ProfilerInterface::class);
+    }
+
+    public function getColumnBuilderClass(): void
+    {
+        $db = $this->getConnection();
+
+        $this->assertSame(ColumnBuilder::class, $db->getColumnBuilderClass());
+
+        $db->close();
     }
 
     public function testGetColumnFactory(): void

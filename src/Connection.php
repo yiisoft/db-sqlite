@@ -10,6 +10,7 @@ use Yiisoft\Db\Schema\Column\ColumnFactoryInterface;
 use Yiisoft\Db\Schema\Quoter;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
+use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
 use Yiisoft\Db\Sqlite\Column\ColumnFactory;
 
 use function str_starts_with;
@@ -56,6 +57,11 @@ final class Connection extends AbstractPdoConnection
     public function createTransaction(): Transaction
     {
         return new Transaction($this);
+    }
+
+    public function getColumnBuilderClass(): string
+    {
+        return ColumnBuilder::class;
     }
 
     public function getColumnFactory(): ColumnFactoryInterface
