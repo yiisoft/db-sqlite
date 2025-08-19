@@ -20,6 +20,8 @@ use function implode;
  *     SELECT value FROM json_each(operand2)
  * ))
  * ```
+ *
+ * @extends MultiOperandFunctionBuilder<ArrayMerge>
  */
 final class ArrayMergeBuilder extends MultiOperandFunctionBuilder
 {

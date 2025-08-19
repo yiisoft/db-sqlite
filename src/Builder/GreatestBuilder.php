@@ -12,6 +12,8 @@ use function implode;
 
 /**
  * Builds SQL MAX() function expressions for {@see Greatest} objects.
+ *
+ * @extends MultiOperandFunctionBuilder<Greatest>
  */
 final class GreatestBuilder extends MultiOperandFunctionBuilder
 {
