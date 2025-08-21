@@ -35,19 +35,14 @@ final class ArrayMergeBuilder extends MultiOperandFunctionBuilder
      */
     protected function buildFromExpression(MultiOperandFunction $expression, array &$params): string
     {
-        $builtSelects = [];
+        $selects = [];
 
         foreach ($expression->getOperands() as $operand) {
-            $builtSelects[] = $this->buildSelect($operand, $params);
+            $builtOperand = $this->buildOperand($operand, $params);
+
+            $selects[] = "SELECT value FROM json_each($builtOperand)";
         }
 
-        return '(SELECT json_group_array(value) AS value FROM (' . implode(' UNION ', $builtSelects) . '))';
-    }
-
-    private function buildSelect(mixed $operand, array &$params): string
-    {
-        $builtOperand = $this->buildOperand($operand, $params);
-
-        return "SELECT value FROM json_each($builtOperand)";
+        return '(SELECT json_group_array(value) AS value FROM (' . implode(' UNION ', $selects) . '))';
     }
 }
