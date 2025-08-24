@@ -226,7 +226,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             ],
             'regular values with update part' => [
                 3 => <<<SQL
-                INSERT INTO "T_upsert" ("email", "address", "status", "profile_id") VALUES (:qp0, :qp1, :qp2, :qp3) ON CONFLICT ("email") DO UPDATE SET "address"=:qp4, "status"=:qp5, "orders"=T_upsert.orders + 1
+                INSERT INTO "T_upsert" ("email", "address", "status", "profile_id") VALUES (:qp0, :qp1, :qp2, :qp3) ON CONFLICT ("email") DO UPDATE SET "address"=:qp4, "status"=2, "orders"=T_upsert.orders + 1
                 SQL,
             ],
             'regular values without update part' => [
@@ -241,7 +241,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             ],
             'query with update part' => [
                 3 => <<<SQL
-                INSERT INTO "T_upsert" ("email", "status") SELECT "email", 2 AS "status" FROM "customer" WHERE "name" = :qp0 LIMIT 1 ON CONFLICT ("email") DO UPDATE SET "address"=:qp1, "status"=:qp2, "orders"=T_upsert.orders + 1
+                INSERT INTO "T_upsert" ("email", "status") SELECT "email", 2 AS "status" FROM "customer" WHERE "name" = :qp0 LIMIT 1 ON CONFLICT ("email") DO UPDATE SET "address"=:qp1, "status"=2, "orders"=T_upsert.orders + 1
                 SQL,
             ],
             'query without update part' => [
@@ -266,7 +266,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             ],
             'query, values and expressions with update part' => [
                 3 => <<<SQL
-                INSERT INTO {{%T_upsert}} ("email", [[ts]]) SELECT :phEmail AS "email", CURRENT_TIMESTAMP AS [[ts]] ON CONFLICT ("email") DO UPDATE SET "ts"=:qp1, "orders"=T_upsert.orders + 1
+                INSERT INTO {{%T_upsert}} ("email", [[ts]]) SELECT :phEmail AS "email", CURRENT_TIMESTAMP AS [[ts]] ON CONFLICT ("email") DO UPDATE SET "ts"=0, "orders"=T_upsert.orders + 1
                 SQL,
             ],
             'query, values and expressions without update part' => [
