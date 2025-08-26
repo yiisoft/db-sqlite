@@ -43,6 +43,12 @@ final class ArrayMergeBuilder extends MultiOperandFunctionBuilder
             $selects[] = "SELECT value FROM json_each($builtOperand)";
         }
 
-        return '(SELECT json_group_array(value) AS value FROM (' . implode(' UNION ', $selects) . '))';
+        $unions = implode(' UNION ', $selects);
+
+        if ($expression->getOrdered()) {
+            $unions .= ' ORDER BY value';
+        }
+
+        return '(SELECT json_group_array(value) AS value FROM (' . $unions . '))';
     }
 }
