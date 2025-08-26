@@ -8,9 +8,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Yiisoft\Db\Constant\DataType;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expression\ArrayExpression;
 use Yiisoft\Db\Expression\CaseExpression;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
+use Yiisoft\Db\Expression\Function\ArrayMerge;
 use Yiisoft\Db\Expression\Param;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
@@ -19,6 +21,7 @@ use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
+use Yiisoft\Db\Tests\Support\Assert;
 
 /**
  * @group sqlite
@@ -757,5 +760,42 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         array $expectedParams = [],
     ): void {
         parent::testUpsertWithMultiOperandFunctions($initValues, $insertValues, $updateValues, $expectedSql, $expectedResult, $expectedParams);
+    }
+
+    public function testArrayMergeWithOrdering(): void
+    {
+        $db = $this->getConnection();
+        $qb = $db->getQueryBuilder();
+
+        $stringParam = new Param('[4,3,5]', DataType::STRING);
+        $arrayMerge = (new ArrayMerge(
+            "'[2,1,3]'",
+            [6, 5, 7],
+            $stringParam,
+            self::getDb()->select(new ArrayExpression([10, 9])),
+        ))->ordered();
+        $params = [];
+
+        $this->assertSame(
+            '(SELECT json_group_array(value) AS value FROM ('
+            . "SELECT value FROM json_each('[2,1,3]')"
+            . ' UNION SELECT value FROM json_each(:qp0)'
+            . ' UNION SELECT value FROM json_each(:qp1)'
+            . ' UNION SELECT value FROM json_each((SELECT :qp2))'
+            . ' ORDER BY value))',
+            $qb->buildExpression($arrayMerge, $params)
+        );
+        Assert::arraysEquals(
+            [
+                ':qp0' => new Param('[6,5,7]', DataType::STRING),
+                ':qp1' => $stringParam,
+                ':qp2' => new Param('[10,9]', DataType::STRING),
+            ],
+            $params,
+        );
+
+        $result = $db->select($arrayMerge)->scalar();
+
+        $this->assertEquals('[1,2,3,4,5,6,7,9,10]', $result);
     }
 }
