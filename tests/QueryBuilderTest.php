@@ -750,6 +750,18 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testMultiOperandFunctionBuilderWithoutOperands($class);
     }
 
+    #[DataProviderExternal(QueryBuilderProvider::class, 'upsertWithMultiOperandFunctions')]
+    public function testUpsertWithMultiOperandFunctions(
+        array $initValues,
+        array $insertValues,
+        array $updateValues,
+        string $expectedSql,
+        array $expectedResult,
+        array $expectedParams = [],
+    ): void {
+        parent::testUpsertWithMultiOperandFunctions($initValues, $insertValues, $updateValues, $expectedSql, $expectedResult, $expectedParams);
+    }
+
     public function testArrayMergeWithOrdering(): void
     {
         $db = $this->getConnection();

@@ -465,4 +465,20 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             ],
         ];
     }
+
+    public static function upsertWithMultiOperandFunctions(): array
+    {
+        $data = parent::upsertWithMultiOperandFunctions();
+
+        $data[0][3] = 'INSERT INTO "test_upsert_with_functions"'
+            . ' ("id", "array_col", "greatest_col", "least_col", "longest_col", "shortest_col")'
+            . ' VALUES (1, :qp0, 5, 5, :qp1, :qp2) ON CONFLICT ("id") DO UPDATE SET'
+            . ' "array_col"=(SELECT json_group_array(value) AS value FROM (SELECT value FROM json_each("test_upsert_with_functions"."array_col") UNION SELECT value FROM json_each(EXCLUDED."array_col") ORDER BY value)),'
+            . ' "greatest_col"=MAX("test_upsert_with_functions"."greatest_col", EXCLUDED."greatest_col"),'
+            . ' "least_col"=MIN("test_upsert_with_functions"."least_col", EXCLUDED."least_col"),'
+            . ' "longest_col"=(SELECT value FROM (SELECT "test_upsert_with_functions"."longest_col" AS value UNION SELECT EXCLUDED."longest_col" AS value) AS t ORDER BY LENGTH(value) DESC LIMIT 1),'
+            . ' "shortest_col"=(SELECT value FROM (SELECT "test_upsert_with_functions"."shortest_col" AS value UNION SELECT EXCLUDED."shortest_col" AS value) AS t ORDER BY LENGTH(value) ASC LIMIT 1)';
+
+        return $data;
+    }
 }
