@@ -8,7 +8,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use PDO;
 use Yiisoft\Db\Connection\ConnectionInterface;
-use Yiisoft\Db\Expression\Param;
+use Yiisoft\Db\Expression\Value\Param;
 use Yiisoft\Db\Schema\Column\BinaryColumn;
 use Yiisoft\Db\Schema\Column\BooleanColumn;
 use Yiisoft\Db\Schema\Column\DoubleColumn;

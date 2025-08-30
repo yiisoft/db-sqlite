@@ -8,7 +8,7 @@ use Yiisoft\Db\Constant\DataType;
 use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\Function\ArrayMerge;
-use Yiisoft\Db\Expression\Param;
+use Yiisoft\Db\Expression\Value\Param;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\QueryBuilder\Condition\In;
 use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
