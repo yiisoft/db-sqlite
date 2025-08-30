@@ -51,6 +51,7 @@
 - New #385: Add `Connection::getColumnBuilderClass()` method (@Tigrov)
 - New #384, #390: Implement `ArrayMergeBuilder`, `GreatestBuilder` and `LeastBuilder` classes (@Tigrov)
 - Enh #387: Refactor `DMLQueryBuilder::upsert()` method (@Tigrov)
+- Chg #391: Update expression namespaces according to changes in `yiisoft/db` package (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
