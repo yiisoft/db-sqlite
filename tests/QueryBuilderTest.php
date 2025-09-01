@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Yiisoft\Db\Constant\DataType;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Expression\Value\ArrayExpression;
+use Yiisoft\Db\Expression\Value\ArrayValue;
 use Yiisoft\Db\Expression\Statement\CaseX;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
@@ -772,7 +772,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             "'[2,1,3]'",
             [6, 5, 7],
             $stringParam,
-            self::getDb()->select(new ArrayExpression([10, 9])),
+            self::getDb()->select(new ArrayValue([10, 9])),
         ))->ordered();
         $params = [];
 
