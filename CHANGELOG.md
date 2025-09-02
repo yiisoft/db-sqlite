@@ -7,7 +7,7 @@
 - New #273: Implement `ColumnSchemaInterface` classes according to the data type of database table columns
   for type casting performance. Related with yiisoft/db#752 (@Tigrov)
 - Chg #307: Replace call of `SchemaInterface::getRawTableName()` to `QuoterInterface::getRawTableName()` (@Tigrov)
-- New #310: Add JSON overlaps condition builder (@Tigrov)
+- New #310, #393: Add JSON overlaps condition builder (@Tigrov)
 - Enh #312: Update `bit` type according to main PR yiisoft/db#860 (@Tigrov)
 - Enh #315: Raise minimum PHP version to `^8.1` with minor refactoring (@Tigrov)
 - New #314, #325: Implement `ColumnFactory` class (@Tigrov)
