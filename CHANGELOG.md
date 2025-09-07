@@ -52,6 +52,7 @@
 - New #384, #390: Implement `ArrayMergeBuilder`, `GreatestBuilder` and `LeastBuilder` classes (@Tigrov)
 - Enh #387: Refactor `DMLQueryBuilder::upsert()` method (@Tigrov)
 - Chg #391: Update expression namespaces according to changes in `yiisoft/db` package (@Tigrov)
+- Enh #386: Update `DMLQueryBuilder::update()` method to adapt changes in `yiisoft/db` (@rustamwin)
 
 ## 1.2.0 March 21, 2024
 
