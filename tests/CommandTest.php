@@ -10,6 +10,7 @@ use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonCommandTest;
 
@@ -468,12 +469,13 @@ final class CommandTest extends CommonCommandTest
     public function testUpdate(
         string $table,
         array $columns,
-        array|string $conditions,
+        array|ExpressionInterface|string $conditions,
+        array|ExpressionInterface|string|null $from,
         array $params,
         array $expectedValues,
         int $expectedCount,
     ): void {
-        parent::testUpdate($table, $columns, $conditions, $params, $expectedValues, $expectedCount);
+        parent::testUpdate($table, $columns, $conditions, $from, $params, $expectedValues, $expectedCount);
     }
 
     /**
