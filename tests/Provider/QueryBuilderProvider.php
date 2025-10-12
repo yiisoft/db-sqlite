@@ -8,6 +8,7 @@ use Yiisoft\Db\Constant\DataType;
 use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\Function\ArrayMerge;
+use Yiisoft\Db\Expression\Value\ArrayValue;
 use Yiisoft\Db\Expression\Value\Param;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\QueryBuilder\Condition\In;
@@ -442,25 +443,30 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             ...$data,
             'ArrayMerge with 1 operand' => [
                 ArrayMerge::class,
-                ["'[1,2,3]'"],
-                "('[1,2,3]')",
+                [[1, 2, 3]],
+                '(:qp0)',
                 [1, 2, 3],
+                [':qp0' => new Param('[1,2,3]', DataType::STRING)],
             ],
             'ArrayMerge with 2 operands' => [
                 ArrayMerge::class,
-                ["'[1,2,3]'", $stringParam],
-                "(SELECT json_group_array(value) AS value FROM (SELECT value FROM json_each('[1,2,3]') UNION SELECT value FROM json_each(:qp0)))",
+                [[1, 2, 3], $stringParam],
+                "(SELECT json_group_array(value) AS value FROM (SELECT value FROM json_each(:qp0) UNION SELECT value FROM json_each(:qp1)))",
                 [1, 2, 3, 4, 5],
-                [':qp0' => $stringParam],
+                [
+                    ':qp0' => new Param('[1,2,3]', DataType::STRING),
+                    ':qp1' => $stringParam,
+                ],
             ],
             'ArrayMerge with 4 operands' => [
                 ArrayMerge::class,
-                ["'[1,2,3]'", [5,6,7], $stringParam, $intQuery],
-                "(SELECT json_group_array(value) AS value FROM (SELECT value FROM json_each('[1,2,3]') UNION SELECT value FROM json_each(:qp0) UNION SELECT value FROM json_each(:qp1) UNION SELECT value FROM json_each($intQuerySql)))",
+                [[1, 2, 3], new ArrayValue([5, 6, 7]), $stringParam, $intQuery],
+                "(SELECT json_group_array(value) AS value FROM (SELECT value FROM json_each(:qp0) UNION SELECT value FROM json_each(:qp1) UNION SELECT value FROM json_each(:qp2) UNION SELECT value FROM json_each($intQuerySql)))",
                 [1, 2, 3, 4, 5, 6, 7, 10],
                 [
-                    ':qp0' => new Param('[5,6,7]', DataType::STRING),
-                    ':qp1' => $stringParam,
+                    ':qp0' => new Param('[1,2,3]', DataType::STRING),
+                    ':qp1' => new Param('[5,6,7]', DataType::STRING),
+                    ':qp2' => $stringParam,
                 ],
             ],
         ];
