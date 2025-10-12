@@ -451,7 +451,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             'ArrayMerge with 2 operands' => [
                 ArrayMerge::class,
                 [[1, 2, 3], $stringParam],
-                "(SELECT json_group_array(value) AS value FROM (SELECT value FROM json_each(:qp0) UNION SELECT value FROM json_each(:qp1)))",
+                '(SELECT json_group_array(value) AS value FROM (SELECT value FROM json_each(:qp0) UNION SELECT value FROM json_each(:qp1)))',
                 [1, 2, 3, 4, 5],
                 [
                     ':qp0' => new Param('[1,2,3]', DataType::STRING),

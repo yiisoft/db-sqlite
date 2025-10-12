@@ -779,7 +779,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->assertSame(
             '(SELECT json_group_array(value) AS value FROM ('
-            . "SELECT value FROM json_each(:qp0)"
+            . 'SELECT value FROM json_each(:qp0)'
             . ' UNION SELECT value FROM json_each(:qp1)'
             . ' UNION SELECT value FROM json_each(:qp2)'
             . ' UNION SELECT value FROM json_each((SELECT :qp3))'
