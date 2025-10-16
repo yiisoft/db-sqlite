@@ -770,8 +770,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $stringParam = new Param('[4,3,5]', DataType::STRING);
         $arrayMerge = (new ArrayMerge(
-            "'[2,1,3]'",
-            [6, 5, 7],
+            [2, 1, 3],
+            new ArrayValue([6, 5, 7]),
             $stringParam,
             self::getDb()->select(new ArrayValue([10, 9])),
         ))->ordered();
@@ -779,18 +779,19 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->assertSame(
             '(SELECT json_group_array(value) AS value FROM ('
-            . "SELECT value FROM json_each('[2,1,3]')"
-            . ' UNION SELECT value FROM json_each(:qp0)'
+            . 'SELECT value FROM json_each(:qp0)'
             . ' UNION SELECT value FROM json_each(:qp1)'
-            . ' UNION SELECT value FROM json_each((SELECT :qp2))'
+            . ' UNION SELECT value FROM json_each(:qp2)'
+            . ' UNION SELECT value FROM json_each((SELECT :qp3))'
             . ' ORDER BY value))',
             $qb->buildExpression($arrayMerge, $params)
         );
         Assert::arraysEquals(
             [
-                ':qp0' => new Param('[6,5,7]', DataType::STRING),
-                ':qp1' => $stringParam,
-                ':qp2' => new Param('[10,9]', DataType::STRING),
+                ':qp0' => new Param('[2,1,3]', DataType::STRING),
+                ':qp1' => new Param('[6,5,7]', DataType::STRING),
+                ':qp2' => $stringParam,
+                ':qp3' => new Param('[10,9]', DataType::STRING),
             ],
             $params,
         );
