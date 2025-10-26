@@ -78,7 +78,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             $sql = "$sql$this->separator$union";
         }
 
-        $with = $this->buildWithQueries($query->getWithQueries(), $params);
+        $with = $this->buildWith($query->getWith(), $params);
 
         if ($with !== '') {
             $sql = "$with$this->separator$sql";

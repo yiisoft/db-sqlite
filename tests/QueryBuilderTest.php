@@ -248,8 +248,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $with2Query = (new Query($db))->select('id')->from('t2')->innerJoin('a1', 't2.id = a1.id')->where('expr = 2');
         $with3Query = (new Query($db))->select('id')->from('t3')->where('expr = 3');
         $query = (new Query($db))
-            ->withQuery($with1Query, 'a1')
-            ->withQuery($with2Query->union($with3Query), 'a2')
+            ->addWith($with1Query, 'a1')
+            ->addWith($with2Query->union($with3Query), 'a2')
             ->from('a2');
 
         [$sql, $queryParams] = $qb->build($query);
