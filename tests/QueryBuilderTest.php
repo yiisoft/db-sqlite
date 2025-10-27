@@ -16,6 +16,7 @@ use Yiisoft\Db\Expression\Function\ArrayMerge;
 use Yiisoft\Db\Expression\Value\Param;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
+use Yiisoft\Db\Query\WithQuery;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlaps;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider;
@@ -248,8 +249,10 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $with2Query = (new Query($db))->select('id')->from('t2')->innerJoin('a1', 't2.id = a1.id')->where('expr = 2');
         $with3Query = (new Query($db))->select('id')->from('t3')->where('expr = 3');
         $query = (new Query($db))
-            ->withQuery($with1Query, 'a1')
-            ->withQuery($with2Query->union($with3Query), 'a2')
+            ->withQueries(
+                new WithQuery($with1Query, 'a1'),
+                new WithQuery($with2Query->union($with3Query), 'a2'),
+            )
             ->from('a2');
 
         [$sql, $queryParams] = $qb->build($query);
