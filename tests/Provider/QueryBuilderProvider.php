@@ -263,12 +263,12 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             ],
             'query, values and expressions with update part' => [
                 3 => <<<SQL
-                INSERT INTO {{%T_upsert}} ("email", [[ts]]) SELECT :phEmail AS "email", CURRENT_TIMESTAMP AS [[ts]] ON CONFLICT ("email") DO UPDATE SET "ts"=0, "orders"=T_upsert.orders + 1
+                INSERT INTO {{%T_upsert}} ("email", "ts") SELECT :phEmail AS "email", CURRENT_TIMESTAMP AS [[ts]] ON CONFLICT ("email") DO UPDATE SET "ts"=0, "orders"=T_upsert.orders + 1
                 SQL,
             ],
             'query, values and expressions without update part' => [
                 3 => <<<SQL
-                INSERT INTO "T_upsert" ("email", [[ts]]) SELECT :phEmail AS "email", CURRENT_TIMESTAMP AS [[ts]] ON CONFLICT DO NOTHING
+                INSERT INTO "T_upsert" ("email", "ts") SELECT :phEmail AS "email", CURRENT_TIMESTAMP AS [[ts]] ON CONFLICT DO NOTHING
                 SQL,
             ],
             'no columns to update' => [
