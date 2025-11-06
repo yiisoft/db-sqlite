@@ -57,7 +57,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         string $referenceTable,
         array|string $referenceColumns,
         ?string $delete = null,
-        ?string $update = null
+        ?string $update = null,
     ): string {
         throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
     }
@@ -96,7 +96,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         string $name,
         array|string $columns,
         ?string $indexType = null,
-        ?string $indexMethod = null
+        ?string $indexMethod = null,
     ): string {
         $tableParts = explode('.', $table);
 

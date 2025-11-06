@@ -32,7 +32,7 @@ final class InBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Builder\InBuild
         string $operator,
         iterable|string|Iterator $columns,
         ExpressionInterface $values,
-        array &$params = []
+        array &$params = [],
     ): string {
         if (is_array($columns)) {
             throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
@@ -50,10 +50,10 @@ final class InBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Builder\InBuild
      * @throws NotSupportedException
      */
     protected function buildCompositeInCondition(
-        string|null $operator,
+        ?string $operator,
         iterable $columns,
         iterable|Iterator $values,
-        array &$params = []
+        array &$params = [],
     ): string {
         $quotedColumns = [];
 

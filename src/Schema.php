@@ -67,6 +67,14 @@ use function strncasecmp;
  */
 final class Schema extends AbstractPdoSchema
 {
+    /**
+     * @throws NotSupportedException
+     */
+    public function getSchemaDefaultValues(string $schema = '', bool $refresh = false): array
+    {
+        throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
+    }
+
     protected function findConstraints(TableSchemaInterface $table): void
     {
         $tableName = $this->resolveFullName($table->getName(), $table->getSchemaName());
@@ -80,11 +88,11 @@ final class Schema extends AbstractPdoSchema
     {
         /** @var string[] */
         return $this->db->createCommand(
-            "SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name<>'sqlite_sequence' ORDER BY tbl_name"
+            "SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name<>'sqlite_sequence' ORDER BY tbl_name",
         )->queryColumn();
     }
 
-    protected function loadTableSchema(string $name): TableSchemaInterface|null
+    protected function loadTableSchema(string $name): ?TableSchemaInterface
     {
         $table = new TableSchema($name);
 
@@ -197,8 +205,8 @@ final class Schema extends AbstractPdoSchema
             $sqlTokenizerAnyCheck = new SqlTokenizer('any CHECK()');
 
             while (
-                $createTableToken instanceof SqlToken &&
-                $createTableToken->matches($sqlTokenizerAnyCheck->tokenize(), (int) $offset, $firstMatchIndex, $offset)
+                $createTableToken instanceof SqlToken
+                && $createTableToken->matches($sqlTokenizerAnyCheck->tokenize(), (int) $offset, $firstMatchIndex, $offset)
             ) {
                 $name = '';
                 $checkSql = (string) $createTableToken[(int) $offset - 1];
@@ -259,14 +267,6 @@ final class Schema extends AbstractPdoSchema
     }
 
     /**
-     * @throws NotSupportedException
-     */
-    public function getSchemaDefaultValues(string $schema = '', bool $refresh = false): array
-    {
-        throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
-    }
-
-    /**
      * @psalm-param array{
      *     native_type: string,
      *     pdo_type: int,
@@ -280,7 +280,7 @@ final class Schema extends AbstractPdoSchema
      *
      * @psalm-suppress MoreSpecificImplementedParamType
      */
-    protected function loadResultColumn(array $metadata): ColumnInterface|null
+    protected function loadResultColumn(array $metadata): ?ColumnInterface
     {
         if (empty($metadata['sqlite:decl_type']) && (empty($metadata['native_type']) || $metadata['native_type'] === 'null')) {
             return null;
@@ -298,6 +298,16 @@ final class Schema extends AbstractPdoSchema
         }
 
         return $this->db->getColumnFactory()->fromDefinition($dbType, $columnInfo);
+    }
+
+    protected function findViewNames(string $schema = ''): array
+    {
+        /** @var string[] */
+        return $this->db->createCommand(
+            <<<SQL
+            SELECT name FROM sqlite_master WHERE type = 'view' AND name NOT LIKE 'sqlite_%'
+            SQL,
+        )->queryColumn();
     }
 
     /**
@@ -333,7 +343,7 @@ final class Schema extends AbstractPdoSchema
     private function loadTableColumnsInfo(string $tableName): array
     {
         $tableColumns = $this->db->createCommand(
-            'PRAGMA TABLE_INFO(' . $this->db->getQuoter()->quoteSimpleTableName($tableName) . ')'
+            'PRAGMA TABLE_INFO(' . $this->db->getQuoter()->quoteSimpleTableName($tableName) . ')',
         )->queryAll();
 
         /** @psalm-var ColumnInfo[] */
@@ -346,7 +356,7 @@ final class Schema extends AbstractPdoSchema
     private function getPragmaForeignKeyList(string $tableName): array
     {
         $foreignKeysList = $this->db->createCommand(
-            'PRAGMA FOREIGN_KEY_LIST(' . $this->db->getQuoter()->quoteSimpleTableName($tableName) . ')'
+            'PRAGMA FOREIGN_KEY_LIST(' . $this->db->getQuoter()->quoteSimpleTableName($tableName) . ')',
         )->queryAll();
         $foreignKeysList = array_map(array_change_key_case(...), $foreignKeysList);
         DbArrayHelper::multisort($foreignKeysList, 'seq');
@@ -368,16 +378,6 @@ final class Schema extends AbstractPdoSchema
 
         /** @psalm-var IndexInfo[] $column */
         return $column;
-    }
-
-    protected function findViewNames(string $schema = ''): array
-    {
-        /** @var string[] */
-        return $this->db->createCommand(
-            <<<SQL
-            SELECT name FROM sqlite_master WHERE type = 'view' AND name NOT LIKE 'sqlite_%'
-            SQL,
-        )->queryColumn();
     }
 
     private function getJsonColumns(TableSchemaInterface $table): array

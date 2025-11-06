@@ -28,7 +28,7 @@ final class SchemaTest extends CommonSchemaTest
     {
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCommentOnColumn is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCommentOnColumn is not supported by SQLite.',
         );
 
         parent::testColumnComment();
@@ -72,7 +72,7 @@ final class SchemaTest extends CommonSchemaTest
         $command->setSql(
             <<<SQL
             PRAGMA foreign_keys = ON
-            SQL
+            SQL,
         )->execute();
         $tableMaster = 'departments';
         $tableRelation = 'students';
@@ -203,7 +203,7 @@ final class SchemaTest extends CommonSchemaTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\Schema does not support fetching all schema names.'
+            'Yiisoft\Db\Sqlite\Schema does not support fetching all schema names.',
         );
 
         $schema->getSchemaNames();
@@ -238,7 +238,7 @@ final class SchemaTest extends CommonSchemaTest
                 ReferentialAction::CASCADE,
                 ReferentialAction::CASCADE,
             )],
-            $tableForeignKeys
+            $tableForeignKeys,
         );
 
         $tableTwoForeignKeys = $schema->getTableForeignKeys('foreign_keys_child');
@@ -267,7 +267,7 @@ final class SchemaTest extends CommonSchemaTest
     {
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addUnique is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addUnique is not supported by SQLite.',
         );
 
         parent::testWorkWithUniqueConstraint();
@@ -277,7 +277,7 @@ final class SchemaTest extends CommonSchemaTest
     {
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCheck is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCheck is not supported by SQLite.',
         );
 
         parent::testWorkWithCheckConstraint();
@@ -287,7 +287,7 @@ final class SchemaTest extends CommonSchemaTest
     {
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addDefaultValue is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addDefaultValue is not supported by SQLite.',
         );
 
         parent::testWorkWithDefaultValueConstraint();
@@ -297,7 +297,7 @@ final class SchemaTest extends CommonSchemaTest
     {
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addPrimaryKey is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addPrimaryKey is not supported by SQLite.',
         );
 
         parent::testWorkWithPrimaryKeyConstraint();
@@ -315,7 +315,7 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     #[DataProviderExternal(SchemaProvider::class, 'resultColumns')]
-    public function testGetResultColumn(ColumnInterface|null $expected, array $info): void
+    public function testGetResultColumn(?ColumnInterface $expected, array $info): void
     {
         parent::testGetResultColumn($expected, $info);
     }

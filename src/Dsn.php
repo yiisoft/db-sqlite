@@ -25,8 +25,7 @@ final class Dsn implements Stringable
     public function __construct(
         public readonly string $driver = 'sqlite',
         public readonly string $databaseName = '',
-    ) {
-    }
+    ) {}
 
     /**
      * @return string The Data Source Name, or DSN, has the information required to connect to the database.

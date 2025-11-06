@@ -29,49 +29,6 @@ final class ColumnTest extends CommonColumnTest
 {
     use TestTrait;
 
-    protected function insertTypeValues(ConnectionInterface $db): void
-    {
-        $command = $db->createCommand();
-
-        $command->insert(
-            'type',
-            [
-                'int_col' => 1,
-                'char_col' => str_repeat('x', 100),
-                'char_col3' => null,
-                'float_col' => 1.234,
-                'blob_col' => "\x10\x11\x12",
-                'timestamp_col' => '2023-07-11 14:50:23',
-                'timestamp_default' => new DateTimeImmutable('2023-07-11 14:50:23'),
-                'bool_col' => false,
-                'bit_col' => 0b0110_0110, // 102
-                'json_col' => [['a' => 1, 'b' => null, 'c' => [1, 3, 5]]],
-                'json_text_col' => (new Query($db))->select(new Param('[1,2,3,"string",null]', PDO::PARAM_STR)),
-            ]
-        );
-        $command->execute();
-    }
-
-    protected function assertTypecastedValues(array $result, bool $allTypecasted = false): void
-    {
-        $this->assertSame(1, $result['int_col']);
-        $this->assertSame(str_repeat('x', 100), $result['char_col']);
-        $this->assertNull($result['char_col3']);
-        $this->assertSame(1.234, $result['float_col']);
-        $this->assertSame("\x10\x11\x12", $result['blob_col']);
-        $this->assertEquals(new DateTimeImmutable('2023-07-11 14:50:23', new DateTimeZone('UTC')), $result['timestamp_col']);
-        $this->assertEquals(new DateTimeImmutable('2023-07-11 14:50:23'), $result['timestamp_default']);
-        $this->assertFalse($result['bool_col']);
-        $this->assertSame(0b0110_0110, $result['bit_col']);
-        $this->assertSame([['a' => 1, 'b' => null, 'c' => [1, 3, 5]]], $result['json_col']);
-
-        if ($allTypecasted) {
-            $this->assertSame([1, 2, 3, 'string', null], $result['json_text_col']);
-        } else {
-            $this->assertSame('[1,2,3,"string",null]', $result['json_text_col']);
-        }
-    }
-
     public function testSelectWithPhpTypecasting(): void
     {
         $db = $this->getConnection();
@@ -119,5 +76,48 @@ final class ColumnTest extends CommonColumnTest
         $this->assertInstanceOf(BinaryColumn::class, $tableSchema->getColumn('blob_col'));
         $this->assertInstanceOf(BooleanColumn::class, $tableSchema->getColumn('bool_col'));
         $this->assertInstanceOf(JsonColumn::class, $tableSchema->getColumn('json_col'));
+    }
+
+    protected function insertTypeValues(ConnectionInterface $db): void
+    {
+        $command = $db->createCommand();
+
+        $command->insert(
+            'type',
+            [
+                'int_col' => 1,
+                'char_col' => str_repeat('x', 100),
+                'char_col3' => null,
+                'float_col' => 1.234,
+                'blob_col' => "\x10\x11\x12",
+                'timestamp_col' => '2023-07-11 14:50:23',
+                'timestamp_default' => new DateTimeImmutable('2023-07-11 14:50:23'),
+                'bool_col' => false,
+                'bit_col' => 0b0110_0110, // 102
+                'json_col' => [['a' => 1, 'b' => null, 'c' => [1, 3, 5]]],
+                'json_text_col' => (new Query($db))->select(new Param('[1,2,3,"string",null]', PDO::PARAM_STR)),
+            ],
+        );
+        $command->execute();
+    }
+
+    protected function assertTypecastedValues(array $result, bool $allTypecasted = false): void
+    {
+        $this->assertSame(1, $result['int_col']);
+        $this->assertSame(str_repeat('x', 100), $result['char_col']);
+        $this->assertNull($result['char_col3']);
+        $this->assertSame(1.234, $result['float_col']);
+        $this->assertSame("\x10\x11\x12", $result['blob_col']);
+        $this->assertEquals(new DateTimeImmutable('2023-07-11 14:50:23', new DateTimeZone('UTC')), $result['timestamp_col']);
+        $this->assertEquals(new DateTimeImmutable('2023-07-11 14:50:23'), $result['timestamp_default']);
+        $this->assertFalse($result['bool_col']);
+        $this->assertSame(0b0110_0110, $result['bit_col']);
+        $this->assertSame([['a' => 1, 'b' => null, 'c' => [1, 3, 5]]], $result['json_col']);
+
+        if ($allTypecasted) {
+            $this->assertSame([1, 2, 3, 'string', null], $result['json_text_col']);
+        } else {
+            $this->assertSame('[1,2,3,"string",null]', $result['json_text_col']);
+        }
     }
 }
