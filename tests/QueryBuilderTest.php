@@ -56,7 +56,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCommentOnColumn is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCommentOnColumn is not supported by SQLite.',
         );
 
         $qb->addCommentOnColumn('customer', 'id', 'Primary key.');
@@ -70,7 +70,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCommentOnTable is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCommentOnTable is not supported by SQLite.',
         );
 
         $qb->addCommentOnTable('customer', 'Customer table.');
@@ -95,9 +95,9 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         array|string $columns,
         string $refTable,
         array|string $refColumns,
-        string|null $delete,
-        string|null $update,
-        string $expected
+        ?string $delete,
+        ?string $update,
+        string $expected,
     ): void {
         $db = $this->getConnection();
 
@@ -158,8 +158,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     #[DataProviderExternal(QueryBuilderProvider::class, 'buildCondition')]
     public function testBuildCondition(
         array|ExpressionInterface|string $condition,
-        string|null $expected,
-        array $expectedParams
+        ?string $expected,
+        array $expectedParams,
     ): void {
         parent::testBuildCondition($condition, $expected, $expectedParams);
     }
@@ -168,7 +168,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testBuildLikeCondition(
         array|ExpressionInterface $condition,
         string $expected,
-        array $expectedParams
+        array $expectedParams,
     ): void {
         parent::testBuildLikeCondition($condition, $expected, $expectedParams);
     }
@@ -388,7 +388,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCommentFromColumn is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCommentFromColumn is not supported by SQLite.',
         );
 
         $qb->dropCommentFromColumn('customer', 'id');
@@ -402,7 +402,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropColumn is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropColumn is not supported by SQLite.',
         );
 
         $qb->dropColumn('customer', 'id');
@@ -416,7 +416,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCommentFromTable is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCommentFromTable is not supported by SQLite.',
         );
 
         $qb->dropCommentFromTable('customer');
@@ -430,7 +430,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropDefaultValue is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropDefaultValue is not supported by SQLite.',
         );
 
         $qb->dropDefaultValue('T_constraints_1', 'CN_pk');
@@ -511,7 +511,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         array|QueryInterface $columns,
         array $params,
         string $expectedSQL,
-        array $expectedParams
+        array $expectedParams,
     ): void {
         parent::testInsert($table, $columns, $params, $expectedSQL, $expectedParams);
     }
@@ -522,7 +522,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         array|QueryInterface $columns,
         array $params,
         string $expectedSQL,
-        array $expectedParams
+        array $expectedParams,
     ): void {
         parent::testInsertReturningPks($table, $columns, $params, $expectedSQL, $expectedParams);
     }
@@ -535,7 +535,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::renameColumn is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::renameColumn is not supported by SQLite.',
         );
 
         $qb->renameColumn('alpha', 'string_identifier', 'string_identifier_test');
@@ -619,7 +619,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         array|QueryInterface $insertColumns,
         array|bool $updateColumns,
         string $expectedSql,
-        array $expectedParams
+        array $expectedParams,
     ): void {
         parent::testUpsert($table, $insertColumns, $updateColumns, $expectedSql, $expectedParams);
     }
@@ -629,9 +629,9 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string $table,
         array|QueryInterface $insertColumns,
         array|bool $updateColumns,
-        array|null $returnColumns,
+        ?array $returnColumns,
         string $expectedSql,
-        array $expectedParams
+        array $expectedParams,
     ): void {
         parent::testUpsertReturning($table, $insertColumns, $updateColumns, $returnColumns, $expectedSql, $expectedParams);
     }
@@ -652,7 +652,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->assertSame(
             'EXISTS(SELECT value FROM json_each("column") INTERSECT SELECT value FROM json_each(:qp0))=1',
-            $sql
+            $sql,
         );
         $this->assertEquals([':qp0' => new Param('[1,2,3]', DataType::STRING)], $params);
 
@@ -662,7 +662,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->assertSame(
             'EXISTS(SELECT value FROM json_each(column) INTERSECT SELECT value FROM json_each(:qp0))=1',
-            $sql
+            $sql,
         );
         $this->assertEquals([':qp0' => new Param('[1,2,3]', DataType::STRING)], $params);
 
@@ -787,7 +787,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             . ' UNION SELECT value FROM json_each(:qp2)'
             . ' UNION SELECT value FROM json_each((SELECT :qp3))'
             . ' ORDER BY value))',
-            $qb->buildExpression($arrayMerge, $params)
+            $qb->buildExpression($arrayMerge, $params),
         );
         Assert::arraysEquals(
             [

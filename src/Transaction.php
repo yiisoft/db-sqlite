@@ -37,7 +37,7 @@ final class Transaction extends AbstractPdoTransaction
             self::SERIALIZABLE => $this->db->createCommand('PRAGMA read_uncommitted = False;')->execute(),
             self::READ_UNCOMMITTED => $this->db->createCommand('PRAGMA read_uncommitted = True;')->execute(),
             default => throw new NotSupportedException(
-                self::class . ' only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.'
+                self::class . ' only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.',
             ),
         };
     }

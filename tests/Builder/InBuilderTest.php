@@ -28,7 +28,7 @@ final class InBuilderTest extends TestCase
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\Builder\InBuilder::buildSubqueryInCondition is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\Builder\InBuilder::buildSubqueryInCondition is not supported by SQLite.',
         );
 
         (new InBuilder($db->getQueryBuilder()))->build($inCondition);

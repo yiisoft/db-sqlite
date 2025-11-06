@@ -31,7 +31,7 @@ final class CommandTest extends CommonCommandTest
     {
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCheck is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCheck is not supported by SQLite.',
         );
 
         parent::testAddCheck();
@@ -50,7 +50,7 @@ final class CommandTest extends CommonCommandTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCommentOnColumn is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCommentOnColumn is not supported by SQLite.',
         );
 
         $command->addCommentOnColumn('{{customer}}', '{{name}}', 'some comment');
@@ -60,7 +60,7 @@ final class CommandTest extends CommonCommandTest
     {
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCommentOnTable is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addCommentOnTable is not supported by SQLite.',
         );
 
         parent::testAddCommentOnTable();
@@ -78,7 +78,7 @@ final class CommandTest extends CommonCommandTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addDefaultValue is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::addDefaultValue is not supported by SQLite.',
         );
 
         $command->addDefaultValue('{{table}}', '{{name}}', 'column', 'value');
@@ -160,7 +160,7 @@ final class CommandTest extends CommonCommandTest
         array $columns,
         string $expected,
         array $expectedParams = [],
-        int $insertedRow = 1
+        int $insertedRow = 1,
     ): void {
         parent::testBatchInsert($table, $values, $columns, $expected, $expectedParams, $insertedRow);
     }
@@ -181,7 +181,7 @@ final class CommandTest extends CommonCommandTest
             <<<SQL
             PRAGMA foreign_keys=1
             SQL,
-            $command->getSql()
+            $command->getSql(),
         );
         $this->assertSame(1, $command->execute());
     }
@@ -214,7 +214,7 @@ final class CommandTest extends CommonCommandTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCommentFromColumn is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCommentFromColumn is not supported by SQLite.',
         );
 
         $command->dropCommentFromColumn('{{table}}', 'column');
@@ -232,7 +232,7 @@ final class CommandTest extends CommonCommandTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCommentFromTable is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropCommentFromTable is not supported by SQLite.',
         );
 
         $command->dropCommentFromTable('{{table}}');
@@ -250,7 +250,7 @@ final class CommandTest extends CommonCommandTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropDefaultValue is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropDefaultValue is not supported by SQLite.',
         );
 
         $command->dropDefaultValue('{{table}}', '{{name}}');
@@ -268,7 +268,7 @@ final class CommandTest extends CommonCommandTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropForeignKey is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropForeignKey is not supported by SQLite.',
         );
 
         $command->dropForeignKey('{{table}}', '{{name}}');
@@ -286,7 +286,7 @@ final class CommandTest extends CommonCommandTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'iisoft\Db\Sqlite\DDLQueryBuilder::dropPrimaryKey is not supported by SQLite.'
+            'iisoft\Db\Sqlite\DDLQueryBuilder::dropPrimaryKey is not supported by SQLite.',
         );
 
         $command->dropPrimaryKey('{{table}}', '{{name}}');
@@ -309,7 +309,7 @@ final class CommandTest extends CommonCommandTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropUnique is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::dropUnique is not supported by SQLite.',
         );
 
         $command->dropUnique('{{table}}', '{{name}}');
@@ -351,7 +351,7 @@ final class CommandTest extends CommonCommandTest
         $queryAll = $db->createCommand(
             <<<SQL
             SELECT * FROM [[T_multistatement]]
-            SQL
+            SQL,
         )->queryAll();
 
         $this->assertEquals(
@@ -374,7 +374,7 @@ final class CommandTest extends CommonCommandTest
     {
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\DDLQueryBuilder::renameColumn is not supported by SQLite.'
+            'Yiisoft\Db\Sqlite\DDLQueryBuilder::renameColumn is not supported by SQLite.',
         );
 
         parent::testRenameColumn();
@@ -410,8 +410,8 @@ final class CommandTest extends CommonCommandTest
             $command->setSql(
                 <<<SQL
                 SELECT [[seq]] FROM [[sqlite_sequence]] where [[name]] = 'testCreateTable'
-                SQL
-            )->queryScalar()
+                SQL,
+            )->queryScalar(),
         );
 
         $command->resetSequence('{{testCreateTable}}', 2)->execute();
@@ -421,8 +421,8 @@ final class CommandTest extends CommonCommandTest
             $command->setSql(
                 <<<SQL
                 SELECT [[seq]] FROM [[sqlite_sequence]] where [[name]] = 'testCreateTable'
-                SQL
-            )->queryScalar()
+                SQL,
+            )->queryScalar(),
         );
 
         $command->resetSequence('{{testCreateTable}}')->execute();
@@ -432,8 +432,8 @@ final class CommandTest extends CommonCommandTest
             $command->setSql(
                 <<<SQL
                 SELECT [[seq]] FROM [[sqlite_sequence]] where [[name]] = 'testCreateTable'
-                SQL
-            )->queryScalar()
+                SQL,
+            )->queryScalar(),
         );
     }
 
@@ -450,7 +450,7 @@ final class CommandTest extends CommonCommandTest
         $command->setSql(
             <<<SQL
             SELECT COUNT(*) FROM [[customer]]
-            SQL
+            SQL,
         );
 
         $this->assertEquals(3, $command->queryScalar());

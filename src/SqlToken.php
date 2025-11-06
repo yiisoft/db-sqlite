@@ -30,10 +30,10 @@ final class SqlToken implements ArrayAccess, Stringable
     public const TYPE_IDENTIFIER = 6;
     public const TYPE_STRING_LITERAL = 7;
     private int $type = self::TYPE_TOKEN;
-    private string|null $content = null;
-    private int|null $startOffset = null;
-    private int|null $endOffset = null;
-    private SqlToken|null $parent = null;
+    private ?string $content = null;
+    private ?int $startOffset = null;
+    private ?int $endOffset = null;
+    private ?SqlToken $parent = null;
     /**
      * @var array list of child tokens.
      *
@@ -78,7 +78,7 @@ final class SqlToken implements ArrayAccess, Stringable
      *
      * @return SqlToken|null The child token at the specified offset, `null` if there's no token.
      */
-    public function offsetGet($offset): self|null
+    public function offsetGet($offset): ?self
     {
         $offset = $this->calculateOffset($offset);
 
@@ -230,7 +230,7 @@ final class SqlToken implements ArrayAccess, Stringable
         self $patternToken,
         int $offset = 0,
         ?int &$firstMatchIndex = null,
-        ?int &$lastMatchIndex = null
+        ?int &$lastMatchIndex = null,
     ): bool {
         $result = false;
 
@@ -239,97 +239,6 @@ final class SqlToken implements ArrayAccess, Stringable
         }
 
         return $result;
-    }
-
-    /**
-     * Tests the given token to match the specified pattern token.
-     */
-    private function tokensMatch(
-        self $patternToken,
-        self $token,
-        int $offset = 0,
-        ?int &$firstMatchIndex = null,
-        ?int &$lastMatchIndex = null
-    ): bool {
-        if (
-            $patternToken->getIsCollection() !== $token->getIsCollection() ||
-            (!$patternToken->getIsCollection() && $patternToken->content !== $token->content)
-        ) {
-            return false;
-        }
-
-        if ($patternToken->children === $token->children) {
-            $firstMatchIndex = $lastMatchIndex = $offset;
-
-            return true;
-        }
-
-        $firstMatchIndex = $lastMatchIndex = null;
-        $wildcard = false;
-
-        for ($index = 0, $count = count($patternToken->children); $index < $count; $index++) {
-            /*
-             Iterate token by token with an exception to "any" that toggles an iteration until matched
-             with a next pattern token or EOF.
-             */
-            if ($patternToken[$index] instanceof self && $patternToken[$index]->content === 'any') {
-                $wildcard = true;
-                continue;
-            }
-
-            for ($limit = $wildcard ? count($token->children) : $offset + 1; $offset < $limit; $offset++) {
-                if (!$wildcard && !isset($token[$offset])) {
-                    break;
-                }
-
-                if (
-                    $patternToken[$index] instanceof self &&
-                    $token[$offset] instanceof self  &&
-                    !$this->tokensMatch($patternToken[$index], $token[$offset])
-                ) {
-                    continue;
-                }
-
-                if ($firstMatchIndex === null) {
-                    $firstMatchIndex = $offset;
-                }
-
-                $lastMatchIndex = $offset;
-                $wildcard = false;
-                $offset++;
-
-                continue 2;
-            }
-
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Returns an absolute offset in the children array.
-     */
-    private function calculateOffset(int $offset): int
-    {
-        if ($offset >= 0) {
-            return $offset;
-        }
-
-        return count($this->children) + $offset;
-    }
-
-    /**
-     * Updates token SQL code start and end offsets based on its children.
-     */
-    private function updateCollectionOffsets(): void
-    {
-        if (!empty($this->children)) {
-            $this->startOffset = reset($this->children)->startOffset;
-            $this->endOffset = end($this->children)->endOffset;
-        }
-
-        $this->parent?->updateCollectionOffsets();
     }
 
     /**
@@ -357,7 +266,7 @@ final class SqlToken implements ArrayAccess, Stringable
     /**
      * Set token content.
      */
-    public function content(string|null $value): self
+    public function content(?string $value): self
     {
         $this->content = $value;
 
@@ -403,7 +312,7 @@ final class SqlToken implements ArrayAccess, Stringable
     /**
      * @return string|null The token content.
      */
-    public function getContent(): string|null
+    public function getContent(): ?string
     {
         return $this->content;
     }
@@ -414,5 +323,96 @@ final class SqlToken implements ArrayAccess, Stringable
     public function getType(): int
     {
         return $this->type;
+    }
+
+    /**
+     * Tests the given token to match the specified pattern token.
+     */
+    private function tokensMatch(
+        self $patternToken,
+        self $token,
+        int $offset = 0,
+        ?int &$firstMatchIndex = null,
+        ?int &$lastMatchIndex = null,
+    ): bool {
+        if (
+            $patternToken->getIsCollection() !== $token->getIsCollection()
+            || (!$patternToken->getIsCollection() && $patternToken->content !== $token->content)
+        ) {
+            return false;
+        }
+
+        if ($patternToken->children === $token->children) {
+            $firstMatchIndex = $lastMatchIndex = $offset;
+
+            return true;
+        }
+
+        $firstMatchIndex = $lastMatchIndex = null;
+        $wildcard = false;
+
+        for ($index = 0, $count = count($patternToken->children); $index < $count; $index++) {
+            /*
+             Iterate token by token with an exception to "any" that toggles an iteration until matched
+             with a next pattern token or EOF.
+             */
+            if ($patternToken[$index] instanceof self && $patternToken[$index]->content === 'any') {
+                $wildcard = true;
+                continue;
+            }
+
+            for ($limit = $wildcard ? count($token->children) : $offset + 1; $offset < $limit; $offset++) {
+                if (!$wildcard && !isset($token[$offset])) {
+                    break;
+                }
+
+                if (
+                    $patternToken[$index] instanceof self
+                    && $token[$offset] instanceof self
+                    && !$this->tokensMatch($patternToken[$index], $token[$offset])
+                ) {
+                    continue;
+                }
+
+                if ($firstMatchIndex === null) {
+                    $firstMatchIndex = $offset;
+                }
+
+                $lastMatchIndex = $offset;
+                $wildcard = false;
+                $offset++;
+
+                continue 2;
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns an absolute offset in the children array.
+     */
+    private function calculateOffset(int $offset): int
+    {
+        if ($offset >= 0) {
+            return $offset;
+        }
+
+        return count($this->children) + $offset;
+    }
+
+    /**
+     * Updates token SQL code start and end offsets based on its children.
+     */
+    private function updateCollectionOffsets(): void
+    {
+        if (!empty($this->children)) {
+            $this->startOffset = reset($this->children)->startOffset;
+            $this->endOffset = end($this->children)->endOffset;
+        }
+
+        $this->parent?->updateCollectionOffsets();
     }
 }

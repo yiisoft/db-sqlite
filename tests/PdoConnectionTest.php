@@ -86,7 +86,7 @@ final class PdoConnectionTest extends CommonPdoConnectionTest
                 'name' => 'Some {{weird}} name',
                 'email' => 'test@example.com',
                 'address' => 'Some {{%weird}} address',
-            ]
+            ],
         )->execute();
 
         $this->assertSame('4', $db->getLastInsertId());
@@ -105,7 +105,7 @@ final class PdoConnectionTest extends CommonPdoConnectionTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Sqlite\Transaction only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.'
+            'Yiisoft\Db\Sqlite\Transaction only supports transaction isolation levels READ UNCOMMITTED and SERIALIZABLE.',
         );
 
         $db->beginTransaction(TransactionInterface::READ_COMMITTED);

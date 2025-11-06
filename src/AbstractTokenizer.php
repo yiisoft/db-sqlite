@@ -73,9 +73,7 @@ abstract class AbstractTokenizer
      */
     private string $buffer = '';
 
-    public function __construct(private string $sql)
-    {
-    }
+    public function __construct(private string $sql) {}
 
     /**
      * Tokenizes and returns a code type token.
@@ -126,9 +124,9 @@ abstract class AbstractTokenizer
         $this->addTokenFromBuffer();
 
         if (
-            $token->getHasChildren() &&
-            $token[-1] instanceof SqlToken &&
-            !$token[-1]->getHasChildren()
+            $token->getHasChildren()
+            && $token[-1] instanceof SqlToken
+            && !$token[-1]->getHasChildren()
         ) {
             unset($token[-1]);
         }
@@ -169,7 +167,7 @@ abstract class AbstractTokenizer
      *
      * @return bool Whether there's an operator at the current offset.
      */
-    abstract protected function isOperator(int &$length, string|null &$content): bool;
+    abstract protected function isOperator(int &$length, ?string &$content): bool;
 
     /**
      * Returns whether there's an identifier at the current offset.
@@ -182,7 +180,7 @@ abstract class AbstractTokenizer
      *
      * @return bool Whether there's an identifier at the current offset.
      */
-    abstract protected function isIdentifier(int &$length, string|null &$content): bool;
+    abstract protected function isIdentifier(int &$length, ?string &$content): bool;
 
     /**
      * Returns whether there's a string literal at the current offset.
@@ -195,7 +193,7 @@ abstract class AbstractTokenizer
      *
      * @return bool Whether there's a string literal at the current offset.
      */
-    abstract protected function isStringLiteral(int &$length, string|null &$content): bool;
+    abstract protected function isStringLiteral(int &$length, ?string &$content): bool;
 
     /**
      * Returns whether the given string is a keyword.
@@ -207,7 +205,7 @@ abstract class AbstractTokenizer
      *
      * @return bool Whether the given string is a keyword.
      */
-    abstract protected function isKeyword(string $string, string|null &$content): bool;
+    abstract protected function isKeyword(string $string, ?string &$content): bool;
 
     /**
      * Returns whether the longest common prefix equals to the SQL code of the same length at the current offset.
@@ -225,14 +223,14 @@ abstract class AbstractTokenizer
         array $with,
         bool $caseSensitive,
         int &$length,
-        ?string &$content = null
+        ?string &$content = null,
     ): bool {
         if (empty($with)) {
             return false;
         }
 
         if (!is_array(reset($with))) {
-            usort($with, static fn (string $string1, string $string2) => mb_strlen($string2, 'UTF-8') - mb_strlen($string1, 'UTF-8'));
+            usort($with, static fn(string $string1, string $string2) => mb_strlen($string2, 'UTF-8') - mb_strlen($string1, 'UTF-8'));
 
             $map = [];
 

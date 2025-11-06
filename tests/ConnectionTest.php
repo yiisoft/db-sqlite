@@ -114,54 +114,6 @@ final class ConnectionTest extends CommonConnectionTest
         );
     }
 
-    protected function getLogger(): LoggerInterface|MockObject
-    {
-        return $this->createMock(LoggerInterface::class);
-    }
-
-    private function runExceptionTest(ConnectionInterface $db): void
-    {
-        $thrown = false;
-
-        try {
-            $db->createCommand('INSERT INTO qlog1(a) VALUES(:a);', [':a' => 1])->execute();
-        } catch (Exception $e) {
-            $this->assertStringContainsString(
-                'INSERT INTO qlog1(a) VALUES(:a);',
-                $e->getMessage(),
-                'Exceptions message should contain raw SQL query: ' . $e
-            );
-
-            $thrown = true;
-        }
-
-        $this->assertTrue($thrown, 'An exception should have been thrown by the command.');
-
-        $thrown = false;
-
-        try {
-            $db->createCommand(
-                'SELECT * FROM qlog1 WHERE id=:a ORDER BY nonexistingcolumn;',
-                [':a' => 1]
-            )->queryAll();
-        } catch (Exception $e) {
-            $this->assertStringContainsString(
-                'SELECT * FROM qlog1 WHERE id=:a ORDER BY nonexistingcolumn;',
-                $e->getMessage(),
-                'Exceptions message should contain raw SQL query: ' . $e
-            );
-
-            $thrown = true;
-        }
-
-        $this->assertTrue($thrown, 'An exception should have been thrown by the command.');
-    }
-
-    private function createProfiler(): ProfilerInterface
-    {
-        return $this->createMock(ProfilerInterface::class);
-    }
-
     public function getColumnBuilderClass(): void
     {
         $db = $this->getConnection();
@@ -189,5 +141,53 @@ final class ConnectionTest extends CommonConnectionTest
         $this->assertSame($columnFactory, $db->getColumnFactory());
 
         $db->close();
+    }
+
+    protected function getLogger(): LoggerInterface|MockObject
+    {
+        return $this->createMock(LoggerInterface::class);
+    }
+
+    private function runExceptionTest(ConnectionInterface $db): void
+    {
+        $thrown = false;
+
+        try {
+            $db->createCommand('INSERT INTO qlog1(a) VALUES(:a);', [':a' => 1])->execute();
+        } catch (Exception $e) {
+            $this->assertStringContainsString(
+                'INSERT INTO qlog1(a) VALUES(:a);',
+                $e->getMessage(),
+                'Exceptions message should contain raw SQL query: ' . $e,
+            );
+
+            $thrown = true;
+        }
+
+        $this->assertTrue($thrown, 'An exception should have been thrown by the command.');
+
+        $thrown = false;
+
+        try {
+            $db->createCommand(
+                'SELECT * FROM qlog1 WHERE id=:a ORDER BY nonexistingcolumn;',
+                [':a' => 1],
+            )->queryAll();
+        } catch (Exception $e) {
+            $this->assertStringContainsString(
+                'SELECT * FROM qlog1 WHERE id=:a ORDER BY nonexistingcolumn;',
+                $e->getMessage(),
+                'Exceptions message should contain raw SQL query: ' . $e,
+            );
+
+            $thrown = true;
+        }
+
+        $this->assertTrue($thrown, 'An exception should have been thrown by the command.');
+    }
+
+    private function createProfiler(): ProfilerInterface
+    {
+        return $this->createMock(ProfilerInterface::class);
     }
 }

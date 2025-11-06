@@ -101,10 +101,10 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
         $sql = '';
 
         if ($limit !== null) {
-            $sql = 'LIMIT ' . ($limit instanceof ExpressionInterface ? $this->buildExpression($limit) : (string)$limit);
+            $sql = 'LIMIT ' . ($limit instanceof ExpressionInterface ? $this->buildExpression($limit) : (string) $limit);
             if (!empty($offset)) {
-                $sql .= ' OFFSET ' .
-                    ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string)$offset);
+                $sql .= ' OFFSET '
+                    . ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string) $offset);
             }
         } elseif (!empty($offset)) {
             /**
@@ -112,8 +112,8 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
              *
              * {@see https://www.sqlite.org/syntaxdiagrams.html#select-stmt}
              */
-            $sql = 'LIMIT 9223372036854775807 OFFSET ' . // 2^63-1
-                ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string)$offset);
+            $sql = 'LIMIT 9223372036854775807 OFFSET ' // 2^63-1
+                . ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string) $offset);
         }
 
         return $sql;
