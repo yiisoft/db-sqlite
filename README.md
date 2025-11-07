@@ -3,34 +3,32 @@
         <img src="https://yiisoft.github.io/docs/images/yii_logo.svg" height="80px" alt="Yii">
     </a>
     <a href="https://www.sqlite.org/" target="_blank">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/SQLite370.svg" height="80px" alt="Sqlite">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/SQLite370.svg" height="80px" alt="SQLite">
     </a>
-    <h1 align="center">Yii Database SQLite driver</h1>
+    <h1 align="center">Yii Database SQLite Driver</h1>
     <br>
 </p>
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/db-sqlite/v)](https://packagist.org/packages/yiisoft/db-sqlite)
 [![Total Downloads](https://poser.pugx.org/yiisoft/db-sqlite/downloads)](https://packagist.org/packages/yiisoft/db-sqlite)
-[![rector](https://github.com/yiisoft/db-sqlite/actions/workflows/rector.yml/badge.svg)](https://github.com/yiisoft/db-sqlite/actions/workflows/rector.yml)
-[![codecov](https://codecov.io/gh/yiisoft/db-sqlite/branch/master/graph/badge.svg?token=YXUHCPPITH)](https://codecov.io/gh/yiisoft/db-sqlite)
-[![StyleCI](https://github.styleci.io/repos/145220194/shield?branch=master)](https://github.styleci.io/repos/145220194?branch=master)
+[![Build status](https://github.com/yiisoft/db-sqlite/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/yiisoft/db-sqlite/actions/workflows/build.yml?query=branch%3Amaster)
+[![Code Coverage](https://codecov.io/gh/yiisoft/db-sqlite/branch/master/graph/badge.svg)](https://codecov.io/gh/yiisoft/db-sqlite)
+[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-sqlite%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-sqlite/master)
+[![Static analysis](https://github.com/yiisoft/db-sqlite/actions/workflows/static.yml/badge.svg?branch=master)](https://github.com/yiisoft/db-sqlite/actions/workflows/static.yml?query=branch%3Amaster)
+[![type-coverage](https://shepherd.dev/github/yiisoft/db-sqlite/coverage.svg)](https://shepherd.dev/github/yiisoft/db-sqlite)
+[![psalm-level](https://shepherd.dev/github/yiisoft/db-sqlite/level.svg)](https://shepherd.dev/github/yiisoft/db-sqlite)
 
-SQLite driver for [Yii Database](https://github.com/yiisoft/db) is a package for working with [SQLite] databases in PHP.
-
-The package provides a set of classes for interacting with [SQLite] databases in PHP. It includes a database connection class,
+SQLite driver for [Yii Database](https://github.com/yiisoft/db) is a package for working with 
+[SQLite](https://www.sqlite.org/) databases in PHP. It includes a database connection class,
 a command builder class, and a set of classes for representing database tables and rows as PHP objects.
 
-You can perform a variety of tasks with [SQLite] databases in PHP, such as connecting to a database, executing SQL queries,
-and working with database transactions. You can also use it to create and manipulate database tables and rows, and to
-perform advanced database operations such as joins and aggregates.
+Driver supports SQLite 3 or higher. 
 
-[SQLite]: https://www.sqlite.org/
+## Requirements
 
-## Support version
-
-| PHP           | Sqlite Version            | CI-Actions |
-|---------------|---------------------------|------------|
-| **8.1 - 8.4** | **3:latest**|[![build](https://github.com/yiisoft/db-sqlite/actions/workflows/build.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-sqlite/actions/workflows/build.yml) [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-sqlite%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-sqlite/master) [![static analysis](https://github.com/yiisoft/db-sqlite/actions/workflows/static.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-sqlite/actions/workflows/static.yml) [![type-coverage](https://shepherd.dev/github/yiisoft/db-sqlite/coverage.svg)](https://shepherd.dev/github/yiisoft/db-sqlite)
+- PHP 8.1 - 8.4.
+- `pdo` PHP extension.
+- `mbstring` PHP extension.
 
 ## Installation
 
@@ -41,15 +39,15 @@ composer require yiisoft/db-sqlite
 ```
 
 > [!IMPORTANT]
-> It also depends on [PSR-16: Common Interface for Caching Libraries](https://www.php-fig.org/psr/psr-16/) and requires
-> the installation of [PSR-16 implementation](https://packagist.org/providers/psr/simple-cache-implementation).
-> For example, [yiisoft/cache](https://github.com/yiisoft/cache) or one of the other [cache handlers](https://github.com/yiisoft/cache#cache-handlers).
+> See also [installation notes](https://github.com/yiisoft/db/?tab=readme-ov-file#documentation) for `yiisoft/db`
+> package.
 
 ## Documentation
 
-For config connection to SQLite database check [Connecting SQLite](https://github.com/yiisoft/db/blob/master/docs/guide/en/connection/sqlite.md)
+For config connection to SQLite database check 
+[Connecting SQLite](https://github.com/yiisoft/db/blob/master/docs/guide/en/connection/sqlite.md).
 
-[Check the yiisoft/db docs](https://github.com/yiisoft/db/blob/master/docs/guide/en/README.md) to learn about usage.
+Check the `yiisoft/db` [docs](https://github.com/yiisoft/db/blob/master/docs/guide/en/README.md) to learn about usage.
 
 - [Internals](docs/internals.md)
 
@@ -58,7 +56,7 @@ You may also check out other [Yii Community Resources](https://www.yiiframework.
 
 ## License
 
-The Yii Database SQLite driver is free software. It is released under the terms of the BSD License.
+The Yii Database SQLite Driver is free software. It is released under the terms of the BSD License.
 Please see [`LICENSE`](./LICENSE.md) for more information.
 
 Maintained by [Yii Software](https://www.yiiframework.com/).
