@@ -39,7 +39,7 @@ composer require yiisoft/db-sqlite
 ```
 
 > [!IMPORTANT]
-> See also [installation notes](https://github.com/yiisoft/db/?tab=readme-ov-file#documentation) for `yiisoft/db`
+> See also [installation notes](https://github.com/yiisoft/db/?tab=readme-ov-file#installation) for `yiisoft/db`
 > package.
 
 ## Documentation
