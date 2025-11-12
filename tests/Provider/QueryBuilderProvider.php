@@ -361,6 +361,12 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
     {
         $values = parent::buildColumnDefinition();
 
+        // SQLite does not support unsigned types
+        unset(
+            $values['bigint(15) unsigned'],
+            $values['unsigned()'],
+        );
+
         $values[PseudoType::PK][0] = 'integer PRIMARY KEY AUTOINCREMENT NOT NULL';
         $values[PseudoType::UPK][0] = 'integer PRIMARY KEY AUTOINCREMENT NOT NULL';
         $values[PseudoType::BIGPK][0] = 'integer PRIMARY KEY AUTOINCREMENT NOT NULL';
@@ -389,7 +395,6 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $values["comment('comment')"][0] = 'varchar(255) /* comment */';
         $values['integer()->primaryKey()'][0] = 'integer PRIMARY KEY NOT NULL';
         $values['string()->primaryKey()'][0] = 'varchar(255) PRIMARY KEY NOT NULL';
-        $values['unsigned()'][0] = 'integer';
 
         return $values;
     }
