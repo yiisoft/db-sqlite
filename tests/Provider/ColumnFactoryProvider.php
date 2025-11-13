@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests\Provider;
 
 use Yiisoft\Db\Constant\ColumnType;
+use Yiisoft\Db\Schema\Column\BigIntColumn;
 use Yiisoft\Db\Schema\Column\BinaryColumn;
 use Yiisoft\Db\Schema\Column\BitColumn;
 use Yiisoft\Db\Schema\Column\BooleanColumn;
@@ -62,6 +63,17 @@ final class ColumnFactoryProvider extends \Yiisoft\Db\Tests\Provider\ColumnFacto
         $definitions[] = ['tinyint(1)', new BooleanColumn(dbType: 'tinyint', size: 1)];
 
         return $definitions;
+    }
+
+    public static function pseudoTypes(): array
+    {
+        $types = parent::pseudoTypes();
+
+        // SQLite doesn't support unsigned types
+        $types['upk'][1] = new IntegerColumn(primaryKey: true, autoIncrement: true, unsigned: false);
+        $types['ubigpk'][1] = new BigIntColumn(primaryKey: true, autoIncrement: true, unsigned: false);
+
+        return $types;
     }
 
     public static function defaultValueRaw(): array

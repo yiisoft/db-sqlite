@@ -52,6 +52,12 @@ final class ColumnFactory extends AbstractColumnFactory
         'json' => ColumnType::JSON,
     ];
 
+    public function fromPseudoType(string $pseudoType, array $info = []): ColumnInterface
+    {
+        // SQLite doesn't support unsigned types
+        return parent::fromPseudoType($pseudoType, $info)->unsigned(false);
+    }
+
     protected function getType(string $dbType, array $info = []): string
     {
         return match ($dbType) {
