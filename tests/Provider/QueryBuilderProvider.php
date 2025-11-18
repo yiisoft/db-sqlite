@@ -13,7 +13,6 @@ use Yiisoft\Db\Expression\Value\Param;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\QueryBuilder\Condition\In;
 use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
-use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Support\TraversableObject;
 
 use function array_replace;
@@ -22,9 +21,6 @@ use function strtr;
 
 final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilderProvider
 {
-    use TestTrait;
-
-    protected static string $driverName = 'sqlite';
     protected static string $likeEscapeCharSql = " ESCAPE '\\'";
 
     public static function buildCondition(): array

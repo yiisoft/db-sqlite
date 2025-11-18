@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
+use Closure;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Throwable;
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Constant\PseudoType;
@@ -11,19 +13,18 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionInterface;
-use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
+use Yiisoft\Db\Sqlite\Tests\Support\IntegrationTestTrait;
 use Yiisoft\Db\Tests\Common\CommonCommandTest;
+use Yiisoft\Db\Tests\Provider\CommandProvider;
 
 use function version_compare;
 
 /**
  * @group sqlite
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class CommandTest extends CommonCommandTest
 {
-    use TestTrait;
+    use IntegrationTestTrait;
 
     protected string $upsertTestCharCast = 'CAST([[address]] AS VARCHAR(255))';
 
@@ -460,17 +461,12 @@ final class CommandTest extends CommonCommandTest
         $this->assertEquals(0, $command->queryScalar());
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::update
-     *
-     * @throws Exception
-     * @throws Throwable
-     */
+    #[DataProviderExternal(CommandProvider::class, 'update')]
     public function testUpdate(
         string $table,
         array $columns,
         array|ExpressionInterface|string $conditions,
-        array|ExpressionInterface|string|null $from,
+        Closure|array|ExpressionInterface|string|null $from,
         array $params,
         array $expectedValues,
         int $expectedCount,
@@ -478,13 +474,8 @@ final class CommandTest extends CommonCommandTest
         parent::testUpdate($table, $columns, $conditions, $from, $params, $expectedValues, $expectedCount);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::upsert
-     *
-     * @throws Exception
-     * @throws Throwable
-     */
-    public function testUpsert(array $firstData, array $secondData): void
+    #[DataProviderExternal(CommandProvider::class, 'upsert')]
+    public function testUpsert(Closure|array $firstData, Closure|array $secondData): void
     {
         $db = $this->getConnection();
 

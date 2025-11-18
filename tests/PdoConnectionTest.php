@@ -9,27 +9,19 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidCallException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonPdoConnectionTest;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 /**
  * @group sqlite
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class PdoConnectionTest extends CommonPdoConnectionTest
 {
-    use TestTrait;
-
     /**
      * Ensure database connection is reset on when a connection is cloned.
      *
      * Make sure each connection element has its own PDO instance i.e. own connection to the DB.
      * Also, transaction elements should not be shared between two connections.
-     *
-     * @throws Exception
-     * @throws Throwable
      */
     public function testClone(): void
     {

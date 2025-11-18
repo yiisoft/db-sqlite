@@ -14,9 +14,7 @@ use Yiisoft\Db\Profiler\ProfilerInterface;
 use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
 use Yiisoft\Db\Sqlite\Column\ColumnFactory;
 use Yiisoft\Db\Sqlite\Connection;
-use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonConnectionTest;
-use Yiisoft\Db\Tests\Support\DbHelper;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 /**
@@ -24,8 +22,6 @@ use Yiisoft\Db\Transaction\TransactionInterface;
  */
 final class ConnectionTest extends CommonConnectionTest
 {
-    use TestTrait;
-
     public function testExceptionContainsRawQuery(): void
     {
         $db = $this->getConnection();

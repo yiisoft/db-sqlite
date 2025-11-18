@@ -20,7 +20,6 @@ use Yiisoft\Db\Query\WithQuery;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlaps;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider;
-use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 use Yiisoft\Db\Tests\Support\Assert;
 
@@ -29,14 +28,12 @@ use Yiisoft\Db\Tests\Support\Assert;
  */
 final class QueryBuilderTest extends CommonQueryBuilderTest
 {
-    use TestTrait;
-
     public function getBuildColumnDefinitionProvider(): array
     {
         return QueryBuilderProvider::buildColumnDefinition();
     }
 
-    public function testAddcheck(): void
+    public function testAddCheck(): void
     {
         $db = $this->getConnection();
 

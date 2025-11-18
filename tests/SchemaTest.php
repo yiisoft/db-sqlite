@@ -13,17 +13,13 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Sqlite\Schema;
 use Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider;
-use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonSchemaTest;
-use Yiisoft\Db\Tests\Support\DbHelper;
 
 /**
  * @group sqlite
  */
 final class SchemaTest extends CommonSchemaTest
 {
-    use TestTrait;
-
     public function testColumnComment(): void
     {
         $this->expectException(NotSupportedException::class);

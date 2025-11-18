@@ -9,15 +9,12 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\QueryBuilder\Condition\In;
 use Yiisoft\Db\Sqlite\Builder\InBuilder;
-use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 
 /**
  * @group sqlite
  */
 final class InBuilderTest extends TestCase
 {
-    use TestTrait;
-
     public function testBuildSubqueryInCondition(): void
     {
         $db = $this->getConnection();

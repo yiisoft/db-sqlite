@@ -11,18 +11,13 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonQueryTest;
 
 /**
  * @group sqlite
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class QueryTest extends CommonQueryTest
 {
-    use TestTrait;
-
     /**
      * Ensure no ambiguous column error occurs on indexBy with JOIN.
      *
