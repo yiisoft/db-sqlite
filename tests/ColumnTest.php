@@ -64,7 +64,7 @@ final class ColumnTest extends CommonColumnTest
         $db->close();
     }
 
-    public function testColumnInstance()
+    public function testColumnInstance(): void
     {
         $db = $this->getSharedConnection();
         $this->loadFixture();
