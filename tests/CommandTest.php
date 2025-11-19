@@ -6,11 +6,8 @@ namespace Yiisoft\Db\Sqlite\Tests;
 
 use Closure;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
-use Throwable;
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Constant\PseudoType;
-use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Sqlite\Tests\Support\IntegrationTestTrait;
