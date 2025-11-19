@@ -26,8 +26,6 @@ final class CommandTest extends CommonCommandTest
 {
     use IntegrationTestTrait;
 
-    protected string $upsertTestCharCast = 'CAST([[address]] AS VARCHAR(255))';
-
     public function testAddCheck(): void
     {
         $this->expectException(NotSupportedException::class);
@@ -38,14 +36,9 @@ final class CommandTest extends CommonCommandTest
         parent::testAddCheck();
     }
 
-    /**
-     * @throws Exception
-     * @throws \Exception
-     * @throws InvalidConfigException
-     */
     public function testAddCommentOnColumn(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $command = $db->createCommand();
 
@@ -67,13 +60,9 @@ final class CommandTest extends CommonCommandTest
         parent::testAddCommentOnTable();
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testAddDefaultValue(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $command = $db->createCommand();
 
@@ -87,9 +76,6 @@ final class CommandTest extends CommonCommandTest
 
     /**
      * @dataProvider \Yiisoft\Db\Tests\Provider\CommandProvider::addForeignKey
-     *
-     * @throws Exception
-     * @throws Throwable
      */
     public function testAddForeignKey(
         string $name,
@@ -106,9 +92,6 @@ final class CommandTest extends CommonCommandTest
 
     /**
      * @dataProvider \Yiisoft\Db\Tests\Provider\CommandProvider::addPrimaryKey
-     *
-     * @throws Exception
-     * @throws Throwable
      */
     public function testAddPrimaryKey(string $name, string $tableName, array|string $column): void
     {
@@ -120,9 +103,6 @@ final class CommandTest extends CommonCommandTest
 
     /**
      * @dataProvider \Yiisoft\Db\Tests\Provider\CommandProvider::addUnique
-     *
-     * @throws Exception
-     * @throws Throwable
      */
     public function testAddUnique(string $name, string $tableName, array|string $column): void
     {
@@ -132,14 +112,9 @@ final class CommandTest extends CommonCommandTest
         parent::testAddUnique($name, $tableName, $column);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws Throwable
-     */
     public function testAlterColumn(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $command = $db->createCommand();
 
@@ -151,9 +126,6 @@ final class CommandTest extends CommonCommandTest
 
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::batchInsert
-     *
-     * @throws Exception
-     * @throws Throwable
      */
     public function testBatchInsert(
         string $table,
@@ -166,14 +138,10 @@ final class CommandTest extends CommonCommandTest
         parent::testBatchInsert($table, $values, $columns, $expected, $expectedParams, $insertedRow);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws Throwable
-     */
     public function testCheckIntegrity(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
 
         $command = $db->createCommand();
         $command->checkIntegrity('', '{{customer}}');
@@ -203,13 +171,9 @@ final class CommandTest extends CommonCommandTest
         parent::testDropColumn();
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testDropCommentFromColumn(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $command = $db->createCommand();
 
@@ -221,13 +185,9 @@ final class CommandTest extends CommonCommandTest
         $command->dropCommentFromColumn('{{table}}', 'column');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testDropCommentFromTable(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $command = $db->createCommand();
 
@@ -239,13 +199,9 @@ final class CommandTest extends CommonCommandTest
         $command->dropCommentFromTable('{{table}}');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testDropDefaultValue(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $command = $db->createCommand();
 
@@ -257,13 +213,9 @@ final class CommandTest extends CommonCommandTest
         $command->dropDefaultValue('{{table}}', '{{name}}');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testDropForeignKey(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $command = $db->createCommand();
 
@@ -275,13 +227,9 @@ final class CommandTest extends CommonCommandTest
         $command->dropForeignKey('{{table}}', '{{name}}');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testDropPrimaryKey(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $command = $db->createCommand();
 
@@ -295,7 +243,7 @@ final class CommandTest extends CommonCommandTest
 
     public function testDropTableCascade(): void
     {
-        $command = $this->getConnection()->createCommand();
+        $command = $this->getSharedConnection()->createCommand();
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('SQLite doesn\'t support cascade drop table.');
@@ -304,7 +252,7 @@ final class CommandTest extends CommonCommandTest
 
     public function testDropUnique(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $command = $db->createCommand();
 
@@ -318,24 +266,15 @@ final class CommandTest extends CommonCommandTest
 
     /**
      * @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\CommandProvider::rawSql
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
      */
     public function testGetRawSql(string $sql, array $params, string $expectedRawSql): void
     {
         parent::testGetRawSql($sql, $params, $expectedRawSql);
     }
 
-    /**
-     * @throws Throwable
-     * @throws InvalidConfigException
-     * @throws Exception
-     */
     public function testMultiStatementSupport(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $sql = <<<SQL
         DROP TABLE IF EXISTS [[T_multistatement]];
@@ -381,14 +320,9 @@ final class CommandTest extends CommonCommandTest
         parent::testRenameColumn();
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws Throwable
-     */
     public function testResetSequence(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $command = $db->createCommand();
 
@@ -438,14 +372,10 @@ final class CommandTest extends CommonCommandTest
         );
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws Throwable
-     */
     public function testTruncateTable(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
 
         $command = $db->createCommand();
         $command->setSql(
@@ -477,7 +407,7 @@ final class CommandTest extends CommonCommandTest
     #[DataProviderExternal(CommandProvider::class, 'upsert')]
     public function testUpsert(Closure|array $firstData, Closure|array $secondData): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         if (version_compare($db->getServerInfo()->getVersion(), '3.8.3', '<')) {
             $this->markTestSkipped('SQLite < 3.8.3 does not support "WITH" keyword.');
@@ -488,11 +418,16 @@ final class CommandTest extends CommonCommandTest
 
     public function testShowDatabases(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $command = $db->createCommand();
 
         $this->assertSame('sqlite::memory:', $db->getDriver()->getDsn());
         $this->assertSame(['main'], $command->showDatabases());
+    }
+
+    protected function getUpsertTestCharCast(): string
+    {
+        return 'CAST([[address]] AS VARCHAR(255))';
     }
 }

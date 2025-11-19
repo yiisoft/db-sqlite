@@ -6,6 +6,7 @@ namespace Yiisoft\Db\Sqlite\Tests;
 
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Yiisoft\Db\Sqlite\Tests\Provider\QuoterProvider;
+use Yiisoft\Db\Sqlite\Tests\Support\IntegrationTestTrait;
 use Yiisoft\Db\Tests\Common\CommonQuoterTest;
 
 /**
@@ -13,6 +14,8 @@ use Yiisoft\Db\Tests\Common\CommonQuoterTest;
  */
 final class QuoterTest extends CommonQuoterTest
 {
+    use IntegrationTestTrait;
+
     #[DataProviderExternal(QuoterProvider::class, 'tableNameParts')]
     public function testGetTableNameParts(string $tableName, array $expected): void
     {
