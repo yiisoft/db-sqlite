@@ -35,9 +35,9 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     #[DataProviderExternal(SchemaProvider::class, 'columns')]
-    public function testColumns(array $columns, string $tableName): void
+    public function testColumns(array $columns, string $tableName, ?string $dump = null): void
     {
-        parent::testColumns($columns, $tableName);
+        parent::testColumns($columns, $tableName, $dump);
     }
 
     #[DataProviderExternal(SchemaProvider::class, 'columnsTypeBit')]
