@@ -45,7 +45,8 @@
         "spatie/phpunit-watcher": "^1.24",
         "vimeo/psalm": "^5.26.1 || ^6.8.8",
         "yiisoft/aliases": "^2.0",
-        "yiisoft/cache-file": "^3.2",
+        "yiisoft/psr-dummy-provider": "^1.0",
+        "yiisoft/test-support": "^3.0",
         "yiisoft/var-dumper": "^1.7"
     },
     "provide": {

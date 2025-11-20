@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite\Tests;
 
+use Closure;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Yiisoft\Db\Constant\DataType;
@@ -20,7 +21,7 @@ use Yiisoft\Db\Query\WithQuery;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlaps;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Sqlite\Tests\Provider\QueryBuilderProvider;
-use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
+use Yiisoft\Db\Sqlite\Tests\Support\IntegrationTestTrait;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 use Yiisoft\Db\Tests\Support\Assert;
 
@@ -29,17 +30,16 @@ use Yiisoft\Db\Tests\Support\Assert;
  */
 final class QueryBuilderTest extends CommonQueryBuilderTest
 {
-    use TestTrait;
+    use IntegrationTestTrait;
 
     public function getBuildColumnDefinitionProvider(): array
     {
         return QueryBuilderProvider::buildColumnDefinition();
     }
 
-    public function testAddcheck(): void
+    public function testAddCheck(): void
     {
-        $db = $this->getConnection();
-
+        $db = $this->getSharedConnection();
         $qb = $db->getQueryBuilder();
 
         $this->expectException(NotSupportedException::class);
@@ -50,8 +50,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testAddCommentOnColumn(): void
     {
-        $db = $this->getConnection();
-
+        $db = $this->getSharedConnection();
         $qb = $db->getQueryBuilder();
 
         $this->expectException(NotSupportedException::class);
@@ -64,7 +63,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testAddCommentOnTable(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
 
@@ -78,7 +77,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testAddDefaultValue(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
 
@@ -99,7 +98,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         ?string $update,
         string $expected,
     ): void {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
 
@@ -112,7 +111,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     #[DataProviderExternal(\Yiisoft\Db\Tests\Provider\QueryBuilderProvider::class, 'addPrimaryKey')]
     public function testAddPrimaryKey(string $name, string $table, array|string $columns, string $expected): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
 
@@ -125,7 +124,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     #[DataProviderExternal(\Yiisoft\Db\Tests\Provider\QueryBuilderProvider::class, 'addUnique')]
     public function testAddUnique(string $name, string $table, array|string $columns, string $expected): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
 
@@ -157,7 +156,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     #[DataProviderExternal(QueryBuilderProvider::class, 'buildCondition')]
     public function testBuildCondition(
-        array|ExpressionInterface|string $condition,
+        Closure|array|ExpressionInterface|string $condition,
         ?string $expected,
         array $expectedParams,
     ): void {
@@ -175,7 +174,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testBuildUnion(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
         $query = (new Query($db))->from('admin_user')->union((new Query($db))->from('admin_profile'));
@@ -203,7 +202,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             return;
         }
 
-        $queryBuilder = $this->getConnection()->getQueryBuilder();
+        $queryBuilder = $this->getSharedConnection()->getQueryBuilder();
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('SQLite don\'t supports FOR clause.');
@@ -212,7 +211,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testBuildWithFor(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
         $queryBuilder = $db->getQueryBuilder();
 
         $query = (new Query($db))->from('test')->for('UPDATE OF {{t1}}');
@@ -224,7 +223,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testBuildWithOffset(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
         $query = (new Query($db))->offset(10);
@@ -242,7 +241,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testBuildWithQuery(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
         $with1Query = (new Query($db))->select('id')->from('t1')->where('expr = 1');
@@ -268,7 +267,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testBuildWithUnion(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
 
@@ -300,8 +299,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testCheckIntegrity(): void
     {
-        $qb = $this->getConnection();
-
+        $qb = $this->getSharedConnection();
         $qb = $qb->getQueryBuilder();
 
         $this->assertSame(
@@ -320,7 +318,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testCreateIndexWithSchema(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $command = $db->createCommand();
         $qb = $db->getQueryBuilder();
@@ -335,7 +333,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testCreateTable(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
 
@@ -370,7 +368,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testDropCheck(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
 
@@ -382,7 +380,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testDropCommentFromColumn(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
 
         $qb = $db->getQueryBuilder();
 
@@ -396,7 +395,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testDropColumn(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
 
@@ -410,7 +409,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testDropCommentFromTable(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
 
@@ -424,7 +423,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testDropDefaultValue(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
 
         $qb = $db->getQueryBuilder();
 
@@ -438,7 +438,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testDropForeignKey(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
 
@@ -450,7 +450,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testDropIndex(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
 
@@ -464,7 +464,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testDropPrimaryKey(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
 
@@ -478,7 +478,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testDropTable(string $expected, ?bool $ifExists, ?bool $cascade): void
     {
         if ($cascade) {
-            $qb = $this->getConnection()->getQueryBuilder();
+            $qb = $this->getSharedConnection()->getQueryBuilder();
 
             $this->expectException(NotSupportedException::class);
             $this->expectExceptionMessage('SQLite doesn\'t support cascade drop table.');
@@ -495,7 +495,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testDropUnique(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
 
@@ -508,7 +508,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     #[DataProviderExternal(QueryBuilderProvider::class, 'insert')]
     public function testInsert(
         string $table,
-        array|QueryInterface $columns,
+        Closure|array|QueryInterface $columns,
         array $params,
         string $expectedSQL,
         array $expectedParams,
@@ -519,7 +519,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     #[DataProviderExternal(QueryBuilderProvider::class, 'insertReturningPks')]
     public function testInsertReturningPks(
         string $table,
-        array|QueryInterface $columns,
+        Closure|array|QueryInterface $columns,
         array $params,
         string $expectedSQL,
         array $expectedParams,
@@ -529,7 +529,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testRenameColumn(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
 
@@ -543,7 +543,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testRenameTable(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
 
@@ -557,7 +557,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testResetSequence(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
 
         $qb = $db->getQueryBuilder();
 
@@ -578,7 +579,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testTruncateTable(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $qb = $db->getQueryBuilder();
         $sql = $qb->truncateTable('customer');
@@ -605,7 +606,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string $table,
         array $columns,
         array|ExpressionInterface|string $condition,
-        array|ExpressionInterface|string|null $from,
+        Closure|array|ExpressionInterface|string|null $from,
         array $params,
         string $expectedSql,
         array $expectedParams = [],
@@ -616,7 +617,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     #[DataProviderExternal(QueryBuilderProvider::class, 'upsert')]
     public function testUpsert(
         string $table,
-        array|QueryInterface $insertColumns,
+        Closure|array|QueryInterface $insertColumns,
         array|bool $updateColumns,
         string $expectedSql,
         array $expectedParams,
@@ -627,7 +628,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     #[DataProviderExternal(QueryBuilderProvider::class, 'upsertReturning')]
     public function testUpsertReturning(
         string $table,
-        array|QueryInterface $insertColumns,
+        Closure|array|QueryInterface $insertColumns,
         array|bool $updateColumns,
         ?array $returnColumns,
         string $expectedSql,
@@ -644,7 +645,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testJsonOverlapsBuilder(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
         $qb = $db->getQueryBuilder();
 
         $params = [];
@@ -670,9 +671,14 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     #[DataProviderExternal(QueryBuilderProvider::class, 'overlapsCondition')]
-    public function testJsonOverlaps(iterable|ExpressionInterface $values, int $expectedCount): void
+    public function testJsonOverlaps(Closure|iterable|ExpressionInterface $values, int $expectedCount): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
+
+        if ($values instanceof Closure) {
+            $values = $values($db);
+        }
 
         $count = (new Query($db))
             ->from('json_type')
@@ -680,14 +686,17 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             ->count();
 
         $this->assertSame($expectedCount, $count);
-
-        $db->close();
     }
 
     #[DataProviderExternal(QueryBuilderProvider::class, 'overlapsCondition')]
-    public function testJsonOverlapsOperator(iterable|ExpressionInterface $values, int $expectedCount): void
+    public function testJsonOverlapsOperator(Closure|iterable|ExpressionInterface $values, int $expectedCount): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
+
+        if ($values instanceof Closure) {
+            $values = $values($db);
+        }
 
         $count = (new Query($db))
             ->from('json_type')
@@ -695,12 +704,10 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             ->count();
 
         $this->assertSame($expectedCount, $count);
-
-        $db->close();
     }
 
     #[DataProviderExternal(QueryBuilderProvider::class, 'buildColumnDefinition')]
-    public function testBuildColumnDefinition(string $expected, ColumnInterface|string $column): void
+    public function testBuildColumnDefinition(string $expected, Closure|ColumnInterface|string $column): void
     {
         parent::testBuildColumnDefinition($expected, $column);
     }
@@ -719,7 +726,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     #[DataProviderExternal(QueryBuilderProvider::class, 'caseXBuilder')]
     public function testCaseXBuilder(
-        CaseX $case,
+        Closure|CaseX $case,
         string $expectedSql,
         array $expectedParams,
         string|int $expectedResult,
@@ -729,7 +736,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     #[DataProviderExternal(QueryBuilderProvider::class, 'lengthBuilder')]
     public function testLengthBuilder(
-        string|ExpressionInterface $operand,
+        Closure|string|ExpressionInterface $operand,
         string $expectedSql,
         int $expectedResult,
         array $expectedParams = [],
@@ -740,7 +747,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     #[DataProviderExternal(QueryBuilderProvider::class, 'multiOperandFunctionBuilder')]
     public function testMultiOperandFunctionBuilder(
         string $class,
-        array $operands,
+        Closure|array $operands,
         string $expectedSql,
         array|string|int $expectedResult,
         array $expectedParams = [],
@@ -768,7 +775,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     public function testArrayMergeWithOrdering(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
         $qb = $db->getQueryBuilder();
 
         $stringParam = new Param('[4,3,5]', DataType::STRING);
@@ -776,7 +783,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             [2, 1, 3],
             new ArrayValue([6, 5, 7]),
             $stringParam,
-            self::getDb()->select(new ArrayValue([10, 9])),
+            $db->select(new ArrayValue([10, 9])),
         ))->ordered();
         $params = [];
 

@@ -14,9 +14,10 @@ use Yiisoft\Db\Profiler\ProfilerInterface;
 use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
 use Yiisoft\Db\Sqlite\Column\ColumnFactory;
 use Yiisoft\Db\Sqlite\Connection;
-use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
+use Yiisoft\Db\Sqlite\Tests\Support\IntegrationTestTrait;
+use Yiisoft\Db\Sqlite\Tests\Support\TestConnection;
 use Yiisoft\Db\Tests\Common\CommonConnectionTest;
-use Yiisoft\Db\Tests\Support\DbHelper;
+use Yiisoft\Db\Tests\Support\TestHelper;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 /**
@@ -24,11 +25,11 @@ use Yiisoft\Db\Transaction\TransactionInterface;
  */
 final class ConnectionTest extends CommonConnectionTest
 {
-    use TestTrait;
+    use IntegrationTestTrait;
 
     public function testExceptionContainsRawQuery(): void
     {
-        $db = $this->getConnection();
+        $db = $this->createConnection();
 
         $command = $db->createCommand();
         $schema = $db->getSchema();
@@ -41,13 +42,13 @@ final class ConnectionTest extends CommonConnectionTest
 
         /* profiling and logging */
         $db->setLogger($this->getLogger());
-        $db->setProfiler($this->createProfiler());
+        $db->setProfiler($this->createMock(ProfilerInterface::class));
 
         $this->runExceptionTest($db);
 
         /* profiling only */
         $db->setLogger(new NullLogger());
-        $db->setProfiler($this->createProfiler());
+        $db->setProfiler($this->createMock(ProfilerInterface::class));
 
         $this->runExceptionTest($db);
 
@@ -62,11 +63,13 @@ final class ConnectionTest extends CommonConnectionTest
         $db->setProfiler(null);
 
         $this->runExceptionTest($db);
+
+        $db->close();
     }
 
     public function testSettingDefaultAttributes(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $this->assertSame(PDO::ERRMODE_EXCEPTION, $db->getActivePDO()?->getAttribute(PDO::ATTR_ERRMODE));
 
@@ -75,7 +78,8 @@ final class ConnectionTest extends CommonConnectionTest
 
     public function testTransactionIsolation(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
 
         $transaction = $db->beginTransaction(TransactionInterface::READ_UNCOMMITTED);
         $transaction->rollBack();
@@ -89,7 +93,8 @@ final class ConnectionTest extends CommonConnectionTest
 
     public function testTransactionShortcutCustom(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
 
         $this->assertTrue(
             $db->transaction(
@@ -116,7 +121,7 @@ final class ConnectionTest extends CommonConnectionTest
 
     public function getColumnBuilderClass(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $this->assertSame(ColumnBuilder::class, $db->getColumnBuilderClass());
 
@@ -125,7 +130,7 @@ final class ConnectionTest extends CommonConnectionTest
 
     public function testGetColumnFactory(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $this->assertInstanceOf(ColumnFactory::class, $db->getColumnFactory());
 
@@ -136,7 +141,11 @@ final class ConnectionTest extends CommonConnectionTest
     {
         $columnFactory = new ColumnFactory();
 
-        $db = new Connection($this->getDriver(), DbHelper::getSchemaCache(), $columnFactory);
+        $db = new Connection(
+            TestConnection::createDriver(),
+            TestHelper::createMemorySchemaCache(),
+            $columnFactory,
+        );
 
         $this->assertSame($columnFactory, $db->getColumnFactory());
 
@@ -184,10 +193,5 @@ final class ConnectionTest extends CommonConnectionTest
         }
 
         $this->assertTrue($thrown, 'An exception should have been thrown by the command.');
-    }
-
-    private function createProfiler(): ProfilerInterface
-    {
-        return $this->createMock(ProfilerInterface::class);
     }
 }

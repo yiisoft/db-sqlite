@@ -13,16 +13,16 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Sqlite\Schema;
 use Yiisoft\Db\Sqlite\Tests\Provider\SchemaProvider;
-use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
+use Yiisoft\Db\Sqlite\Tests\Support\IntegrationTestTrait;
 use Yiisoft\Db\Tests\Common\CommonSchemaTest;
-use Yiisoft\Db\Tests\Support\DbHelper;
+use Yiisoft\Db\Tests\Support\TestHelper;
 
 /**
  * @group sqlite
  */
 final class SchemaTest extends CommonSchemaTest
 {
-    use TestTrait;
+    use IntegrationTestTrait;
 
     public function testColumnComment(): void
     {
@@ -35,9 +35,9 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     #[DataProviderExternal(SchemaProvider::class, 'columns')]
-    public function testColumns(array $columns, string $tableName): void
+    public function testColumns(array $columns, string $tableName, ?string $dump = null): void
     {
-        parent::testColumns($columns, $tableName);
+        parent::testColumns($columns, $tableName, $dump);
     }
 
     #[DataProviderExternal(SchemaProvider::class, 'columnsTypeBit')]
@@ -48,7 +48,8 @@ final class SchemaTest extends CommonSchemaTest
 
     public function testCompositeFk(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
 
         $schema = $db->getSchema();
         $table = $schema->getTableSchema('composite_fk');
@@ -65,7 +66,7 @@ final class SchemaTest extends CommonSchemaTest
 
     public function testForeignKey(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $command = $db->createCommand();
         $schema = $db->getSchema();
@@ -155,7 +156,9 @@ final class SchemaTest extends CommonSchemaTest
 
     public function testMultiForeingKeys(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
+
         $schema = $db->getSchema();
         $tableSchema = $schema->getTableSchema('foreign_keys_child');
 
@@ -176,7 +179,8 @@ final class SchemaTest extends CommonSchemaTest
 
     public function testGetTableChecks(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
 
         $schema = $db->getSchema();
         $tableChecks = $schema->getTableChecks('T_constraints_check');
@@ -187,7 +191,7 @@ final class SchemaTest extends CommonSchemaTest
 
     public function testGetSchemaDefaultValues(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Sqlite\Schema::getSchemaDefaultValues is not supported by SQLite.');
@@ -197,7 +201,7 @@ final class SchemaTest extends CommonSchemaTest
 
     public function testGetSchemaNames(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $schema = $db->getSchema();
 
@@ -211,7 +215,7 @@ final class SchemaTest extends CommonSchemaTest
 
     public function testGetTableDefaultValues(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $schema = $db->getSchema();
 
@@ -223,7 +227,8 @@ final class SchemaTest extends CommonSchemaTest
 
     public function testGetTableForeignKeys(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
 
         $schema = $db->getSchema();
         $tableForeignKeys = $schema->getTableForeignKeys('T_constraints_3');
@@ -303,10 +308,10 @@ final class SchemaTest extends CommonSchemaTest
         parent::testWorkWithPrimaryKeyConstraint();
     }
 
-    public function testNotConnectionPDO(): void
+    public function testNotConnectionPdo(): void
     {
         $db = $this->createMock(ConnectionInterface::class);
-        $schema = new Schema($db, DbHelper::getSchemaCache());
+        $schema = new Schema($db, TestHelper::createMemorySchemaCache());
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Only PDO connections are supported.');
@@ -315,8 +320,8 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     #[DataProviderExternal(SchemaProvider::class, 'resultColumns')]
-    public function testGetResultColumn(?ColumnInterface $expected, array $info): void
+    public function testGetResultColumn(?ColumnInterface $expected, array $metadata): void
     {
-        parent::testGetResultColumn($expected, $info);
+        parent::testGetResultColumn($expected, $metadata);
     }
 }

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Sqlite\Tests;
 
 use Yiisoft\Db\Sqlite\SqlParser;
-use Yiisoft\Db\Tests\AbstractSqlParserTest;
+use Yiisoft\Db\Tests\Common\CommonSqlParserTest;
 
 /**
  * @group sqlite
  */
-final class SqlParserTest extends AbstractSqlParserTest
+final class SqlParserTest extends CommonSqlParserTest
 {
     /** @dataProvider \Yiisoft\Db\Sqlite\Tests\Provider\SqlParserProvider::getNextPlaceholder */
     public function testGetNextPlaceholder(string $sql, ?string $expectedPlaceholder, ?int $expectedPosition): void

@@ -15,8 +15,8 @@ use Yiisoft\Db\Schema\Column\DoubleColumn;
 use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Schema\Column\JsonColumn;
 use Yiisoft\Db\Schema\Column\StringColumn;
-use Yiisoft\Db\Sqlite\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\Sqlite\Tests\Support\IntegrationTestTrait;
 use Yiisoft\Db\Tests\Common\CommonColumnTest;
 
 use function iterator_to_array;
@@ -27,11 +27,11 @@ use function str_repeat;
  */
 final class ColumnTest extends CommonColumnTest
 {
-    use TestTrait;
+    use IntegrationTestTrait;
 
     public function testSelectWithPhpTypecasting(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $sql = "SELECT null, 1, 2.5, true, false, 'string'";
         $expected = [
@@ -64,9 +64,11 @@ final class ColumnTest extends CommonColumnTest
         $db->close();
     }
 
-    public function testColumnInstance()
+    public function testColumnInstance(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
+
         $schema = $db->getSchema();
         $tableSchema = $schema->getTableSchema('type');
 
