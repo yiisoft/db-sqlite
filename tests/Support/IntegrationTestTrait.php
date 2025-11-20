@@ -13,22 +13,7 @@ trait IntegrationTestTrait
 {
     protected function createConnection(): Connection
     {
-        return new Connection(
-            $this->createDriver(),
-            TestHelper::createMemorySchemaCache(),
-        );
-    }
-
-    protected function createDriver(): Driver
-    {
-        $dsn = new Dsn(
-            databaseName: 'memory',
-        );
-
-        $driver = new Driver($dsn);
-        $driver->charset('utf8');
-
-        return $driver;
+        return TestConnection::create();
     }
 
     protected function getDefaultFixture(): string

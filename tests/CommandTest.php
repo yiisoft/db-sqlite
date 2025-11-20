@@ -11,6 +11,7 @@ use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Sqlite\Tests\Support\IntegrationTestTrait;
+use Yiisoft\Db\Sqlite\Tests\Support\TestConnection;
 use Yiisoft\Db\Tests\Common\CommonCommandTest;
 use Yiisoft\Db\Tests\Provider\CommandProvider;
 
@@ -404,9 +405,7 @@ final class CommandTest extends CommonCommandTest
     #[DataProviderExternal(CommandProvider::class, 'upsert')]
     public function testUpsert(Closure|array $firstData, Closure|array $secondData): void
     {
-        $db = $this->getSharedConnection();
-
-        if (version_compare($db->getServerInfo()->getVersion(), '3.8.3', '<')) {
+        if (version_compare(TestConnection::getServerVersion(), '3.8.3', '<')) {
             $this->markTestSkipped('SQLite < 3.8.3 does not support "WITH" keyword.');
         }
 

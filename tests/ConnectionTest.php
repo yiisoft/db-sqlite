@@ -15,6 +15,7 @@ use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
 use Yiisoft\Db\Sqlite\Column\ColumnFactory;
 use Yiisoft\Db\Sqlite\Connection;
 use Yiisoft\Db\Sqlite\Tests\Support\IntegrationTestTrait;
+use Yiisoft\Db\Sqlite\Tests\Support\TestConnection;
 use Yiisoft\Db\Tests\Common\CommonConnectionTest;
 use Yiisoft\Db\Tests\Support\TestHelper;
 use Yiisoft\Db\Transaction\TransactionInterface;
@@ -141,7 +142,7 @@ final class ConnectionTest extends CommonConnectionTest
         $columnFactory = new ColumnFactory();
 
         $db = new Connection(
-            $this->createDriver(),
+            TestConnection::createDriver(),
             TestHelper::createMemorySchemaCache(),
             $columnFactory,
         );
