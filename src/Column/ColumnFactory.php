@@ -8,6 +8,8 @@ use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Schema\Column\AbstractColumnFactory;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
 
+use Yiisoft\Db\Syntax\ColumnDefinitionParserInterface;
+
 use function str_replace;
 use function substr;
 
@@ -84,5 +86,10 @@ final class ColumnFactory extends AbstractColumnFactory
         }
 
         return parent::normalizeNotNullDefaultValue($defaultValue, $column);
+    }
+
+    protected function columnDefinitionParser(): ColumnDefinitionParserInterface
+    {
+        return new ColumnDefinitionParser();
     }
 }
