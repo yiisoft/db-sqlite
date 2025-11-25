@@ -11,7 +11,6 @@ use Yiisoft\Db\Schema\Column\BitColumn;
 use Yiisoft\Db\Schema\Column\BooleanColumn;
 use Yiisoft\Db\Schema\Column\DatetimeColumn;
 use Yiisoft\Db\Schema\Column\DoubleColumn;
-use Yiisoft\Db\Schema\Column\EnumColumn;
 use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Schema\Column\JsonColumn;
 use Yiisoft\Db\Schema\Column\StringColumn;
