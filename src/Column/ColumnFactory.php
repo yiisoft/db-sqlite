@@ -7,7 +7,6 @@ namespace Yiisoft\Db\Sqlite\Column;
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Schema\Column\AbstractColumnFactory;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
-
 use Yiisoft\Db\Syntax\ColumnDefinitionParserInterface;
 
 use function str_replace;
