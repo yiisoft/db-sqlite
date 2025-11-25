@@ -39,7 +39,6 @@ final class ColumnFactoryProvider extends \Yiisoft\Db\Tests\Provider\ColumnFacto
             ['char', ColumnType::CHAR, StringColumn::class],
             ['varchar', ColumnType::STRING, StringColumn::class],
             ['string', ColumnType::STRING, StringColumn::class],
-            ['enum', ColumnType::ENUM, EnumColumn::class],
             ['tinytext', ColumnType::TEXT, StringColumn::class],
             ['mediumtext', ColumnType::TEXT, StringColumn::class],
             ['longtext', ColumnType::TEXT, StringColumn::class],

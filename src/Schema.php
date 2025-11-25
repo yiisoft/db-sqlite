@@ -243,6 +243,7 @@ final class Schema extends AbstractPdoSchema
     {
         $columns = $this->loadTableColumnsInfo($table->getName());
         $jsonColumns = $this->getJsonColumns($table);
+        $checks = $this->loadTableChecks($table->getName());
 
         foreach ($columns as $info) {
             if (in_array($info['name'], $jsonColumns, true)) {
@@ -252,7 +253,7 @@ final class Schema extends AbstractPdoSchema
             $info['schema'] = $table->getSchemaName();
             $info['table'] = $table->getName();
 
-            $column = $this->loadColumn($info);
+            $column = $this->loadColumn($info, $checks);
             $table->column($info['name'], $column);
         }
 
@@ -314,12 +315,13 @@ final class Schema extends AbstractPdoSchema
      * Loads the column information into a {@see ColumnInterface} object.
      *
      * @param array $info The column information.
+     * @param Check[] $checks
      *
      * @return ColumnInterface The column object.
      *
      * @psalm-param ColumnInfo $info
      */
-    private function loadColumn(array $info): ColumnInterface
+    private function loadColumn(array $info, array $checks): ColumnInterface
     {
         return $this->db->getColumnFactory()->fromDefinition($info['type'], [
             'defaultValueRaw' => $info['dflt_value'],
@@ -328,6 +330,7 @@ final class Schema extends AbstractPdoSchema
             'primaryKey' => (bool) $info['pk'],
             'schema' => $info['schema'],
             'table' => $info['table'],
+            'values' => $this->tryGetEnumValuesFromCheck($info['name'], $checks),
         ]);
     }
 
@@ -396,5 +399,42 @@ final class Schema extends AbstractPdoSchema
         }
 
         return $result;
+    }
+
+    /**
+     * @param Check[] $checks
+     *
+     * @psalm-return list<string>|null
+     */
+    private function tryGetEnumValuesFromCheck(string $name, array $checks): ?array
+    {
+        if (empty($checks)) {
+            return null;
+        }
+
+        foreach ($checks as $check) {
+            if (!str_starts_with($check->expression, "$name ")) {
+                continue;
+            }
+
+            preg_match_all(
+                "~ IN\s*\(\s*(?:'(?:[^']+|'(?:''|[^']))*')+~i",
+                $check->expression,
+                $block,
+            );
+
+            if (empty($block[0][0])) {
+                continue;
+            }
+
+            preg_match_all("~'((?:''|[^'])*)'~", $block[0][0], $matches);
+
+            return array_map(
+                static fn($v) => str_replace("''", "'", $v),
+                $matches[1] ?? [],
+            );
+        }
+
+        return null;
     }
 }
