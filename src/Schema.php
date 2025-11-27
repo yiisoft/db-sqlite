@@ -413,7 +413,9 @@ final class Schema extends AbstractPdoSchema
         }
 
         foreach ($checks as $check) {
-            if (!str_starts_with($check->expression, "$name ")) {
+            if (!str_starts_with($check->expression, "$name ") &&
+                !str_starts_with($check->expression, "\"$name\" ")
+            ) {
                 continue;
             }
 
