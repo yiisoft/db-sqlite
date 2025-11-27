@@ -21,6 +21,7 @@ use function array_change_key_case;
 use function array_column;
 use function array_map;
 use function count;
+use function in_array;
 use function strncasecmp;
 
 /**
