@@ -243,7 +243,7 @@ final class Schema extends AbstractPdoSchema
     {
         $columns = $this->loadTableColumnsInfo($table->getName());
         $jsonColumns = $this->getJsonColumns($table);
-        $checks = $this->loadTableChecks($table->getName());
+        $checks = $this->getTableChecks($table->getName());
 
         foreach ($columns as $info) {
             if (in_array($info['name'], $jsonColumns, true)) {
