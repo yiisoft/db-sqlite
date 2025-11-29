@@ -443,6 +443,6 @@ final class Schema extends AbstractPdoSchema
     {
         $quotedColumnName = preg_quote($columnName, '~');
         return preg_match("~^\"$quotedColumnName\"\s~", $check) !== 1
-            && preg_match("~^(|`|'|\[)$quotedColumnName(|`|'|\])\s~i", $check) !== 1;
+            && preg_match("~^(|`|\[)$quotedColumnName(|`|\])\s~i", $check) !== 1;
     }
 }
