@@ -16,8 +16,10 @@ final class EnumColumnTest extends CommonEnumColumnTest
     #[TestWith(['INTEGER CHECK (status IN (1, 2, 3))'])]
     #[TestWith(["TEXT CHECK (status != 'abc')"])]
     #[TestWith(["TEXT CHECK (status NOT IN ('a', 'b', 'c'))"])]
-    #[TestWith(["TEXT CHECK (\"Status\" not IN ('a', 'b', 'c'))"])]
     #[TestWith(["TEXT CHECK ('status' not IN ('a', 'b', 'c'))"])]
+    #[TestWith(["TEXT CHECK (\"Status\" IN ('a', 'b', 'c'))"])]
+    #[TestWith(["TEXT CHECK ('Status' IN ('a', 'b', 'c'))"])]
+    #[TestWith(["TEXT CHECK ([Status] IN ('a', 'b', 'c'))"])]
     public function testNonEnumCheck(string $columnDefinition): void
     {
         $this->dropTable('test_enum_table');
@@ -65,17 +67,7 @@ final class EnumColumnTest extends CommonEnumColumnTest
     ])]
     #[TestWith([
         'letter',
-        "TEXT CHECK (`LETTER` IN ('a', 'b'))",
-        ['a', 'b'],
-    ])]
-    #[TestWith([
-        'letter',
         "TEXT CHECK ([letter] IN ('a', 'b'))",
-        ['a', 'b'],
-    ])]
-    #[TestWith([
-        'letter',
-        "TEXT CHECK ([LETTER] IN ('a', 'b'))",
         ['a', 'b'],
     ])]
     #[TestWith([
