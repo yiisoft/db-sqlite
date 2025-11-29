@@ -43,6 +43,11 @@ final class EnumColumnTest extends CommonEnumColumnTest
         ['a', 'b'],
     ])]
     #[TestWith([
+        'status',
+        "TEXT CHECK (status in ('a', 'b'))",
+        ['a', 'b'],
+    ])]
+    #[TestWith([
         'letter',
         "TEXT CHECK ('letter' IN ('a', 'b'))",
         ['a', 'b'],
