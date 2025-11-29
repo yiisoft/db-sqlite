@@ -242,9 +242,10 @@ final class Schema extends AbstractPdoSchema
      */
     protected function findColumns(TableSchemaInterface $table): bool
     {
-        $columns = $this->loadTableColumnsInfo($table->getName());
+        $tableName = $table->getName();
+        $columns = $this->loadTableColumnsInfo($tableName);
         $jsonColumns = $this->getJsonColumns($table);
-        $checks = $this->getTableChecks($table->getName());
+        $checks = $this->getTableChecks($tableName);
 
         foreach ($columns as $info) {
             if (in_array($info['name'], $jsonColumns, true)) {
@@ -252,7 +253,7 @@ final class Schema extends AbstractPdoSchema
             }
 
             $info['schema'] = $table->getSchemaName();
-            $info['table'] = $table->getName();
+            $info['table'] = $tableName;
 
             $column = $this->loadColumn($info, $checks);
             $table->column($info['name'], $column);
