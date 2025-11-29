@@ -53,6 +53,7 @@
 - Enh #387: Refactor `DMLQueryBuilder::upsert()` method (@Tigrov)
 - Chg #391: Update expression namespaces according to changes in `yiisoft/db` package (@Tigrov)
 - Chg #402: Throw exception on "unsigned" column usage (@vjik)
+- New #404: Add enumeration column type support (@vjik)
 
 ## 1.2.0 March 21, 2024
 
