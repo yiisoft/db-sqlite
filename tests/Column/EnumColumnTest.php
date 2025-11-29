@@ -75,6 +75,11 @@ final class EnumColumnTest extends CommonEnumColumnTest
         "TEXT CHECK (\"letter\" IN ('a', 'b'))",
         ['a', 'b'],
     ])]
+    #[TestWith([
+        'status',
+        "TEXT CHECK (status IN\n(\n'a',\n'b'\n))",
+        ['a', 'b'],
+    ])]
     public function testEnumCheck(string $columnName, string $columnDefinition, array $expectedValues): void
     {
         $this->dropTable('test_enum_table');
