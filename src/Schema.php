@@ -443,6 +443,6 @@ final class Schema extends AbstractPdoSchema
     private function isCheckNotStartsFromColumnName(string $check, string $columnName): bool
     {
         $quotedColumnName = preg_quote($columnName, '~');
-        return preg_match("~^(?:(?i:$quotedColumnName)|[\"`[]{$quotedColumnName}[\"`\]])\s~", $check) !== 1;
+        return preg_match("~^(?:(?i:$quotedColumnName)|[\"`\[]{$quotedColumnName}[\"`\]])\s~", $check) !== 1;
     }
 }
