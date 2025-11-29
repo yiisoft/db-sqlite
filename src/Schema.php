@@ -421,7 +421,7 @@ final class Schema extends AbstractPdoSchema
             }
 
             preg_match_all(
-                "~ IN\s*\(\s*(?:'(?:[^']+|'(?:''|[^']))*')+~i",
+                "~(?<!\sNOT)\s+IN\s*\(\s*(?:'(?:[^']+|'(?:''|[^']))*')+~i",
                 $check->expression,
                 $block,
             );

@@ -15,6 +15,8 @@ final class EnumColumnTest extends CommonEnumColumnTest
 
     #[TestWith(['INTEGER CHECK (status IN (1, 2, 3))'])]
     #[TestWith(["TEXT CHECK (status != 'abc')"])]
+    #[TestWith(["TEXT CHECK (status NOT IN ('a', 'b', 'c'))"])]
+    #[TestWith(["TEXT CHECK (status not IN ('a', 'b', 'c'))"])]
     public function testNonEnumCheck(string $columnDefinition): void
     {
         $this->dropTable('test_enum_table');
@@ -31,6 +33,34 @@ final class EnumColumnTest extends CommonEnumColumnTest
         $column = $db->getTableSchema('test_enum_table')->getColumn('status');
 
         $this->assertNotInstanceOf(EnumColumn::class, $column);
+
+        $this->dropTable('test_enum_table');
+    }
+
+    #[TestWith([
+        'knot',
+        "TEXT CHECK (knot IN ('a', 'b'))",
+        ['a', 'b'],
+    ])]
+    public function testEnumCheck(string $columnName, string $columnDefinition, array $expectedValues): void
+    {
+        $this->dropTable('test_enum_table');
+
+        $quotedColumnName = $this->getSharedConnection()->getQuoter()->quoteColumnName($columnName);
+        $this->executeStatements(
+            <<<SQL
+            CREATE TABLE test_enum_table (
+                id INTEGER,
+                $quotedColumnName $columnDefinition
+            )
+            SQL,
+        );
+
+        $db = $this->getSharedConnection();
+        $column = $db->getTableSchema('test_enum_table')->getColumn($columnName);
+
+        $this->assertInstanceOf(EnumColumn::class, $column, $column::class);
+        $this->assertEqualsCanonicalizing($expectedValues, $column->getValues());
 
         $this->dropTable('test_enum_table');
     }
