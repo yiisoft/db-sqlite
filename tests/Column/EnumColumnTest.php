@@ -42,6 +42,26 @@ final class EnumColumnTest extends CommonEnumColumnTest
         "TEXT CHECK (knot IN ('a', 'b'))",
         ['a', 'b'],
     ])]
+    #[TestWith([
+        'letter',
+        "TEXT CHECK ('letter' IN ('a', 'b'))",
+        ['a', 'b'],
+    ])]
+    #[TestWith([
+        'letter',
+        "TEXT CHECK (`letter` IN ('a', 'b'))",
+        ['a', 'b'],
+    ])]
+    #[TestWith([
+        'letter',
+        "TEXT CHECK ([letter] IN ('a', 'b'))",
+        ['a', 'b'],
+    ])]
+    #[TestWith([
+        'letter',
+        "TEXT CHECK (\"letter\" IN ('a', 'b'))",
+        ['a', 'b'],
+    ])]
     public function testEnumCheck(string $columnName, string $columnDefinition, array $expectedValues): void
     {
         $this->dropTable('test_enum_table');

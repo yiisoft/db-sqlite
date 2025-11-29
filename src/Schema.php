@@ -414,9 +414,7 @@ final class Schema extends AbstractPdoSchema
         }
 
         foreach ($checks as $check) {
-            if (!str_starts_with($check->expression, "$name ")
-                && !str_starts_with($check->expression, "\"$name\" ")
-            ) {
+            if ($this->isCheckNotStartsFromColumnName($check->expression, $name)) {
                 continue;
             }
 
@@ -439,5 +437,11 @@ final class Schema extends AbstractPdoSchema
         }
 
         return null;
+    }
+
+    private function isCheckNotStartsFromColumnName(string $check, string $columnName): bool
+    {
+        $quotedColumnName = preg_quote($columnName, '~');
+        return preg_match("~^(|\"|`|'|\[)$quotedColumnName(|\"|`|'|\])\s~", $check) !== 1;
     }
 }
