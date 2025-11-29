@@ -36,7 +36,6 @@ final class ColumnFactory extends AbstractColumnFactory
         'numeric' => ColumnType::DECIMAL,
         'char' => ColumnType::CHAR,
         'varchar' => ColumnType::STRING,
-        'enum' => ColumnType::STRING,
         'tinytext' => ColumnType::TEXT,
         'mediumtext' => ColumnType::TEXT,
         'longtext' => ColumnType::TEXT,
