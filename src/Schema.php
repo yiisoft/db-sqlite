@@ -21,6 +21,7 @@ use function array_change_key_case;
 use function array_column;
 use function array_map;
 use function count;
+use function in_array;
 use function strncasecmp;
 
 /**
@@ -241,8 +242,10 @@ final class Schema extends AbstractPdoSchema
      */
     protected function findColumns(TableSchemaInterface $table): bool
     {
-        $columns = $this->loadTableColumnsInfo($table->getName());
+        $tableName = $table->getName();
+        $columns = $this->loadTableColumnsInfo($tableName);
         $jsonColumns = $this->getJsonColumns($table);
+        $checks = $this->getTableChecks($tableName);
 
         foreach ($columns as $info) {
             if (in_array($info['name'], $jsonColumns, true)) {
@@ -250,9 +253,9 @@ final class Schema extends AbstractPdoSchema
             }
 
             $info['schema'] = $table->getSchemaName();
-            $info['table'] = $table->getName();
+            $info['table'] = $tableName;
 
-            $column = $this->loadColumn($info);
+            $column = $this->loadColumn($info, $checks);
             $table->column($info['name'], $column);
         }
 
@@ -314,12 +317,13 @@ final class Schema extends AbstractPdoSchema
      * Loads the column information into a {@see ColumnInterface} object.
      *
      * @param array $info The column information.
+     * @param Check[] $checks
      *
      * @return ColumnInterface The column object.
      *
      * @psalm-param ColumnInfo $info
      */
-    private function loadColumn(array $info): ColumnInterface
+    private function loadColumn(array $info, array $checks): ColumnInterface
     {
         return $this->db->getColumnFactory()->fromDefinition($info['type'], [
             'defaultValueRaw' => $info['dflt_value'],
@@ -328,6 +332,7 @@ final class Schema extends AbstractPdoSchema
             'primaryKey' => (bool) $info['pk'],
             'schema' => $info['schema'],
             'table' => $info['table'],
+            'values' => $this->tryGetEnumValuesFromCheck($info['name'], $checks),
         ]);
     }
 
@@ -396,5 +401,48 @@ final class Schema extends AbstractPdoSchema
         }
 
         return $result;
+    }
+
+    /**
+     * @param Check[] $checks
+     *
+     * @psalm-return list<string>|null
+     */
+    private function tryGetEnumValuesFromCheck(string $name, array $checks): ?array
+    {
+        if (empty($checks)) {
+            return null;
+        }
+
+        foreach ($checks as $check) {
+            if ($this->isCheckNotStartsFromColumnName($check->expression, $name)) {
+                continue;
+            }
+
+            preg_match_all(
+                "~(?<!\sNOT)\s+IN\s*\(\s*('(?:''|[^'])*')(?:,\s*(?1))*~i",
+                $check->expression,
+                $block,
+            );
+
+            if (empty($block[0][0])) {
+                continue;
+            }
+
+            preg_match_all("~'((?:''|[^'])*)'~", $block[0][0], $matches);
+
+            return array_map(
+                static fn($v) => str_replace("''", "'", $v),
+                $matches[1] ?? [],
+            );
+        }
+
+        return null;
+    }
+
+    private function isCheckNotStartsFromColumnName(string $check, string $columnName): bool
+    {
+        $quotedColumnName = preg_quote($columnName, '~');
+        return preg_match("~^(?:(?i:$quotedColumnName)|[\"`\[]{$quotedColumnName}[\"`\]])\s~", $check) !== 1;
     }
 }
