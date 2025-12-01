@@ -34,7 +34,7 @@ jobs:
           - ubuntu-latest
 
         php:
-          - 8.4
+          - 8.5
 
     steps:
       - name: Checkout.
@@ -48,8 +48,8 @@ jobs:
           ini-values: memory_limit=-1
           coverage: pcov
 
-      - name: Update composer.
-        run: composer self-update
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
 
       - name: Install db.
         uses: yiisoft/actions/install-packages@master
@@ -59,6 +59,6 @@ jobs:
 
       - name: Run infection.
         run: |
-          vendor/bin/roave-infection-static-analysis-plugin --threads=2 --ignore-msi-with-no-mutations
+          vendor/bin/infection --threads=2 --ignore-msi-with-no-mutations
         env:
           STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
