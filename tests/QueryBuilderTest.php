@@ -521,10 +521,10 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string $table,
         Closure|array|QueryInterface $columns,
         array $params,
-        string $expectedSQL,
+        string $expectedSql,
         array $expectedParams,
     ): void {
-        parent::testInsertReturningPks($table, $columns, $params, $expectedSQL, $expectedParams);
+        parent::testInsertReturningPks($table, $columns, $params, $expectedSql, $expectedParams);
     }
 
     public function testRenameColumn(): void

@@ -74,12 +74,12 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                     'blob_col' => new BinaryColumn(
                         dbType: 'blob',
                     ),
-                    'numeric_col' => new DoubleColumn(
+                    'numeric_col' => new StringColumn(
                         ColumnType::DECIMAL,
                         dbType: 'decimal',
                         size: 5,
                         scale: 2,
-                        defaultValue: 33.22,
+                        defaultValue: '33.22',
                     ),
                     'timestamp_col' => new DatetimeColumn(
                         ColumnType::TIMESTAMP,
