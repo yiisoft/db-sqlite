@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Sqlite;
 
+use Yiisoft\Db\Constant\ColumnInfoSource;
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Constant\ReferentialAction;
 use Yiisoft\Db\Constraint\Check;
@@ -291,7 +292,7 @@ final class Schema extends AbstractPdoSchema
 
         $dbType = $metadata['sqlite:decl_type'] ?? $metadata['native_type'];
 
-        $columnInfo = ['fromResult' => true];
+        $columnInfo = ['source' => ColumnInfoSource::QUERY_RESULT];
 
         if (!empty($metadata['table'])) {
             $columnInfo['table'] = $metadata['table'];
@@ -331,6 +332,7 @@ final class Schema extends AbstractPdoSchema
             'notNull' => (bool) $info['notnull'],
             'primaryKey' => (bool) $info['pk'],
             'schema' => $info['schema'],
+            'source' => ColumnInfoSource::TABLE_SCHEMA,
             'table' => $info['table'],
             'values' => $this->tryGetEnumValuesFromCheck($info['name'], $checks),
         ]);
