@@ -62,16 +62,6 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             }
         }
 
-        $groupBy = $query->getGroupBy();
-
-        if (!empty($groupBy)) {
-            foreach ($groupBy as $expression) {
-                if ($expression instanceof ExpressionInterface) {
-                    $this->buildExpression($expression, $params);
-                }
-            }
-        }
-
         $union = $this->buildUnion($query->getUnions(), $params);
 
         if ($union !== '') {
