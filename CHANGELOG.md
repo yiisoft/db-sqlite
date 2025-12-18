@@ -2,7 +2,7 @@
 
 ## 2.0.1 under development
 
-- no changes in this release.
+- Bug #413: Fix "GROUP BY" builder ignoring parameters (@vjik)
 
 ## 2.0.0 December 05, 2025
 

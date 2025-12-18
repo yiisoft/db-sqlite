@@ -45,7 +45,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             $this->buildFrom($query->getFrom(), $params),
             $this->buildJoin($query->getJoins(), $params),
             $this->buildWhere($query->getWhere(), $params),
-            $this->buildGroupBy($query->getGroupBy()),
+            $this->buildGroupBy($query->getGroupBy(), $params),
             $this->buildHaving($query->getHaving(), $params),
             $this->buildFor($query->getFor()),
         ];
