@@ -45,7 +45,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             $this->buildFrom($query->getFrom(), $params),
             $this->buildJoin($query->getJoins(), $params),
             $this->buildWhere($query->getWhere(), $params),
-            $this->buildGroupBy($query->getGroupBy()),
+            $this->buildGroupBy($query->getGroupBy(), $params),
             $this->buildHaving($query->getHaving(), $params),
             $this->buildFor($query->getFor()),
         ];
@@ -56,16 +56,6 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
 
         if (!empty($orderBy)) {
             foreach ($orderBy as $expression) {
-                if ($expression instanceof ExpressionInterface) {
-                    $this->buildExpression($expression, $params);
-                }
-            }
-        }
-
-        $groupBy = $query->getGroupBy();
-
-        if (!empty($groupBy)) {
-            foreach ($groupBy as $expression) {
                 if ($expression instanceof ExpressionInterface) {
                     $this->buildExpression($expression, $params);
                 }
