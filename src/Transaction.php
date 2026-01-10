@@ -9,6 +9,7 @@ use Yiisoft\Db\Driver\Pdo\AbstractPdoTransaction;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Transaction\TransactionInterface;
 
 /**
  * Implements the SQLite Server specific transaction.
@@ -20,8 +21,8 @@ final class Transaction extends AbstractPdoTransaction
      *
      * @param string $level The transaction isolation level to use for this transaction.
      *
-     * @see \Yiisoft\Db\Transaction\TransactionInterface::READ_UNCOMMITTED
-     * @see \Yiisoft\Db\Transaction\TransactionInterface::SERIALIZABLE
+     * @see TransactionInterface::READ_UNCOMMITTED
+     * @see TransactionInterface::SERIALIZABLE
      *
      * @throws Exception
      * @throws InvalidConfigException

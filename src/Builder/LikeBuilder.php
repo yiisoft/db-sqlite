@@ -6,9 +6,10 @@ namespace Yiisoft\Db\Sqlite\Builder;
 
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionInterface;
+use Yiisoft\Db\QueryBuilder\Condition\LikeCondition;
 
 /**
- * Build an object of {@see \Yiisoft\Db\QueryBuilder\Condition\LikeCondition} into SQL expressions for SQLite Server.
+ * Build an object of {@see LikeCondition} into SQL expressions for SQLite Server.
  */
 final class LikeBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Builder\LikeBuilder
 {

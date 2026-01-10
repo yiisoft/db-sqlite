@@ -10,13 +10,14 @@ use InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionInterface;
+use Yiisoft\Db\QueryBuilder\Condition\In;
 
 use function implode;
 use function is_array;
 use function str_contains;
 
 /**
- * Build an object of {@see \Yiisoft\Db\QueryBuilder\Condition\In} into SQL expressions for SQLite Server.
+ * Build an object of {@see In} into SQL expressions for SQLite Server.
  */
 final class InBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Builder\InBuilder
 {
