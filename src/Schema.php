@@ -25,6 +25,8 @@ use function count;
 use function in_array;
 use function strncasecmp;
 
+use const PREG_SET_ORDER;
+
 /**
  * Implements the SQLite Server specific schema, supporting SQLite 3.3.0 or higher.
  *

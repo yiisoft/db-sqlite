@@ -14,6 +14,7 @@ use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\QueryBuilder\Condition\In;
 use Yiisoft\Db\Sqlite\Column\ColumnBuilder;
 use Yiisoft\Db\Tests\Support\TraversableObject;
+use Yiisoft\Db\Connection\ConnectionInterface;
 
 use function array_replace;
 use function array_splice;
@@ -168,7 +169,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             ],
             'carry passed params (query)' => [
                 'customer',
-                static fn(\Yiisoft\Db\Connection\ConnectionInterface $db) => (new Query($db))
+                static fn(ConnectionInterface $db) => (new Query($db))
                     ->select(['email', 'name', 'address', 'is_active', 'related_id'])
                     ->from('customer')
                     ->where(
@@ -460,7 +461,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         ];
         yield 'ArrayMerge with 4 operands' => [
             ArrayMerge::class,
-            static fn(\Yiisoft\Db\Connection\ConnectionInterface $db) => [
+            static fn(ConnectionInterface $db) => [
                 [1, 2, 3],
                 new ArrayValue([5, 6, 7]),
                 $stringParam,

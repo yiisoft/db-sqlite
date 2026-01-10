@@ -7,6 +7,8 @@ namespace Yiisoft\Db\Sqlite;
 use PDO;
 use Yiisoft\Db\Driver\Pdo\AbstractPdoDriver;
 
+use const PHP_VERSION_ID;
+
 /**
  * Implements the SQLite Server driver based on the PDO (PHP Data Objects) extension.
  *

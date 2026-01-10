@@ -16,6 +16,8 @@ use function mb_strlen;
 use function preg_match_all;
 use function strpos;
 
+use const PREG_SET_ORDER;
+
 /**
  * Implements a database command that can be executed with a PDO (PHP Data Object) database connection for SQLite
  * Server.
