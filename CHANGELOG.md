@@ -3,6 +3,7 @@
 ## 2.0.1 under development
 
 - Bug #413: Fix "GROUP BY" builder ignoring parameters (@vjik)
+- Enh #414: Explicitly import classes and constants in "use" section (@mspirkov)
 
 ## 2.0.0 December 05, 2025
 
