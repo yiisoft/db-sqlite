@@ -35,7 +35,7 @@ Driver supports SQLite 3 or higher.
 The package could be installed with [Composer](https://getcomposer.org):
 
 ```shell
-composer require yiisoft/db-sqlite:2.*
+composer require yiisoft/db-sqlite
 ```
 
 > [!IMPORTANT]
