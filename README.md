@@ -27,7 +27,7 @@ Driver supports SQLite 3 or higher.
 ## Requirements
 
 - PHP 8.1 - 8.5.
-- `pdo` PHP extension.
+- `pdo_sqlite` PHP extension.
 - `mbstring` PHP extension.
 
 ## Installation
