@@ -1,22 +1,16 @@
+name: build
+
 on:
   pull_request:
-    paths:
+    paths: &paths
       - 'src/**'
       - 'tests/**'
       - '.github/workflows/build.yml'
       - 'composer.json'
       - 'phpunit.xml.dist'
-
   push:
     branches: ['master']
-    paths:
-      - 'src/**'
-      - 'tests/**'
-      - '.github/workflows/build.yml'
-      - 'composer.json'
-      - 'phpunit.xml.dist'
-
-name: build
+    paths: *paths
 
 permissions:
   contents: read
