@@ -12,7 +12,7 @@ use Yiisoft\Db\Schema\Column\ArrayColumn;
 use Yiisoft\Db\Schema\Column\BinaryColumn;
 use Yiisoft\Db\Schema\Column\BitColumn;
 use Yiisoft\Db\Schema\Column\BooleanColumn;
-use Yiisoft\Db\Schema\Column\DatetimeColumn;
+use Yiisoft\Db\Schema\Column\DateTimeColumn;
 use Yiisoft\Db\Schema\Column\DoubleColumn;
 use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Schema\Column\JsonColumn;
@@ -81,7 +81,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         scale: 2,
                         defaultValue: '33.22',
                     ),
-                    'timestamp_col' => new DatetimeColumn(
+                    'timestamp_col' => new DateTimeColumn(
                         ColumnType::TIMESTAMP,
                         dbType: 'timestamp',
                         notNull: true,
@@ -89,7 +89,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         hasTimezone: false,
                         shouldConvertTimezone: true,
                     ),
-                    'timestamp_default' => new DatetimeColumn(
+                    'timestamp_default' => new DateTimeColumn(
                         ColumnType::TIMESTAMP,
                         dbType: 'timestamp',
                         notNull: true,
@@ -151,19 +151,19 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         notNull: true,
                         defaultValue: 'CURRENT_TIMESTAMP',
                     ),
-                    'timestamp_text' => new DatetimeColumn(
+                    'timestamp_text' => new DateTimeColumn(
                         ColumnType::DATETIMETZ,
                         dbType: 'text',
                         notNull: true,
                         defaultValue: new Expression('CURRENT_TIMESTAMP'),
                     ),
-                    'time_text' => new DatetimeColumn(
+                    'time_text' => new DateTimeColumn(
                         ColumnType::TIMETZ,
                         dbType: 'text',
                         notNull: true,
                         defaultValue: new Expression('CURRENT_TIME'),
                     ),
-                    'date_text' => new DatetimeColumn(
+                    'date_text' => new DateTimeColumn(
                         ColumnType::DATE,
                         dbType: 'text',
                         notNull: true,
@@ -282,7 +282,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                 'len' => -1,
                 'precision' => 0,
             ]],
-            [new DatetimeColumn(ColumnType::TIMESTAMP, dbType: 'timestamp', name: 'timestamp_col'), [
+            [new DateTimeColumn(ColumnType::TIMESTAMP, dbType: 'timestamp', name: 'timestamp_col'), [
                 'native_type' => 'null',
                 'pdo_type' => 0,
                 'sqlite:decl_type' => 'timestamp',

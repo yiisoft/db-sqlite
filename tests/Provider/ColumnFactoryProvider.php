@@ -9,7 +9,7 @@ use Yiisoft\Db\Schema\Column\BigIntColumn;
 use Yiisoft\Db\Schema\Column\BinaryColumn;
 use Yiisoft\Db\Schema\Column\BitColumn;
 use Yiisoft\Db\Schema\Column\BooleanColumn;
-use Yiisoft\Db\Schema\Column\DatetimeColumn;
+use Yiisoft\Db\Schema\Column\DateTimeColumn;
 use Yiisoft\Db\Schema\Column\DoubleColumn;
 use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Schema\Column\JsonColumn;
@@ -44,12 +44,12 @@ final class ColumnFactoryProvider extends \Yiisoft\Db\Tests\Provider\ColumnFacto
             ['text', ColumnType::TEXT, StringColumn::class],
             ['blob', ColumnType::BINARY, BinaryColumn::class],
             ['year', ColumnType::SMALLINT, IntegerColumn::class],
-            ['date', ColumnType::DATE, DatetimeColumn::class],
-            ['time', ColumnType::TIME, DatetimeColumn::class],
-            ['timetz', ColumnType::TIMETZ, DatetimeColumn::class],
-            ['datetime', ColumnType::DATETIME, DatetimeColumn::class],
-            ['datetimetz', ColumnType::DATETIMETZ, DatetimeColumn::class],
-            ['timestamp', ColumnType::TIMESTAMP, DatetimeColumn::class],
+            ['date', ColumnType::DATE, DateTimeColumn::class],
+            ['time', ColumnType::TIME, DateTimeColumn::class],
+            ['timetz', ColumnType::TIMETZ, DateTimeColumn::class],
+            ['datetime', ColumnType::DATETIME, DateTimeColumn::class],
+            ['datetimetz', ColumnType::DATETIMETZ, DateTimeColumn::class],
+            ['timestamp', ColumnType::TIMESTAMP, DateTimeColumn::class],
             ['json', ColumnType::JSON, JsonColumn::class],
         ];
     }
