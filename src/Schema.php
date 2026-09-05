@@ -71,14 +71,6 @@ use const PREG_SET_ORDER;
  */
 final class Schema extends AbstractPdoSchema
 {
-    /**
-     * @throws NotSupportedException
-     */
-    public function getSchemaDefaultValues(string $schema = '', bool $refresh = false): array
-    {
-        throw new NotSupportedException(__METHOD__ . ' is not supported by SQLite.');
-    }
-
     protected function findConstraints(TableSchemaInterface $table): void
     {
         $tableName = $this->resolveFullName($table->getName(), $table->getSchemaName());

@@ -1,5 +1,10 @@
 # SQLite driver for Yii Database Change Log
 
+## 3.0.0 under development
+
+- Chg #1175: Remove `Schema::getSchemaDefaultValues()`, following its removal from
+  `Yiisoft\Db\Constraint\ConstraintSchemaInterface` (@KalimeroMK)
+
 ## 2.0.1 under development
 
 - Bug #413: Fix "GROUP BY" builder ignoring parameters (@vjik)
