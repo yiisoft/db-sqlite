@@ -6,6 +6,7 @@
 - Enh #414: Explicitly import classes and constants in "use" section (@mspirkov)
 - Enh #415: Remove unnecessary files from Composer package (@mspirkov)
 - Enh #416: Add `ext-pdo_sqlite` to `require` section of `composer.json` (@Tigrov)
+- New #432: Add SQLite implementation of `UuidValue` expression (@KalimeroMK)
 
 ## 2.0.0 December 05, 2025
 
