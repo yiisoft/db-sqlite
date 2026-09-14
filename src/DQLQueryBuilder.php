@@ -9,6 +9,7 @@ use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\Function\ArrayMerge;
 use Yiisoft\Db\Expression\Function\Greatest;
 use Yiisoft\Db\Expression\Function\Least;
+use Yiisoft\Db\Expression\Value\UuidValue;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
@@ -23,6 +24,7 @@ use Yiisoft\Db\Sqlite\Builder\InBuilder;
 use Yiisoft\Db\Sqlite\Builder\JsonOverlapsBuilder;
 use Yiisoft\Db\Sqlite\Builder\LeastBuilder;
 use Yiisoft\Db\Sqlite\Builder\LikeBuilder;
+use Yiisoft\Db\Sqlite\Builder\UuidValueBuilder;
 
 use function array_filter;
 use function array_merge;
@@ -141,6 +143,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             ArrayMerge::class => ArrayMergeBuilder::class,
             Greatest::class => GreatestBuilder::class,
             Least::class => LeastBuilder::class,
+            UuidValue::class => UuidValueBuilder::class,
         ];
     }
 }

@@ -374,9 +374,7 @@ final class SqlToken implements ArrayAccess, Stringable
                     continue;
                 }
 
-                if ($firstMatchIndex === null) {
-                    $firstMatchIndex = $offset;
-                }
+                $firstMatchIndex ??= $offset;
 
                 $lastMatchIndex = $offset;
                 $wildcard = false;

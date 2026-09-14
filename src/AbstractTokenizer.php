@@ -265,9 +265,7 @@ abstract class AbstractTokenizer
      */
     protected function substring(int $length, bool $caseSensitive = true, ?int $offset = null): string
     {
-        if ($offset === null) {
-            $offset = $this->offset;
-        }
+        $offset ??= $this->offset;
 
         if ($offset + $length > $this->length) {
             return '';
@@ -275,9 +273,7 @@ abstract class AbstractTokenizer
 
         $cacheKey = $offset . ',' . $length;
 
-        if (!isset($this->substrings[$cacheKey . ',1'])) {
-            $this->substrings[$cacheKey . ',1'] = mb_substr($this->sql, $offset, $length, 'UTF-8');
-        }
+        $this->substrings[$cacheKey . ',1'] ??= mb_substr($this->sql, $offset, $length, 'UTF-8');
 
         if (!$caseSensitive && !isset($this->substrings[$cacheKey . ',0'])) {
             $this->substrings[$cacheKey . ',0'] = mb_strtoupper($this->substrings[$cacheKey . ',1'], 'UTF-8');
@@ -296,9 +292,7 @@ abstract class AbstractTokenizer
      */
     protected function indexAfter(string $string, ?int $offset = null): int
     {
-        if ($offset === null) {
-            $offset = $this->offset;
-        }
+        $offset ??= $this->offset;
 
         if ($offset + mb_strlen($string, 'UTF-8') > $this->length) {
             return $this->length;
