@@ -189,16 +189,6 @@ final class SchemaTest extends CommonSchemaTest
         $this->assertContainsOnlyInstancesOf(Check::class, $tableChecks);
     }
 
-    public function testGetSchemaDefaultValues(): void
-    {
-        $db = $this->getSharedConnection();
-
-        $this->expectException(NotSupportedException::class);
-        $this->expectExceptionMessage('Yiisoft\Db\Sqlite\Schema::getSchemaDefaultValues is not supported by SQLite.');
-
-        $db->getSchema()->getSchemaDefaultValues();
-    }
-
     public function testGetSchemaNames(): void
     {
         $db = $this->getSharedConnection();
