@@ -15,6 +15,7 @@ use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\Function\ArrayMerge;
 use Yiisoft\Db\Expression\Value\Param;
+use Yiisoft\Db\Expression\Value\Identifier;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\Query\WithQuery;
@@ -809,5 +810,28 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $result = $db->select($arrayMerge)->scalar();
 
         $this->assertEquals('[1,2,3,4,5,6,7,9,10]', $result);
+    }
+
+    public static function dataBuildIdentifier(): iterable
+    {
+        yield ['name', '"name"'];
+        yield ['t.name', '"t"."name"'];
+        yield ['s.t.name', '"s"."t"."name"'];
+        yield [['t', 'na.me'], '"t"."na.me"'];
+        yield ['LOWER(name)', '"LOWER(name)"'];
+        yield ['[[name]]', '"[[name]]"'];
+        yield ['{{%t}}.name', '"{{%t}}"."name"'];
+        yield ['*', '"*"'];
+        yield ['arr[1]', '"arr[1]"'];
+        yield ['a"b', '"a""b"'];
+        yield ['"a" DESC; DROP TABLE t; --', '"""a"" DESC; DROP TABLE t; --"'];
+    }
+
+    #[DataProvider('dataBuildIdentifier')]
+    public function testBuildIdentifier(string|array $name, string $expected): void
+    {
+        $qb = $this->getSharedConnection()->getQueryBuilder();
+
+        $this->assertSame($expected, $qb->buildExpression(new Identifier($name)));
     }
 }
